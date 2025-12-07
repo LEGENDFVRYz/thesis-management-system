@@ -21,7 +21,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'password',
+        'password',     
+        // 'role'       # depend in final account creation system, temporarily disabled
     ];
 
     /**
@@ -49,4 +50,11 @@ class User extends Authenticatable
             'two_factor_confirmed_at' => 'datetime',
         ];
     }
+
+    // This is the fixed main roles for all of the users
+    public const ROLES = [
+        'student', 
+        'faculty', 
+        'admin'
+    ];
 }
