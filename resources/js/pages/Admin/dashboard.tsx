@@ -41,7 +41,7 @@ export default function Dashboard() {
                     {/* HEADER SECTION */}
                     <div className="flex items-center justify-between ">
                         <div>
-                            <h1 className={`text-[42px] font-bold leading-tight text-[#730000]`}>
+                            <h1 className={`text-[42px] font-bold leading-tight text-primary`}>
                                 Welcome back, Engr. Dela Cruz
                             </h1>
                             <p className="mt-1 text-lg text-gray-700">
@@ -53,9 +53,9 @@ export default function Dashboard() {
                         <div className="flex gap-x-10">
 
                             <div className="flex items-start gap-3">
-                                <CalendarDays className="h-8 w-8 text-[#730000]" strokeWidth={1.5} />
+                                <CalendarDays className="h-8 w-8 text-primary" strokeWidth={1.5} />
                                 <div>
-                                    <p className="text-xs font-bold uppercase tracking-wide text-[#730000]">
+                                    <p className="text-xs font-bold uppercase tracking-wide text-primary">
                                         TODAY
                                     </p>
                                     <p className="font-bold text-gray-800">
@@ -65,9 +65,9 @@ export default function Dashboard() {
                             </div>
 
                             <div className="flex items-start gap-3">
-                                <GraduationCap className="h-8 w-8 text-[#730000]" strokeWidth={1.5} />
+                                <GraduationCap className="h-8 w-8 text-primary" strokeWidth={1.5} />
                                 <div>
-                                    <p className="text-xs font-bold uppercase tracking-wide text-[#730000]">
+                                    <p className="text-xs font-bold uppercase tracking-wide text-primary">
                                         SCHOOL YEAR
                                     </p>
                                     <p className="font-bold text-gray-800">
@@ -77,9 +77,9 @@ export default function Dashboard() {
                             </div>
 
                             <div className="flex items-start gap-3">
-                                <NotebookPen className="h-8 w-8 text-[#730000]" strokeWidth={1.5} />
+                                <NotebookPen className="h-8 w-8 text-primary" strokeWidth={1.5} />
                                 <div>
-                                    <p className="text-xs font-bold uppercase tracking-wide text-[#730000]">
+                                    <p className="text-xs font-bold uppercase tracking-wide text-primary">
                                         CURRENT SEM
                                     </p>
                                     <p className="font-bold text-gray-800">
@@ -93,23 +93,23 @@ export default function Dashboard() {
                     <hr className="my-8 border-gray-200" />
 
                     {/* QUICK MENU */}
-                    <div className="w-full rounded-xl border border-gray-200 shadow-sm bg-[#FDFCF6] py-12 px-4">
+                    <div className="w-full rounded-xl border border-gray-200 shadow-sm bg-accent py-12 px-4">
                         <div className="flex justify-evenly items-center">
 
                             {quickMenuItems.map((item, index) => (
                                 <div key={index} className="flex flex-col items-center gap-4">
                                     {/* ICON PART */}
                                     <div
-                                        className={`flex h-28 w-28 items-center justify-center rounded-full border-[3px] bg-[#FDFCF6] border-[#730000]`}
+                                        className={`flex h-28 w-28 items-center justify-center rounded-full border-[3px] bg-accent border-ring`}
                                     >
                                         <item.icon 
-                                            className={`h-12 w-12 text-[#730000]`} 
+                                            className={`h-12 w-12 text-accent-foreground`} 
                                             strokeWidth={2} 
                                         />
                                     </div>
 
                                     {/* LABEL PART */}
-                                    <span className={`font-bold text-[#730000]`}>
+                                    <span className={`font-bold text-accent-foreground`}>
                                         {item.label}
                                     </span>
                                 </div>
@@ -128,9 +128,9 @@ export default function Dashboard() {
 function HeaderInfoItem({ icon: Icon, label, valueFirst }) {
     return (
         <div className="flex items-start gap-3">
-            <Icon className={`h-8 w-8 text-[#730000]`} strokeWidth={1.5} />
+            <Icon className={`h-8 w-8 text-primary`} strokeWidth={1.5} />
             <div>
-                <p className={`text-xs font-bold uppercase tracking-wide text-[#730000]`}>
+                <p className={`text-xs font-bold uppercase tracking-wide text-primary`}>
                     {label}
                 </p>
                 <p className="font-bold text-gray-800">{valueFirst}</p>

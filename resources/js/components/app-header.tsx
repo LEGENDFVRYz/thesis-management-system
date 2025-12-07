@@ -11,10 +11,6 @@ import {
     NavigationMenu,
     NavigationMenuItem,
     NavigationMenuList,
-    navigationMenuTriggerStyle,
-    NavigationMenuTrigger,
-    NavigationMenuContent,
-    NavigationMenuLink,
 } from '@/components/ui/navigation-menu';
 import {
     Sheet,
@@ -32,12 +28,13 @@ import {
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { cn, isSameUrl, resolveUrl } from '@/lib/utils';
-import { dashboard } from '@/routes';
+import { 
+    dashboard
+} from '@/routes';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronDown, Search } from 'lucide-react';
-import AppLogo from './app-logo';
-import AppLogoIcon from './app-logo-icon';
+
 
 const mainNavItems: NavItem[] = [
     {
@@ -97,7 +94,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     const getInitials = useInitials();
     return (
         <>
-            <div className="border-b border-sidebar-border/80 bg-[#730000]">
+            <div className="border-b border-sidebar-border/80 bg-primary">
                 <div className="mx-auto flex h-25 items-center justify-between px-4 md:max-w-[1440px]">
 
                     {/* NAV LOGO */}
@@ -145,7 +142,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                         href={item.href}
                                                         className={cn(
                                                             'hover:bg-[#9B000A] rounded-sm',
-                                                            'bg-[#730000] text-[#fff] h-9 cursor-pointer px-3 gap-2.5 flex items-center',
+                                                            'bg-primary text-primary-foreground h-9 cursor-pointer px-3 gap-2.5 flex items-center',
                                                             isSameUrl(page.url, item.href) && 'text-[#FFBD00] underline underline-offset-4 bg-[]',
                                                         )}
                                                     >
@@ -157,13 +154,13 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                 <DropdownMenuContent 
                                                     align="center" 
                                                     sideOffset={40} 
-                                                    className="w-[200px] rounded-md border shadow-md bg-[#730000]"
+                                                    className="w-[200px] rounded-md border shadow-md bg-primary"
                                                 >
                                                     {item.children.map((child, childIndex) => (
                                                     <Link
                                                         key={childIndex}
                                                         href={child.href}
-                                                        className="block px-3 py-2 text-sm hover:bg-[#9B000A] dark:hover:bg-gray-800 text-center text-[#fff]"
+                                                        className="block px-3 py-2 text-sm hover:bg-[#9B000A] dark:hover:bg-gray-800 text-center text-primary-foreground"
                                                     >
                                                         {child.title}
                                                     </Link>
@@ -178,7 +175,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                 href={item.href}
                                                 className={cn(
                                                     'hover:bg-[#9B000A] rounded-sm',
-                                                    'bg-[#730000] text-[#fff] h-9 cursor-pointer px-3 gap-2.5 flex items-center',
+                                                    'bg-primary text-primary-foreground h-9 cursor-pointer px-3 gap-2.5 flex items-center',
                                                     isSameUrl(page.url, item.href) && 'text-[#FFBD00] underline underline-offset-4 bg-[]',
                                                 )}
                                             >
@@ -214,7 +211,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                     href={resolveUrl(item.href)}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="group ml-1 inline-flex h-9 w-9 items-center justify-center rounded-md bg-transparent p-0 text-sm font-medium text-[#fff] ring-offset-background transition-colors hover:bg-[#9B000A] hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+                                                    className="group ml-1 inline-flex h-9 w-9 items-center justify-center rounded-md bg-transparent p-0 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-[#9B000A] hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
                                                 >
                                                     <span className="sr-only">
                                                         {item.title}
