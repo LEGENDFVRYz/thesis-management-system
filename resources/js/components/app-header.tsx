@@ -146,7 +146,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                         className={cn(
                                                             'hover:bg-[#9B000A] rounded-sm',
                                                             'bg-[#730000] text-[#fff] h-9 cursor-pointer px-3 gap-2.5 flex items-center',
-                                                            isSameUrl(page.url, item.href) && 'text-[#FFBD00] underline underline-offset-7 bg-[]',
+                                                            isSameUrl(page.url, item.href) && 'text-[#FFBD00] underline underline-offset-4 bg-[]',
                                                         )}
                                                     >
                                                         {item.title}
@@ -179,7 +179,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                 className={cn(
                                                     'hover:bg-[#9B000A] rounded-sm',
                                                     'bg-[#730000] text-[#fff] h-9 cursor-pointer px-3 gap-2.5 flex items-center',
-                                                    isSameUrl(page.url, item.href) && 'text-[#FFBD00] underline underline-offset-7 bg-[]',
+                                                    isSameUrl(page.url, item.href) && 'text-[#FFBD00] underline underline-offset-4 bg-[]',
                                                 )}
                                             >
                                                 {item.title}
