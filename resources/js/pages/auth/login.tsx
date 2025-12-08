@@ -24,8 +24,8 @@ export default function Login({
 }: LoginProps) {
     return (
         <AuthLayout
-            title="Log in to your account"
-            description="Enter your email and password below to log in"
+            title="Sign In"
+            description="Access your thesis portal"
         >
             <Head title="Log in" />
 
@@ -38,7 +38,7 @@ export default function Login({
                     <>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                                <Label htmlFor="email">Email</Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -76,15 +76,16 @@ export default function Login({
                                 />
                                 <InputError message={errors.password} />
                             </div>
-
-                            <div className="flex items-center space-x-3">
+                            
+                            {/* TEMPORARY COMMENTED OUT */}
+                            {/* <div className="flex items-center space-x-3">
                                 <Checkbox
                                     id="remember"
                                     name="remember"
                                     tabIndex={3}
                                 />
                                 <Label htmlFor="remember">Remember me</Label>
-                            </div>
+                            </div> */}
 
                             <Button
                                 type="submit"
@@ -98,13 +99,14 @@ export default function Login({
                             </Button>
                         </div>
 
-                        {canRegister && (
-                            <div className="text-center text-sm text-muted-foreground">
-                                Don't have an account?{' '}
-                                <TextLink href={register()} tabIndex={5}>
-                                    Sign up
-                                </TextLink>
-                            </div>
+                        {canResetPassword && (
+                            <TextLink
+                                href={request()}
+                                className="m-auto text-sm text-center"
+                                tabIndex={5}
+                            >
+                                Forgot password?
+                            </TextLink>
                         )}
                     </>
                 )}

@@ -15,30 +15,54 @@ export default function AuthSimpleLayout({
     description,
 }: PropsWithChildren<AuthLayoutProps>) {
     return (
-        <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10">
-            <div className="w-full max-w-sm">
-                <div className="flex flex-col gap-8">
-                    <div className="flex flex-col items-center gap-4">
-                        <Link
-                            href={home()}
-                            className="flex flex-col items-center gap-2 font-medium"
-                        >
-                            <div className="mb-1 flex h-9 w-9 items-center justify-center rounded-md">
-                                <AppLogoIcon className="size-9 fill-current text-[var(--foreground)] dark:text-white" />
-                            </div>
-                            <span className="sr-only">{title}</span>
-                        </Link>
-
-                        <div className="space-y-2 text-center">
-                            <h1 className="text-xl font-medium">{title}</h1>
-                            <p className="text-center text-sm text-muted-foreground">
-                                {description}
-                            </p>
-                        </div>
+        <div className="w-full lg:flex lg:min-h-svh">
+            {/* LEFT PANEL */}
+            <div className="hidden flex-col justify-between bg-primary p-8 text-primary-foreground lg:flex dark:border-r max-w-xs w-full lg:flex-none">
+                {/* Top PART */}
+                <div className="space-y-5">
+                    <div className="flex h-12 w-12">
+                        {/* please change it to finalized logo */}
+                        <img
+                            src="https://placehold.co/48/FFBD00/730000/png?text=Logo" 
+                            alt="Thesis Management System Logo"
+                            className="h-12 w-12 object-contain rounded-full"
+                        />
                     </div>
-                    {children}
+                    
+                    <h2 className="text-lg font-dm">Thesis Management System</h2>
+                    <p className="text-primary-foreground">
+                        Your complete solution for managing computer engineering thesis projects
+                    </p>
                 </div>
+
+                {/* Bot PART */}
+                <div className="space-y-4 text-sm font-dm">
+                    <div className="flex items-center gap-3">
+                        {/* change to correct icon */}
+                        <div className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-primary-foreground-2 text-primary-foreground-2 font-bold">✓</div>
+                        <span>Secure & Reliable</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        {/* change to correct icon */}
+                        <div className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-primary-foreground-2 text-primary-foreground-2 font-bold">✓</div>
+                        <span>24/7 Access</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        {/* change to correct icon */}
+                        <div className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-primary-foreground-2 text-primary-foreground-2 font-bold">✓</div>
+                        <span>Real-time Updates</span>
+                    </div>
+                </div>
+            </div>
+
+
+            {/* RIGHT PANEL */}
+            <div className="w-full lg:flex-1 flex flex-col min-h-svh bg-background">
+
+
+
             </div>
         </div>
     );
 }
+
