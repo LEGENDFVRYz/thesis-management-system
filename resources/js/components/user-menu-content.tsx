@@ -8,7 +8,7 @@ import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { logout } from '@/routes/student';                  // temporary, since we dont have mobile yet
 import { edit } from '@/routes/profile';
-import { dashboard } from '@/routes/faculty/admin';
+import { dashboard } from '@/routes/admin';
 import { type User } from '@/types';
 import { Link, router } from '@inertiajs/react';
 import { LogOut, Settings, ArrowRightLeft } from 'lucide-react';

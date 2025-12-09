@@ -44,10 +44,9 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 
 
 
-
 /*
 ==================================================================================
-FACULTY ROUTES      (admin-side)
+FACULTY ROUTES      (NON-ADMIN SIDE)
 ==================================================================================
 - Expected Roles: "ADVISER", "PANEL", "COORDINATOR"
 
@@ -64,19 +63,21 @@ Route::prefix('faculty')->group(function () {
             return Inertia::render('Faculty/dashboard');
         })->name('faculty.dashboard');
 
-
-        Route::middleware(['faculty.admin'])->prefix('admin')->group(function () {
-            
-            Route::get('dashboard', function () {
-                return Inertia::render('Admin/dashboard');
-            })->name('faculty.admin.dashboard');
-        });
-
     });
 });
 
 
 
+/*
+==================================================================================
+FACULTY ROUTES      (ADMIN SIDE)
+==================================================================================
+*/
+Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->group(function () {
+    Route::get('/', function () {
+        return Inertia::render('Admin/dashboard');
+    })->name('admin.dashboard');
+});
 
 
 
