@@ -27,7 +27,8 @@ class StudentLoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'identity_no' => ['required', 'string'],    // used student number
+            'password' => ['required', 'string'],
         ];
     }
 
@@ -35,11 +36,11 @@ class StudentLoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        if (! Auth::attempt($this->only('identity_no', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'identity_no' => trans('auth.failed'),
             ]);
         }
 
@@ -52,7 +53,7 @@ class StudentLoginRequest extends FormRequest
             RateLimiter::hit($this->throttleKey());
             
             throw ValidationException::withMessages([
-                'email' => 'Access denied. You are not authorized',
+                'identity_no' => 'Access denied. You are not authorized',
             ]);
         }
 
@@ -77,6 +78,6 @@ class StudentLoginRequest extends FormRequest
 
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->input('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->input('identity_no')).'|'.$this->ip());
     }
 }

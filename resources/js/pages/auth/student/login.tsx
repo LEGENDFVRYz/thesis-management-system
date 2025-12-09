@@ -38,18 +38,18 @@ export default function Login({
                     <>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email</Label>
+                                <Label htmlFor="login_id">Student Number</Label>
                                 <Input
-                                    id="email"
-                                    type="email"
-                                    name="email"
+                                    id="identity_no"
+                                    type="text"
+                                    name="identity_no"
                                     required
                                     autoFocus
                                     tabIndex={1}
                                     autoComplete="email"
-                                    placeholder="email@example.com"
+                                    placeholder="20XX-XXXXX-MN-X"
                                 />
-                                <InputError message={errors.email} />
+                                <InputError message={errors.identity_no} />
                             </div>
 
                             <div className="grid gap-2">

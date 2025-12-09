@@ -26,6 +26,8 @@ class StudentLoginController extends Controller
     // Handle an incoming authentication request.
     public function store(StudentLoginRequest $request): RedirectResponse
     {
+        // dd($request);
+        
         $request->authenticate();
         $request->session()->regenerate();
 
