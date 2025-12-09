@@ -28,6 +28,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
             // faculty role: admin checker
             'faculty.admin' => \App\Http\Middleware\FacultyIsAdmin::class,
+
+            'gues' => \App\Http\Middleware\Guesser::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

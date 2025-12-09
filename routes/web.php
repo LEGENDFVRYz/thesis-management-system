@@ -31,8 +31,10 @@ Route::get('/', function () {
 STUDENT ROUTES 
 ==================================================================================
 */
-Route::get('login', [StudentLoginController::class, 'create'])->name('student.login');
-Route::post('login', [StudentLoginController::class, 'store'])->name('student.store');
+Route::middleware('gues')->group(function () {
+    Route::get('login', [StudentLoginController::class, 'create'])->name('student.login');
+    Route::post('login', [StudentLoginController::class, 'store'])->name('student.store');
+});
 Route::post('logout', [StudentLoginController::class, 'destroy'])->name('student.logout');
 
 // AUTHENTICATED STUDENT ROUTES
@@ -53,9 +55,11 @@ FACULTY ROUTES      (NON-ADMIN SIDE)
 */
 Route::prefix('faculty')->group(function () {
     // PUBLIC FACULTY ROUTES
-    Route::get('login', [FacultyLoginController::class, 'create'])->name('faculty.login');
-    Route::post('login', [FacultyLoginController::class, 'store'])->name('faculty.store');
-    Route::post('logout', [FacultyLoginController::class, 'destroy'])->name('faculty.logout');
+    Route::middleware('gues')->group(function () {
+        Route::get('login', [FacultyLoginController::class, 'create'])->middleware('gues')->name('faculty.login');
+        Route::post('login', [FacultyLoginController::class, 'store'])->name('faculty.store');
+    });
+    Route::post('logout', [FacultyLoginController::class, 'destroy'])->name('faculty.logout');  // can be removed
 
     // AUTHENTICATED FACULTY ROUTES
     Route::middleware(['auth', 'role:faculty'])->group(function () {

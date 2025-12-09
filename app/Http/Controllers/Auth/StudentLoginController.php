@@ -38,11 +38,16 @@ class StudentLoginController extends Controller
     // Destroy an authenticated session.
     public function destroy(Request $request): RedirectResponse
     {
-        Auth::logout();
+        $referer = $request->headers->get('referer');   // path caller
 
+        Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        // Check if contained '/faculty'
+        if ($referer && str_contains($referer, '/faculty')) {
+            return redirect()->route('faculty.login');
+        }
+        return redirect()->route('student.login');
     }
 }
