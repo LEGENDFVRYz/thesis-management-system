@@ -29,8 +29,27 @@ class Faculty extends Model
     RELATIONSHIPS
     ==================================================================================
     */
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(FacultyRole::class, 'faculty_assignments', 'faculty_id', 'role_id');
+    }
+
+
+    /*
+    ==================================================================================
+    HELPERS
+    ==================================================================================
+    */
+    public function isAdmin(): bool
+    {
+        return $this->roles()
+                    ->where('role_name', 'Admin') // Must match your DB string exactly
+                    ->wherePivot('is_active', true) // Only active admins
+                    ->exists();
     }
 }
