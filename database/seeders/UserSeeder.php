@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Faculty;
+use App\Models\FacultyAssignment;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -26,6 +28,26 @@ class UserSeeder extends Seeder
         $admin->remember_token = null;
         $admin->save();
 
+        $adminn = Faculty::firstOrCreate(
+            ['user_id' => $admin->id],
+            [
+                'name_prefix' => 'Dr.',
+                'first_name' => 'Admin',
+                'middle_name' => '',
+                'last_name' => 'User',
+                'is_regular' => true,
+            ]
+        );
+
+        FacultyAssignment::firstOrCreate([
+            'faculty_id' => $adminn->id,
+            'role_id' => 1,
+            'school_year' => '2025',
+        ], [
+            'is_active' => true,
+        ]);
+
+
         // Sample Faculty account
         $faculty = User::firstOrNew(['email' => 'faculty@example.com']);
         $faculty->name = 'Faculty User';
@@ -36,6 +58,26 @@ class UserSeeder extends Seeder
         $faculty->remember_token = null;
         $faculty->save();
 
+        $facultyy = Faculty::firstOrCreate(
+            ['user_id' => $faculty->id],
+            [
+                'name_prefix' => 'Prof.',
+                'first_name' => 'Faculty',
+                'middle_name' => '',
+                'last_name' => 'User',
+                'is_regular' => true,
+            ]
+        );
+
+        FacultyAssignment::firstOrCreate([
+            'faculty_id' => $facultyy->id,
+            'role_id' => 2,
+            'school_year' => '2025',
+        ], [
+            'is_active' => true,
+        ]);
+
+        
         // Sample Student account
         $student = User::firstOrNew(['email' => 'student@example.com']);
         $student->name = 'Student User';
