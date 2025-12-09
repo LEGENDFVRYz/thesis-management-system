@@ -26,7 +26,7 @@ export default function Login({
     return (
         <AuthLayout
             title="Sign In"
-            description="_Access your portal"
+            description="Access your faculty thesis portal"
         >
             <Head title="Log in" />
 
