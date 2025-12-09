@@ -8,9 +8,11 @@ import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { logout } from '@/routes/student';                  // temporary, since we dont have mobile yet
 import { edit } from '@/routes/profile';
+import { dashboard } from '@/routes/faculty/admin';
 import { type User } from '@/types';
 import { Link, router } from '@inertiajs/react';
-import { LogOut, Settings } from 'lucide-react';
+import { LogOut, Settings, ArrowRightLeft } from 'lucide-react';
+import { usePage } from '@inertiajs/react';
 
 interface UserMenuContentProps {
     user: User;
@@ -24,6 +26,8 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
         router.flushAll();
     };
 
+    const { faculty } = usePage().props;
+
     return (
         <>
             <DropdownMenuLabel className="p-0 font-normal">
@@ -31,7 +35,30 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                     <UserInfo user={user} showEmail={true} />
                 </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
+
+            {faculty?.is_admin && (
+                // SPECIAL SWITCHING BUTTON FOR ADMIN
+                <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                        <DropdownMenuItem asChild>
+                            <Link
+                                className="block w-full"
+                                href={dashboard()}
+                                as="button"
+                                prefetch
+                                onClick={cleanup}
+                            >
+                                <ArrowRightLeft className="mr-2" />
+                                Switch to admin
+                            </Link>
+                        </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
+                </>
+            )}
+
+
             <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
                     <Link

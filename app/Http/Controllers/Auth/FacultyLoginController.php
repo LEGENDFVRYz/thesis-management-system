@@ -30,9 +30,16 @@ class FacultyLoginController extends Controller
 
         $request->session()->regenerate();
 
+        $user = Auth::user();
+
+        // Add user session values here
+        session([
+            'faculty_id' => $user->faculty?->id,
+            'is_admin' => $user->faculty?->isAdmin(),
+        ]);
+
         return redirect()->intended(route('faculty.dashboard', absolute: false));
     }
-
 
     // Destroy an authenticated session.
     public function destroy(Request $request): RedirectResponse

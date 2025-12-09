@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -46,6 +47,20 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+
+            // Faculty Context
+            'faculty' => function () {
+                $user = Auth::user();
+
+                if (!$user || !$user->faculty || $user->role != 'faculty') {
+                    return null;
+                }
+
+                return [
+                    'id' => $user->faculty->id,
+                    'is_admin' => $user->faculty->isAdmin(),
+                ];
+            },
         ];
     }
 }
