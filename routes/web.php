@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\FacultyLoginController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -41,17 +42,20 @@ FACULTY ROUTES      (admin-side)
 - Expected Roles: "ADVISER", "PANEL", "COORDINATOR"
 
 */
+Route::prefix('faculty')->group(function () {
+    // PUBLIC FACULTY ROUTES
+    Route::get('login', [FacultyLoginController::class, 'create'])->name('faculty.login');
+    Route::post('login', [FacultyLoginController::class, 'store'])->name('faculty.store');
+    Route::post('logout', [FacultyLoginController::class, 'destroy'])->name('faculty.logout');
 
+    // AUTHENTICATED FACULTY ROUTES
+    Route::middleware(['auth', 'role:faculty'])->group(function () {
+        Route::get('dashboard', function () {
+            return Inertia::render('Faculty/dashboard');
+        })->name('faculty.dashboard');
+    });
+});
 
-
-
-
-/*
-==================================================================================
-ADMIN ROUTES        (super-admin side)
-==================================================================================
-
-*/
 
 
 
