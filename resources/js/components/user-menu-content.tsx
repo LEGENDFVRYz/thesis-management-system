@@ -8,7 +8,9 @@ import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { logout } from '@/routes/student';                  // temporary, since we dont have mobile yet
 import { edit } from '@/routes/profile';
-import { dashboard } from '@/routes/admin';
+import { dashboard as fcltyDashboard } from '@/routes/faculty';
+import { dashboard as adminDashboard } from '@/routes/admin';
+import { isSameUrl } from '@/lib/utils';
 import { type User } from '@/types';
 import { Link, router } from '@inertiajs/react';
 import { LogOut, Settings, ArrowRightLeft } from 'lucide-react';
@@ -27,6 +29,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
     };
 
     const { faculty } = usePage().props;
+    const { url } = usePage(); // current URL
 
     return (
         <>
@@ -44,13 +47,13 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                         <DropdownMenuItem asChild>
                             <Link
                                 className="block w-full"
-                                href={dashboard()}
+                                href={isSameUrl(url, fcltyDashboard()) ? adminDashboard() : fcltyDashboard()}
                                 as="button"
                                 prefetch
                                 onClick={cleanup}
                             >
                                 <ArrowRightLeft className="mr-2" />
-                                Switch to admin
+                                {isSameUrl(url, fcltyDashboard()) ? 'Switch to Admin' : 'Switch to Faculty'}
                             </Link>
                         </DropdownMenuItem>
                     </DropdownMenuGroup>
