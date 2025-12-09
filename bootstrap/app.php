@@ -22,9 +22,12 @@ return Application::configure(basePath: dirname(__DIR__))
             AddLinkHeadersForPreloadedAssets::class,
         ]);
         
-        // role checker
         $middleware->alias([
+            // main role checker    (either student or faculty)
             'role' => \App\Http\Middleware\CheckRole::class,
+
+            // faculty role: admin checker
+            'faculty.admin' => \App\Http\Middleware\FacultyIsAdmin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

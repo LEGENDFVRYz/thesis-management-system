@@ -45,8 +45,6 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 
 
 
-
-
 /*
 ==================================================================================
 FACULTY ROUTES      (admin-side)
@@ -65,6 +63,15 @@ Route::prefix('faculty')->group(function () {
         Route::get('dashboard', function () {
             return Inertia::render('Faculty/dashboard');
         })->name('faculty.dashboard');
+
+
+        Route::middleware(['faculty.admin'])->prefix('admin')->group(function () {
+            
+            Route::get('dashboard', function () {
+                return Inertia::render('Admin/dashboard');
+            })->name('faculty.admin.dashboard');
+        });
+
     });
 });
 
