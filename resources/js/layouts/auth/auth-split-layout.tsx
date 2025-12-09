@@ -61,7 +61,7 @@ export default function AuthSplitLayout({
             {/* RIGHT PANEL */}
             <div className="w-full max-h-240 gap-5 flex-1 lg:p-8 flex flex-col justify-between">
                 {/* HEADER SECTION */}
-                <div className="flex flex-col items-center justify-center py-15">
+                <div className="flex flex-col items-center justify-center pb-15">
                     <Link href={home()} className="flex flex-col items-center gap-2 font-medium">
                         <div className="mb-1 flex h-14 w-14 items-center justify-center rounded-full bg-[#800000]/10">
                             {/* please change it to finalized logo */}
@@ -105,7 +105,7 @@ export default function AuthSplitLayout({
                             </div>
                         </button>
 
-                        <button className="flex flex-col items-start gap-4 rounded-xl border p-4 text-left hover:border-[#800000] hover:bg-muted/50 transition-colors">
+                        {/* <button className="flex flex-col items-start gap-4 rounded-xl border p-4 text-left hover:border-[#800000] hover:bg-muted/50 transition-colors">
                             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#800000] text-white">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
                             </div>
@@ -113,7 +113,7 @@ export default function AuthSplitLayout({
                                 <div className="font-semibold">For Admin</div>
                                 <div className="text-xs text-muted-foreground">Manage faculties, students, and thesis</div>
                             </div>
-                        </button>
+                        </button> */}
                     </div>
 
                     {/* Form Render */}

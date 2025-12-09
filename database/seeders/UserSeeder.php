@@ -21,7 +21,8 @@ class UserSeeder extends Seeder
         $admin->name = 'Admin User';
         $admin->email_verified_at = $now;
         $admin->password = Hash::make('test123');
-        $admin->role = 'admin'; // manual assignment since role is not fillable
+        $admin->role = 'faculty'; // manual assignment since role is not fillable
+        $admin->identity_no = '2022-87000-JB-D';
         $admin->remember_token = null;
         $admin->save();
 
@@ -31,6 +32,7 @@ class UserSeeder extends Seeder
         $faculty->email_verified_at = $now;
         $faculty->password = Hash::make('test123');
         $faculty->role = 'faculty';
+        $faculty->identity_no = '2022-87001-JB-D';
         $faculty->remember_token = null;
         $faculty->save();
 
@@ -40,6 +42,7 @@ class UserSeeder extends Seeder
         $student->email_verified_at = $now;
         $student->password = Hash::make('test123');
         $student->role = 'student';
+        $student->identity_no = '2022-00001-MN-0';
         $student->remember_token = null;
         $student->save();
     }

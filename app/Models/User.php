@@ -55,6 +55,6 @@ class User extends Authenticatable
     public const ROLES = [
         'student', 
         'faculty', 
-        'admin'
+        // 'admin'      // make admin transferable
     ];
 }
