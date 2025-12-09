@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\FacultyLoginController;
+use App\Http\Controllers\Auth\StudentLoginController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -15,14 +16,14 @@ WEB STATIC ROUTES       (global routes)
 */
 Route::get('/', function () {
     return Inertia::render('welcome', [
-        'canRegister' => Features::enabled(Features::registration()),
+        'canRegister' => false,
     ]);
 })->name('home');
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    // Acts as a gateway for each main role     (temporary, soon will have merge gateway controller)
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-});
+// Route::middleware(['auth', 'verified'])->group(function () {
+//     // Acts as a gateway for each main role     (temporary, soon will have merge gateway controller)
+//     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+// });
 
 
 /*
@@ -30,6 +31,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 STUDENT ROUTES 
 ==================================================================================
 */
+Route::get('login', [StudentLoginController::class, 'create'])->name('student.login');
+Route::post('login', [StudentLoginController::class, 'store'])->name('student.store');
+Route::post('logout', [StudentLoginController::class, 'destroy'])->name('student.logout');
+
+// AUTHENTICATED STUDENT ROUTES
+Route::middleware(['auth', 'role:student'])->group(function () {
+    Route::get('/dashboard', function () {
+        return Inertia::render('Student/dashboard'); // Your Student Dashboard Component
+    })->name('dashboard');
+});
+
 
 
 

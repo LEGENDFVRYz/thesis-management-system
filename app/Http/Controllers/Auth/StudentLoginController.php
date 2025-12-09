@@ -3,34 +3,33 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
-use App\Http\Requests\Auth\FacultyLoginRequest;
+use Illuminate\Http\Request;
+use App\Http\Requests\Auth\StudentLoginRequest;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class FacultyLoginController extends Controller
+
+class StudentLoginController extends Controller
 {
     // Show the login page.
     public function create(): Response
     {
-        // login
-        return Inertia::render('auth/faculty/login', [
+        return Inertia::render('auth/student/login', [
             'status' => session('status'),
-            'loginType' => 'faculty', 
+            'loginType' => 'student',
         ]);
     }
 
 
     // Handle an incoming authentication request.
-    public function store(FacultyLoginRequest $request): RedirectResponse
+    public function store(StudentLoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
         $request->session()->regenerate();
 
-        return redirect()->intended(route('faculty.dashboard', absolute: false));
+        return redirect()->intended(route('dashboard', absolute: false));
     }
 
 
@@ -38,10 +37,10 @@ class FacultyLoginController extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         Auth::logout();
-        
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        
-        return redirect('/faculty/login');
+
+        return redirect('/login');
     }
 }
