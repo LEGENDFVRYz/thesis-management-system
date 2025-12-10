@@ -65,7 +65,7 @@ class HandleInertiaRequests extends Middleware
                 if ($user->role === 'faculty' && $user->faculty) {
                     $data['is_admin'] = $user->faculty->isAdmin();
                     $data['faculty_id']   = $user->faculty->id;
-                    $data['faculty_role']   = $user->faculty->roles->pluck('role_name')->toArray();     // expect duplicate rol;e, since no active and calendar sync yet
+                    $data['faculty_roles']   = $user->faculty->roles->pluck('role_name')->toArray();     // expect duplicate rol;e, since no active and calendar sync yet
                 }
 
                 return $data;
