@@ -81,6 +81,44 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
     Route::get('/', function () {
         return Inertia::render('Admin/dashboard');
     })->name('admin.dashboard');
+
+    // Management Routes
+    Route::prefix('management')->group(function () {
+        Route::get('deadlines', function () {
+            return Inertia::render('Admin/management/deadline');
+        })->name('admin.management.deadlines');
+        
+        Route::get('defenses', function () {
+            return Inertia::render('Admin/management/defense');
+        })->name('admin.management.defenses');
+
+        Route::get('faculty', function () {
+            return Inertia::render('Admin/management/faculty');
+        })->name('admin.management.faculty');
+
+        Route::get('students', function () {
+            return Inertia::render('Admin/management/student');
+        })->name('admin.management.students');
+    });
+
+    Route::get('system', function () {
+        return Inertia::render('Admin/system');
+    })->name('admin.system');
+
+    // Repository Routes
+    Route::prefix('repository')->group(function () {
+        Route::get('theses', function () {
+            return Inertia::render('Admin/repository/thesis');
+        })->name('admin.repository.theses');
+
+        Route::get('resources', function () {
+            return Inertia::render('Admin/repository/system');
+        })->name('admin.repository.system');
+    });
+
+    Route::get('resources', function () {
+        return Inertia::render('Admin/resources');
+    })->name('admin.resources');
 });
 
 

@@ -16,3 +16,17 @@ export function isSameUrl(
 export function resolveUrl(url: NonNullable<InertiaLinkProps['href']>): string {
     return typeof url === 'string' ? url : url.url;
 }
+
+// Check if a URL belongs to a specific section prefix dynamically
+export function isSectionUrl(
+    url: NonNullable<InertiaLinkProps['href']>,
+    parentPrefix: string,
+): boolean {
+    const resolvedUrl = resolveUrl(url);
+
+    // Remove domain if present
+    const path = resolvedUrl.replace(/^https?:\/\/[^/]+/, '');
+
+    // Check if the path starts with the parent prefix
+    return path.startsWith(parentPrefix);
+}

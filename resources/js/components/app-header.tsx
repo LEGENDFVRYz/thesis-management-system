@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/tooltip';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
-import { cn, isSameUrl, resolveUrl } from '@/lib/utils';
+import { cn, isSameUrl, isSectionUrl, resolveUrl } from '@/lib/utils';
 import { 
     dashboard
 } from '@/routes';
@@ -36,40 +36,11 @@ import { Link, usePage } from '@inertiajs/react';
 import { ChevronDown, Search } from 'lucide-react';
 import useUserRole from '@/hooks/use-user-role';
 import { adminMainNav } from '@/pages/Admin/_navigation';
+import { facultyMainNav } from '@/pages/Faculty/_navigation';
+import { studentMainNav } from '@/pages/Student/_navigation';
 import { useMemo } from 'react';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Home',
-        href: dashboard(),
-    },
-    {
-        title: 'Management',
-        href: dashboard(),
-        children: [
-            { title: 'Faculty',     href: '#' },
-            { title: 'Student',     href: '#' },
-            { title: 'Deadline',    href: '#' },
-            { title: 'Defense',     href: '#' },
-        ]
-    },
-    {
-        title: 'System',
-        href: dashboard(),
-    },
-    {
-        title: 'Repository',
-        href: dashboard(),
-        children: [
-            { title: 'Thesis',     href: '#' },
-            { title: 'System',     href: '#' },
-        ]
-    },
-    {
-        title: 'Resources',
-        href: dashboard(),
-    },
-];
+
 
 const rightNavItems: NavItem[] = [
     {
@@ -82,12 +53,18 @@ const rightNavItems: NavItem[] = [
     },
 ];
 
-const activeItemStyles =
-    'text-[#FFBD00]';
-
 interface AppHeaderProps {
     breadcrumbs?: BreadcrumbItem[];
 }
+
+const isActivePrefix = (currentUrl: string, prefix: string): boolean => {
+    if (!prefix) return false;
+
+    const normalizedUrl = currentUrl.split('?')[0].replace(/\/$/, '');
+    const normalizedPrefix = prefix.replace(/\/$/, '');
+    
+    return normalizedUrl === normalizedPrefix || normalizedUrl.startsWith(normalizedPrefix + '/');
+};
 
 
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
@@ -104,7 +81,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
             case 'faculty':
                 return facultyMainNav;
             case 'student':
-                return mainNavItems;
+                return studentMainNav;
             default:
                 return [];
         }
@@ -162,7 +139,9 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                         className={cn(
                                                             'hover:bg-[#9B000A] rounded-sm',
                                                             'bg-primary text-primary-foreground h-9 cursor-pointer px-3 gap-2.5 flex items-center',
-                                                            isSameUrl(page.url, item.href) && 'text-primary-foreground-2 underline underline-offset-4 bg-[]',
+                                                            isSameUrl(page.url, item.href) || isSectionUrl(page.url, item.href) 
+                                                                ? 'text-primary-foreground-2 underline underline-offset-4 bg-[]' 
+                                                                : ''
                                                         )}
                                                     >
                                                         {item.title}
