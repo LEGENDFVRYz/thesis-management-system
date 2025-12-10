@@ -29,6 +29,9 @@ return Application::configure(basePath: dirname(__DIR__))
             // faculty role: admin checker
             'faculty.admin' => \App\Http\Middleware\FacultyIsAdmin::class,
 
+            // faculty sub-roles checker
+            'faculty.role' => \App\Http\Middleware\CheckFacultyRole::class,
+
             'gues' => \App\Http\Middleware\Guesser::class,
         ]);
     })
