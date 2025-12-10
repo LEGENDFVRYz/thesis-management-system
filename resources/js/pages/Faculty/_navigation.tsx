@@ -1,7 +1,9 @@
 import { NavItem } from "@/types";
 import { 
-    dashboard, resources
+    dashboard, resources, repository
 } from '@/routes/faculty';
+
+
 
 
 export const facultyMainNav: NavItem[] = [
@@ -21,11 +23,7 @@ export const facultyMainNav: NavItem[] = [
     },
     {
         title: 'Repository',
-        href: dashboard(),
-        children: [
-            { title: 'Thesis',     href: '#' },
-            { title: 'System',     href: '#' },
-        ]
+        href: repository(),
     },
     {
         title: 'Resources',

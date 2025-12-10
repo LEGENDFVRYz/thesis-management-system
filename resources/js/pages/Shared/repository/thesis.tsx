@@ -3,7 +3,7 @@ import AppLayout from '@/layouts/app-layout';
 import { theses } from '@/routes/admin/repository';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import RepositoryLayout from '.';
+import RepositoryLayout from '@/pages/Shared/repository';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

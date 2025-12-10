@@ -70,6 +70,10 @@ Route::prefix('faculty')->group(function () {
         Route::get('resources', function () {
             return Inertia::render('Shared/resources');
         })->name('faculty.resources');
+
+        Route::get('repository', function () {
+            return Inertia::render('Shared/repository/thesis');
+        })->name('faculty.repository');
     });
 });
 
@@ -113,11 +117,11 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
     // Repository Routes
     Route::prefix('repository')->group(function () {
         Route::get('/', function () {
-            return Inertia::render('Admin/repository/index');
+            return Inertia::render('Shared/repository/index');
         })->name('admin.repository.index');
 
         Route::get('theses', function () {
-            return Inertia::render('Admin/repository/thesis');
+            return Inertia::render('Shared/repository/thesis');
         })->name('admin.repository.theses');
 
         Route::get('resources', function () {
