@@ -20,7 +20,7 @@ export function resolveUrl(url: NonNullable<InertiaLinkProps['href']>): string {
 // Check if a URL belongs to a specific section prefix dynamically
 export function isSectionUrl(
     url: NonNullable<InertiaLinkProps['href']>,
-    parentPrefix: string,
+    parentPrefix: NonNullable<InertiaLinkProps['href']>,
 ): boolean {
     const resolvedUrl = resolveUrl(url);
 

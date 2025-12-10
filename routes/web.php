@@ -75,6 +75,8 @@ Route::prefix('faculty')->group(function () {
 /*
 ==================================================================================
 FACULTY ROUTES      (ADMIN SIDE)
+
+Note: Temporary Routes only for frontend, but soon will have own controller dependent on the purpose
 ==================================================================================
 */
 Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->group(function () {

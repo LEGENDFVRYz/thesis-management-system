@@ -35,6 +35,7 @@ import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronDown, Search } from 'lucide-react';
 import useUserRole from '@/hooks/use-user-role';
+
 import { adminMainNav } from '@/pages/Admin/_navigation';
 import { facultyMainNav } from '@/pages/Faculty/_navigation';
 import { studentMainNav } from '@/pages/Student/_navigation';
@@ -57,35 +58,25 @@ interface AppHeaderProps {
     breadcrumbs?: BreadcrumbItem[];
 }
 
-const isActivePrefix = (currentUrl: string, prefix: string): boolean => {
-    if (!prefix) return false;
-
-    const normalizedUrl = currentUrl.split('?')[0].replace(/\/$/, '');
-    const normalizedPrefix = prefix.replace(/\/$/, '');
-    
-    return normalizedUrl === normalizedPrefix || normalizedUrl.startsWith(normalizedPrefix + '/');
-};
-
 
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth } = page.props;
     const getInitials = useInitials();
-
-    const role = useUserRole();
+    
+    const url = page.url;
 
     const navItems = useMemo<NavItem[]>(() => {
-        switch (role) {
-            case 'admin':
-                return adminMainNav;
-            case 'faculty':
-                return facultyMainNav;
-            case 'student':
-                return studentMainNav;
-            default:
-                return [];
+        if (url.startsWith('/admin')) {
+            return adminMainNav;
+        } else if (url.startsWith('/faculty')) {
+            return facultyMainNav;
+        } else if (url === '/' || url.startsWith('/student')) {
+            return studentMainNav;
+        } else {
+            return [];
         }
-    }, [role]);
+    }, [url]);
 
 
     return (
@@ -139,9 +130,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                         className={cn(
                                                             'hover:bg-[#9B000A] rounded-sm',
                                                             'bg-primary text-primary-foreground h-9 cursor-pointer px-3 gap-2.5 flex items-center',
-                                                            isSameUrl(page.url, item.href) || isSectionUrl(page.url, item.href) 
-                                                                ? 'text-primary-foreground-2 underline underline-offset-4 bg-[]' 
-                                                                : ''
+                                                            isSectionUrl(page.url, item.href) && 'text-primary-foreground-2 underline underline-offset-4 bg-[]',
                                                         )}
                                                     >
                                                         {item.title}
