@@ -48,18 +48,26 @@ class HandleInertiaRequests extends Middleware
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
 
-            // Faculty Context
-            'faculty' => function () {
+            // User Context
+            'user_info' => function () {
                 $user = Auth::user();
 
-                if (!$user || !$user->faculty || $user->role != 'faculty') {
-                    return null;
+                if (!$user) {
+                    return null;    // guest
                 }
 
-                return [
-                    'id' => $user->faculty->id,
-                    'is_admin' => $user->faculty->isAdmin(),
+                $data = [
+                    'user_id'   => $user->id,
+                    'user_role' => $user->role, // student | faculty
                 ];
+
+                // If faculty, there is additional information
+                if ($user->role === 'faculty' && $user->faculty) {
+                    $data['faculty_role'] = $user->faculty->isAdmin() ? 'admin' : 'faculty';
+                    $data['faculty_id']   = $user->faculty->id;
+                }
+
+                return $data;
             },
         ];
     }

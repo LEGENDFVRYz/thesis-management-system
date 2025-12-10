@@ -28,7 +28,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
         router.flushAll();
     };
 
-    const { faculty } = usePage().props;
+    const { user_info } = usePage().props;
     const { url } = usePage(); // current URL
 
     return (
@@ -39,7 +39,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                 </div>
             </DropdownMenuLabel>
 
-            {faculty?.is_admin && (
+            {user_info?.faculty_role === 'admin' && (
                 // SPECIAL SWITCHING BUTTON FOR ADMIN
                 <>
                     <DropdownMenuSeparator />
