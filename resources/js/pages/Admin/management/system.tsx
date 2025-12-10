@@ -2,21 +2,21 @@ import ManagementLayout from '@/pages/Admin/management/index';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import { deadlines } from '@/routes/admin/management/index';
+import { system } from '@/routes/admin/management/index';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Deadlines',
-        href: deadlines().url,
+        href: system().url,
     },
 ];
 
 export default function DeadlinePage() {
     return (
         <ManagementLayout breadcrumbs={breadcrumbs}>
-            <Head title="Deadline Management" />
+            <Head title="System Configuration" />
 
-            <h1>DEADLINE (SCHEDULE) MANAGEMENT</h1>
+            <h1>SYSTEM CONFIG</h1>
 
             <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
                 <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />

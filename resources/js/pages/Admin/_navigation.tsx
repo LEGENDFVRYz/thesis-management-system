@@ -1,9 +1,9 @@
 import { NavItem } from "@/types";
 import { 
-    dashboard, resources, system
+    dashboard, resources
 } from '@/routes/admin';
 import { 
-    faculty, students, deadlines, defenses
+    user, system, defenses, index as management
 } from '@/routes/admin/management';
 import { 
     theses, system as rsystem
@@ -17,17 +17,12 @@ export const adminMainNav: NavItem[] = [
     },
     {
         title: 'Management',
-        href: '/admin/management',
+        href: management(),
         children: [
-            { title: 'Faculty',     href: faculty() },
-            { title: 'Student',     href: students() },
-            { title: 'Deadline',    href: deadlines() },
+            { title: 'User',     href: user() },
+            { title: 'System Config',     href: system() },
             { title: 'Defense',     href: defenses() },
         ]
-    },
-    {
-        title: 'System',
-        href: system(),
     },
     {
         title: 'Repository',
