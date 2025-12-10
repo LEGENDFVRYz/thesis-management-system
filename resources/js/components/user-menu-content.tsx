@@ -39,7 +39,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                 </div>
             </DropdownMenuLabel>
 
-            {user_info?.faculty_role === 'admin' && (
+            {user_info?.is_admin && (
                 // SPECIAL SWITCHING BUTTON FOR ADMIN
                 <>
                     <DropdownMenuSeparator />
