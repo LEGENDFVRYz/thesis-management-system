@@ -8,7 +8,6 @@ import {
 
 
 
-
 export const facultyMainNav: NavItem[] = [
     {
         title: 'Home',

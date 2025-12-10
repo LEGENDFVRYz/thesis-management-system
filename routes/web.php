@@ -67,6 +67,47 @@ Route::prefix('faculty')->group(function () {
             return Inertia::render('Faculty/dashboard');
         })->name('faculty.dashboard');
 
+        // MANAGEMENT ROUTING DEPENDENT ON SUBROLES
+        Route::prefix('management')->group(function () {
+
+            // Adviser Route
+            Route::middleware('faculty.role:Adviser')->group(function () {
+                Route::get('advisee_management', function () {
+                    return Inertia::render('Faculty/management/adviser/advisee_management');
+                })->name('faculty.management.advisee_management');
+            });
+
+            // Award Committee Route
+            Route::middleware('faculty.role:Awardee')->group(function () {
+                Route::get('awards_evaluation', function () {
+                    return Inertia::render('Faculty/management/award_committee/awards_evaluation');
+                })->name('faculty.management.awards_evaluation');
+            });
+
+            // Committee Route
+            Route::middleware('faculty.role:Committee')->group(function () {
+                Route::get('proposal_review', function () {
+                    return Inertia::render('Faculty/management/committee/proposal_review');
+                })->name('faculty.management.proposal_review');
+            });
+
+            // Coordinator Route
+            Route::middleware('faculty.role:Coordinator')->group(function () {
+                Route::get('thesis_monitoring', function () {
+                    return Inertia::render('Faculty/management/coordinator/thesis_monitoring');
+                })->name('faculty.management.thesis_monitoring');
+            });
+
+            // Panel Route
+            Route::middleware('faculty.role:Panelist')->group(function () {
+                Route::get('thesis_review', function () {
+                    return Inertia::render('Faculty/management/panel/thesis_review');
+                })->name('faculty.management.thesis_review');
+            });
+        });
+
+
+
         Route::get('resources', function () {
             return Inertia::render('Shared/resources');
         })->name('faculty.resources');

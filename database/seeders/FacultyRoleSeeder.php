@@ -39,6 +39,10 @@ class FacultyRoleSeeder extends Seeder
                 'role_name' => 'Panelist',
                 'description' => 'Participates in evaluations in every defense'
             ],
+            [
+                'role_name' => 'Awardee',
+                'description' => 'The one who award the best thesis'
+            ],
         ];
 
         foreach ($roles as $role) {
