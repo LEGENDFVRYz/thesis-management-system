@@ -34,7 +34,9 @@ import {
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronDown, Search } from 'lucide-react';
-
+import useUserRole from '@/hooks/use-user-role';
+import { adminMainNav } from '@/pages/Admin/_navigation';
+import { useMemo } from 'react';
 
 const mainNavItems: NavItem[] = [
     {
@@ -92,6 +94,23 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth } = page.props;
     const getInitials = useInitials();
+
+    const role = useUserRole();
+
+    const navItems = useMemo<NavItem[]>(() => {
+        switch (role) {
+            case 'admin':
+                return adminMainNav;
+            case 'faculty':
+                return facultyMainNav;
+            case 'student':
+                return mainNavItems;
+            default:
+                return [];
+        }
+    }, [role]);
+
+
     return (
         <>
             <div className="border-b border-sidebar-border/80 bg-primary">
@@ -128,7 +147,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                     <div className=" hidden h-full items-center space-x-6 lg:flex">
                         <NavigationMenu className="flex h-full items-stretch">
                             <NavigationMenuList className="flex h-full items-stretch space-x-2">
-                                {mainNavItems.map((item, index) => (
+                                {navItems.map((item, index) => (
                                     <NavigationMenuItem
                                         key={index}
                                         className="relative flex h-full items-center"
