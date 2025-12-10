@@ -86,6 +86,10 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
 
     // Management Routes
     Route::prefix('management')->group(function () {
+        Route::get('/', function () {
+            return Inertia::render('Admin/management/index');
+        })->name('admin.management.index');
+
         Route::get('deadlines', function () {
             return Inertia::render('Admin/management/deadline');
         })->name('admin.management.deadlines');
