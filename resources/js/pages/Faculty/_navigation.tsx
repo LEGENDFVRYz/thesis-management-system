@@ -1,7 +1,7 @@
 import { NavItem } from "@/types";
 import { 
-    dashboard, res
-} from '@/routes/admin';
+    dashboard, resources
+} from '@/routes/faculty';
 
 
 export const facultyMainNav: NavItem[] = [
@@ -29,6 +29,6 @@ export const facultyMainNav: NavItem[] = [
     },
     {
         title: 'Resources',
-        href: dashboard(),
+        href: resources(),
     },
 ];

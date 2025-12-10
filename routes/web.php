@@ -67,6 +67,9 @@ Route::prefix('faculty')->group(function () {
             return Inertia::render('Faculty/dashboard');
         })->name('faculty.dashboard');
 
+        Route::get('resources', function () {
+            return Inertia::render('Shared/resources');
+        })->name('faculty.resources');
     });
 });
 
@@ -123,7 +126,7 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
     });
 
     Route::get('resources', function () {
-        return Inertia::render('Admin/resources');
+        return Inertia::render('Shared/resources');
     })->name('admin.resources');
 });
 
