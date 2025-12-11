@@ -11,7 +11,7 @@ import { edit } from '@/routes/profile';
 import { dashboard as fcltyDashboard } from '@/routes/faculty';
 import { dashboard as adminDashboard } from '@/routes/admin';
 import { isSameUrl, isSectionUrl } from '@/lib/utils';
-import { type User } from '@/types';
+import { type SharedData, type User } from '@/types';
 import { Link, router } from '@inertiajs/react';
 import { LogOut, Settings, ArrowRightLeft } from 'lucide-react';
 import { usePage } from '@inertiajs/react';
@@ -19,14 +19,6 @@ import { usePage } from '@inertiajs/react';
 interface UserMenuContentProps {
     user: User;
 }
-
-type UserInfo = {
-    user_id: number;
-    user_role: 'student' | 'faculty';
-    is_admin?: boolean;
-    faculty_id?: number;
-    faculty_roles?: string[];
-};
 
 export function UserMenuContent({ user }: UserMenuContentProps) {
     const cleanup = useMobileNavigation();
@@ -36,7 +28,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
         router.flushAll();
     };
 
-    const { user_info } = usePage().props as { user_info?: UserInfo };
+    const { user_info } = usePage<SharedData>().props;
     const { url } = usePage(); // current URL
 
     return (

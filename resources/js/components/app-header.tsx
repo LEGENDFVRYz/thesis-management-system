@@ -28,10 +28,12 @@ import {
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { cn, isSameUrl, isSectionUrl, resolveUrl } from '@/lib/utils';
-import { 
-    dashboard
-} from '@/routes';
-import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
+
+import { dashboard as studentDB } from '@/routes';
+import { dashboard as facultyDB } from '@/routes/faculty';
+import { dashboard as adminDB } from '@/routes/admin';
+
+import { type BreadcrumbItem, type NavItem, type SharedData} from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronDown, Search } from 'lucide-react';
 import useUserRole from '@/hooks/use-user-role';
@@ -40,7 +42,6 @@ import { adminMainNav } from '@/pages/Admin/_navigation';
 import { facultyMainNav } from '@/pages/Faculty/_navigation';
 import { studentMainNav } from '@/pages/Student/_navigation';
 import { useMemo } from 'react';
-
 
 
 const rightNavItems: NavItem[] = [
@@ -78,6 +79,16 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
         }
     }, [url]);
 
+    const home = () => {
+        if (url.startsWith('/admin')) {
+            return adminDB.url();
+        } else if (url.startsWith('/faculty')) {
+            return facultyDB.url();
+        } else {
+            return studentDB.url();
+        }
+    };
+
 
     return (
         <>
@@ -87,7 +98,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                     {/* NAV LOGO */}
                     <div>
                         <Link
-                            href={dashboard()}
+                            href={home()}
                             prefetch
                             className="flex items-center gap-3 font-dm-sans hover:opacity-90 transition-opacity"
                         >

@@ -58,6 +58,7 @@ class HandleInertiaRequests extends Middleware
 
                 $data = [
                     'user_id'   => $user->id,
+                    'user_name' => $user->name,
                     'user_role' => $user->role, // student | faculty
                 ];
 

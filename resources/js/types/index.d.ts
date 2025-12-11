@@ -28,6 +28,7 @@ export interface SharedData {
     quote: { message: string; author: string };
     auth: Auth;
     sidebarOpen: boolean;
+    user_info: UserInfo | null;
     [key: string]: unknown;
 }
 
@@ -41,4 +42,15 @@ export interface User {
     created_at: string;
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface UserInfo {
+    user_id: number;
+    user_name: string;
+    user_role: 'student' | 'faculty';
+    
+    // Faculty-specific
+    is_admin?: boolean;
+    faculty_id?: number;
+    faculty_roles?: string[];
 }

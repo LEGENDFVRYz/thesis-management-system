@@ -1,17 +1,12 @@
+import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 
-type UserInfo = {
-    user_id: number;
-    user_role: 'student' | 'faculty';
-    is_admin?: boolean;
-    faculty_id?: number;
-    faculty_roles?: string[];
-};
+
 
 type EffectiveRole = 'admin' | 'faculty' | 'student' | null;
 
 export default function useUserRole(): EffectiveRole {
-    const { user_info } = usePage().props as { user_info?: UserInfo };
+    const { user_info } = usePage<SharedData>().props;
 
     if (!user_info) return null;    // guest
 

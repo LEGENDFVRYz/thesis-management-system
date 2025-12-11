@@ -19,6 +19,8 @@ Ensure you have the following tools installed on your system:
 
 ## ⚙️ Installation & Setup
 
+**Reminder:** Read this [Repository Guide](https://docs.google.com/document/d/1SlAwqsNnV790dnU3NlKlaEGhZmSm9d0UHJK19TLLrPg/edit?usp=sharing) for detailed setup process, repository rules, system structure, and FAQs incase you encounter error in the setup process.
+
 Follow these steps to get the application up and running locally:
 
 1. Clone the project repository
