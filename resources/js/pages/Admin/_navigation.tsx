@@ -17,7 +17,7 @@ export const adminMainNav: NavItem[] = [
     },
     {
         title: 'Management',
-        href: management(),
+        href: '/admin/management',
         children: [
             { title: 'User',     href: user() },
             { title: 'System Config',     href: system() },

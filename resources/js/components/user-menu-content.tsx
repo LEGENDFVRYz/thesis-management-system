@@ -10,7 +10,7 @@ import { logout } from '@/routes/student';                  // temporary, since 
 import { edit } from '@/routes/profile';
 import { dashboard as fcltyDashboard } from '@/routes/faculty';
 import { dashboard as adminDashboard } from '@/routes/admin';
-import { isSameUrl } from '@/lib/utils';
+import { isSameUrl, isSectionUrl } from '@/lib/utils';
 import { type User } from '@/types';
 import { Link, router } from '@inertiajs/react';
 import { LogOut, Settings, ArrowRightLeft } from 'lucide-react';
@@ -20,6 +20,14 @@ interface UserMenuContentProps {
     user: User;
 }
 
+type UserInfo = {
+    user_id: number;
+    user_role: 'student' | 'faculty';
+    is_admin?: boolean;
+    faculty_id?: number;
+    faculty_roles?: string[];
+};
+
 export function UserMenuContent({ user }: UserMenuContentProps) {
     const cleanup = useMobileNavigation();
 
@@ -28,7 +36,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
         router.flushAll();
     };
 
-    const { user_info } = usePage().props;
+    const { user_info } = usePage().props as { user_info?: UserInfo };
     const { url } = usePage(); // current URL
 
     return (
@@ -47,13 +55,13 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                         <DropdownMenuItem asChild>
                             <Link
                                 className="block w-full"
-                                href={isSameUrl(url, fcltyDashboard()) ? adminDashboard() : fcltyDashboard()}
+                                href={isSectionUrl(url, '/faculty') ? adminDashboard() : fcltyDashboard()}
                                 as="button"
                                 prefetch
                                 onClick={cleanup}
                             >
                                 <ArrowRightLeft className="mr-2" />
-                                {isSameUrl(url, fcltyDashboard()) ? 'Switch to Admin' : 'Switch to Faculty'}
+                                {isSectionUrl(url, '/faculty') ? 'Switch to Admin' : 'Switch to Faculty'}
                             </Link>
                         </DropdownMenuItem>
                     </DropdownMenuGroup>

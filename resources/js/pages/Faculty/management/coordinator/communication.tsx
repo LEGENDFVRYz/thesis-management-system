@@ -7,7 +7,7 @@ import ManagementLayout from '@/pages/Faculty/management/index';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Advisee Management',
+        title: 'Communication',
         href: dashboard().url,
     },
 ];
@@ -15,9 +15,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Dashboard() {
     return (
         <ManagementLayout breadcrumbs={breadcrumbs}>
-            <Head title="Advisee Management" />
+            <Head title="Communication" />
 
-            <h1>Advisee Management</h1>
+            <h1>Communication</h1>
 
             <div className="grid auto-rows-min gap-4 md:grid-cols-2">
                 <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
