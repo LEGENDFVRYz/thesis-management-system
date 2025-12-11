@@ -64,7 +64,7 @@ export const facultyMainNav = (): NavItem[] => {
         // Add management if has children
         ...(managementChildren.length > 0 ? [{ 
             title: 'Management', 
-            href: 'faculty/management', 
+            href: '/faculty/management', 
             children: managementChildren 
         }] : []),
 
