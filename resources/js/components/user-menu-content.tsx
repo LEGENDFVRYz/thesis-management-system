@@ -10,7 +10,7 @@ import { logout } from '@/routes/student';                  // temporary, since 
 import { edit } from '@/routes/profile';
 import { dashboard as fcltyDashboard } from '@/routes/faculty';
 import { dashboard as adminDashboard } from '@/routes/admin';
-import { isSameUrl } from '@/lib/utils';
+import { isSameUrl, isSectionUrl } from '@/lib/utils';
 import { type User } from '@/types';
 import { Link, router } from '@inertiajs/react';
 import { LogOut, Settings, ArrowRightLeft } from 'lucide-react';
@@ -47,13 +47,13 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                         <DropdownMenuItem asChild>
                             <Link
                                 className="block w-full"
-                                href={isSameUrl(url, fcltyDashboard()) ? adminDashboard() : fcltyDashboard()}
+                                href={isSectionUrl(url, '/faculty') ? adminDashboard() : fcltyDashboard()}
                                 as="button"
                                 prefetch
                                 onClick={cleanup}
                             >
                                 <ArrowRightLeft className="mr-2" />
-                                {isSameUrl(url, fcltyDashboard()) ? 'Switch to Admin' : 'Switch to Faculty'}
+                                {isSectionUrl(url, '/faculty') ? 'Switch to Admin' : 'Switch to Faculty'}
                             </Link>
                         </DropdownMenuItem>
                     </DropdownMenuGroup>
