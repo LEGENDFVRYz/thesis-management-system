@@ -25,7 +25,7 @@ Follow these steps to get the application up and running locally:
 
    ```sh
    git clone https://github.com/LEGENDFVRYz/thesis-management-system.git
-   cd rmis
+   cd thesis-management-system
    ```
 
 2. Clone the project repository
