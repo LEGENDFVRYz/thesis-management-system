@@ -24,18 +24,26 @@ Follow these steps to get the application up and running locally:
 1. Clone the project repository
 
    ```sh
-   git clone <github-link-project>
+   git clone https://github.com/LEGENDFVRYz/thesis-management-system.git
    cd rmis
    ```
 
-2. Install Backend and Frontend Dependencies
+2. Clone the project repository
+
+   ```sh
+   git checkout -b <your-initials-plus-lastname>     #Ex. "sljcruz" "cakvillanueva"
+   git pull origin main
+   git pull origin staging
+   ```
+
+3. Install Backend and Frontend Dependencies
 
    ```sh
    composer install
    npm install
    ```
 
-3. Configure Environment Variables for applications
+4. Configure Environment Variables for applications
 
    - Create .env files
 
@@ -46,25 +54,25 @@ Follow these steps to get the application up and running locally:
 
    - Update the necessary variables based on your setup
 
-4. Generate Application Key
+5. Generate Application Key
 
    ```sh
    php artisan key:generate
    ```
 
-5. Run Database Migrations and Data Seeder
+6. Run Database Migrations and Data Seeder
 
    ```sh
    php artisan migrate --seed
    ```
 
-6. Start the Development Servers
+7. Start the Development Servers
 
    ```sh
    composer run dev
    ```
 
-7. Access the applications
+8. Access the applications
    - http://127.0.0.1:8000
 
    **Note:** You may change the application URL in the .env file if the default address is not available.
