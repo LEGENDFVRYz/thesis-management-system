@@ -46,6 +46,7 @@ export interface User {
 
 export interface UserInfo {
     user_id: number;
+    user_name: string;
     user_role: 'student' | 'faculty';
     
     // Faculty-specific
