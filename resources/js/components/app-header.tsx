@@ -69,11 +69,11 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
 
     const navItems = useMemo<NavItem[]>(() => {
         if (url.startsWith('/admin')) {
-            return adminMainNav; // if adminMainNav is an array
+            return adminMainNav; 
         } else if (url.startsWith('/faculty')) {
-            return facultyMainNav(); // <-- call the function
-        } else if (url === '/' || url.startsWith('/student')) {
-            return studentMainNav; // if studentMainNav is an array
+            return facultyMainNav(); 
+        } else if (url === '/' || url.startsWith('/')) {
+            return studentMainNav; 
         } else {
             return [];
         }
