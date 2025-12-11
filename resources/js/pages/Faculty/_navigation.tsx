@@ -31,7 +31,7 @@ type UserInfo = {
 // Export a function that returns NavItem[]
 export const facultyMainNav = (): NavItem[] => {
     const { user_info } = usePage().props as { user_info?: UserInfo };
-    const userRoles = user_info.faculty_roles || [];
+    const userRoles = user_info?.faculty_roles ?? [];
 
     // Helper to check if user has at least one required role
     const hasRole = (requiredRoles: string[]) => {

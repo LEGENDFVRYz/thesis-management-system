@@ -20,6 +20,14 @@ interface UserMenuContentProps {
     user: User;
 }
 
+type UserInfo = {
+    user_id: number;
+    user_role: 'student' | 'faculty';
+    is_admin?: boolean;
+    faculty_id?: number;
+    faculty_roles?: string[];
+};
+
 export function UserMenuContent({ user }: UserMenuContentProps) {
     const cleanup = useMobileNavigation();
 
@@ -28,7 +36,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
         router.flushAll();
     };
 
-    const { user_info } = usePage().props;
+    const { user_info } = usePage().props as { user_info?: UserInfo };
     const { url } = usePage(); // current URL
 
     return (
