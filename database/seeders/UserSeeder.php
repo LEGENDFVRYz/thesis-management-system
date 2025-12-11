@@ -47,7 +47,6 @@ class UserSeeder extends Seeder
             'is_active' => true,
         ]);
 
-
         // Sample Faculty account
         $faculty = User::firstOrNew(['email' => 'faculty@example.com']);
         $faculty->name = 'Faculty User';
@@ -77,7 +76,53 @@ class UserSeeder extends Seeder
             'is_active' => true,
         ]);
 
+
+        // Create Specialieed Account per each roles for testing
+        $roles = [
+            2 => 'Adviser',
+            3 => 'Co-adviser',
+            4 => 'Coordinator',
+            5 => 'Committee',
+            6 => 'Panelist',
+            7 => 'Awardee',
+        ];
+
+        foreach ($roles as $roleId => $roleName) {
+            $email = strtolower($roleName) . '@example.com';
+            
+            // Create the User Account
+            $user = User::firstOrNew(['email' => $email]);
+            $user->name = $roleName . ' User';
+            $user->email_verified_at = $now; // Ensure $now is defined (e.g. $now = now();)
+            $user->password = Hash::make('test123');
+            $user->role = 'faculty'; // Assuming they all need base access as faculty
+            $user->identity_no = '2025-000' . $roleId . '-TEST'; // Unique ID generation
+            $user->remember_token = null;
+            $user->save();
+
+            // Create the Faculty Profile
+            $facultyProfile = Faculty::firstOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'name_prefix' => 'Prof.',
+                    'first_name' => $roleName,
+                    'middle_name' => '',
+                    'last_name' => 'User',
+                    'is_regular' => true,
+                ]
+            );
+
+            // Assign the specific Role
+            FacultyAssignment::firstOrCreate([
+                'faculty_id' => $facultyProfile->id,
+                'role_id' => $roleId, 
+                'school_year' => '2025',
+            ], [
+                'is_active' => true,
+            ]);
+        }
         
+
         // Sample Student account
         $student = User::firstOrNew(['email' => 'student@example.com']);
         $student->name = 'Student User';
