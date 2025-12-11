@@ -3,8 +3,20 @@ import {
     dashboard, resources, repository
 } from '@/routes/faculty';
 import { 
-    advisee_management, awards_evaluation, proposal_review, thesis_monitoring, thesis_review
-} from '@/routes/faculty/management';
+    advisee_management, defense_management as adviser_defense_management, defense_management, endorsement, eval_n_grading
+} from '@/routes/faculty/management/adviser';
+import { 
+    awards_evaluation
+} from '@/routes/faculty/management/award';
+import { 
+    proposal_review
+} from '@/routes/faculty/management/committee';
+import { 
+    communication, compliance, defense_management as coor_defense_management, grading_management, thesis_monitoring
+} from '@/routes/faculty/management/coordinator';
+import { 
+    defense_management as panel_defense_management, thesis_review
+} from '@/routes/faculty/management/panel';
 import { usePage } from '@inertiajs/react';
 
 type UserInfo = {
@@ -32,7 +44,10 @@ export const facultyMainNav = (): NavItem[] => {
 
     if (hasRole(['Adviser', 'Co-adviser'])) {
         managementChildren.push(
-            { title: 'Advisee', href: advisee_management() },
+            { title: 'Advisee',             href: advisee_management() },
+            { title: 'Defense (adviser)',   href: adviser_defense_management() },
+            { title: 'Endorsement',         href: endorsement() },
+            { title: 'Evaluation',          href: eval_n_grading() },
         );
     }
     if (hasRole(['Awardee'])) {
@@ -42,12 +57,17 @@ export const facultyMainNav = (): NavItem[] => {
     }
     if (hasRole(['Coordinator'])) {
         managementChildren.push(
-            { title: 'Thesis Monitoring', href: thesis_monitoring() },
+            { title: 'Communication',               href: communication() },
+            { title: 'Compliance and Eligibility',  href: compliance() },
+            { title: 'Defense (coor)',  href: defense_management() },
+            { title: 'Grading',                     href: grading_management() },
+            { title: 'Thesis Monitoring',           href: thesis_monitoring() },
         );
     }
     if (hasRole(['Panelist'])) {
         managementChildren.push(
-            { title: 'Thesis Review', href: thesis_review() },
+            { title: 'Thesis Review',   href: thesis_review() },
+            { title: 'Defense (panel)', href: panel_defense_management() },
     );
     }
     if (hasRole(['Committee'])) {

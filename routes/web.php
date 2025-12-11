@@ -74,45 +74,78 @@ Route::prefix('faculty')->group(function () {
             })->name('faculty.management.index');
 
 
-
-            // PROTECTED ROUTES VIA FACULTY ROLES
-
-            // Adviser Route
-            Route::middleware('faculty.role:Adviser')->group(function () {
+            // --- ADVISER ROUTES ---
+            Route::middleware('faculty.role:Adviser')->prefix('adviser')->group(function () {
                 Route::get('advisee_management', function () {
                     return Inertia::render('Faculty/management/adviser/advisee_management');
-                })->name('faculty.management.advisee_management');
+                })->name('faculty.management.adviser.advisee_management'); // Unique Name
+
+                Route::get('defense_management', function () {
+                    return Inertia::render('Faculty/management/adviser/defense_management');
+                })->name('faculty.management.adviser.defense_management'); // Unique Name
+
+                Route::get('endorsement', function () {
+                    return Inertia::render('Faculty/management/adviser/endorsements');
+                })->name('faculty.management.adviser.endorsement');
+
+                Route::get('eval_n_grading', function () {
+                    return Inertia::render('Faculty/management/adviser/eval_n_grading');
+                })->name('faculty.management.adviser.eval_n_grading');
             });
 
-            // Award Committee Route
-            Route::middleware('faculty.role:Awardee')->group(function () {
+
+            // --- AWARD COMMITTEE ROUTES ---
+            Route::middleware('faculty.role:Awardee')->prefix('award_committee')->group(function () {
                 Route::get('awards_evaluation', function () {
                     return Inertia::render('Faculty/management/award_committee/awards_evaluation');
-                })->name('faculty.management.awards_evaluation');
+                })->name('faculty.management.award.awards_evaluation');
             });
 
-            // Committee Route
-            Route::middleware('faculty.role:Committee')->group(function () {
+
+            // --- COMMITTEE ROUTES ---
+            Route::middleware('faculty.role:Committee')->prefix('committee')->group(function () {
                 Route::get('proposal_review', function () {
                     return Inertia::render('Faculty/management/committee/proposal_review');
-                })->name('faculty.management.proposal_review');
+                })->name('faculty.management.committee.proposal_review');
             });
 
-            // Coordinator Route
-            Route::middleware('faculty.role:Coordinator')->group(function () {
+
+            // --- COORDINATOR ROUTES ---
+            Route::middleware('faculty.role:Coordinator')->prefix('coordinator')->group(function () {
+                Route::get('defense_management', function () {
+                    return Inertia::render('Faculty/management/coordinator/defense_management');
+                })->name('faculty.management.coordinator.defense_management');
+                
                 Route::get('thesis_monitoring', function () {
                     return Inertia::render('Faculty/management/coordinator/thesis_monitoring');
-                })->name('faculty.management.thesis_monitoring');
+                })->name('faculty.management.coordinator.thesis_monitoring');
+
+                Route::get('compliance', function () {
+                    return Inertia::render('Faculty/management/coordinator/compliance');
+                })->name('faculty.management.coordinator.compliance');
+
+                Route::get('communication', function () {
+                    return Inertia::render('Faculty/management/coordinator/communication');
+                })->name('faculty.management.coordinator.communication');
+
+                Route::get('grading_management', function () {
+                    return Inertia::render('Faculty/management/coordinator/grading_management');
+                })->name('faculty.management.coordinator.grading_management');
             });
 
-            // Panel Route
-            Route::middleware('faculty.role:Panelist')->group(function () {
+
+            // --- PANEL ROUTES ---
+            Route::middleware('faculty.role:Panelist')->prefix('panel')->group(function () {
                 Route::get('thesis_review', function () {
                     return Inertia::render('Faculty/management/panel/thesis_review');
-                })->name('faculty.management.thesis_review');
+                })->name('faculty.management.panel.thesis_review');
+                
+                Route::get('defense_management', function () {
+                    return Inertia::render('Faculty/management/panel/defense_management');
+                })->name('faculty.management.panel.defense_management'); 
             });
         });
-
+            
 
 
         Route::get('resources', function () {
