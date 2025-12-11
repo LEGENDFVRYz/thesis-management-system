@@ -33,7 +33,7 @@ import { dashboard as studentDB } from '@/routes';
 import { dashboard as facultyDB } from '@/routes/faculty';
 import { dashboard as adminDB } from '@/routes/admin';
 
-import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
+import { type BreadcrumbItem, type NavItem, type SharedData} from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronDown, Search } from 'lucide-react';
 import useUserRole from '@/hooks/use-user-role';
@@ -43,15 +43,6 @@ import { facultyMainNav } from '@/pages/Faculty/_navigation';
 import { studentMainNav } from '@/pages/Student/_navigation';
 import { useMemo } from 'react';
 
-
-
-type UserInfo = {
-    user_id: number;
-    user_role: 'student' | 'faculty';
-    is_admin?: boolean;
-    faculty_id?: number;
-    faculty_roles?: string[];
-};
 
 const rightNavItems: NavItem[] = [
     {
@@ -72,7 +63,6 @@ interface AppHeaderProps {
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth } = page.props;
-    const { user_info } = usePage().props as { user_info?: UserInfo };
     const getInitials = useInitials();
     
     const url = page.url;

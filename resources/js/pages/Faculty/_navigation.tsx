@@ -1,4 +1,4 @@
-import { NavItem } from "@/types";
+import { NavItem, SharedData } from "@/types";
 import { 
     dashboard, resources, repository
 } from '@/routes/faculty';
@@ -19,18 +19,10 @@ import {
 } from '@/routes/faculty/management/panel';
 import { usePage } from '@inertiajs/react';
 
-type UserInfo = {
-    user_id: number;
-    user_role: 'student' | 'faculty';
-    is_admin?: boolean;
-    faculty_id?: number;
-    faculty_roles?: string[];
-};
-
 
 // Export a function that returns NavItem[]
 export const facultyMainNav = (): NavItem[] => {
-    const { user_info } = usePage().props as { user_info?: UserInfo };
+    const { user_info } = usePage<SharedData>().props;
     const userRoles = user_info?.faculty_roles ?? [];
 
     // Helper to check if user has at least one required role
