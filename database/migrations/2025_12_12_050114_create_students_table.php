@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('students', function (Blueprint $table) {
+        Schema::create('tbl_students', function (Blueprint $table) {
             $table->id();
             
             // Foreign Key to Users
@@ -32,7 +32,7 @@ return new class extends Migration
             
             // Foreign Key to Specializations
             $table->foreignId('spec_id')
-                  ->constrained('specializations')
+                  ->constrained('tbl_specializations')
                   ->comment("Student's Specialization / Major");
 
             $table->boolean('is_leader')->default(false);

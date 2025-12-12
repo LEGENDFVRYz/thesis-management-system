@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('endorsements', function (Blueprint $table) {
+        Schema::create('tbl_endorsements', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('thesis_id')
-                  ->constrained('theses')
+                  ->constrained('tbl_theses')
                   ->cascadeOnDelete();
 
             $table->boolean('is_adviser_approved')->nullable();
