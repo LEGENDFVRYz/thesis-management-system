@@ -10,6 +10,8 @@ class Specialization extends Model
     
     protected $fillable = ['spec_name'];
 
+    public $timestamps = false;
+
     /*
     ==================================================================================
     RELATIONSHIPS

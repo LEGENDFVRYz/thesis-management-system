@@ -25,11 +25,11 @@ return new class extends Migration
                   ->nullable()
                   ->constrained('tbl_thesis_groups')
                   ->nullOnDelete();
-
-            $table->string('email');
+            
             $table->string('last_name');
             $table->string('first_name');
             $table->string('middle_name')->nullable();
+            $table->string('suffix')->nullable();
             $table->string('section');
             
             // Foreign Key to Specializations

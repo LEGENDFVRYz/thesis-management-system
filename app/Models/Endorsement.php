@@ -4,33 +4,32 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Proposal extends Model
+class Endorsement extends Model
 {
-    use HasFactory, SoftDeletes;    
-    
-    protected $table = 'tbl_proposals';
+    use HasFactory;
+
+    protected $table = 'tbl_endorsements';
 
     protected $fillable = [
-        'group_id',
-        'proposal_title',
-        'proposal_filepath',
-        'is_pursued',
+        'thesis_id',
+        'is_adviser_approved',
+        'is_coordinator_approved',
     ];
 
     protected $casts = [
-        'is_pursued' => 'boolean',
+        'is_adviser_approved'     => 'boolean',
+        'is_coordinator_approved' => 'boolean',
     ];
-
 
     /*
     ==================================================================================
     RELATIONSHIPS
     ==================================================================================
     */
-    public function group()
+
+    public function thesis()
     {
-        return $this->belongsTo(ThesisGroup::class, 'group_id');
+        return $this->belongsTo(Theses::class, 'thesis_id');
     }
 }

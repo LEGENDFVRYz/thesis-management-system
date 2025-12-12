@@ -22,7 +22,7 @@ class FacultyAssignmentFactory extends Factory
 
         return [
             'faculty_id' => Faculty::factory(),
-            'role_id' => FacultyRole::factory(),
+            'role_id' => FacultyRole::inRandomOrder()->first()->id,
             'school_year' => $year,
             'is_active' => fake()->boolean(90),
         ];

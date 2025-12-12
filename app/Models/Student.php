@@ -2,19 +2,22 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Student extends Model
 {
+    use HasFactory;
+
     protected $table = 'tbl_students';
     
     protected $fillable = [
         'user_id',
         'group_id',
-        'email',
         'last_name',
         'first_name',
         'middle_name',
+        'suffix',
         'section',
         'spec_id',
         'is_leader',

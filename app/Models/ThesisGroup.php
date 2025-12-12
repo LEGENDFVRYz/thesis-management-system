@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ThesisGroup extends Model
 {
+    use HasFactory;
+
     protected $table = 'tbl_thesis_groups';
 
     protected $fillable = [
-        'adviser_id',
-        'group_section',
+        'section_adviser_id',
         'group_number',
     ];
 
@@ -23,7 +25,7 @@ class ThesisGroup extends Model
     */
     public function adviser()
     {
-        return $this->belongsTo(FacultyAssignment::class, 'adviser_id');
+        return $this->belongsTo(SectionAdviser::class, 'section_adviser_id');
     }
 
     public function students()

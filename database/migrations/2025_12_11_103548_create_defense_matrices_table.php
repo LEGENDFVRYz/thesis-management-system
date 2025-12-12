@@ -18,19 +18,17 @@ return new class extends Migration
                   ->constrained('tbl_theses')
                   ->cascadeOnDelete();
 
-            $table->string('title');
-
             $table->enum('course', ['MOR', 'DP1', 'DP2'])->comment('MOR, DP1, DP2');
 
             // Derived (Review this later)
-            $table->string('academic_year')->nullable();
+            // $table->string('academic_year')->nullable();
 
             $table->dateTime('defense_schedule');
 
-            $table->string('defense_room');
+            $table->integer('defense_room');
 
             // Derived (Review this later)
-            $table->boolean('is_defended')->default(false);
+            // $table->boolean('is_defended')->default(false);
 
             $table->timestamps();
         });
