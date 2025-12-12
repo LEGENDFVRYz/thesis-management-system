@@ -2,12 +2,12 @@ import ManagementLayout from '@/pages/Admin/management/index';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import { system } from '@/routes/admin/management/index';
+import { depPolicies } from '@/routes/admin/management/index';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Deadlines',
-        href: system().url,
+        href: depPolicies().url,
     },
 ];
 

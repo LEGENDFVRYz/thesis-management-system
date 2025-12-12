@@ -174,23 +174,31 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
 
     // Management Routes
     Route::prefix('management')->group(function () {
-        Route::redirect('/', 'management/system')->name('admin.management.index');
+        Route::redirect('/', 'management/student')->name('admin.management.index');     // dont know ehere is the default, so ayan nalang muna
 
-        Route::get('system', function () {
-            return Inertia::render('Admin/management/system');
-        })->name('admin.management.system');
-        
-        Route::get('defenses', function () {
-            return Inertia::render('Admin/management/defense');
-        })->name('admin.management.defenses');
-
-        Route::get('user', function () {
-            return Inertia::render('Admin/management/user');
-        })->name('admin.management.user');
+        Route::get('student', function () {
+            return Inertia::render('Admin/management/student');
+        })->name('admin.management.student');
 
         Route::get('faculty', function () {
             return Inertia::render('Admin/management/faculty');
         })->name('admin.management.faculty');
+
+        Route::get('academic-settings', function () {
+            return Inertia::render('Admin/management/academic');
+        })->name('admin.management.academic');
+
+        Route::get('deadline', function () {
+            return Inertia::render('Admin/management/deadline');
+        })->name('admin.management.deadline');
+
+        Route::get('dept-policies', function () {
+            return Inertia::render('Admin/management/dep-policies');
+        })->name('admin.management.dep-policies');
+        
+        Route::get('defenses', function () {
+            return Inertia::render('Admin/management/defense');
+        })->name('admin.management.defenses');
     });
 
     // Repository Routes

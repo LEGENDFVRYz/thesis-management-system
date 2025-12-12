@@ -2,12 +2,12 @@ import ManagementLayout from '@/pages/Admin/management/index';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import { user } from '@/routes/admin/management/index';
+import { student } from '@/routes/admin/management/index';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Student',
-        href: user().url,
+        href: student().url,
     },
 ];
 
