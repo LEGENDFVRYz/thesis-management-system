@@ -21,11 +21,9 @@ export default function AuthSimpleLayout({
                 {/* Top PART */}
                 <div className="space-y-5">
                     <div className="flex h-12 w-12">
-                        {/* please change it to finalized logo */}
-                        <img
-                            src="https://placehold.co/48/FFBD00/730000/png?text=Logo" 
-                            alt="Thesis Management System Logo"
-                            className="h-12 w-12 object-contain rounded-full"
+                        <AppLogoIcon
+                            className="h-12 w-12"
+                            variant="light"
                         />
                     </div>
                     
