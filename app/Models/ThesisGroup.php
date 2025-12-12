@@ -37,4 +37,13 @@ class ThesisGroup extends Model
     {
         return $this->hasMany(Proposal::class, 'group_id');
     }
+
+    /**
+     * Link to the Section Adviser (tbl_section_advisers)
+     */
+    public function sectionAdviser()
+    {
+        // 2nd argument 'section_adviser_id' is REQUIRED because you aren't using the default 'section_adviser_id' convention
+        return $this->belongsTo(SectionAdviser::class, 'section_adviser_id');
+    }
 }
