@@ -41,6 +41,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('defense_matrices');
+        Schema::dropIfExists('tbl_defense_matrices');
     }
 };
