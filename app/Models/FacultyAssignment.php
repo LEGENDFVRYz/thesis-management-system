@@ -11,6 +11,8 @@ class FacultyAssignment extends Model
     /** @use HasFactory<\Database\Factories\FacultyAssignmentFactory> */
     use HasFactory;
 
+    protected $table = 'tbl_faculty_assignments';
+
     protected $fillable = [
         'faculty_id',
         'role_id',

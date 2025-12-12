@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('thesis_groups', function (Blueprint $table) {
+        Schema::create('tbl_thesis_groups', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('adviser_id')
-                  ->constrained('faculty_assignments')
+                  ->constrained('tbl_faculty_assignments')
                   ->cascadeOnDelete();
 
             $table->integer('group_section'); 
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('thesis_groups');
+        Schema::dropIfExists('tbl_thesis_groups');
     }
 };

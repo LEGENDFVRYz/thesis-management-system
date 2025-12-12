@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('defense_evaluations', function (Blueprint $table) {
+        Schema::create('tbl_defense_evaluations', function (Blueprint $table) {
             $table->id();
             
             $table->foreignId('defense_id')
-                  ->constrained('defense_matrices')
+                  ->constrained('tbl_defense_matrices')
                   ->cascadeOnDelete();
 
             $table->foreignId('evaluator_id')
-                  ->constrained('faculty_assignments')
+                  ->constrained('tbl_faculty_assignments')
                   ->cascadeOnDelete();
 
             $table->decimal('grade', 5, 2);
@@ -39,6 +39,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('defense_evaluations');
+        Schema::dropIfExists('tbl_defense_evaluations');
     }
 };

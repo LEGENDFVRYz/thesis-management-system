@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('faculty_roles', function (Blueprint $table) {
+        Schema::create('tbl_faculty_roles', function (Blueprint $table) {
             $table->id();
             $table->string('role_name')->comment('Admin, Adviser, Co-adviser, Coordinator, Committee, Panelist, ++');
             $table->text('description')->nullable();
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('faculty_roles');
+        Schema::dropIfExists('tbl_faculty_roles');
     }
 };

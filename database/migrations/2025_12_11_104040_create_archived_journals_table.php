@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('archived_journals', function (Blueprint $table) {
+        Schema::create('tbl_archived_journals', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('thesis_id')
-                  ->constrained('theses')
+                  ->constrained('tbl_theses')
                   ->cascadeOnDelete();
 
             $table->text('file_path');
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('archived_journals');
+        Schema::dropIfExists('tbl_archived_journals');
     }
 };
