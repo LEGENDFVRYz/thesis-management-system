@@ -1,5 +1,4 @@
 import * as React from "react"
-
 import { cn } from "@/lib/utils"
 
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
@@ -8,9 +7,15 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
       type={type}
       data-slot="input"
       className={cn(
-        "border-input file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-        "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+        "bg-[#f3efd0] w-full sm:w-[384px] h-[36px] px-[12px] py-[4px] rounded-[8px] border-[0.8px] border-transparent",
+        "font-['DM_Sans:Medium',sans-serif] font-medium text-[#1a1a1a] text-[13.33px]",
+        "outline-none transition-all shadow-xs",
+        "placeholder:text-[#1a1a1a] placeholder:font-['DM_Sans:Medium',sans-serif] placeholder:font-medium",
+        "hover:border-[#ffbd00] hover:placeholder:text-[#ffbd00]",
+        "focus-visible:border-[#730000] focus-visible:placeholder:text-transparent",
+        "focus-visible:ring-0 focus-visible:ring-offset-0",
+        "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
+        "aria-invalid:border-[#730000] aria-invalid:ring-[#730000]/20",
         className
       )}
       {...props}
