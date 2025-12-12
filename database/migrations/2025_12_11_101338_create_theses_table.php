@@ -18,19 +18,17 @@ return new class extends Migration
                   ->constrained('tbl_proposals')
                   ->cascadeOnDelete();
 
-            $table->foreignId('group_id')
-                  ->constrained('tbl_thesis_groups')
-                  ->cascadeOnDelete();
-
             // Derived (Review this later)
-            $table->integer('group_code')->nullable();
+            // $table->foreignId('group_id')
+            //       ->constrained('tbl_thesis_groups')
+            //       ->cascadeOnDelete();
 
             $table->string('title');
 
             $table->text('manuscript_filepath')->nullable();
 
             // Derived (Review this later)
-            $table->string('thesis_status')->nullable();
+            // $table->string('thesis_status')->nullable();
 
             $table->timestamps();
         });

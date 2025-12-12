@@ -19,7 +19,7 @@ return new class extends Migration
                   ->cascadeOnDelete();
 
             // Derived (Review this later)
-            $table->integer('group_code')->nullable();
+            // $table->integer('group_code')->nullable();
 
             $table->text('proposal_title');
 
@@ -28,7 +28,7 @@ return new class extends Migration
             $table->boolean('is_pursued')->default(false);
 
             // Derived (Review this later)
-            $table->string('proposal_status')->nullable();
+            // $table->string('proposal_status')->nullable();
 
             $table->timestamps();
 
