@@ -179,6 +179,8 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
         Route::redirect('/', 'management/student')->name('admin.management.index');     // dont know ehere is the default, so ayan nalang muna
 
         Route::get('student', [StudentController::class, 'index'])->name('admin.management.student');
+        Route::post('student/store', [StudentController::class, 'store'])
+            ->name('admin.management.student.store');
 
         Route::get('faculty', function () {
             return Inertia::render('Admin/management/faculty');
@@ -226,7 +228,7 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
 API ROUTES (temporary only)        
 ==================================================================================
 */
-Route::post('/file-import', [FileImportController::class, 'store'])->name('file.import');
+Route::post('file-import', [FileImportController::class, 'store'])->name('file.import');
 
 
 

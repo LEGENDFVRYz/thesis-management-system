@@ -23,7 +23,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',     
-        'role'       # depend in final account creation system, temporarily disabled
+        'role',       # depend in final account creation system, temporarily disabled\
+        'identity_no'
     ];
 
     /**

@@ -4,6 +4,7 @@ import Papa from 'papaparse';
 import ManagementLayout from '@/pages/Admin/management/index';
 import { type BreadcrumbItem } from '@/types';
 import { student } from '@/routes/admin/management/index';
+import { store } from '@/routes/admin/management/student/index';
 
 
 const FIELDS = [
@@ -88,19 +89,23 @@ export default function DeadlinePage() {
             return;
         }
 
+        console.log(action)
+
         setLoading(true);
         const formData = new FormData();
         formData.append('file', file);
         formData.append('mapping', JSON.stringify(columnMapping)); // Send the mapping to backend
         formData.append('action', action); // Send the selected action
 
+
         try {
-            const response = await axios.post('/file-import', formData, {
+            const response = await axios.post(store().url, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             setMessage(response.data.message || 'Import successful!');
             // Reset form optionally
         } catch (error: any) {
+            console.log(error)
             setMessage(error.response?.data?.message || 'Upload failed.');
         } finally {
             setLoading(false);
