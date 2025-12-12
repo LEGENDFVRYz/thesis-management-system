@@ -29,11 +29,9 @@ export default function AuthSplitLayout({
                 {/* Top PART */}
                 <div className="space-y-5">
                     <div className="flex h-12 w-12">
-                        {/* please change it to finalized logo */}
-                        <img
-                            src="https://placehold.co/48/FFBD00/730000/png?text=Logo" 
-                            alt="Thesis Management System Logo"
-                            className="h-12 w-12 object-contain rounded-full"
+                        <AppLogoIcon
+                            className="h-12 w-12"
+                            variant="light"
                         />
                     </div>
                     
@@ -69,11 +67,9 @@ export default function AuthSplitLayout({
                 <div className="flex flex-col items-center justify-center pb-15">
                     <Link href={home()} className="flex flex-col items-center gap-2 font-medium">
                         <div className="mb-1 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-                            {/* please change it to finalized logo */}
-                            <img
-                                src="https://placehold.co/60/730000/FFBD00/png?text=Logo" 
-                                alt="Thesis Management System Logo"
-                                className="h-14 w-14 object-contain rounded-full"
+                            <AppLogoIcon
+                                className="h-14 w-14"
+                                variant="dark"
                             />
                         </div>
                     </Link>
