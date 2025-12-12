@@ -1,24 +1,22 @@
+import ManagementLayout from '@/pages/Admin/management/index';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import AppLayout from '@/layouts/app-layout';
-import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import ManagementLayout from '.';
-import { defenses } from '@/routes/admin/management/index';
+import { depPolicies } from '@/routes/admin/management/index';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Defense',
-        href: defenses().url,
+        title: 'Deadlines',
+        href: depPolicies().url,
     },
 ];
 
-export default function Dashboard() {
+export default function DeadlinePage() {
     return (
         <ManagementLayout 
             breadcrumbs={breadcrumbs}
-            title="Defense Management" 
-            description="Monitor all defense schedules and panel assignments"
+            title="Department Policies" 
+            description="Configure academic year, semester parameters, and system timeline"
         >
             
             <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">

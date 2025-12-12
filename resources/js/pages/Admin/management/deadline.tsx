@@ -1,24 +1,22 @@
+import ManagementLayout from '@/pages/Admin/management/index';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import AppLayout from '@/layouts/app-layout';
-import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import ManagementLayout from '.';
-import { defenses } from '@/routes/admin/management/index';
+import { deadline } from '@/routes/admin/management/index';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Defense',
-        href: defenses().url,
+        title: 'Deadlines',
+        href: deadline().url,
     },
 ];
 
-export default function Dashboard() {
+export default function DeadlinePage() {
     return (
         <ManagementLayout 
             breadcrumbs={breadcrumbs}
-            title="Defense Management" 
-            description="Monitor all defense schedules and panel assignments"
+            title="Deadline Management" 
+            description="Set submission windows, defense periods, and grading deadlines "
         >
             
             <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">

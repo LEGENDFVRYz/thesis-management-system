@@ -3,7 +3,9 @@ import {
     dashboard, resources
 } from '@/routes/admin';
 import { 
-    user, system, defenses, index as management
+    student, faculty,
+    academic, deadline, depPolicies,
+    defenses
 } from '@/routes/admin/management';
 import { 
     theses, system as rsystem
@@ -19,9 +21,14 @@ export const adminMainNav: NavItem[] = [
         title: 'Management',
         href: '/admin/management',
         children: [
-            { title: 'User',     href: user() },
-            { title: 'System Config',     href: system() },
-            { title: 'Defense',     href: defenses() },
+            { title: 'Faculty',         href: faculty() },
+            { title: 'Student',         href: student() },
+
+            { title: 'Academic Settings',   href: academic() },
+            { title: 'Deadline',            href: deadline() },
+            { title: 'Department Policies', href: depPolicies() },
+
+            { title: 'Defense',         href: defenses() },
         ]
     },
     {
