@@ -64,9 +64,11 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-gradient-mid: var(--sidebar-gradient-mid);
 }
 
 :root {
+    --font-size: 16px;
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
@@ -87,6 +89,8 @@
     --border: oklch(0.922 0 0);
     --input: oklch(0.922 0 0);
     --ring: #730000;                                        /* based on figma, collect from admin forms */
+    --font-weight-medium: 500;
+    --font-weight-normal: 400;
     --chart-1: oklch(0.646 0.222 41.116);
     --chart-2: oklch(0.6 0.118 184.704);
     --chart-3: oklch(0.398 0.07 227.392);
@@ -94,14 +98,15 @@
     --chart-5: oklch(0.769 0.188 70.08);
     --breadcrumb: #F3EFD0;                                  /* based on figma, collect from admin nav */
     --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.87 0 0);
+    --sidebar: #730000;                          /* Maroon background */
+    --sidebar-foreground: #FFFFFF;               /* White text */
+    --sidebar-primary: #730000;                  /* Maroon primary */
+    --sidebar-primary-foreground: #FFFFFF;       /* White on maroon */
+    --sidebar-accent: #FFBD00;                   /* Yellow accent */
+    --sidebar-accent-foreground: #730000;        /* Maroon on yellow */
+    --sidebar-border: rgba(255, 189, 0, 0.2);    /* Subtle yellow border */
+    --sidebar-ring: #FFBD00;                     /* Yellow focus ring */
+    --sidebar-gradient-mid: #9b000a;             /* Gradient middle color */
 }
 
 .dark {
@@ -124,6 +129,8 @@
     --border: oklch(0.269 0 0);
     --input: oklch(0.269 0 0);
     --ring: oklch(0.439 0 0);
+    --font-weight-medium: 500;
+    --font-weight-normal: 400;
     --chart-1: oklch(0.488 0.243 264.376);
     --chart-2: oklch(0.696 0.17 162.48);
     --chart-3: oklch(0.769 0.188 70.08);
@@ -141,10 +148,102 @@
 
 @layer base {
     * {
-        @apply border-border;
+        @apply border-border outline-ring/50;
     }
 
     body {
         @apply bg-background text-foreground;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
     }
+
+    /* Auth Input Styling */
+    .auth-input {
+        background-color: var(--breadcrumb);
+        border: 0.8px solid transparent;
+        transition: border-color 0.2s ease;
+    }
+
+    .auth-input::placeholder {
+        color: #1a1a1a;
+        transition: color 0.2s ease;
+    }
+
+    .auth-input:hover {
+        border-color: var(--primary-foreground-2); /* Yellow */
+    }
+
+    .auth-input:hover::placeholder {
+        color: var(--primary-foreground-2);
+    }
+
+    .auth-input:focus {
+        border-color: var(--primary); /* Maroon */
+        outline: none;
+    }
+
+    .auth-input:focus::placeholder {
+        color: transparent;
+    }
+
+    .auth-heading {
+        color: var(--foreground);
+    }
+
+    .auth-subtext {
+        color: var(--muted-foreground);
+    }
+}
+
+/**
+ * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
+ */
+@layer base {
+    :where(:not(:has([class*=' text-']), :not(:has([class^='text-'])))) {
+        h1 {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-weight-medium);
+            line-height: 1.5;
+        }
+
+        h2 {
+            font-size: var(--text-xl);
+            font-weight: var(--font-weight-medium);
+            line-height: 1.5;
+        }
+
+        h3 {
+            font-size: var(--text-lg);
+            font-weight: var(--font-weight-medium);
+            line-height: 1.5;
+        }
+
+        h4 {
+            font-size: var(--text-base);
+            font-weight: var(--font-weight-medium);
+            line-height: 1.5;
+        }
+
+        label {
+            font-size: var(--text-base);
+            font-weight: var(--font-weight-medium);
+            line-height: 1.5;
+        }
+
+        button {
+            font-size: var(--text-base);
+            font-weight: var(--font-weight-medium);
+            line-height: 1.5;
+        }
+
+        input {
+            font-size: var(--text-base);
+            font-weight: var(--font-weight-normal);
+            line-height: 1.5;
+        }
+    }
+}
+
+html {
+    font-size: var(--font-size);
 }

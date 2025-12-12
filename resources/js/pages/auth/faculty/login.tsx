@@ -1,3 +1,5 @@
+import RoleToggle from '@/components/role-toggle';
+import { login as studentLogin } from '@/routes/student';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
@@ -33,68 +35,65 @@ export default function Login({
             <Form
                 {...store.form()}
                 resetOnSuccess={['password']}
-                className="flex flex-col gap-6"
+                className="flex flex-col gap-[16px]"
             >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-6">
-                            <div className="grid gap-2">
+                        {/* Add Role Toggle */}
+                        <RoleToggle
+                            currentRole="faculty"
+                            studentRoute={studentLogin()}
+                            facultyRoute={store()}
+                        />
+
+                        <div className="flex flex-col items-center gap-[17px] self-stretch">
+                            <div className="flex flex-col gap-[8px]">
                                 <Label htmlFor="email">Email</Label>
                                 <Input
+                                    className="auth-input"
                                     id="email"
                                     type="email"
                                     name="email"
                                     required
-                                    autoFocus
                                     tabIndex={1}
                                     autoComplete="email"
-                                    placeholder="email@example.com"
+                                    placeholder="Enter your email"
                                 />
                                 <InputError message={errors.email} />
                             </div>
 
-                            <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
-                                </div>
+                            <div className="flex flex-col gap-[8px]">
+                                <Label htmlFor="password">Password</Label>
                                 <Input
+                                    className="auth-input"
                                     id="password"
                                     type="password"
                                     name="password"
                                     required
                                     tabIndex={2}
                                     autoComplete="current-password"
-                                    placeholder="Password"
+                                    placeholder="Enter your password"
                                 />
                                 <InputError message={errors.password} />
                             </div>
-                            
-                            {/* TEMPORARY COMMENTED OUT */}
-                            {/* <div className="flex items-center space-x-3">
-                                <Checkbox
-                                    id="remember"
-                                    name="remember"
-                                    tabIndex={3}
-                                />
-                                <Label htmlFor="remember">Remember me</Label>
-                            </div> */}
 
                             <Button
                                 type="submit"
-                                className="mt-4 w-full"
+                                variant="destructive"
+                                className="w-[384px] h-[36px] font-['DM_Sans'] font-medium text-[13.33px] text-justify rounded-[8px]"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
                             >
                                 {processing && <Spinner />}
-                                Log in
+                                Sign In
                             </Button>
                         </div>
 
                         {canResetPassword && (
                             <TextLink
                                 href={request()}
-                                className="m-auto text-sm text-center"
+                                className="m-auto text-sm text-center text-[#730000] hover:underline"
                                 tabIndex={5}
                             >
                                 Forgot password?

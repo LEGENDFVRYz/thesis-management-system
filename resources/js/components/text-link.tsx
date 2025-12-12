@@ -12,10 +12,11 @@ export default function TextLink({
     return (
         <Link
             className={cn(
-                'text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500',
+                "font-['DM_Sans:Medium',sans-serif] font-medium text-[#730000] text-[13.33px] text-justify hover:underline transition-colors",
                 className,
             )}
             {...props}
+            style={{ fontVariationSettings: "'opsz' 14" }}
         >
             {children}
         </Link>
