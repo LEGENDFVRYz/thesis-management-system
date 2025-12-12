@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\FileUploadRequest;
+use App\Models\Faculty;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -83,7 +84,7 @@ class StudentController extends Controller
     {
         //
     }
-    
+
 
     /**
      * Store a newly created resource in storage.
@@ -149,6 +150,15 @@ class StudentController extends Controller
                 $name      = isset($indexMap['name']) ? ($row[$indexMap['name']] ?? null) : null;
                 $email     = isset($indexMap['email']) ? ($row[$indexMap['email']] ?? null) : null;
 
+                if ($name) {
+                    $parts = explode(' ', $name);
+
+                    if (count($parts) >= 2) {
+                        $firstName = $parts[0];
+                        $lastName  = $parts[1];
+                    }
+                }
+
                 if (!$studentId) {
                     $stats['errors']++;
                     continue; 
@@ -174,13 +184,23 @@ class StudentController extends Controller
                     $stats['to_create']++;
 
                     if (!$isDryRun) {
-                        User::create([
+                        $temp = User::create([
                             'name'        => $name,
                             'identity_no' => $studentId,
                             'email'       => $email,
                             'role'        => 'student',
                             'password'    => Hash::make('suffering'),
                         ]);
+
+                        Student::firstOrCreate(
+                            ['user_id' => $temp->id],
+                            [
+                                'first_name' => $firstName ?? $name,
+                                'last_name'  => $lastName ?? '<lastname>',
+                                'section'    => 1,          # force buy muna para sa presentation
+                                'spec_id'    => 2,          # force buy muna para sa presentation
+                            ]
+                        );
                     }
                 }
             }
