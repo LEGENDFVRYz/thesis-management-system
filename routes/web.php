@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Auth\FacultyLoginController;
 use App\Http\Controllers\Auth\StudentLoginController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FileImportController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -225,8 +226,9 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
 API ROUTES (temporary only)        
 ==================================================================================
 */
-
+Route::post('/file-import', [FileImportController::class, 'store'])->name('file.import');
 
 
 
 require __DIR__.'/settings.php';
+
