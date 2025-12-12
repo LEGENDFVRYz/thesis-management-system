@@ -25,6 +25,11 @@ class Student extends Model
     ];
     
 
+    /*
+    ==================================================================================
+    RELATIONSHIPS
+    ==================================================================================
+    */
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -32,6 +37,11 @@ class Student extends Model
 
     public function specialization()
     {
-        return $this->belongsTo(Specialization::class, 'spec_id');
+        return $this->belongsTo(Specialization::class);
+    }
+
+    public function group()
+    {
+        return $this->belongsTo(ThesisGroup::class);
     }
 }

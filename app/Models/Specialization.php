@@ -10,6 +10,11 @@ class Specialization extends Model
     
     protected $fillable = ['spec_name'];
 
+    /*
+    ==================================================================================
+    RELATIONSHIPS
+    ==================================================================================
+    */
     public function students()
     {
         return $this->hasMany(Student::class, 'spec_id');

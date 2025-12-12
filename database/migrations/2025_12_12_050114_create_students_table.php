@@ -20,9 +20,11 @@ return new class extends Migration
                   ->onDelete('cascade')
                   ->comment('Link to their main account credentials');
 
-            // Foreign Key to Groups (Uncomment ->constrained if table exists)
-            $table->unsignedBigInteger('group_id')->nullable();
-            // $table->foreign('group_id')->references('id')->on('groups'); 
+            // Foreign Key to Groups
+            $table->foreignId('group_id')
+                  ->nullable()
+                  ->constrained('tbl_thesis_groups')
+                  ->nullOnDelete();
 
             $table->string('email');
             $table->string('last_name');
