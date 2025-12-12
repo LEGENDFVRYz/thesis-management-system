@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\DefenseController;
+use App\Http\Controllers\Admin\FacultyController;
+use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Auth\FacultyLoginController;
 use App\Http\Controllers\Auth\StudentLoginController;
 use App\Http\Controllers\DashboardController;
@@ -176,13 +179,9 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
     Route::prefix('management')->group(function () {
         Route::redirect('/', 'management/student')->name('admin.management.index');     // dont know ehere is the default, so ayan nalang muna
 
-        Route::get('student', function () {
-            return Inertia::render('Admin/management/student');
-        })->name('admin.management.student');
+        Route::get('student', [StudentController::class, 'index'])->name('admin.management.student');
 
-        Route::get('faculty', function () {
-            return Inertia::render('Admin/management/faculty');
-        })->name('admin.management.faculty');
+        Route::get('faculty', [FacultyController::class, 'index'])->name('admin.management.faculty');
 
         Route::get('academic-settings', function () {
             return Inertia::render('Admin/management/academic');
@@ -196,9 +195,9 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
             return Inertia::render('Admin/management/dep-policies');
         })->name('admin.management.dep-policies');
         
-        Route::get('defenses', function () {
-            return Inertia::render('Admin/management/defense');
-        })->name('admin.management.defenses');
+
+        Route::get('defenses', [DefenseController::class, 'index'])->name('admin.management.defenses');
+
     });
 
     // Repository Routes
