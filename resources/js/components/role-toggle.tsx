@@ -23,7 +23,7 @@ export default function RoleToggle({
     return (
         <div
             className={cn(
-                "bg-breadcrumb flex h-[30px] items-start justify-between p-[5px] rounded-[14px] w-[398px]",
+                "bg-breadcrumb flex h-[30px] items-start justify-between p-[5px] rounded-[14px] w-full sm:w-[398px]",
                 className
             )}
         >

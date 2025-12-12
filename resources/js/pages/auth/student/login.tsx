@@ -12,6 +12,7 @@ import { register } from '@/routes';
 import { store } from '@/routes/student';
 import { request } from '@/routes/password';
 import { Form, Head } from '@inertiajs/react';
+import { useState } from 'react';
 
 interface LoginProps {
     status?: string;
@@ -24,6 +25,33 @@ export default function Login({
     canResetPassword,
     canRegister,
 }: LoginProps) {
+    const [validationErrors, setValidationErrors] = useState<{
+        identity_no?: string;
+        password?: string;
+    }>({});
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        const identity = (e.currentTarget.querySelector('#identity_no') as HTMLInputElement)?.value || '';
+        const password = (e.currentTarget.querySelector('#password') as HTMLInputElement)?.value || '';
+
+        const errors: { identity_no?: string; password?: string } = {};
+
+        if (!identity.trim()) {
+            errors.identity_no = '* This is a required field';
+        }
+        if (!password.trim()) {
+            errors.password = '* This is a required field';
+        }
+
+        if (Object.keys(errors).length > 0) {
+            e.preventDefault();
+            setValidationErrors(errors);
+            return false;
+        }
+
+        setValidationErrors({});
+    };
+
     return (
         <AuthLayout
             title="Sign In"
@@ -35,6 +63,7 @@ export default function Login({
                 {...store.form()}
                 resetOnSuccess={['password']}
                 className="flex flex-col gap-[16px]"
+                onSubmit={handleSubmit}
             >
                 {({ processing, errors }) => (
                     <>
@@ -46,6 +75,11 @@ export default function Login({
                         />
 
                         <div className="flex flex-col items-center gap-[17px] self-stretch">
+                            {errors.identity_no && errors.identity_no.includes('credentials') && (
+                                <div className="w-full sm:w-[384px] text-center">
+                                    <InputError message={errors.identity_no} />
+                                </div>
+                            )}
                             <div className="flex flex-col gap-[8px]">
                                 <Label htmlFor="identity_no">Student No.</Label>
                                 <Input
@@ -53,12 +87,20 @@ export default function Login({
                                     id="identity_no"
                                     type="text"
                                     name="identity_no"
-                                    required
                                     tabIndex={1}
                                     autoComplete="off"
                                     placeholder="20XX-XXXXX-MN-X"
+                                    onBlur={(e) => {
+                                        if (validationErrors.identity_no && e.target.value.trim()) {
+                                            setValidationErrors({ ...validationErrors, identity_no: undefined });
+                                        }
+                                    }}
+                                    style={validationErrors.identity_no ? {
+                                        borderColor: '#730000'
+                                    } as React.CSSProperties : undefined}
                                 />
-                                <InputError message={errors.identity_no} />
+                                {validationErrors.identity_no && <InputError message={validationErrors.identity_no} />}
+                                {!validationErrors.identity_no && errors.identity_no && !errors.identity_no.includes('credentials') && <InputError message={errors.identity_no} />}
                             </div>
 
                             <div className="flex flex-col gap-[8px]">
@@ -68,12 +110,20 @@ export default function Login({
                                     id="password"
                                     type="password"
                                     name="password"
-                                    required
                                     tabIndex={2}
                                     autoComplete="current-password"
                                     placeholder="Enter your password"
+                                    onBlur={(e) => {
+                                        if (validationErrors.password && e.target.value.trim()) {
+                                            setValidationErrors({ ...validationErrors, password: undefined });
+                                        }
+                                    }}
+                                    style={validationErrors.password ? {
+                                        borderColor: '#730000'
+                                    } as React.CSSProperties : undefined}
                                 />
-                                <InputError message={errors.password} />
+                                {validationErrors.password && <InputError message={validationErrors.password} />}
+                                {!validationErrors.password && errors.password && <InputError message={errors.password} />}
                             </div>
                             <Button
                                 type="submit"
