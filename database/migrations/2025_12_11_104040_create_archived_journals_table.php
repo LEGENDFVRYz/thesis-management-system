@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('archived_journals');
+        Schema::dropIfExists('tbl_archived_journals');
     }
 };
