@@ -174,9 +174,7 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
 
     // Management Routes
     Route::prefix('management')->group(function () {
-        Route::get('/', function () {
-            return Inertia::render('Admin/management/index');
-        })->name('admin.management.index');
+        Route::redirect('/', 'management/system')->name('admin.management.index');
 
         Route::get('system', function () {
             return Inertia::render('Admin/management/system');
@@ -189,19 +187,17 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
         Route::get('user', function () {
             return Inertia::render('Admin/management/user');
         })->name('admin.management.user');
-    });
 
-    Route::get('system', function () {
-        return Inertia::render('Admin/system');
-    })->name('admin.system');
+        Route::get('faculty', function () {
+            return Inertia::render('Admin/management/faculty');
+        })->name('admin.management.faculty');
+    });
 
     // Repository Routes
     Route::prefix('repository')->group(function () {
-        Route::get('/', function () {
-            return Inertia::render('Shared/repository/index');
-        })->name('admin.repository.index');
+        Route::redirect('/', 'repository/thesis')->name('admin.repository.index');
 
-        Route::get('theses', function () {
+        Route::get('thesis', function () {
             return Inertia::render('Shared/repository/thesis');
         })->name('admin.repository.theses');
 
