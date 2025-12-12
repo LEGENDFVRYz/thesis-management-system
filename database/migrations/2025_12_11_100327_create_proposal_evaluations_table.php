@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('proposal_evaluations', function (Blueprint $table) {
+        Schema::create('tbl_proposal_evaluations', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('proposal_id')
-                  ->constrained('proposals')
+                  ->constrained('tbl_proposals')
                   ->cascadeOnDelete();
 
             $table->foreignId('evaluator_id')
-                  ->constrained('faculty_assignments')
+                  ->constrained('tbl_faculty_assignments')
                   ->cascadeOnDelete();
 
             $table->text('comment')->nullable();

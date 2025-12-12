@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('defense_matrices', function (Blueprint $table) {
+        Schema::create('tbl_defense_matrices', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('thesis_id')
-                  ->constrained('theses')
+                  ->constrained('tbl_theses')
                   ->cascadeOnDelete();
 
             $table->string('title');

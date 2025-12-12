@@ -10,6 +10,8 @@ class Faculty extends Model
 {
     use HasFactory;
 
+    protected $table = 'tbl_faculties';
+
     protected $fillable = [
         'user_id',
         'name_prefix',
