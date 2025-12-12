@@ -80,7 +80,7 @@ export default function Login({
                                     <InputError message={errors.identity_no} />
                                 </div>
                             )}
-                            <div className="flex flex-col gap-[8px]">
+                            <div className="flex flex-col gap-[8px] w-full sm:w-[384px]">
                                 <Label htmlFor="identity_no">Student No.</Label>
                                 <Input
                                     className="auth-input"
@@ -90,11 +90,6 @@ export default function Login({
                                     tabIndex={1}
                                     autoComplete="off"
                                     placeholder="20XX-XXXXX-MN-X"
-                                    onBlur={(e) => {
-                                        if (validationErrors.identity_no && e.target.value.trim()) {
-                                            setValidationErrors({ ...validationErrors, identity_no: undefined });
-                                        }
-                                    }}
                                     style={validationErrors.identity_no ? {
                                         borderColor: '#730000'
                                     } as React.CSSProperties : undefined}
@@ -103,7 +98,7 @@ export default function Login({
                                 {!validationErrors.identity_no && errors.identity_no && !errors.identity_no.includes('credentials') && <InputError message={errors.identity_no} />}
                             </div>
 
-                            <div className="flex flex-col gap-[8px]">
+                            <div className="flex flex-col gap-[8px] w-full sm:w-[384px]">
                                 <Label htmlFor="password">Password</Label>
                                 <Input
                                     className="auth-input"
@@ -113,11 +108,6 @@ export default function Login({
                                     tabIndex={2}
                                     autoComplete="current-password"
                                     placeholder="Enter your password"
-                                    onBlur={(e) => {
-                                        if (validationErrors.password && e.target.value.trim()) {
-                                            setValidationErrors({ ...validationErrors, password: undefined });
-                                        }
-                                    }}
                                     style={validationErrors.password ? {
                                         borderColor: '#730000'
                                     } as React.CSSProperties : undefined}
@@ -128,7 +118,7 @@ export default function Login({
                             <Button
                                 type="submit"
                                 variant="destructive"
-                                className="w-[384px] h-[36px] font-['DM_Sans'] font-medium text-[13.33px] text-justify rounded-[8px]"
+                                className="w-full sm:w-[384px] h-[36px] font-['DM_Sans'] font-medium text-[13.33px] text-justify rounded-[8px]"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
