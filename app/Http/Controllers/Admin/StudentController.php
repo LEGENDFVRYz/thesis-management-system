@@ -70,6 +70,8 @@ class StudentController extends Controller
             )
             ->orderBy('tbl_students.id', 'asc')
             ->get(); // Use ->paginate(10) if you want pagination
+        
+        dd($students);
 
         return Inertia::render('Admin/management/student', [
             'students' => $students
