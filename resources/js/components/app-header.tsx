@@ -35,13 +35,13 @@ import { dashboard as adminDB } from '@/routes/admin';
 
 import { type BreadcrumbItem, type NavItem, type SharedData} from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { ChevronDown, Search } from 'lucide-react';
+import { ChevronDown, ChevronRight, Search } from 'lucide-react';
 import useUserRole from '@/hooks/use-user-role';
 
 import { adminMainNav } from '@/pages/Admin/_navigation';
 import { facultyMainNav } from '@/pages/Faculty/_navigation';
 import { studentMainNav } from '@/pages/Student/_navigation';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 
 const rightNavItems: NavItem[] = [
@@ -89,6 +89,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
         }
     };
 
+    const [activeTab, setActiveTab] = useState(0);
 
     return (
         <>
@@ -132,6 +133,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                         className="relative flex h-full items-center"
                                     >
                                         {item.children ? (
+                                            
 
                                             // Navtabs with children
                                             <DropdownMenu>
@@ -139,31 +141,74 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                     <Link
                                                         href={item.href}
                                                         className={cn(
-                                                            'hover:bg-[#9B000A] rounded-sm',
+                                                            'hover:bg-[#9B000A] rounded-sm transition-colors',
                                                             'bg-primary text-primary-foreground h-9 cursor-pointer px-3 gap-2.5 flex items-center',
-                                                            isSectionUrl(page.url, item.href) && 'text-primary-foreground-2 underline underline-offset-4 bg-[]',
+                                                            isSectionUrl(page.url, item.href) && 'text-primary-foreground-2 underline underline-offset-4'
                                                         )}
                                                     >
                                                         {item.title}
                                                         <ChevronDown className="h-4 w-4 stroke-[3]" />
                                                     </Link>
                                                 </DropdownMenuTrigger>
-
-                                                <DropdownMenuContent 
-                                                    align="center" 
-                                                    sideOffset={40} 
-                                                    className="w-[200px] rounded-md border shadow-md bg-primary"
-                                                >
-                                                    {item.children.map((child, childIndex) => (
-                                                    <Link
-                                                        key={childIndex}
-                                                        href={child.href}
-                                                        className="block px-3 py-2 text-sm hover:bg-[#9B000A] dark:hover:bg-gray-800 text-center text-primary-foreground"
+                                                
+                                                {item.children?.[0]?.children ? (
+                                                    // Special Two-Column (Roles + Management)
+                                                    <DropdownMenuContent
+                                                        align="center"
+                                                        sideOffset={40}
+                                                        className="w-[450px] p-0 flex flex-row overflow-hidden rounded-md border shadow-md"
                                                     >
-                                                        {child.title}
-                                                    </Link>
-                                                    ))}
-                                                </DropdownMenuContent>
+                                                        {/* LEFT SIDE: Role Tab of the user */}
+                                                        <div className="w-1/3 bg-white border-r border-gray-100 flex flex-col">
+                                                            {item.children.map((group, gIdx) => (
+                                                                <div 
+                                                                    key={gIdx}
+                                                                    onMouseEnter={() => setActiveTab(gIdx)}
+                                                                    className={cn(
+                                                                        "flex items-center justify-between px-4 py-4 font-bold text-sm cursor-pointer transition-colors",
+                                                                        activeTab === gIdx ? "bg-yellow-50/50 text-primary" : "text-primary"
+                                                                    )}
+                                                                >
+                                                                    {group.title}
+                                                                    <ChevronRight className="h-4 w-4" />
+                                                                </div>
+                                                            ))}
+                                                        </div>
+
+                                                        {/* RIGHT SIDE: Management Tabs of the selected users */}
+                                                        <div className="w-2/3 bg-primary flex flex-col py-2">
+                                                            {item.children?.[activeTab]?.children.map((child, childIndex) => (
+                                                                <Link
+                                                                    key={childIndex}
+                                                                    href={child.href}
+                                                                    className="px-4 py-3 text-sm text-white hover:bg-[#9B000A] transition-colors flex items-center gap-2 group"
+                                                                >
+                                                                    <span className="h-1 w-1 bg-primary-foreground rounded-full group-hover:bg-white transition-colors"></span>
+                                                                    {child.title}
+                                                                </Link>
+                                                            ))}
+                                                        </div>
+                                                    </DropdownMenuContent>
+
+                                                ) : (
+                                                    // Standard Single Column
+                                                    <DropdownMenuContent 
+                                                        align="center" 
+                                                        sideOffset={40} 
+                                                        className="w-[200px] rounded-md border shadow-md bg-primary"
+                                                    >
+                                                        {item.children.map((child, childIndex) => (
+                                                        <Link
+                                                            key={childIndex}
+                                                            href={child.href}
+                                                            className="block px-3 py-2 text-sm hover:bg-[#9B000A] dark:hover:bg-gray-800 text-center text-primary-foreground"
+                                                        >
+                                                            {child.title}
+                                                        </Link>
+                                                        ))}
+                                                    </DropdownMenuContent>
+
+                                                )}
                                             </DropdownMenu>
 
                                         ) : (

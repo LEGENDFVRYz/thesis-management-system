@@ -29,46 +29,70 @@ export const facultyMainNav = (): NavItem[] => {
     const hasRole = (requiredRoles: string[]) => {
         return requiredRoles.some(role => userRoles.includes(role));
     };
-
+    
 
     // Render management children 
     const managementChildren: NavItem[] = [];
 
     if (hasRole(['Adviser', 'Co-adviser'])) {
-        managementChildren.push(
-            { title: 'Advisee',             href: advisee_management() },
-            { title: 'Defense (adviser)',   href: adviser_defense_management() },
-            { title: 'Endorsement',         href: endorsement() },
-            { title: 'Evaluation',          href: eval_n_grading() },
-        );
-    }
-    if (hasRole(['Awardee'])) {
-        managementChildren.push(
-            { title: 'Awards Evaluation', href: awards_evaluation() },
-        );
-    }
-    if (hasRole(['Coordinator'])) {
-        managementChildren.push(
-            { title: 'Communication',               href: communication() },
-            { title: 'Compliance and Eligibility',  href: compliance() },
-            { title: 'Defense (coor)',  href: defense_management() },
-            { title: 'Grading',                     href: grading_management() },
-            { title: 'Thesis Monitoring',           href: thesis_monitoring() },
-        );
-    }
-    if (hasRole(['Panelist'])) {
-        managementChildren.push(
-            { title: 'Thesis Review',   href: thesis_review() },
-            { title: 'Defense (panel)', href: panel_defense_management() },
-    );
-    }
-    if (hasRole(['Committee'])) {
-        managementChildren.push(
-            { title: 'Proposal Review', href: proposal_review() }
-        );
+        managementChildren.push({
+            title: 'Adviser',
+            href: '#', // Role headers aren't clickable links
+            children: [
+                { title: 'Advisee', href: advisee_management() },
+                { title: 'Defense (adviser)', href: adviser_defense_management() },
+                { title: 'Endorsement', href: endorsement() },
+                { title: 'Evaluation', href: eval_n_grading() },
+            ]
+        });
     }
 
+    if (hasRole(['Coordinator'])) {
+        managementChildren.push({
+            title: 'Coordinator',
+            href: '#',
+            children: [
+                { title: 'Communication', href: communication() },
+                { title: 'Compliance', href: compliance() },
+                { title: 'Defense (coor)', href: defense_management() },
+                { title: 'Grading', href: grading_management() },
+                { title: 'Thesis Monitoring', href: thesis_monitoring() },
+            ]
+        });
+    }
     
+    if (hasRole(['Awardee'])) {
+        managementChildren.push({
+            title: 'Awardee',
+            href: '#',
+            children: [
+                { title: 'Awards Evaluation', href: awards_evaluation() },
+            ]
+        });
+    }
+
+    if (hasRole(['Panelist'])) {
+        managementChildren.push({
+            title: 'Panelist',
+            href: '#',
+            children: [
+                { title: 'Thesis Review',   href: thesis_review() },
+                { title: 'Defense (panel)', href: panel_defense_management() },
+            ]
+        });
+    }
+    
+    if (hasRole(['Committee'])) {
+        managementChildren.push({
+            title: 'Panelist',
+            href: '#',
+            children: [
+                { title: 'Proposal Review', href: proposal_review() }
+            ]
+        });
+    }
+
+
     // Combine and Return
     return [
         { title: 'Home', href: dashboard() },
