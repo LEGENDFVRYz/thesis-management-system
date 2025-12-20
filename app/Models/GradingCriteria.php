@@ -11,6 +11,12 @@ class GradingCriteria extends Model
 
     protected $table = 'tbl_grading_criterias';
 
+    protected $fillable = [
+        'category',
+        'weight',
+        'minimum',
+    ];
+
     protected static function boot()
     {
         parent::boot();

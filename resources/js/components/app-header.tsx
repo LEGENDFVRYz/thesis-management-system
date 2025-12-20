@@ -159,13 +159,13 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                         className="w-[450px] p-0 flex flex-row overflow-hidden rounded-md border shadow-md"
                                                     >
                                                         {/* LEFT SIDE: Role Tab of the user */}
-                                                        <div className="w-1/3 bg-white border-r border-gray-100 flex flex-col">
+                                                        <div className="w-1/3 py-2 bg-white border-r border-gray-100 flex flex-col">
                                                             {item.children.map((group, gIdx) => (
                                                                 <div 
                                                                     key={gIdx}
                                                                     onMouseEnter={() => setActiveTab(gIdx)}
                                                                     className={cn(
-                                                                        "flex items-center justify-between px-4 py-4 font-bold text-sm cursor-pointer transition-colors",
+                                                                        "flex items-center justify-between px-4 py-3 font-bold text-sm cursor-pointer transition-colors",
                                                                         activeTab === gIdx ? "bg-yellow-50/50 text-primary" : "text-primary"
                                                                     )}
                                                                 >

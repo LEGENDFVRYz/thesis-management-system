@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\DefenseController;
+use App\Http\Controllers\Admin\DepartmentPoliciesController;
 use App\Http\Controllers\Admin\FacultyController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Auth\FacultyLoginController;
@@ -192,9 +193,11 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
             return Inertia::render('Admin/management/deadline');
         })->name('admin.management.deadline');
 
-        Route::get('dept-policies', function () {
-            return Inertia::render('Admin/management/dep-policies');
-        })->name('admin.management.dep-policies');
+
+        // Full Crud Examples
+        Route::get('dept-policies', [DepartmentPoliciesController::class, 'index'])->name('admin.management.dep-policies');
+        Route::get('dept-policies/grading-criteria/{id}/edit', [DepartmentPoliciesController::class, 'edit'])->name('admin.management.dep-policies.edit');
+        Route::put('dept-policies/grading-criteria/{id}', [DepartmentPoliciesController::class, 'update'])->name('admin.management.dep-policies.update');
         
 
         Route::get('defenses', [DefenseController::class, 'index'])->name('admin.management.defenses');
