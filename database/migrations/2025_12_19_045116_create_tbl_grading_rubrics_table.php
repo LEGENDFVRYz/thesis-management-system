@@ -13,9 +13,12 @@ return new class extends Migration
     {
         Schema::create('tbl_grading_rubrics', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('criteria_id')->constrained('tbl_grading_criterias');
+            $table->foreignId('criteria_id')
+                  ->constrained('tbl_grading_criterias')
+                  ->onDelete('cascade');
+                  
             $table->text('title');
-            $table->date('deleted_at')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
