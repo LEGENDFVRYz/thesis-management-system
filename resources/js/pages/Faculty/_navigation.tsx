@@ -9,8 +9,10 @@ import {
     proposal_review
 } from '@/routes/faculty/management/committee';
 import { 
-    communication, compliance, defense_management as coor_defense_management, grading_management, thesis_monitoring
+    communication, compliance, grading_management
 } from '@/routes/faculty/management/coordinator';
+import { matrix } from '@/routes/faculty/management/coordinator/defense_management';
+import { thesis_registry } from '@/routes/faculty/management/coordinator/thesis_monitoring';
 import { thesis_review } from '@/routes/faculty/management/panel';
 import { 
     defense_management as joint_defense_management
@@ -38,10 +40,10 @@ export const facultyMainNav = (): NavItem[] => {
             title: 'Adviser',
             href: '#', // Role headers aren't clickable links
             children: [
-                { title: 'Advisee', href: my_advisees() },
-                { title: 'Defense (adviser)', href: joint_defense_management() },
-                { title: 'Endorsement', href: endorsement() },
-                { title: 'Evaluation', href: eval_n_grading() },
+                { title: 'Advisee',             href: my_advisees() },
+                { title: 'Defense (adviser)',   href: joint_defense_management() },
+                { title: 'Endorsement',         href: endorsement() },
+                { title: 'Evaluation',          href: eval_n_grading() },
             ]
         });
     }
@@ -51,11 +53,11 @@ export const facultyMainNav = (): NavItem[] => {
             title: 'Coordinator',
             href: '#',
             children: [
-                { title: 'Communication', href: communication() },
-                { title: 'Compliance', href: compliance() },
-                { title: 'Defense (coor)', href: coor_defense_management() },
-                { title: 'Grading', href: grading_management() },
-                { title: 'Thesis Monitoring', href: thesis_monitoring() },
+                { title: 'Communication',       href: communication() },
+                { title: 'Compliance',          href: compliance() },
+                { title: 'Defense (coor)',      href: matrix() },
+                { title: 'Grading',             href: grading_management() },
+                { title: 'Thesis Monitoring',   href: thesis_registry() },
             ]
         });
     }

@@ -148,14 +148,6 @@ Route::prefix('faculty')->group(function () {
 
             // --- COORDINATOR ROUTES ---
             Route::middleware('faculty.role:Coordinator')->prefix('coordinator')->group(function () {
-                Route::get('defense_management', function () {
-                    return Inertia::render('Faculty/management/coordinator/defense_management');
-                })->name('faculty.management.coordinator.defense_management');
-                
-                Route::get('thesis_monitoring', function () {
-                    return Inertia::render('Faculty/management/coordinator/thesis_monitoring');
-                })->name('faculty.management.coordinator.thesis_monitoring');
-
                 Route::get('compliance', function () {
                     return Inertia::render('Faculty/management/coordinator/compliance');
                 })->name('faculty.management.coordinator.compliance');
@@ -163,6 +155,32 @@ Route::prefix('faculty')->group(function () {
                 Route::get('communication', function () {
                     return Inertia::render('Faculty/management/coordinator/communication');
                 })->name('faculty.management.coordinator.communication');
+
+                // Grouped "Defense Management" tab
+                Route::prefix('defense_management')->group(function () {
+                    Route::redirect('/', 'defense_management/matrix')->name('faculty.management.coordinator.defense_management.index');   // temporary
+
+                    Route::get('/matrix', function () {
+                        return Inertia::render('Faculty/management/coordinator/defense_management/matrix');
+                    })->name('faculty.management.coordinator.defense_management.matrix');
+
+                    Route::get('/panel_assign', function () {
+                        return Inertia::render('Faculty/management/coordinator/defense_management/panel_assign');
+                    })->name('faculty.management.coordinator.defense_management.panel_assign');
+                });
+
+                // Grouped "Thesis Monitoring" tab
+                Route::prefix('thesis_monitoring')->group(function () {
+                    Route::redirect('/', 'thesis_monitoring/thesis_registry')->name('faculty.management.coordinator.thesis_monitoring.index');   // temporary
+
+                    Route::get('/thesis_registry', function () {
+                        return Inertia::render('Faculty/management/coordinator/thesis_monitoring/thesis_registry');
+                    })->name('faculty.management.coordinator.thesis_monitoring.thesis_registry');
+
+                    Route::get('/progress', function () {
+                        return Inertia::render('Faculty/management/coordinator/thesis_monitoring/progress');
+                    })->name('faculty.management.coordinator.thesis_monitoring.progress');
+                });
 
                 Route::get('grading_management', function () {
                     return Inertia::render('Faculty/management/coordinator/grading_management');
