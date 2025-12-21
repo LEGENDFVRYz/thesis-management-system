@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('identity_no')->unique()->comment(
                 "Student No / Faculty No"
             );
-            $table->enum('role', User::ROLES)->default('student');
+            $table->enum('role', User::ROLES)->default('student')->comment("student or faculty");
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
