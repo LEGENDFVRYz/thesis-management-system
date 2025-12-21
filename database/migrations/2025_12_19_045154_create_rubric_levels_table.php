@@ -17,7 +17,7 @@ return new class extends Migration
                   ->constrained('tbl_grading_rubrics')
                   ->onDelete('cascade');
                   
-            $table->integer('performance_indicator');
+            $table->integer('levels');
             $table->text('description');
             $table->softDeletes();
             $table->timestamps();
