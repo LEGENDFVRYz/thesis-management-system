@@ -34,16 +34,16 @@ class ArchivedJournalSeeder extends Seeder
             if ($averageGrade >= 75.00) {
                 
                 // Prevent duplicates
-                if (ArchivedJournal::where('thesis_id', $defense->thesis_id)->exists()) {
+                if (ArchivedJournal::where('thesis_id', $defense->endorsement->thesis_id)->exists()) {
                     continue;
                 }
 
                 // 5. Create Archive Record
                 ArchivedJournal::factory()->create([
-                    'thesis_id' => $defense->thesis_id,
+                    'thesis_id' => $defense->endorsement->thesis->id,
                     
                     // Optional: Use words from the real thesis title as keywords
-                    'keywords' => $this->generateKeywords($defense->thesis->title ?? 'Research'),
+                    'keywords' => $this->generateKeywords($defense->endorsement->thesis->title ?? 'Research'),
                 ]);
             }
         }
