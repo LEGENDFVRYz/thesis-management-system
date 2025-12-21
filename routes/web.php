@@ -77,9 +77,27 @@ Route::prefix('faculty')->group(function () {
 
             // --- ADVISER ROUTES ---
             Route::middleware('faculty.role:Adviser')->prefix('adviser')->group(function () {
-                Route::get('advisee_management', function () {
-                    return Inertia::render('Faculty/management/adviser/advisee_management');
-                })->name('faculty.management.adviser.advisee_management'); 
+
+                // Grouped "Advisee Management" tab
+                Route::prefix('advisee_management')->group(function () {
+                    Route::redirect('/', 'advisee_management/my_advisees')->name('faculty.management.adviser.advisee_management.index');   // temporary
+
+                    Route::get('/my_advisees', function () {
+                        return Inertia::render('Faculty/management/adviser/advisee_management/my_advisees');
+                    })->name('faculty.management.adviser.advisee_management.my_advisees');
+
+                    Route::get('/group_comp', function () {
+                        return Inertia::render('Faculty/management/adviser/advisee_management/group_comp');
+                    })->name('faculty.management.adviser.advisee_management.group_comp');
+
+                    Route::get('/thesis_review', function () {
+                        return Inertia::render('Faculty/management/adviser/advisee_management/thesis_review');
+                    })->name('faculty.management.adviser.advisee_management.thesis_review');
+
+                    Route::get('/progress', function () {
+                        return Inertia::render('Faculty/management/adviser/advisee_management/progress');
+                    })->name('faculty.management.adviser.advisee_management.progress');
+                });
 
                 // DEFENSE MANAGEMENT OF ADVISER HAS BEEN JOINED WITH PANEL
                 // CHECK THE SPECIAL ROUTES FOR THIS SCENARIO... 
@@ -152,7 +170,7 @@ Route::prefix('faculty')->group(function () {
             });
 
         });
-        
+
 
         Route::get('resources', function () {
             return Inertia::render('Shared/resources');

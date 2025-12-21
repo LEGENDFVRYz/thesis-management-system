@@ -2,21 +2,16 @@ import { NavItem, SharedData } from "@/types";
 import { 
     dashboard, resources, repository
 } from '@/routes/faculty';
-import { 
-    advisee_management, endorsement, eval_n_grading
-} from '@/routes/faculty/management/adviser';
-import { 
-    awards_evaluation
-} from '@/routes/faculty/management/award';
+import { endorsement, eval_n_grading } from '@/routes/faculty/management/adviser';
+import { my_advisees } from '@/routes/faculty/management/adviser/advisee_management';
+import { awards_evaluation } from '@/routes/faculty/management/award';
 import { 
     proposal_review
 } from '@/routes/faculty/management/committee';
 import { 
     communication, compliance, defense_management as coor_defense_management, grading_management, thesis_monitoring
 } from '@/routes/faculty/management/coordinator';
-import { 
-    thesis_review
-} from '@/routes/faculty/management/panel';
+import { thesis_review } from '@/routes/faculty/management/panel';
 import { 
     defense_management as joint_defense_management
 } from '@/routes/faculty/management/joint';
@@ -43,7 +38,7 @@ export const facultyMainNav = (): NavItem[] => {
             title: 'Adviser',
             href: '#', // Role headers aren't clickable links
             children: [
-                { title: 'Advisee', href: advisee_management() },
+                { title: 'Advisee', href: my_advisees() },
                 { title: 'Defense (adviser)', href: joint_defense_management() },
                 { title: 'Endorsement', href: endorsement() },
                 { title: 'Evaluation', href: eval_n_grading() },
