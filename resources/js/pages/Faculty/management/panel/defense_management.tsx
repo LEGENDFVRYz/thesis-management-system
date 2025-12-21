@@ -20,14 +20,9 @@ export default function Dashboard() {
             title="Defense Management" 
             description="loremmms"
         >
-                <div className="flex flex-1 flex-row gap-4"> 
-                    <div className="relative aspect-video flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                    </div>
-                    <div className="relative aspect-video flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                    </div>
-                </div>
+            {/* NOTE: This page is joint now with the adviser */}
+            {/* YOU SHOULD EDIT IT WITH adviser/defense_management.tsx */}
+            <div>temporary: for notice only... read the comment above of this tsx file</div>
         </FacultyManagementLayout>
     );
 }

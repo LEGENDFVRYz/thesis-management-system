@@ -3,7 +3,7 @@ import {
     dashboard, resources, repository
 } from '@/routes/faculty';
 import { 
-    advisee_management, defense_management as adviser_defense_management, defense_management, endorsement, eval_n_grading
+    advisee_management, endorsement, eval_n_grading
 } from '@/routes/faculty/management/adviser';
 import { 
     awards_evaluation
@@ -15,9 +15,13 @@ import {
     communication, compliance, defense_management as coor_defense_management, grading_management, thesis_monitoring
 } from '@/routes/faculty/management/coordinator';
 import { 
-    defense_management as panel_defense_management, thesis_review
+    thesis_review
 } from '@/routes/faculty/management/panel';
+import { 
+    defense_management as joint_defense_management
+} from '@/routes/faculty/management/joint';
 import { usePage } from '@inertiajs/react';
+
 
 
 // Export a function that returns NavItem[]
@@ -40,7 +44,7 @@ export const facultyMainNav = (): NavItem[] => {
             href: '#', // Role headers aren't clickable links
             children: [
                 { title: 'Advisee', href: advisee_management() },
-                { title: 'Defense (adviser)', href: adviser_defense_management() },
+                { title: 'Defense (adviser)', href: joint_defense_management() },
                 { title: 'Endorsement', href: endorsement() },
                 { title: 'Evaluation', href: eval_n_grading() },
             ]
@@ -77,7 +81,7 @@ export const facultyMainNav = (): NavItem[] => {
             href: '#',
             children: [
                 { title: 'Thesis Review',   href: thesis_review() },
-                { title: 'Defense (panel)', href: panel_defense_management() },
+                { title: 'Defense (panel)', href: joint_defense_management() },
             ]
         });
     }
