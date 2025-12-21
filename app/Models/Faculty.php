@@ -10,6 +10,8 @@ class Faculty extends Model
 {
     use HasFactory;
 
+    protected $table = 'tbl_faculties';
+
     protected $fillable = [
         'user_id',
         'name_prefix',
@@ -36,7 +38,7 @@ class Faculty extends Model
 
     public function roles()
     {
-        return $this->belongsToMany(FacultyRole::class, 'faculty_assignments', 'faculty_id', 'role_id');
+        return $this->belongsToMany(FacultyRole::class, 'tbl_faculty_assignments', 'faculty_id', 'role_id');
     }
 
 

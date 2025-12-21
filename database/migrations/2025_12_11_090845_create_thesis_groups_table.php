@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('thesis_groups', function (Blueprint $table) {
+        Schema::create('tbl_thesis_groups', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('adviser_id')
-                  ->constrained('faculty_assignments')
+            $table->foreignId('section_adviser_id')
+                  ->constrained('tbl_section_advisers')
                   ->cascadeOnDelete();
-
-            $table->integer('group_section'); 
 
             $table->integer('group_number');
         });
@@ -29,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('thesis_groups');
+        Schema::dropIfExists('tbl_thesis_groups');
     }
 };

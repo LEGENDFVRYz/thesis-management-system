@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\DefenseController;
+use App\Http\Controllers\Admin\FacultyController;
+use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Auth\FacultyLoginController;
 use App\Http\Controllers\Auth\StudentLoginController;
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FileImportController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -174,34 +177,35 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
 
     // Management Routes
     Route::prefix('management')->group(function () {
-        Route::get('/', function () {
-            return Inertia::render('Admin/management/index');
-        })->name('admin.management.index');
+        Route::redirect('/', 'management/student')->name('admin.management.index');     // dont know ehere is the default, so ayan nalang muna
 
-        Route::get('system', function () {
-            return Inertia::render('Admin/management/system');
-        })->name('admin.management.system');
+        Route::get('student', [StudentController::class, 'index'])->name('admin.management.student');
+        Route::post('student/store', [StudentController::class, 'store'])->name('admin.management.student.store');
+
+        Route::get('faculty', [FacultyController::class, 'index'])->name('admin.management.faculty');
+
+        Route::get('academic-settings', function () {
+            return Inertia::render('Admin/management/academic');
+        })->name('admin.management.academic');
+
+        Route::get('deadline', function () {
+            return Inertia::render('Admin/management/deadline');
+        })->name('admin.management.deadline');
+
+        Route::get('dept-policies', function () {
+            return Inertia::render('Admin/management/dep-policies');
+        })->name('admin.management.dep-policies');
         
-        Route::get('defenses', function () {
-            return Inertia::render('Admin/management/defense');
-        })->name('admin.management.defenses');
 
-        Route::get('user', function () {
-            return Inertia::render('Admin/management/user');
-        })->name('admin.management.user');
+        Route::get('defenses', [DefenseController::class, 'index'])->name('admin.management.defenses');
+
     });
-
-    Route::get('system', function () {
-        return Inertia::render('Admin/system');
-    })->name('admin.system');
 
     // Repository Routes
     Route::prefix('repository')->group(function () {
-        Route::get('/', function () {
-            return Inertia::render('Shared/repository/index');
-        })->name('admin.repository.index');
+        Route::redirect('/', 'repository/thesis')->name('admin.repository.index');
 
-        Route::get('theses', function () {
+        Route::get('thesis', function () {
             return Inertia::render('Shared/repository/thesis');
         })->name('admin.repository.theses');
 
@@ -222,8 +226,9 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
 API ROUTES (temporary only)        
 ==================================================================================
 */
-
+Route::post('file-import', [FileImportController::class, 'store'])->name('file.import');
 
 
 
 require __DIR__.'/settings.php';
+

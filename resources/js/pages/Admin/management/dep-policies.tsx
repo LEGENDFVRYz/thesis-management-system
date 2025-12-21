@@ -2,22 +2,23 @@ import ManagementLayout from '@/pages/Admin/management/index';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import { user } from '@/routes/admin/management/index';
+import { depPolicies } from '@/routes/admin/management/index';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Deadlines',
-        href: user().url,
+        href: depPolicies().url,
     },
 ];
 
 export default function DeadlinePage() {
     return (
-        <ManagementLayout breadcrumbs={breadcrumbs}>
-            <Head title="User Management" />
-
-            <h1>USER MANAGEMENT</h1>
-
+        <ManagementLayout 
+            breadcrumbs={breadcrumbs}
+            title="Department Policies" 
+            description="Configure academic year, semester parameters, and system timeline"
+        >
+            
             <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
                 <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
             </div>

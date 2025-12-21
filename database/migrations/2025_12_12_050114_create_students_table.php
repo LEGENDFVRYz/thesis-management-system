@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('students', function (Blueprint $table) {
+        Schema::create('tbl_students', function (Blueprint $table) {
             $table->id();
             
             // Foreign Key to Users
@@ -20,19 +20,21 @@ return new class extends Migration
                   ->onDelete('cascade')
                   ->comment('Link to their main account credentials');
 
-            // Foreign Key to Groups (Uncomment ->constrained if table exists)
-            $table->unsignedBigInteger('group_id')->nullable();
-            // $table->foreign('group_id')->references('id')->on('groups'); 
-
-            $table->string('email');
+            // Foreign Key to Groups
+            $table->foreignId('group_id')
+                  ->nullable()
+                  ->constrained('tbl_thesis_groups')
+                  ->nullOnDelete();
+            
             $table->string('last_name');
             $table->string('first_name');
             $table->string('middle_name')->nullable();
+            $table->string('suffix')->nullable();
             $table->string('section');
             
             // Foreign Key to Specializations
             $table->foreignId('spec_id')
-                  ->constrained('specializations')
+                  ->constrained('tbl_specializations')
                   ->comment("Student's Specialization / Major");
 
             $table->boolean('is_leader')->default(false);
@@ -45,6 +47,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('students');
+        Schema::dropIfExists('tbl_students');
     }
 };
