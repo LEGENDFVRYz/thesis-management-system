@@ -35,7 +35,16 @@ class DepartmentPoliciesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Validate request
+        $validated = $request->validate([
+            'category' => 'required|string|max:120',
+            'weight'   => 'required|numeric|min:0|max:100',
+            'minimum'  => 'required|numeric|min:0|max:100',
+        ]);
+
+        GradingCriteria::create($validated);
+
+        return redirect()->route('admin.management.dep-policies');
     }
 
     /**
@@ -51,6 +60,9 @@ class DepartmentPoliciesController extends Controller
      */
     public function edit(string $id)
     {
+        // Testing phase, but since we used modal... this route is technically unnecessary
+        // Used this if you have specific editing form page
+        
         // Fetch the grading criteria by ID
         $criteria = GradingCriteria::find($id);
 
@@ -78,7 +90,7 @@ class DepartmentPoliciesController extends Controller
             return redirect()->back()->with('error', 'Grading criteria not found');
         }
 
-        // Validate incoming request
+        // Validate request
         $validated = $request->validate([
             'category' => 'required|string|max:120',
             'weight'   => 'required|numeric|min:0|max:100',
@@ -98,6 +110,9 @@ class DepartmentPoliciesController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $criteria = GradingCriteria::findOrFail($id);
+
+        $criteria->delete();
+        return redirect()->route('admin.management.dep-policies');
     }
 }

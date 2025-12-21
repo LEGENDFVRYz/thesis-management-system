@@ -194,14 +194,15 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
         })->name('admin.management.deadline');
 
 
-        // Full Crud Examples
+        // FULL CRUD OPERATIONS EXAMPLES
         Route::get('dept-policies', [DepartmentPoliciesController::class, 'index'])->name('admin.management.dep-policies');
-        Route::get('dept-policies/grading-criteria/{id}/edit', [DepartmentPoliciesController::class, 'edit'])->name('admin.management.dep-policies.edit');
+        // Route::get('dept-policies/grading-criteria/{id}/edit', [DepartmentPoliciesController::class, 'edit'])->name('admin.management.dep-policies.edit');
         Route::put('dept-policies/grading-criteria/{id}', [DepartmentPoliciesController::class, 'update'])->name('admin.management.dep-policies.update');
-        
+        Route::delete('dept-policies/grading-criteria/{id}', [DepartmentPoliciesController::class, 'destroy'])->name('admin.management.dep-policies.destroy');
+        Route::post('dept-policies/grading-criteria', [DepartmentPoliciesController::class, 'store'])->name('admin.management.dep-policies.store');
+
 
         Route::get('defenses', [DefenseController::class, 'index'])->name('admin.management.defenses');
-
     });
 
     // Repository Routes

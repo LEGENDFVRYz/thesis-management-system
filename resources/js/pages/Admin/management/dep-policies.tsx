@@ -13,31 +13,69 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function DeadlinePage({ grading }: { grading: any[] }) {
-    const { data, setData, put, processing, errors } = useForm({
+    const { data, setData, post, put, delete: destroy, processing, errors, reset, clearErrors } = useForm({
         category: '',
         weight: 0,
         minimum: 0,
     });
-
-    // 
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
+
     
+    // Editing Proccess
     const openEdit = (criteria: any) => {
+        clearErrors();
         setEditingId(criteria.id);
         setData({
             category: criteria.category,
             weight: criteria.weight,
             minimum: criteria.minimum,
         });
+        setIsModalOpen(true);
     };
 
-    const submit = () => {
-        if (!editingId) return;
-
-        put(`/admin/management/dept-policies/grading-criteria/${editingId}`, {
-            onSuccess: () => setEditingId(null),
-        });
+    // Delete Process
+    const handleDelete = (id: number) => {
+        if (confirm('Are you sure you want to delete this criteria? This action cannot be undone.')) {
+            destroy(`/admin/management/dept-policies/grading-criteria/${id}`, {
+                preserveScroll: true
+            });
+        }
     };
+
+    // Create Process
+    const openCreate = () => {
+        clearErrors();
+        setEditingId(null);     // Logic for editing/create process identifier
+        reset();                
+        setIsModalOpen(true);
+    };
+
+
+    // Form Handling (shared logic for submissions)
+    const submit = (e: React.FormEvent) => {
+        e.preventDefault();
+        const isEditing = editingId !== null;
+
+        if (isEditing) {
+            // Update mode
+            put(`/admin/management/dept-policies/grading-criteria/${editingId}`, {
+                onSuccess: () => closeModal(),
+            });
+        } else {
+            // Create mode
+            post(`/admin/management/dept-policies/grading-criteria`, {
+                onSuccess: () => closeModal(),
+            });
+        }
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setEditingId(null);
+        reset();
+    };
+
 
 
     return (
@@ -47,7 +85,16 @@ export default function DeadlinePage({ grading }: { grading: any[] }) {
             description="Configure academic year, semester parameters, and system timeline"
         >
             <div className="relative min-h-[100vh] p-8 flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                <h1 className='font-bold pb-5'>Grade Policies</h1>
+                <div className="flex items-center justify-between pb-4">
+                    <h1 className='font-bold pb-5'>Grade Policies</h1>
+                    <button
+                        className="py-2 px-4 bg-primary text-sm text-primary-foreground hover:text-primary-foreground-2 cursor-pointer rounded-sm"
+                        onClick={openCreate}
+                        disabled={processing}
+                    >
+                        Create
+                    </button>
+                </div>
 
                 <table className="min-w-full text-left text-sm whitespace-nowrap">
                     <thead className="uppercase tracking-wider border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
@@ -72,12 +119,19 @@ export default function DeadlinePage({ grading }: { grading: any[] }) {
                                     <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100 text-center">
                                         {criteria.minimum}
                                     </td>
-                                    <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100 text-center">
+                                    <td className="px-6 py-4 flex gap-2 font-medium text-gray-900 dark:text-gray-100 justify-center">
                                         <button
                                             className="py-1 px-4 bg-primary text-primary-foreground hover:text-primary-foreground-2 cursor-pointer rounded-sm"
                                             onClick={() => openEdit(criteria)}
                                         >
                                             Edit
+                                        </button>
+                                        <button
+                                            className="py-1 px-4 bg-primary text-primary-foreground hover:text-primary-foreground-2 cursor-pointer rounded-sm"
+                                            onClick={() => handleDelete(criteria.id)}
+                                            disabled={processing}
+                                        >
+                                            Delete
                                         </button>
                                     </td>
                                 </tr>
@@ -92,13 +146,14 @@ export default function DeadlinePage({ grading }: { grading: any[] }) {
                     </tbody>
                 </table>
             </div>
+            
 
-            {/* TESTING MODAL */}
-            {editingId && (
+            {/* SAMPLE TESTING MODAL FOR CRUD OPERATIONS */}
+            {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/12 backdrop-blur-sm">
                     <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
                         <h2 className="mb-4 text-lg font-semibold text-gray-800">
-                            Edit Grading Criteria
+                            {editingId ? 'Edit Grading Criteria' : 'Add New Grading Criteria'}
                         </h2>
 
                         {/* Category */}
@@ -159,7 +214,7 @@ export default function DeadlinePage({ grading }: { grading: any[] }) {
                         {/* CONFIRMATIONS */}
                         <div className="flex gap-2 justify-end">
                             <button
-                                onClick={() => setEditingId(null)}
+                                onClick={closeModal}
                                 className="rounded-md px-4 py-2 text-sm bg-gray-400 text-primary-foreground"
                             >
                                 Cancel
@@ -169,7 +224,7 @@ export default function DeadlinePage({ grading }: { grading: any[] }) {
                                 disabled={processing}
                                 className="rounded-md px-4 py-2 text-sm bg-primary text-primary-foreground"
                             >
-                                Save
+                                {editingId ? 'Save' : 'Create'}
                             </button>
                         </div>
                     </div>
