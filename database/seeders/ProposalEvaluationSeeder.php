@@ -34,7 +34,7 @@ class ProposalEvaluationSeeder extends Seeder
         foreach ($proposals as $proposal) {
             
             // LOGIC: Randomly pick 1 to 3 evaluators for this proposal
-            $randomEvaluators = $evaluators->random(rand(1, 3));
+            $randomEvaluators = $evaluators->random(rand(3, 3));
 
             foreach ($randomEvaluators as $evaluator) {
                 ProposalEvaluation::factory()->create([

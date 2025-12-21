@@ -31,7 +31,12 @@ class DatabaseSeeder extends Seeder
             DefenseMatrixSeeder::class,
             DefenseEvaluationSeeder::class,
             ArchivedJournalSeeder::class,
-            StudentSeeder::class
+            StudentSeeder::class,
+            
+            // grading criteria seeder
+            GradingCriteriasSeeder::class,
+            GradingRubricsSeeder::class,
+            RubricLevelsSeeder::class,
         ]);
 
         // Faculty::factory(10)->create();

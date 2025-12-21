@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Faculty;
 use App\Models\FacultyRole;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -52,5 +53,7 @@ class FacultyRoleSeeder extends Seeder
             );
         }
         
+        // Add more faculty for testing
+        Faculty::factory()->count(20)->create();
     }
 }
