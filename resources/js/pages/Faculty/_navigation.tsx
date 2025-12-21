@@ -54,7 +54,7 @@ export const facultyMainNav = (): NavItem[] => {
             children: [
                 { title: 'Communication', href: communication() },
                 { title: 'Compliance', href: compliance() },
-                { title: 'Defense (coor)', href: defense_management() },
+                { title: 'Defense (coor)', href: coor_defense_management() },
                 { title: 'Grading', href: grading_management() },
                 { title: 'Thesis Monitoring', href: thesis_monitoring() },
             ]
@@ -84,7 +84,7 @@ export const facultyMainNav = (): NavItem[] => {
     
     if (hasRole(['Committee'])) {
         managementChildren.push({
-            title: 'Panelist',
+            title: 'Committee',
             href: '#',
             children: [
                 { title: 'Proposal Review', href: proposal_review() }

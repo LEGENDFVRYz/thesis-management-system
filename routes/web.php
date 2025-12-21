@@ -73,10 +73,7 @@ Route::prefix('faculty')->group(function () {
 
         // MANAGEMENT ROUTING DEPENDENT ON SUBROLES
         Route::prefix('management')->group(function () {
-            Route::get('/', function () {
-                return Inertia::render('Faculty/management/index');
-            })->name('faculty.management.index');
-
+            Route::redirect('/', '/faculty/dashboard')->name('faculty.management.index');   // temporary
 
             // --- ADVISER ROUTES ---
             Route::middleware('faculty.role:Adviser')->prefix('adviser')->group(function () {
