@@ -27,6 +27,7 @@ class FacultyFactory extends Factory
             'first_name' => fake()->firstName(),
             
             'middle_name' => fake()->optional()->lastName(),
+            'suffix'      => fake()->optional()->suffix(),
             'is_regular' => fake()->boolean(),
         ];
     }
