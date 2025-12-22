@@ -63,12 +63,11 @@ class StudentController extends Controller
                 // Logic: IF year=2025 THEN Prefix '3' + Section + Padded Group Number (09)
                 // ELSE: Section + Padded Group Number (09)
                 DB::raw("
-                    CASE 
-                        WHEN tbl_school_years.year = 2025 THEN 
-                            CONCAT('3', tbl_section_advisers.section, LPAD(tbl_thesis_groups.group_number, 2, '0'))
-                        ELSE 
-                            CONCAT('4', tbl_section_advisers.section, LPAD(tbl_thesis_groups.group_number, 2, '0')) 
-                    END as group_code
+                    CONCAT(
+                        3 - (tbl_school_years.year - 2025), 
+                        tbl_section_advisers.section, 
+                        LPAD(tbl_thesis_groups.group_number, 2, '0')
+                    )  AS group_code
                 ")
             )
             ->orderBy('tbl_students.id', 'asc')
