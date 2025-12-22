@@ -16,11 +16,13 @@ class DefenseController extends Controller
     {
         $defenses = DB::table('tbl_defense_matrices')
             // 1. Join Tables to reach Group and Faculty
-            ->join('tbl_theses', 'tbl_defense_matrices.thesis_id', '=', 'tbl_theses.id')
+            ->join('tbl_endorsements', 'tbl_defense_matrices.endorsement_id', '=', 'tbl_endorsements.id')
+            ->join('tbl_theses', 'tbl_endorsements.thesis_id', '=', 'tbl_theses.id')
             ->join('tbl_proposals', 'tbl_theses.proposal_id', '=', 'tbl_proposals.id')
             ->join('tbl_thesis_groups', 'tbl_proposals.group_id', '=', 'tbl_thesis_groups.id')
             ->join('tbl_section_advisers', 'tbl_thesis_groups.section_adviser_id', '=', 'tbl_section_advisers.id')
             ->join('tbl_faculty_assignments', 'tbl_section_advisers.faculty_assign_id', '=', 'tbl_faculty_assignments.id')
+            ->leftJoin('tbl_school_years', 'tbl_faculty_assignments.sy_id', '=', 'tbl_school_years.id')
             ->join('tbl_faculties', 'tbl_faculty_assignments.faculty_id', '=', 'tbl_faculties.id')
             
             // 2. Join Students (Left Join ensures we still see the group even if empty)
@@ -30,10 +32,10 @@ class DefenseController extends Controller
                 // --- Group Code Logic ---
                 DB::raw("
                     CASE 
-                        WHEN tbl_faculty_assignments.school_year = '2025' THEN 
+                        WHEN tbl_school_years.year = 2025 THEN 
                             CONCAT('3', tbl_section_advisers.section, LPAD(tbl_thesis_groups.group_number, 2, '0'))
                         ELSE 
-                            CONCAT(tbl_section_advisers.section, LPAD(tbl_thesis_groups.group_number, 2, '0')) 
+                            CONCAT('4', tbl_section_advisers.section, LPAD(tbl_thesis_groups.group_number, 2, '0')) 
                     END as group_code
                 "),
 
@@ -43,8 +45,8 @@ class DefenseController extends Controller
                 DB::raw("COUNT(tbl_students.id) as proponents"),
 
                 // --- Adviser Name ---
-                DB::raw("CONCAT(tbl_faculties.first_name, ' ', tbl_faculties.last_name) as adviser_name"),
-
+                DB::raw("CONCAT(tbl_faculties.name_prefix, ' ', tbl_faculties.first_name, ' ', tbl_faculties.last_name) as adviser_name"),
+                
                 'tbl_section_advisers.section as block',
 
                 // --- Date Formatting (Month Day, Year 12:00 PM) ---
@@ -56,10 +58,11 @@ class DefenseController extends Controller
             // Group By is mandatory when using COUNT() alongside other columns
             ->groupBy(
                 'tbl_defense_matrices.id',
-                'tbl_faculty_assignments.school_year',
+                'tbl_school_years.year',
                 'tbl_section_advisers.section',
                 'tbl_thesis_groups.group_number',
                 'tbl_theses.title',
+                'tbl_faculties.name_prefix',
                 'tbl_faculties.first_name',
                 'tbl_faculties.last_name',
                 'tbl_defense_matrices.defense_schedule',

@@ -54,6 +54,6 @@ class FacultyRoleSeeder extends Seeder
         }
         
         // Add more faculty for testing
-        Faculty::factory()->count(20)->create();
+        // Faculty::factory()->count(20)->create();
     }
 }

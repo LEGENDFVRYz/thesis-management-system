@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\DefenseEvaluation;
 use App\Models\DefenseMatrix;
 use App\Models\FacultyAssignment;
+use App\Models\FacultyRole;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -15,34 +16,47 @@ class DefenseEvaluationSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Get all Scheduled Defenses
-        $defenses = DefenseMatrix::all();
+        // 1. Get valid Panelists for substitution logic later
+        $panelistRole = FacultyRole::where('role_name', 'Panelist')->first();
+        $allPanelists = FacultyAssignment::where('role_id', $panelistRole->id)->get();
 
-        // 2. Get ONLY Faculty who are 'Panelists'
-        $panelists = FacultyAssignment::whereHas('role', function($q) {
-            $q->where('role_name', 'Panelist');
-        })->get();
+        // 2. Loop through every scheduled defense
+        // Eager load 'endorsedPanels' to see who was SUPPOSED to be there
+        $defenses = DefenseMatrix::with('endorsedPanels')->get();
 
-        // Safety Checks
-        if ($defenses->isEmpty()) {
-            $this->command->info('No Defenses scheduled. Skipping Evaluation seeding.');
-            return;
-        }
-        if ($panelists->count() < 3) {
-            $this->command->warn('Not enough Panelists found (Need at least 3). Skipping Evaluation seeding.');
-            return;
-        }
-
-        // 3. Assign 3 Panelists to EACH Defense
         foreach ($defenses as $defense) {
-            
-            // Pick 3 random unique panelists from the list
-            $assignedPanelists = $panelists->random(3);
 
-            foreach ($assignedPanelists as $panelist) {
+            // 3. Filter only the 3 CONFIRMED panelists
+            $confirmedPanels = $defense->endorsedPanels->where('is_confirmed', true);
+
+            if ($confirmedPanels->isEmpty()) {
+                continue;
+            }
+
+            foreach ($confirmedPanels as $panelInvitation) {
+                
+                // 4. ATTENDANCE LOGIC
+                // 90% chance the confirmed panel attends. 10% chance they are absent.
+                $isPresent = (rand(1, 100) <= 90);
+                
+                if ($isPresent) {
+                    // Scenario A: The confirmed panel grades the student
+                    $evaluatorId = $panelInvitation->panel_id;
+                } else {
+                    // Scenario B: SUBSTITUTION
+                    // Pick a random faculty who is NOT one of the original invited panels
+                    // (To avoid duplicate evaluators in the same room)
+                    $excludedIds = $confirmedPanels->pluck('panel_id')->toArray();
+                    
+                    $substitute = $allPanelists->whereNotIn('id', $excludedIds)->random();
+                    $evaluatorId = $substitute->id;
+                }
+
+                // 5. Create the Evaluation
                 DefenseEvaluation::factory()->create([
-                    'defense_id' => $defense->id,
-                    'evaluator_id' => $panelist->id,
+                    'defense_id'   => $defense->id,
+                    'evaluator_id' => $evaluatorId,
+                    // Grades/Comments are handled by the Factory's random logic
                 ]);
             }
         }

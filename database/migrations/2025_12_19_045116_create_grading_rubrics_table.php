@@ -17,7 +17,7 @@ return new class extends Migration
                   ->constrained('tbl_grading_criterias')
                   ->onDelete('cascade');
                   
-            $table->text('title');
+            $table->text('performance_indicator');
             $table->softDeletes();
             $table->timestamps();
         });

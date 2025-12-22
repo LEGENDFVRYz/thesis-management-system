@@ -11,16 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tbl_rubric_levels', function (Blueprint $table) {
+        Schema::create('tbl_announcements', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('rubrics_id')
-                  ->constrained('tbl_grading_rubrics')
+
+            $table->foreignId('semester_id')
+                  ->constrained('tbl_semesters')
                   ->onDelete('cascade');
-                  
-            $table->integer('performance_indicator');
-            $table->text('description');
-            $table->softDeletes();
-            $table->timestamps();
+
+            // Derived
+            // $table->string('title'); // Copied from template for convenience
+
+            $table->date('due_date');
         });
     }
 
@@ -29,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tbl_rubric_levels');
+        Schema::dropIfExists('tbl_announcements');
     }
 };

@@ -148,7 +148,7 @@ class RubricLevelsSeeder extends Seeder
             foreach ($indicators as $pi => $desc) {
                 $data[] = [
                     'rubrics_id'            => $rubricId,
-                    'performance_indicator' => $pi,
+                    'levels'                => $pi,
                     'description'           => $desc,
                     'created_at'            => $now,
                     'updated_at'            => $now,

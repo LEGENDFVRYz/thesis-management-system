@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Faculty;
 use App\Models\FacultyAssignment;
+use App\Models\SchoolYear;
+use App\Models\Semester;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -17,6 +19,14 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $now = now();
+
+        // We need this ID to link assignments correctly.
+        $activeSemester = Semester::where('is_active', true)->first();
+
+        if (!$activeSemester) {
+            $this->command->error("No active Semester found. Please run SchoolYearSeeder first.");
+            return;
+        }
 
         // Sample Admin account
         $admin = User::firstOrNew(['email' => 'admin@example.com']);
@@ -42,7 +52,7 @@ class UserSeeder extends Seeder
         FacultyAssignment::firstOrCreate([
             'faculty_id' => $adminn->id,
             'role_id' => 1,
-            'school_year' => '2025',
+            'sy_id' => $activeSemester->school_year_id,
         ], [
             'is_active' => true,
         ]);
@@ -71,7 +81,7 @@ class UserSeeder extends Seeder
         FacultyAssignment::firstOrCreate([
             'faculty_id' => $facultyy->id,
             'role_id' => 2,
-            'school_year' => '2025',
+            'sy_id' => $activeSemester->school_year_id,
         ], [
             'is_active' => true,
         ]);
@@ -116,7 +126,7 @@ class UserSeeder extends Seeder
             FacultyAssignment::firstOrCreate([
                 'faculty_id' => $facultyProfile->id,
                 'role_id' => $roleId, 
-                'school_year' => '2025',
+                'sy_id' => $activeSemester->school_year_id,
             ], [
                 'is_active' => true,
             ]);
