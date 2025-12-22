@@ -64,7 +64,7 @@ export default function Dashboard({ defenses }: { defenses: any[] }) {
                                         </td>
 
                                         <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
-                                            BSCPE 3-{def.block}
+                                            BSCPE {def.year_level}-{def.block}  
                                         </td>
 
                                         <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
