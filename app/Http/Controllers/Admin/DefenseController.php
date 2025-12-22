@@ -14,6 +14,15 @@ class DefenseController extends Controller
      */
     public function index()
     {
+        // Get the year (e.g., 2025) from the active semester
+        $activeYear = DB::table('tbl_school_years')
+            ->join('tbl_semesters', 'tbl_school_years.id', '=', 'tbl_semesters.school_year_id')
+            ->where('tbl_semesters.is_active', true)
+            ->value('year');
+
+        // Fallback if no active year is set (optional safety)
+        $activeYear = $activeYear ?? 2025;
+
         $defenses = DB::table('tbl_defense_matrices')
             // 1. Join Tables to reach Group and Faculty
             ->join('tbl_endorsements', 'tbl_defense_matrices.endorsement_id', '=', 'tbl_endorsements.id')
@@ -31,13 +40,14 @@ class DefenseController extends Controller
             ->select(
                 // --- Group Code Logic ---
                 DB::raw("
-                    CASE 
-                        WHEN tbl_school_years.year = 2025 THEN 
-                            CONCAT('3', tbl_section_advisers.section, LPAD(tbl_thesis_groups.group_number, 2, '0'))
-                        ELSE 
-                            CONCAT('4', tbl_section_advisers.section, LPAD(tbl_thesis_groups.group_number, 2, '0')) 
-                    END as group_code
+                    CONCAT(
+                        (3 + ($activeYear - tbl_school_years.year)), 
+                        tbl_section_advisers.section, 
+                        LPAD(tbl_thesis_groups.group_number, 2, '0')
+                    ) AS group_code
                 "),
+
+                DB::raw("(3 + ($activeYear - tbl_school_years.year)) as year_level"),
 
                 'tbl_theses.title as thesis_title',
                 
@@ -72,7 +82,8 @@ class DefenseController extends Controller
             ->get();
 
         return Inertia::render('Admin/management/defense', [
-            'defenses' => $defenses
+            'defenses' => $defenses,
+            'activeYear' => $activeYear
         ]);
     }
 
