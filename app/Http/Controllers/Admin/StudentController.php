@@ -65,10 +65,10 @@ class StudentController extends Controller
                 DB::raw("
                     CONCAT(
                         3 - (tbl_school_years.year - 2025), 
-                        tbl_section_advisers.section, 
+                        tbl_section_advisers.section,
                         LPAD(tbl_thesis_groups.group_number, 2, '0')
                     )  AS group_code
-                ")
+                "),
             )
             ->orderBy('tbl_students.id', 'asc')
             ->get(); // Use ->paginate(10) if you want pagination

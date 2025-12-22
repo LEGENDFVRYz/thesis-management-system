@@ -6,7 +6,19 @@ use App\Http\Controllers\Admin\FacultyController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Auth\FacultyLoginController;
 use App\Http\Controllers\Auth\StudentLoginController;
+use App\Http\Controllers\Faculty\Adviser\Endorsement;
+use App\Http\Controllers\Faculty\Adviser\AdviseeManagement\GroupComp;
+use App\Http\Controllers\Faculty\Adviser\AdviseeManagement\MyAdvisees;
+use App\Http\Controllers\Faculty\Adviser\AdviseeManagement\ProgressReport;
+use App\Http\Controllers\Faculty\Adviser\AdviseeManagement\ThesisReview;
+use App\Http\Controllers\Faculty\Adviser\EvaluationGrading;
+use App\Http\Controllers\Faculty\Committee\ProposalReview;
+use App\Http\Controllers\Faculty\Coordinator\DefenseManagement\Matrix;
+use App\Http\Controllers\Faculty\Coordinator\DefenseManagement\PanelAssign;
+use App\Http\Controllers\Faculty\Coordinator\ThesisMonitoring\ThesisRegistry;
+use App\Http\Controllers\Faculty\Joint1\DefenseManagement;
 use App\Http\Controllers\FileImportController;
+use App\Http\Controllers\Shared\ThesisArchive;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -28,6 +40,14 @@ Route::get('/', function () {
 //     // Acts as a gateway for each main role     (temporary, soon will have merge gateway controller)
 //     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 // });
+
+
+// PUBLIC ARCHIVE
+Route::prefix('repository')->group(function () {
+    Route::redirect('/', 'repository/thesis')->name('repository.index');
+
+    Route::get('thesis', [ThesisArchive::class, 'index'])->name('repository.theses');
+});
 
 
 /*
@@ -75,6 +95,7 @@ Route::prefix('faculty')->group(function () {
         Route::prefix('management')->group(function () {
             Route::redirect('/', '/faculty/dashboard')->name('faculty.management.index');   // temporary
 
+
             // --- ADVISER ROUTES ---
             Route::middleware('faculty.role:Adviser')->prefix('adviser')->group(function () {
 
@@ -82,34 +103,23 @@ Route::prefix('faculty')->group(function () {
                 Route::prefix('advisee_management')->group(function () {
                     Route::redirect('/', 'advisee_management/my_advisees')->name('faculty.management.adviser.advisee_management.index');   // temporary
 
-                    Route::get('/my_advisees', function () {
-                        return Inertia::render('Faculty/management/adviser/advisee_management/my_advisees');
-                    })->name('faculty.management.adviser.advisee_management.my_advisees');
+                    Route::get('/my_advisees', [MyAdvisees::class, 'index'])->name('faculty.management.adviser.advisee_management.my_advisees');
 
-                    Route::get('/group_comp', function () {
-                        return Inertia::render('Faculty/management/adviser/advisee_management/group_comp');
-                    })->name('faculty.management.adviser.advisee_management.group_comp');
+                    Route::get('/group_comp', [GroupComp::class, 'index'])->name('faculty.management.adviser.advisee_management.group_comp');
 
-                    Route::get('/thesis_review', function () {
-                        return Inertia::render('Faculty/management/adviser/advisee_management/thesis_review');
-                    })->name('faculty.management.adviser.advisee_management.thesis_review');
+                    Route::get('/thesis_review', [ThesisReview::class, 'index'])->name('faculty.management.adviser.advisee_management.thesis_review');
 
-                    Route::get('/progress', function () {
-                        return Inertia::render('Faculty/management/adviser/advisee_management/progress');
-                    })->name('faculty.management.adviser.advisee_management.progress');
+                    Route::get('/progress', [ProgressReport::class, 'index'])->name('faculty.management.adviser.advisee_management.progress');
                 });
 
                 // DEFENSE MANAGEMENT OF ADVISER HAS BEEN JOINED WITH PANEL
                 // CHECK THE SPECIAL ROUTES FOR THIS SCENARIO... 
 
-                Route::get('endorsement', function () {
-                    return Inertia::render('Faculty/management/adviser/endorsements');
-                })->name('faculty.management.adviser.endorsement');
+                Route::get('endorsement', [Endorsement::class, 'index'])->name('faculty.management.adviser.endorsement');
 
-                Route::get('eval_n_grading', function () {
-                    return Inertia::render('Faculty/management/adviser/eval_n_grading');
-                })->name('faculty.management.adviser.eval_n_grading');
+                Route::get('eval_n_grading', [EvaluationGrading::class, 'index'])->name('faculty.management.adviser.eval_n_grading');
             });
+
 
             // --- PANEL ROUTES ---
             Route::middleware('faculty.role:Panelist')->prefix('panel')->group(function () {
@@ -124,9 +134,7 @@ Route::prefix('faculty')->group(function () {
 
             // --- SPECIAL ROUTES (ADVISER AND PANEL JOINT) ---
             Route::middleware('faculty.role:Panelist,Adviser')->group(function () {
-                Route::get('defense_management', function () {
-                    return Inertia::render('Faculty/management/adviser/defense_management');
-                })->name('faculty.management.joint.defense_management'); 
+                Route::get('defense_management', [DefenseManagement::class, 'index'])->name('faculty.management.joint.defense_management'); 
             });
 
 
@@ -140,9 +148,7 @@ Route::prefix('faculty')->group(function () {
 
             // --- COMMITTEE ROUTES ---
             Route::middleware('faculty.role:Committee')->prefix('committee')->group(function () {
-                Route::get('proposal_review', function () {
-                    return Inertia::render('Faculty/management/committee/proposal_review');
-                })->name('faculty.management.committee.proposal_review');
+                Route::get('proposal_review', [ProposalReview::class, 'index'])->name('faculty.management.committee.proposal_review');
             });
 
 
@@ -153,29 +159,23 @@ Route::prefix('faculty')->group(function () {
                 })->name('faculty.management.coordinator.compliance');
 
                 Route::get('communication', function () {
-                    return Inertia::render('Faculty/management/coordinator/communication');
+                    
                 })->name('faculty.management.coordinator.communication');
 
                 // Grouped "Defense Management" tab
                 Route::prefix('defense_management')->group(function () {
                     Route::redirect('/', 'defense_management/matrix')->name('faculty.management.coordinator.defense_management.index');   // temporary
 
-                    Route::get('/matrix', function () {
-                        return Inertia::render('Faculty/management/coordinator/defense_management/matrix');
-                    })->name('faculty.management.coordinator.defense_management.matrix');
+                    Route::get('/matrix', [Matrix::class, 'index'])->name('faculty.management.coordinator.defense_management.matrix');
 
-                    Route::get('/panel_assign', function () {
-                        return Inertia::render('Faculty/management/coordinator/defense_management/panel_assign');
-                    })->name('faculty.management.coordinator.defense_management.panel_assign');
+                    Route::get('/panel_assign', [PanelAssign::class, 'index'])->name('faculty.management.coordinator.defense_management.panel_assign');
                 });
 
                 // Grouped "Thesis Monitoring" tab
                 Route::prefix('thesis_monitoring')->group(function () {
                     Route::redirect('/', 'thesis_monitoring/thesis_registry')->name('faculty.management.coordinator.thesis_monitoring.index');   // temporary
 
-                    Route::get('/thesis_registry', function () {
-                        return Inertia::render('Faculty/management/coordinator/thesis_monitoring/thesis_registry');
-                    })->name('faculty.management.coordinator.thesis_monitoring.thesis_registry');
+                    Route::get('/thesis_registry', [ThesisRegistry::class, 'index'])->name('faculty.management.coordinator.thesis_monitoring.thesis_registry');
 
                     Route::get('/progress', function () {
                         return Inertia::render('Faculty/management/coordinator/thesis_monitoring/progress');
@@ -186,7 +186,6 @@ Route::prefix('faculty')->group(function () {
                     return Inertia::render('Faculty/management/coordinator/grading_management');
                 })->name('faculty.management.coordinator.grading_management');
             });
-
         });
 
 
@@ -194,9 +193,9 @@ Route::prefix('faculty')->group(function () {
             return Inertia::render('Shared/resources');
         })->name('faculty.resources');
 
-        Route::get('repository', function () {
-            return Inertia::render('Shared/repository/thesis');
-        })->name('faculty.repository');
+        // Route::get('repository', function () {
+        //     return Inertia::render('Shared/repository/thesis');
+        // })->name('faculty.repository');
     });
 });
 
@@ -247,9 +246,9 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
     Route::prefix('repository')->group(function () {
         Route::redirect('/', 'repository/thesis')->name('admin.repository.index');
 
-        Route::get('thesis', function () {
-            return Inertia::render('Shared/repository/thesis');
-        })->name('admin.repository.theses');
+        // Route::get('thesis', function () {
+        //     return Inertia::render('Shared/repository/thesis');
+        // })->name('admin.repository.theses');
 
         Route::get('resources', function () {
             return Inertia::render('Admin/repository/system');

@@ -8,8 +8,9 @@ import {
     defenses
 } from '@/routes/admin/management';
 import { 
-    theses, system as rsystem
+    system as rsystem
 } from '@/routes/admin/repository';
+import { theses } from '@/routes/repository';
 
 
 export const adminMainNav: NavItem[] = [

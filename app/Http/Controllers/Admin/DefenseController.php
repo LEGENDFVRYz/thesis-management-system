@@ -71,6 +71,9 @@ class DefenseController extends Controller
             ->orderBy('tbl_defense_matrices.defense_schedule', 'asc')
             ->get();
 
+
+        dd($defenses);
+
         return Inertia::render('Admin/management/defense', [
             'defenses' => $defenses
         ]);

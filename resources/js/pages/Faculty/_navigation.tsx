@@ -1,6 +1,6 @@
 import { NavItem, SharedData } from "@/types";
 import { 
-    dashboard, resources, repository
+    dashboard, resources,
 } from '@/routes/faculty';
 import { endorsement, eval_n_grading } from '@/routes/faculty/management/adviser';
 import { my_advisees } from '@/routes/faculty/management/adviser/advisee_management';
@@ -17,6 +17,7 @@ import { thesis_review } from '@/routes/faculty/management/panel';
 import { 
     defense_management as joint_defense_management
 } from '@/routes/faculty/management/joint';
+import { theses } from '@/routes/repository';
 import { usePage } from '@inertiajs/react';
 
 
@@ -30,7 +31,6 @@ export const facultyMainNav = (): NavItem[] => {
     const hasRole = (requiredRoles: string[]) => {
         return requiredRoles.some(role => userRoles.includes(role));
     };
-    
 
     // Render management children 
     const managementChildren: NavItem[] = [];
@@ -105,7 +105,7 @@ export const facultyMainNav = (): NavItem[] => {
             children: managementChildren 
         }] : []),
 
-        { title: 'Repository', href: repository() },
+        { title: 'Repository', href: theses() },
         { title: 'Resources', href: resources() },
     ];
 };
