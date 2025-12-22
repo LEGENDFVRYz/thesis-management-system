@@ -18,9 +18,14 @@ class DatabaseSeeder extends Seeder
         $this->call([
             FacultyRoleSeeder::class,
             SpecializationSeeder::class,
-
+            SchoolYearSeeder::class,
+            DeadlineTemplateSeeder::class,
+            EventSeeder::class,
+            AnnouncementSeeder::class,
+            
             UserSeeder::class,
             FacultySeeder::class,
+            AvailabilitySeeder::class,
             
             SectionAdviserSeeder::class,
             ThesisGroupSeeder::class,
@@ -29,9 +34,16 @@ class DatabaseSeeder extends Seeder
             ThesesSeeder::class,
             EndorsementSeeder::class,
             DefenseMatrixSeeder::class,
+            EndorsedPanelSeeder::class,
             DefenseEvaluationSeeder::class,
             ArchivedJournalSeeder::class,
-            StudentSeeder::class
+            StudentSeeder::class,
+            ResourceSeeder::class,
+            
+            // grading criteria seeder
+            GradingCriteriasSeeder::class,
+            GradingRubricsSeeder::class,
+            RubricLevelsSeeder::class,
         ]);
 
         // Faculty::factory(10)->create();

@@ -17,7 +17,6 @@ class DefenseMatrixSeeder extends Seeder
         // 1. Find Endorsements where BOTH checks are TRUE
         $approvedEndorsements = Endorsement::where('is_adviser_approved', true)
                                            ->where('is_coordinator_approved', true)
-                                           ->with('thesis') // Load thesis to get the title
                                            ->get();
 
         if ($approvedEndorsements->isEmpty()) {
@@ -28,14 +27,13 @@ class DefenseMatrixSeeder extends Seeder
         // 2. Schedule a Defense for these specific theses
         foreach ($approvedEndorsements as $endorsement) {
             
-            // Prevent duplicates (one schedule per thesis)
-            if (DefenseMatrix::where('thesis_id', $endorsement->thesis_id)->exists()) {
+            // Prevent duplicates: Check if this endorsement already has a schedule
+            if (DefenseMatrix::where('endorsement_id', $endorsement->id)->exists()) {
                 continue;
             }
 
             DefenseMatrix::factory()->create([
-                'thesis_id' => $endorsement->thesis_id,
-                
+                'endorsement_id' => $endorsement->id,
             ]);
         }
     }
