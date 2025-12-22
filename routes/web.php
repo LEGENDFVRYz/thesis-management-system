@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\FacultyController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Auth\FacultyLoginController;
 use App\Http\Controllers\Auth\StudentLoginController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\FileImportController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -171,9 +172,13 @@ Note: Temporary Routes only for frontend, but soon will have own controller depe
 ==================================================================================
 */
 Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('Admin/dashboard');
-    })->name('admin.dashboard');
+    
+    // Old Dashboard Route
+    // Route::get('/', function () {
+    //     return Inertia::render('Admin/dashboard');
+    // })->name('admin.dashboard');
+
+    Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
 
     // Management Routes
     Route::prefix('management')->group(function () {
