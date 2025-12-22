@@ -13,6 +13,7 @@ use App\Http\Controllers\Faculty\Adviser\AdviseeManagement\ProgressReport;
 use App\Http\Controllers\Faculty\Adviser\AdviseeManagement\ThesisReview;
 use App\Http\Controllers\Faculty\Adviser\EvaluationGrading;
 use App\Http\Controllers\Faculty\Committee\ProposalReview;
+use App\Http\Controllers\Faculty\Coordinator\Communication;
 use App\Http\Controllers\Faculty\Coordinator\DefenseManagement\Matrix;
 use App\Http\Controllers\Faculty\Coordinator\DefenseManagement\PanelAssign;
 use App\Http\Controllers\Faculty\Coordinator\ThesisMonitoring\ThesisRegistry;
@@ -167,9 +168,7 @@ Route::prefix('faculty')->group(function () {
                     return Inertia::render('Faculty/management/coordinator/compliance');
                 })->name('faculty.management.coordinator.compliance');
 
-                Route::get('communication', function () {
-                    
-                })->name('faculty.management.coordinator.communication');
+                Route::get('communication', [Communication::class, 'create'])->name('faculty.management.coordinator.communication');
 
                 // Grouped "Defense Management" tab
                 Route::prefix('defense_management')->group(function () {

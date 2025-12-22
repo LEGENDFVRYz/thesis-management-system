@@ -72,7 +72,7 @@ class DefenseController extends Controller
             ->get();
 
 
-        dd($defenses);
+        // dd($defenses);
 
         return Inertia::render('Admin/management/defense', [
             'defenses' => $defenses
