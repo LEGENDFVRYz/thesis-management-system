@@ -23,6 +23,15 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
+// UI Showcase (temporary - for testing components)
+Route::get('/ui-showcase', function () {
+    return Inertia::render('ui-showcase');
+})->name('ui-showcase');
+
+Route::get('/components-showcase', function () {
+    return Inertia::render('components-showcase');
+})->name('components-showcase');
+
 // Route::middleware(['auth', 'verified'])->group(function () {
 //     // Acts as a gateway for each main role     (temporary, soon will have merge gateway controller)
 //     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

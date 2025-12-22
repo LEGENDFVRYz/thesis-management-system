@@ -1,0 +1,502 @@
+import { useState } from 'react';
+import { Head } from '@inertiajs/react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Spinner } from '@/components/ui/spinner';
+import { Alert } from '@/components/ui/alert';
+import { Avatar } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
+import { Separator } from '@/components/ui/separator';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Toggle } from '@/components/ui/toggle';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Icon } from '@/components/ui/icon';
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
+import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from '@/components/ui/sidebar';
+import { HomeIcon, SettingsIcon, UsersIcon } from 'lucide-react';
+
+export default function UIShowcase() {
+    const [isCollapsibleOpen, setIsCollapsibleOpen] = useState(false);
+
+    return (
+        <>
+            <Head title="UI Components Showcase" />
+            <div className="min-h-screen bg-gray-800 p-8">
+                <div className="max-w-6xl mx-auto space-y-12">
+                    <div>
+                        <h1 className="text-4xl font-bold mb-2 text-white">UI Components Showcase</h1>
+                        <p className="text-gray-300">Preview of all available UI components (26 total)</p>
+                    </div>
+
+                    {/* Buttons */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Buttons</h2>
+                        <div className="flex flex-wrap gap-4">
+                            <Button>Default</Button>
+                            <Button variant="secondary">Secondary</Button>
+                            <Button variant="destructive">Destructive</Button>
+                            <Button variant="outline">Outline</Button>
+                            <Button variant="ghost">Ghost</Button>
+                            <Button variant="link">Link</Button>
+                            <Button disabled>Disabled</Button>
+                            <Button>
+                                <Spinner />
+                                Loading
+                            </Button>
+                        </div>
+                    </section>
+
+                    {/* Inputs */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Inputs</h2>
+                        <div className="space-y-4 max-w-md">
+                            <div className="space-y-2">
+                                <Label htmlFor="email" className="text-white">Email</Label>
+                                <Input id="email" type="email" placeholder="email@example.com" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="password" className="text-white">Password</Label>
+                                <Input id="password" type="password" placeholder="Enter password" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="disabled" className="text-white">Disabled Input</Label>
+                                <Input id="disabled" disabled placeholder="Disabled" />
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Radio Group */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Radio Group</h2>
+                        <div className="max-w-md">
+                            <Label className="text-white">Choose your role</Label>
+                            <RadioGroup defaultValue="student" className="mt-2">
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="student" id="radio-student" />
+                                    <Label htmlFor="radio-student" className="font-normal cursor-pointer text-white">Student</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="faculty" id="radio-faculty" />
+                                    <Label htmlFor="radio-faculty" className="font-normal cursor-pointer text-white">Faculty</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="admin" id="radio-admin" />
+                                    <Label htmlFor="radio-admin" className="font-normal cursor-pointer text-white">Admin</Label>
+                                </div>
+                            </RadioGroup>
+                        </div>
+                    </section>
+
+                    {/* Checkboxes */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Checkboxes</h2>
+                        <div className="space-y-3 max-w-md">
+                            <div className="flex items-center space-x-2">
+                                <Checkbox id="terms" />
+                                <Label htmlFor="terms" className="font-normal cursor-pointer text-white">
+                                    Accept terms and conditions
+                                </Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <Checkbox id="marketing" defaultChecked />
+                                <Label htmlFor="marketing" className="font-normal cursor-pointer text-white">
+                                    Receive marketing emails (checked by default)
+                                </Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <Checkbox id="disabled-check" disabled />
+                                <Label htmlFor="disabled-check" className="font-normal text-white">
+                                    Disabled checkbox
+                                </Label>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Select */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Select Dropdown</h2>
+                        <div className="max-w-md space-y-2">
+                            <Label className="text-white">Choose a fruit</Label>
+                            <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a fruit" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="apple">Apple</SelectItem>
+                                    <SelectItem value="banana">Banana</SelectItem>
+                                    <SelectItem value="orange">Orange</SelectItem>
+                                    <SelectItem value="mango">Mango</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </section>
+
+                    {/* Alert */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Alert</h2>
+                        <div className="max-w-md space-y-4">
+                            <Alert>
+                                <div className="text-white">
+                                    <div className="font-semibold">Note</div>
+                                    <div className="text-sm">This is an informational alert message.</div>
+                                </div>
+                            </Alert>
+                        </div>
+                    </section>
+
+                    {/* Avatar */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Avatar</h2>
+                        <div className="flex gap-4 items-center">
+                            <Avatar>
+                                <div className="w-10 h-10 rounded-full bg-[#730000] flex items-center justify-center text-white font-semibold">
+                                    JD
+                                </div>
+                            </Avatar>
+                            <Avatar>
+                                <div className="w-10 h-10 rounded-full bg-[#FFBD00] flex items-center justify-center text-gray-900 font-semibold">
+                                    AB
+                                </div>
+                            </Avatar>
+                        </div>
+                    </section>
+
+                    {/* Badge */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Badge</h2>
+                        <div className="flex flex-wrap gap-3">
+                            <Badge>Default</Badge>
+                            <Badge variant="secondary">Secondary</Badge>
+                            <Badge variant="destructive">Destructive</Badge>
+                            <Badge variant="outline">Outline</Badge>
+                        </div>
+                    </section>
+
+                    {/* Breadcrumb */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Breadcrumb</h2>
+                        <Breadcrumb>
+                            <BreadcrumbList>
+                                <BreadcrumbItem>
+                                    <BreadcrumbLink href="/" className="text-white">Home</BreadcrumbLink>
+                                </BreadcrumbItem>
+                                <BreadcrumbSeparator />
+                                <BreadcrumbItem>
+                                    <BreadcrumbLink href="/components" className="text-white">Components</BreadcrumbLink>
+                                </BreadcrumbItem>
+                                <BreadcrumbSeparator />
+                                <BreadcrumbItem>
+                                    <BreadcrumbPage className="text-white">Breadcrumb</BreadcrumbPage>
+                                </BreadcrumbItem>
+                            </BreadcrumbList>
+                        </Breadcrumb>
+                    </section>
+
+                    {/* Card */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Card</h2>
+                        <div className="max-w-md">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="text-white">Card Title</CardTitle>
+                                    <CardDescription>Card description goes here</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-white">This is the card content area.</p>
+                                </CardContent>
+                                <CardFooter>
+                                    <Button>Action</Button>
+                                </CardFooter>
+                            </Card>
+                        </div>
+                    </section>
+
+                    {/* Collapsible */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Collapsible</h2>
+                        <div className="max-w-md">
+                            <Collapsible open={isCollapsibleOpen} onOpenChange={setIsCollapsibleOpen}>
+                                <CollapsibleTrigger asChild>
+                                    <Button variant="outline" className="w-full justify-between">
+                                        <span>Can I use this in my project?</span>
+                                        <span>{isCollapsibleOpen ? '−' : '+'}</span>
+                                    </Button>
+                                </CollapsibleTrigger>
+                                <CollapsibleContent className="mt-2 p-4 border rounded-md">
+                                    <p className="text-gray-900 text-sm">
+                                        Yes! You can use all these components in your project. They are built with Radix UI and styled with Tailwind CSS.
+                                    </p>
+                                </CollapsibleContent>
+                            </Collapsible>
+                        </div>
+                    </section>
+
+                    {/* Dialog */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Dialog (Modal)</h2>
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button>Open Dialog</Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle className="text-white">Dialog Title</DialogTitle>
+                                    <DialogDescription>
+                                        This is a dialog description. You can put any content here.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="py-4">
+                                    <p className="text-gray-900 text-sm">Dialog content goes here.</p>
+                                </div>
+                            </DialogContent>
+                        </Dialog>
+                    </section>
+
+                    {/* Dropdown Menu */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Dropdown Menu</h2>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button>Open Menu</Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem>Profile</DropdownMenuItem>
+                                <DropdownMenuItem>Settings</DropdownMenuItem>
+                                <DropdownMenuItem>Logout</DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </section>
+
+                    {/* Input OTP */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Input OTP</h2>
+                        <div className="max-w-md space-y-2">
+                            <Label className="text-white">Enter verification code</Label>
+                            <InputOTP maxLength={6}>
+                                <InputOTPGroup>
+                                    <InputOTPSlot index={0} />
+                                    <InputOTPSlot index={1} />
+                                    <InputOTPSlot index={2} />
+                                    <InputOTPSlot index={3} />
+                                    <InputOTPSlot index={4} />
+                                    <InputOTPSlot index={5} />
+                                </InputOTPGroup>
+                            </InputOTP>
+                        </div>
+                    </section>
+
+                    {/* Separator */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Separator</h2>
+                        <div className="max-w-md">
+                            <div className="space-y-4">
+                                <p className="text-white">Content above separator</p>
+                                <Separator />
+                                <p className="text-white">Content below separator</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Sheet */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Sheet (Side Panel)</h2>
+                        <Sheet>
+                            <SheetTrigger asChild>
+                                <Button>Open Sheet</Button>
+                            </SheetTrigger>
+                            <SheetContent>
+                                <SheetHeader>
+                                    <SheetTitle className="text-white">Sheet Title</SheetTitle>
+                                    <SheetDescription>
+                                        This is a sheet (side panel) component.
+                                    </SheetDescription>
+                                </SheetHeader>
+                                <div className="py-4">
+                                    <p className="text-gray-900 text-sm">Sheet content goes here.</p>
+                                </div>
+                            </SheetContent>
+                        </Sheet>
+                    </section>
+
+                    {/* Skeleton */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Skeleton (Loading State)</h2>
+                        <div className="max-w-md space-y-3">
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-3/4" />
+                            <Skeleton className="h-4 w-1/2" />
+                        </div>
+                    </section>
+
+                    {/* Spinner */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Spinner</h2>
+                        <div className="flex gap-4 items-center">
+                            <Spinner />
+                            <span className="text-sm text-gray-400">Loading...</span>
+                        </div>
+                    </section>
+
+                    {/* Toggle */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Toggle</h2>
+                        <div className="flex gap-3">
+                            <Toggle>Normal</Toggle>
+                            <Toggle defaultPressed>Pressed</Toggle>
+                            <Toggle disabled>Disabled</Toggle>
+                        </div>
+                    </section>
+
+                    {/* Toggle Group */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Toggle Group</h2>
+                        <ToggleGroup type="single" defaultValue="left">
+                            <ToggleGroupItem value="left">Left</ToggleGroupItem>
+                            <ToggleGroupItem value="center">Center</ToggleGroupItem>
+                            <ToggleGroupItem value="right">Right</ToggleGroupItem>
+                        </ToggleGroup>
+                    </section>
+
+                    {/* Tooltip */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Tooltip</h2>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button variant="outline">Hover me</Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p className="text-white">This is a tooltip</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </section>
+
+                    {/* Icon */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Icon Wrapper</h2>
+                        <p className="text-sm text-gray-400">Wrapper component for Lucide icons</p>
+                        <div className="flex gap-4 items-center">
+                            <Icon iconNode={HomeIcon} className="w-6 h-6 text-gray-900" />
+                            <Icon iconNode={SettingsIcon} className="w-6 h-6 text-gray-900" />
+                            <Icon iconNode={UsersIcon} className="w-6 h-6 text-gray-900" />
+                        </div>
+                    </section>
+
+                    {/* Navigation Menu */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Navigation Menu</h2>
+                        <p className="text-sm text-gray-400">Horizontal navigation with dropdown menus</p>
+                        <NavigationMenu>
+                            <NavigationMenuList>
+                                <NavigationMenuItem>
+                                    <NavigationMenuTrigger className="text-white">Getting Started</NavigationMenuTrigger>
+                                    <NavigationMenuContent>
+                                        <div className="p-4 w-[400px]">
+                                            <NavigationMenuLink className="text-white">
+                                                Introduction
+                                            </NavigationMenuLink>
+                                        </div>
+                                    </NavigationMenuContent>
+                                </NavigationMenuItem>
+                                <NavigationMenuItem>
+                                    <NavigationMenuLink className="text-white">
+                                        Documentation
+                                    </NavigationMenuLink>
+                                </NavigationMenuItem>
+                            </NavigationMenuList>
+                        </NavigationMenu>
+                    </section>
+
+                    {/* Placeholder Pattern */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Placeholder Pattern</h2>
+                        <p className="text-sm text-gray-400">Decorative pattern for empty states</p>
+                        <div className="w-full h-32 bg-white border rounded-lg overflow-hidden relative">
+                            <PlaceholderPattern className="absolute inset-0 stroke-gray-300" />
+                        </div>
+                    </section>
+
+                    {/* Sidebar Primitive */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Sidebar Primitive</h2>
+                        <p className="text-sm text-gray-400">Base sidebar component (used in app-sidebar)</p>
+                        <div className="h-64 border rounded-lg overflow-hidden">
+                            <SidebarProvider>
+                                <Sidebar>
+                                    <SidebarHeader className="border-b p-4">
+                                        <p className="text-sm font-semibold text-white">Sidebar Header</p>
+                                    </SidebarHeader>
+                                    <SidebarContent>
+                                        <SidebarGroup>
+                                            <SidebarGroupLabel className="text-white">Navigation</SidebarGroupLabel>
+                                            <SidebarGroupContent>
+                                                <SidebarMenu>
+                                                    <SidebarMenuItem>
+                                                        <SidebarMenuButton>
+                                                            <HomeIcon className="w-4 h-4" />
+                                                            <span>Home</span>
+                                                        </SidebarMenuButton>
+                                                    </SidebarMenuItem>
+                                                    <SidebarMenuItem>
+                                                        <SidebarMenuButton>
+                                                            <SettingsIcon className="w-4 h-4" />
+                                                            <span>Settings</span>
+                                                        </SidebarMenuButton>
+                                                    </SidebarMenuItem>
+                                                </SidebarMenu>
+                                            </SidebarGroupContent>
+                                        </SidebarGroup>
+                                    </SidebarContent>
+                                    <SidebarFooter className="border-t p-4">
+                                        <p className="text-xs text-gray-400">Sidebar Footer</p>
+                                    </SidebarFooter>
+                                </Sidebar>
+                            </SidebarProvider>
+                        </div>
+                    </section>
+
+                    {/* Color Palette */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Theme Colors</h2>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="space-y-2">
+                                <div className="h-20 rounded-lg bg-[#730000]" />
+                                <p className="text-sm font-medium text-white">Maroon</p>
+                                <p className="text-xs text-gray-400">#730000</p>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="h-20 rounded-lg bg-[#FFBD00]" />
+                                <p className="text-sm font-medium text-white">Yellow</p>
+                                <p className="text-xs text-gray-400">#FFBD00</p>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="h-20 rounded-lg bg-white border-2 border-gray-200" />
+                                <p className="text-sm font-medium text-white">Background</p>
+                                <p className="text-xs text-gray-400">White</p>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="h-20 rounded-lg bg-black" />
+                                <p className="text-sm font-medium text-white">Foreground</p>
+                                <p className="text-xs text-gray-400">Black</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </>
+    );
+}

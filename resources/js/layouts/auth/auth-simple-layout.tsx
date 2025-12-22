@@ -1,4 +1,4 @@
-import AppLogoIcon from '@/components/app-logo-icon';
+import Logo from '@/components/icons/logo';
 import { home } from '@/routes';
 import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
@@ -21,7 +21,7 @@ export default function AuthSimpleLayout({
                 {/* Top PART */}
                 <div className="space-y-5">
                     <div className="flex h-12 w-12">
-                        <AppLogoIcon
+                        <Logo
                             className="h-12 w-12"
                             variant="light"
                         />
