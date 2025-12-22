@@ -25,7 +25,7 @@ return new class extends Migration
                   ->onDelete('cascade');
 
             // Status of their confirmation
-            $table->boolean('is_confirmed')->default(false);
+            $table->boolean('is_confirmed')->nullable()->default(null);
         
         });
     }
