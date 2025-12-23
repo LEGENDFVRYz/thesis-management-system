@@ -14,7 +14,7 @@ const buttonVariants = cva(
         tertiary: "border border-primary/15 text-primary hover:bg-breadcrumb border border-primarytext-primary active:bg-primary-foreground-2 border border-primary text-primary",
         negative: "bg-sidebar-gradient-mid text-white hover:bg-destructive active:bg-primary",
         negativelight: "bg-white border border-primary/15 text-destructive hover:bg-breadcrumb active:bg-primary/35",
-        ghost: "hover:bg-secondary-foreground-2 active:bg-background active:border border-secondary-foreground-2 active:text-secondary-foreground-2",
+        ghost: "text-foreground hover:bg-secondary-foreground-2 active:bg-background active:border border-secondary-foreground-2 active:text-secondary-foreground-2",
         link: "text-primary underline-offset-4 hover:underline underline-destructive hover:text-destructive active:text-secondary-foreground-2",
       },
       size: {

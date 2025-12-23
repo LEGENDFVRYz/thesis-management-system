@@ -26,39 +26,91 @@ import { Icon } from '@/components/ui/icon';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from '@/components/ui/sidebar';
-import { HomeIcon, SettingsIcon, UsersIcon } from 'lucide-react';
+import { HomeIcon, SettingsIcon, UsersIcon, Moon, Sun, Plus, Trash2, ArrowRight, Loader2, Settings, ChevronDown} from 'lucide-react';
 
 export default function UIShowcase() {
     const [isCollapsibleOpen, setIsCollapsibleOpen] = useState(false);
+    const [theme, setTheme] = useState("dark");
+
+const toggleTheme = () => {
+        const newTheme = theme === "light" ? "dark" : "light";
+        setTheme(newTheme);
+        document.documentElement.setAttribute("data-theme", newTheme);
+    };
+
+        // Color Helpers based on theme
+        const bgClass = theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900";
+        const sectionClass = theme === "dark" ? "bg-gray-800/50 border-gray-700" : "bg-white border-gray-200";
 
     return (
-        <>
+        <div className={`min-h-screen transition-colors duration-300 ${bgClass}`}>
             <Head title="UI Components Showcase" />
             <div className="min-h-screen bg-gray-800 p-8">
                 <div className="max-w-6xl mx-auto space-y-12">
-                    <div>
-                        <h1 className="text-4xl font-bold mb-2 text-white">UI Components Showcase</h1>
-                        <p className="text-gray-300">Preview of all available UI components (26 total)</p>
-                    </div>
+                    
+                    {/* Header */}
+                    <header className="flex justify-between items-end border-b border-gray-700 pb-8">
+                        <div>
+                            <h1 className="text-4xl font-bold mb-2 text-white">UI Components Showcase</h1>
+                            <p className="text-gray-300">Preview of all available UI components (26 total)</p>
+                        </div>
+                        <Button variant="tertiary" size="icon" onClick={toggleTheme} className="rounded-full shadow-inner border-2">
+                            {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
+                        </Button>
+                    </header>
 
                     {/* Buttons */}
-                    <section className="space-y-4">
-                        <h2 className="text-2xl font-semibold text-white">Buttons</h2>
-                        <div className="flex flex-wrap gap-4">
-                            <Button variant="primary">Primary</Button>
-                            <Button variant="secondary">Secondary</Button>
-                            <Button variant="tertiary">Tertiary</Button>
-                            <Button variant="negative">Negative</Button>
-                            <Button variant="negativelight">Negative-light</Button>
-                            <Button variant="ghost">Ghost</Button>
-                            <Button variant="link">Link</Button>
-                            <Button disabled>Disabled</Button>
-                            <Button>
-                                <Spinner />
-                                Loading
-                            </Button>
-                        </div>
-                    </section>
+                    <div className="space-y-12 text-white">
+                        <h2 className="text-2xl font-bold border-l-4 border-[#FFBD00] pl-4">Button Variants</h2>
+                        
+                        <VariantRow 
+                            title="Primary" 
+                            description="Main call-to-action buttons." 
+                            variant="primary" 
+                            theme={theme}
+                        />
+                        <VariantRow 
+                            title="Secondary" 
+                            description="Alternative actions with less weight." 
+                            variant="secondary" 
+                            theme={theme}
+                        />
+                        <VariantRow 
+                            title="Tertiary" 
+                            description="Danger actions like deletion." 
+                            variant="tertiary" 
+                            icon={<Trash2 className="size-4" />}
+                            theme={theme}
+                        />
+                        <VariantRow 
+                            title="Negative" 
+                            description="Danger actions like deletion or cancellation."
+                            variant="negative"
+                            icon={<Trash2 className="size-4" />}
+                            theme={theme}
+                        />
+                        <VariantRow 
+                            title="Negative-Light" 
+                            description="Danger actions like deletion or cancellation."
+                            variant="negativelight"
+                            icon={<Trash2 className="size-4" />}
+                            theme={theme}
+                        />
+                        <VariantRow 
+                            title="Ghost" 
+                            description="Subtle style for toolbars." 
+                            variant="ghost" 
+                            icon={<Settings className="size-4" />}
+                            theme={theme}
+                        />
+                        <VariantRow 
+                            title="Link" 
+                            description="Textual links styled as buttons for navigation."
+                            variant="link"
+                            icon={<Settings className="size-4" />}
+                            theme={theme}
+                        />
+                    </div>
 
                     {/* Inputs */}
                     <section className="space-y-4">
@@ -498,6 +550,63 @@ export default function UIShowcase() {
                     </section>
                 </div>
             </div>
-        </>
+        </div>
+    );
+}
+
+/**
+ * Helper component for the Button Grid
+ */
+function VariantRow({ title, description, variant, theme, icon = <Plus className="size-4" /> }: any) {
+    const isDark = theme === "dark";
+    const cardBg = isDark ? "bg-gray-800/40 border-gray-700" : "bg-white border-gray-200";
+
+    return (
+        <section className="space-y-4">
+            <div className="flex flex-col">
+                <h3 className="text-lg font-bold">{title} Variant</h3>
+                <p className="text-sm opacity-60">{description}</p>
+            </div>
+
+            <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-6 rounded-xl border ${cardBg}`}>
+                {/* Column 1: Sizes */}
+                <div className="space-y-3">
+                    <p className="text-foreground text-[10px] font-bold uppercase opacity-40">Sizes</p>
+                    <div className="flex flex-col gap-2 items-start">
+                        <Button variant={variant} size="sm">Small</Button>
+                        <Button variant={variant} size="default">Default</Button>
+                        <Button variant={variant} size="lg">Large</Button>
+                    </div>
+                </div>
+
+                {/* Column 2: Icons */}
+                <div className="space-y-3">
+                    <p className="text-foreground text-[10px] font-bold uppercase opacity-40">Layouts</p>
+                    <div className="flex flex-col gap-2 items-start">
+                        <Button variant={variant}>{icon} Left Icon</Button>
+                        <Button variant={variant}>Right Icon <ArrowRight className="size-4" /></Button>
+                    </div>
+                </div>
+
+                {/* Column 3: Icon Only */}
+                <div className="space-y-3">
+                    <p className="text-foreground text-[10px] font-bold uppercase opacity-40">Square / Icon Only</p>
+                    <div className="flex items-center gap-2">
+                        <Button variant={variant} size="icon" className="size-8">{icon}</Button>
+                        <Button variant={variant} size="icon" className="size-10">{icon}</Button>
+                        <Button variant={variant} size="icon" className="size-12">{icon}</Button>
+                    </div>
+                </div>
+
+                {/* Column 4: Misc */}
+                <div className="space-y-3">
+                    <p className="text-foreground text-[10px] font-bold uppercase opacity-40">Misc</p>
+                    <Button variant={variant} className="w-full justify-between">
+                        Dropdown <ChevronDown className="size-4" />
+                    </Button>
+                    <Button variant={variant} size="sm" className="rounded-full px-6">Pill Button</Button>
+                </div>
+            </div>
+        </section>
     );
 }
