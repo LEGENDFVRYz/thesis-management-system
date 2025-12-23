@@ -21,6 +21,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { Skeleton } from '@/components/ui/skeleton';
 import { Toggle } from '@/components/ui/toggle';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { WizardStepper, WizardSteps, WizardStep, InteractiveWizard } from '@/components/ui/wizard-stepper';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Icon } from '@/components/ui/icon';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
@@ -279,6 +280,23 @@ export default function UIShowcase() {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </section>
+                    
+                    {/* Wizard Stepper */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Wizard Stepper</h2>
+                        
+                        <div className="space-y-8">
+                            <div>
+                                <h3 className="text-lg font-semibold mb-4 text-white">4 Steps</h3>
+                                <InteractiveWizard stepCount={4} />
+                            </div>
+
+                            <div>
+                                <h3 className="text-lg font-semibold mb-4 text-white">3 Steps</h3>
+                                <InteractiveWizard stepCount={3} />
+                            </div>
+                        </div>
+                    </section>              
 
                     {/* Input OTP */}
                     <section className="space-y-4">
