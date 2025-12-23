@@ -22,7 +22,9 @@ return new class extends Migration
                   ->constrained('tbl_faculty_roles')
                   ->onDelete('cascade');
 
-            $table->string('school_year')
+            $table->foreignId('sy_id')
+                  ->constrained('tbl_school_years')
+                  ->onDelete('cascade')
                   ->comment("This is the batch that a role can access -> starting year");
             
             $table->boolean('is_active')->default(true);

@@ -12,7 +12,7 @@ class DefenseMatrix extends Model
     protected $table = 'tbl_defense_matrices';
 
     protected $fillable = [
-        'thesis_id',          
+        'endorsement_id',          
         'course',           
         'defense_schedule', 
         'defense_room',
@@ -29,8 +29,26 @@ class DefenseMatrix extends Model
     ==================================================================================
     */
 
-    public function thesis()
+    public function endorsement()
     {
-        return $this->belongsTo(Theses::class, 'thesis_id');
+        return $this->belongsTo(Endorsement::class, 'endorsement_id');
+    }
+
+    /**
+     * Link to the Endorsed Panels (The invitations sent for this defense)
+    */
+    public function endorsedPanels()
+    {
+        // One Defense Schedule has MANY Panel Invitations
+        return $this->hasMany(EndorsedPanel::class, 'defense_matrix_id');
+    }
+
+    /**
+     * Helper: Access the Thesis "through" the Endorsement
+     * Usage: $matrix->thesis->title
+     */
+    public function getThesisAttribute()
+    {
+        return $this->endorsement->thesis;
     }
 }

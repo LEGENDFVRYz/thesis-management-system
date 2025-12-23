@@ -8,8 +8,9 @@ import {
     defenses
 } from '@/routes/admin/management';
 import { 
-    theses, system as rsystem
+    system as rsystem
 } from '@/routes/admin/repository';
+import { theses } from '@/routes/repository';
 
 
 export const adminMainNav: NavItem[] = [
@@ -18,17 +19,33 @@ export const adminMainNav: NavItem[] = [
         href: dashboard(),
     },
     {
-        title: 'Management',
+        title: 'Admin Management',
         href: '/admin/management',
         children: [
-            { title: 'Faculty',         href: faculty() },
-            { title: 'Student',         href: student() },
-
-            { title: 'Academic Settings',   href: academic() },
-            { title: 'Deadline',            href: deadline() },
-            { title: 'Department Policies', href: depPolicies() },
-
-            { title: 'Defense',         href: defenses() },
+            {
+                title: 'User',
+                href: dashboard(),
+                children: [
+                    { title: 'Faculty Management',     href: faculty() },
+                    { title: 'Student Management',     href: student() },
+                ]
+            },
+            {
+                title: 'System',
+                href: dashboard(),
+                children: [
+                    { title: 'Academic Settings',   href: academic() },
+                    { title: 'Deadline Config',            href: deadline() },
+                    { title: 'Department Policies', href: depPolicies() },
+                ]
+            },
+            {
+                title: 'Defense',
+                href: dashboard(),
+                children: [
+                    { title: 'Defense Monitoring',    href: defenses() },
+                ]
+            },
         ]
     },
     {

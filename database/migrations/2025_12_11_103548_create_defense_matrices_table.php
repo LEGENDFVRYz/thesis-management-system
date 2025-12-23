@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('tbl_defense_matrices', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('thesis_id')
-                  ->constrained('tbl_theses')
+            $table->foreignId('endorsement_id')
+                  ->constrained('tbl_endorsements')
                   ->cascadeOnDelete();
 
             $table->enum('course', ['MOR', 'DP1', 'DP2'])->comment('MOR, DP1, DP2');

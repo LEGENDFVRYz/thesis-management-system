@@ -14,7 +14,7 @@ class CheckFacultyRole
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, string $faculty_role): Response
+    public function handle(Request $request, Closure $next, string ...$faculty_role): Response
     {
         $user = Auth::user();
 
@@ -27,10 +27,10 @@ class CheckFacultyRole
             // dd($user->faculty->roles->pluck('role_name')->toArray());
             $user_faculty_roles = $user->faculty->roles->pluck('role_name')->toArray();
 
-            if (!in_array($faculty_role, $user_faculty_roles)) {
+            if (empty(array_intersect($faculty_role, $user_faculty_roles))) {
                 
                 // ...show 403 Forbidden error
-                abort(403, 'Unauthorized. You do have Faculty (' . $faculty_role . ') role.');
+                abort(403, 'Unauthorized. Required faculty role(s): ' . implode(', ', $faculty_role));
             }
         }
 

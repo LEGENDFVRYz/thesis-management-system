@@ -47,7 +47,7 @@ class StudentSeeder extends Seeder
             $assignedSpecId = $specs[$specIndex] ?? $specs[0];
 
             // 5. Create Students with OVERRIDES
-            Student::factory()->count(rand(2, 4))->create([
+            Student::factory()->count(rand(3, 4))->create([
                 'group_id' => $group->id,      // Force them into this loop's group
                 'section'  => $realSection,    // Force section to match the adviser's section
                 'spec_id'  => $assignedSpecId, // Force consistent specialization
