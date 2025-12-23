@@ -232,3 +232,9 @@ Route::post('file-import', [FileImportController::class, 'store'])->name('file.i
 
 require __DIR__.'/settings.php';
 
+
+// Buttons Development Route
+
+Route::get('/buttondev', function () {
+    return inertia('buttondev');
+});
