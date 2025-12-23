@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Head } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +32,38 @@ export default function UIShowcase() {
     const [isCollapsibleOpen, setIsCollapsibleOpen] = useState(false);
     const [theme, setTheme] = useState("dark");
 
+    // States for interactive logic
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [isUploading, setIsUploading] = useState(false);
+    const [contentProgress, setContentProgress] = useState(0);
+    const [evalValue, setEvalValue] = useState(0);
+
+    // Auto-animate Content Loading and Eval Progress on mount
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setContentProgress(prev => (prev >= 100 ? 0 : prev + 0.5));
+            setEvalValue(prev => (prev >= 6 ? 0 : prev + 1));
+        }, 5000); // Eval updates every 2 seconds
+        return () => clearInterval(timer);
+    }, []);
+
+    // Manual Upload Logic
+    const startUpload = () => {
+        setIsUploading(true);
+        setUploadProgress(0);
+        
+        const interval = setInterval(() => {
+            setUploadProgress(prev => {
+                if (prev >= 100) {
+                    clearInterval(interval);
+                    setIsUploading(false);
+                    return 100;
+                }
+                return prev + Math.random() * 10;
+            });
+        }, 200);
+    };
+
 const toggleTheme = () => {
         const newTheme = theme === "light" ? "dark" : "light";
         setTheme(newTheme);
@@ -41,7 +73,8 @@ const toggleTheme = () => {
         // Color Helpers based on theme
         const bgClass = theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900";
         const sectionClass = theme === "dark" ? "bg-gray-800/50 border-gray-700" : "bg-white border-gray-200";
-
+        const subTextClass = theme === "dark" ? "text-gray-400" : "text-gray-500";
+        
     return (
         <div className={`min-h-screen transition-colors duration-300 ${bgClass}`}>
             <Head title="UI Components Showcase" />
@@ -386,11 +419,46 @@ const toggleTheme = () => {
 
                     {/* Skeleton */}
                     <section className="space-y-4">
-                        <h2 className="text-2xl font-semibold text-white">Skeleton (Loading State)</h2>
-                        <div className="max-w-md space-y-3">
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-3/4" />
-                            <Skeleton className="h-4 w-1/2" />
+                        <h2 className="text-2xl font-semibold">Skeleton</h2>
+                        {/* Replaced bg-[#1e1e1e] with sectionClass */}
+                        <div className={`grid grid-cols-1 md:grid-cols-2 gap-12 p-8 rounded-2xl border transition-colors duration-300 ${sectionClass}`}>
+                            
+                            {/* 1. Default Loading */}
+                            <div className="space-y-4">
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>1. Default Loading (Scanning)</h3>
+                                <Skeleton variant="default" />
+                                <Skeleton variant="default" className="w-3/4" />
+                            </div>
+
+                            {/* 2. Upload Loading */}
+                            <div className="space-y-4">
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>2. Upload Loading</h3>
+                                <Skeleton variant="progress" progress={uploadProgress} />
+                                <Button 
+                                    variant="primary" 
+                                    onClick={startUpload} 
+                                    disabled={isUploading}
+                                    className="w-full"
+                                >
+                                    {isUploading ? `Uploading ${Math.round(uploadProgress)}%` : "Start Upload"}
+                                </Button>
+                            </div>
+
+                            {/* 3. Eval Progress */}
+                            <div className="space-y-4">
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>3. Eval Progress (Step Based)</h3>
+                                <div className="grid grid-cols-1 gap-6">
+                                    <Skeleton variant="eval" progress={evalValue} />
+                                    <Skeleton variant="eval" progress={6} />
+                                </div>
+                            </div>
+
+                            {/* 4. Loading Contents */}
+                            <div className="space-y-4">
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>4. Loading Contents</h3>
+                                <Skeleton variant="contents" progress={contentProgress} statusText="Fetching Thesis Data..." />
+                                <Skeleton variant="contents" progress={contentProgress * 0.7} statusText="Syncing Repository..." />
+                            </div>
                         </div>
                     </section>
 
