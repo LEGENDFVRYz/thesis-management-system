@@ -27,9 +27,11 @@ import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMe
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from '@/components/ui/sidebar';
 import { HomeIcon, SettingsIcon, UsersIcon } from 'lucide-react';
+import { SwitchButton } from '@/components/ui/switch-button';
 
 export default function UIShowcase() {
     const [isCollapsibleOpen, setIsCollapsibleOpen] = useState(false);
+    const [switchView, setSwitchView] = useState<"By Semester" | "By Year">("By Semester");
 
     return (
         <>
@@ -385,6 +387,18 @@ export default function UIShowcase() {
                         </TooltipProvider>
                     </section>
 
+                    {/* Switch Button */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Switch Button</h2>
+                        <div className="max-w-md space-y-2">
+                            <SwitchButton
+                                option1="By Semester"
+                                option2="By Year"
+                                value={switchView}
+                                onChange={(v) => setSwitchView(v as "By Semester" | "By Year")} />
+                        </div>
+                    </section>
+
                     {/* Icon */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Icon Wrapper</h2>
@@ -495,6 +509,8 @@ export default function UIShowcase() {
                             </div>
                         </div>
                     </section>
+
+                    
                 </div>
             </div>
         </>
