@@ -21,6 +21,8 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { Skeleton } from '@/components/ui/skeleton';
 import { Toggle } from '@/components/ui/toggle';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Tabs } from '@/components/ui/tabs';
+import { TimelineState } from '@/components/ui/wizard-timeline';
 import { WizardStepper, WizardSteps, WizardStep, InteractiveWizard } from '@/components/ui/wizard-stepper';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Icon } from '@/components/ui/icon';
@@ -368,7 +370,43 @@ export default function UIShowcase() {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </section>
-                    
+
+                    {/* Tabs */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Tabs</h2>
+                        
+                        <div className="space-y-8">
+                            {/* Two Tabs */}
+                            <div>
+                                <h3 className="text-lg font-semibold mb-4 text-white">Two Tabs</h3>
+                                <Tabs tabs={['Tab 1', 'Tab 2']} defaultTab="Tab 1" />
+                            </div>
+
+                            {/* Multiple Tabs */}
+                            <div>
+                                <h3 className="text-lg font-semibold mb-4 text-white">Multiple Tabs</h3>
+                                <Tabs tabs={['Current', 'Upcoming', 'Past']} defaultTab="Current" />
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Wizard Timeline */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Wizard Timeline</h2>
+                        
+                        <div className="space-y-8">
+                            {/* Timeline States */}
+                            <div>
+                                <h3 className="text-lg font-semibold mb-4 text-white">Timeline States</h3>
+                                <div className="flex items-start justify-center gap-12 p-6 rounded-lg">
+                                    <TimelineState state="past" label="Past (Filled, lighter connector)" />
+                                    <TimelineState state="current" label="Current (Filled)" />
+                                    <TimelineState state="upcoming" label="Upcoming (Hollow)" />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
                     {/* Wizard Stepper */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Wizard Stepper</h2>

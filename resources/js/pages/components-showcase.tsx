@@ -14,7 +14,6 @@ import { Icon } from '@/components/ui/icon';
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import AppearanceToggleTab from '@/components/appearance-tabs';
 import DeleteUser from '@/components/delete-user';
-import { WizardStepper } from '@/components/wizard-stepper';
 import TwoFactorRecoveryCodes from '@/components/two-factor-recovery-codes';
 import { NavMain } from '@/components/nav-main';
 import { NavFooter } from '@/components/nav-footer';
@@ -232,58 +231,6 @@ export default function ComponentsShowcase() {
                                 { title: 'Profile', href: '' }
                             ]}
                         />
-                    </section>
-
-                    {/* Wizard Stepper */}
-                    <section className="space-y-6">
-                        <h2 className="text-2xl font-semibold text-white">
-                            Wizard Stepper Component
-                        </h2>
-                        <p className="text-sm text-gray-400">
-                            Fully responsive wizard with customizable steps and content
-                        </p>
-
-                        <div className="space-y-10">
-                            {/* Version 1: Default Demo */}
-                            <div>
-                                <p className="text-sm text-gray-400 mb-4">
-                                    Default Wizard (4 Steps)
-                                </p>
-                                <div className="flex items-center justify-center p-4 sm:p-6">
-                                    <WizardStepper />
-                                </div>
-                            </div>
-
-                            {/* Version 2: Example / Specific */}
-                            <div>
-                                <p className="text-sm text-gray-400 mb-4">
-                                    Example Wizard (Student Account Setup)
-                                </p>
-                                <div className="flex items-center justify-center p-4 sm:p-6">
-                                    <WizardStepper
-                                        title="Import Student Account"
-                                        steps={[
-                                            { number: 1, title: 'Step 1', description: 'Import File' },
-                                            { number: 2, title: 'Step 2', description: 'Map Columns' },
-                                            { number: 3, title: 'Step 3', description: 'Review & Import' },
-                                        ]}
-                                    >
-                                    
-                                        {/* Custom Content Area */}
-                                        <div className="w-full max-w-full space-y-4 rounded-lg border border-border bg-accent/30 p-4 sm:p-6">
-                                            <h3 className="text-base sm:text-lg font-semibold text-foreground">
-                                                Step Content
-                                            </h3>
-
-                                            <p className="text-sm text-muted-foreground">
-                                                Add custom content for each step.
-                                                Forms, instructions, or any other components can go here.
-                                            </p>
-                                        </div>
-                                    </WizardStepper>
-                                </div>
-                            </div>
-                        </div>
                     </section>
 
                     {/* User Info */}
