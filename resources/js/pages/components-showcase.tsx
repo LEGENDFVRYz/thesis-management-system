@@ -406,7 +406,7 @@ export default function ComponentsShowcase() {
                         <div className="border border-gray-600 rounded-lg p-4 bg-gray-700 max-w-sm">
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="outline">Open User Menu</Button>
+                                    <Button variant="tertiary">Open User Menu</Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent className="w-56">
                                     <UserMenuContent user={mockUser} />
