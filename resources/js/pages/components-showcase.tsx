@@ -30,9 +30,24 @@ import { login as studentLogin } from '@/routes/student';
 import { login as facultyLogin } from '@/routes/faculty';
 import { HomeIcon, SettingsIcon, BellIcon } from 'lucide-react';
 import { useState } from 'react';
+import { Calendar } from "@/components/calendar";
+import { DatePicker } from "@/components/date-picker";
+import { MonthPicker } from "@/components/month-picker";
+import { YearDropdownPicker } from "@/components/year-dropdown-picker";
+import { YearPicker } from "@/components/year-picker";
+import { YearRangePicker } from "@/components/acad-year-range-picker";
+import { DefenseCalendarWeekly } from "@/components/defense-calendar-weekly";
+import { DefenseCalendar } from "@/components/defense-calendar-monthly";
+import { ResearchAreaChart } from "@/components/research-area-distribution-pie";
+import { SubmissionStatusChart } from "@/components/submission-status-bar";
+import { ArchivedJournalsChart } from "@/components/archived-journals-line";
+import { PerformanceOverviewChart } from "@/components/performance-overview-ver-bar";
+import { SubmissionStatusNonAdminChart } from "@/components/submission-status-bar-nonadmin";
+
 
 export default function ComponentsShowcase() {
     const [is2FAModalOpen, setIs2FAModalOpen] = useState(false);
+    const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
     const mockUser = {
         id: 1,
@@ -43,6 +58,65 @@ export default function ComponentsShowcase() {
         created_at: '',
         updated_at: ''
     };
+
+
+    // Sample events
+    const sampleEvents = [
+        {
+            id: "1",
+            title: "BSCPE 4-1 (D1)",
+            date: new Date(2025, 10, 24),
+            section: "4-1",
+        },
+        {
+            id: "2",
+            title: "BSCPE 4-1 (D2)",
+            date: new Date(2025, 10, 25),
+            section: "4-1",
+        },
+        {
+            id: "3",
+            title: "BSCPE 4-5 (D1)",
+            date: new Date(2025, 10, 26),
+            section: "4-5",
+        },
+        {
+            id: "4",
+            title: "BSCPE 4-5 (D2)",
+            date: new Date(2025, 10, 27),
+            section: "4-5",
+        },
+        {
+            id: "5",
+            title: "BSCPE 4-3 (D1)",
+            date: new Date(2025, 10, 28),
+            section: "4-3",
+        },
+    ];
+
+    const weeklyEvents = [
+        {
+            id: "1",
+            title: "BSCPE 4-1 (D1)",
+            date: new Date(2025, 10, 24),
+            time: "9:00 AM",
+            section: "4-1",
+        },
+        {
+            id: "2",
+            title: "BSCPE 4-1 (D2)",
+            date: new Date(2025, 10, 25),
+            time: "9:00 AM",
+            section: "4-1",
+        },
+        {
+            id: "3",
+            title: "BSCPE 4-5 (D1)",
+            date: new Date(2025, 10, 26),
+            time: "9:00 AM",
+            section: "4-5",
+        },
+    ];
 
     return (
         <>
@@ -569,6 +643,161 @@ export default function ComponentsShowcase() {
                                     <strong className="text-white">Dependency Flow:</strong> Pages → Components → UI → Radix UI
                                 </p>
                             </div>
+                        </div>
+                    </section>
+
+                    {/* Calendar Components */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Calendar Components</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <Card className="bg-transparent border-gray-600">
+                                <CardHeader>
+                                    <CardTitle className="text-white">Basic Calendar</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <Calendar value={selectedDate} onChange={setSelectedDate} />
+                                </CardContent>
+                            </Card>
+
+                            <Card className="bg-transparent border-gray-600">
+                                <CardHeader>
+                                    <CardTitle className="text-white">Date Picker</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <DatePicker
+                                        value={selectedDate}
+                                        onChange={setSelectedDate}
+                                        className="w-full max-w-[240px]"
+                                    />
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </section>
+
+                    {/* Month & Year Pickers */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Date Selection Components</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <Card className="bg-transparent border-gray-600">
+                                <CardHeader>
+                                    <CardTitle className="text-white">Year Dropdown Picker</CardTitle>
+                                </CardHeader>
+                                <CardContent className="flex justify-center">
+                                <YearDropdownPicker placeholder='Year' />
+                                </CardContent>
+                            </Card>
+
+                            <Card className="bg-transparent border-gray-600">
+                                <CardHeader>
+                                    <CardTitle className="text-white">Academic Year</CardTitle>
+                                </CardHeader>
+                                <CardContent className="flex justify-center">
+                                    <YearRangePicker placeholder='Academic Year' />
+                                </CardContent>
+                            </Card>
+
+                            <Card className="bg-transparent border-gray-600">
+                                <CardHeader>
+                                    <CardTitle className="text-white">Month Picker</CardTitle>
+                                </CardHeader>
+                                <CardContent className="flex justify-center">
+                                    <MonthPicker value={new Date(2026, 0, 1)} />
+                                </CardContent>
+                            </Card>
+
+                            <Card className="bg-transparent border-gray-600">
+                                <CardHeader>
+                                    <CardTitle className="text-white">Year Picker</CardTitle>
+                                </CardHeader>
+                                <CardContent className="flex justify-center">
+                                    <YearPicker value={new Date(2026, 0, 1)} />
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </section>
+
+                    {/* Defense Calendars */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Defense Calendars</h2>
+                        <div className="space-y-6">
+                            <Card className="bg-transparent border-gray-600">
+                                <CardHeader>
+                                    <CardTitle className="text-white">Defense Calendar - Monthly</CardTitle>
+                                    <CardDescription className="text-gray-400">Shows defense events for the entire month</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <DefenseCalendar
+                                        events={sampleEvents}
+                                        value={new Date(2025, 10, 24)}
+                                    />
+                                </CardContent>
+                            </Card>
+
+                            <Card className="bg-transparent border-gray-600">
+                                <CardHeader>
+                                    <CardTitle className="text-white">Defense Calendar - Weekly</CardTitle>
+                                    <CardDescription className="text-gray-400">Shows defense schedule for the week</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <DefenseCalendarWeekly
+                                        events={weeklyEvents}
+                                        value={new Date(2025, 10, 24)}
+                                    />
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </section>
+
+                    {/* Charts */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Data Visualization Charts</h2>
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <Card className="bg-transparent border-gray-600">
+                                    <CardHeader>
+                                        <CardTitle className="text-white">Research Area Distribution</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <ResearchAreaChart />
+                                    </CardContent>
+                                </Card>
+
+                                <Card className="bg-transparent border-gray-600">
+                                    <CardHeader>
+                                        <CardTitle className="text-white">Performance Overview</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <PerformanceOverviewChart />
+                                    </CardContent>
+                                </Card>
+                            </div>
+
+                            <Card className="bg-transparent border-gray-600">
+                                <CardHeader>
+                                    <CardTitle className="text-white">Archived Journals</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <ArchivedJournalsChart />
+                                </CardContent>
+                            </Card>
+
+                            <Card className="bg-transparent border-gray-600">
+                                <CardHeader>
+                                    <CardTitle className="text-white">Submission Status (Admin)</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <SubmissionStatusChart />
+                                </CardContent>
+                            </Card>
+
+                            <Card className="bg-transparent border-gray-600">
+                                <CardHeader>
+                                    <CardTitle className="text-white">Submission Status (Non-Admin)</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <SubmissionStatusNonAdminChart />
+                                </CardContent>
+                            </Card>
                         </div>
                     </section>
                 </div>

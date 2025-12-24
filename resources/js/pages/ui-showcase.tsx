@@ -28,9 +28,11 @@ import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMe
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from '@/components/ui/sidebar';
 import { HomeIcon, SettingsIcon, UsersIcon, Moon, Sun, Plus, Trash2, ArrowRight, Loader2, Settings, ChevronDown} from 'lucide-react';
+import { SwitchButton } from '@/components/ui/switch-button';
 
 export default function UIShowcase() {
     const [isCollapsibleOpen, setIsCollapsibleOpen] = useState(false);
+    const [switchView, setSwitchView] = useState<"By Semester" | "By Year">("By Semester");
     const [theme, setTheme] = useState("dark");
 
     // States for interactive logic
@@ -65,16 +67,16 @@ export default function UIShowcase() {
         }, 200);
     };
 
-const toggleTheme = () => {
+    const toggleTheme = () => {
         const newTheme = theme === "light" ? "dark" : "light";
         setTheme(newTheme);
         document.documentElement.setAttribute("data-theme", newTheme);
     };
 
-        // Color Helpers based on theme
-        const bgClass = theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900";
-        const sectionClass = theme === "dark" ? "bg-gray-800/50 border-gray-700" : "bg-white border-gray-200";
-        const subTextClass = theme === "dark" ? "text-gray-400" : "text-gray-500";
+    // Color Helpers based on theme
+    const bgClass = theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900";
+    const sectionClass = theme === "dark" ? "bg-gray-800/50 border-gray-700" : "bg-white border-gray-200";
+    const subTextClass = theme === "dark" ? "text-gray-400" : "text-gray-500";
         
     return (
         <div className={`min-h-screen transition-colors duration-300 ${bgClass}`}>
@@ -524,6 +526,18 @@ const toggleTheme = () => {
                         </TooltipProvider>
                     </section>
 
+                    {/* Switch Button */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Switch Button</h2>
+                        <div className="max-w-md space-y-2">
+                            <SwitchButton
+                                option1="By Semester"
+                                option2="By Year"
+                                value={switchView}
+                                onChange={(v) => setSwitchView(v as "By Semester" | "By Year")} />
+                        </div>
+                    </section>
+
                     {/* Icon */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Icon Wrapper</h2>
@@ -634,6 +648,8 @@ const toggleTheme = () => {
                             </div>
                         </div>
                     </section>
+
+                    
                 </div>
             </div>
         </div>
