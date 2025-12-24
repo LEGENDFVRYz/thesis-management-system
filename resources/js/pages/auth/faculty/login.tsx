@@ -118,7 +118,7 @@ export default function Login({
 
                             <Button
                                 type="submit"
-                                variant="destructive"
+                                variant="negative"
                                 className="w-full sm:w-[384px] h-[36px] font-['DM_Sans'] font-medium text-[13.33px] text-justify rounded-[8px]"
                                 tabIndex={4}
                                 disabled={processing}

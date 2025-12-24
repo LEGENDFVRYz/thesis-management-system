@@ -4,7 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { CheckboxWithLabel } from '@/components/ui/checkbox-with-label';
+import { RadioGroup } from '@/components/ui/radio-group';
+import { RadioGroupItemWithLabel } from '@/components/ui/radio-group-with-label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { Alert } from '@/components/ui/alert';
@@ -170,21 +172,12 @@ export default function UIShowcase() {
                     {/* Radio Group */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Radio Group</h2>
-                        <div className="max-w-md">
-                            <Label className="text-white">Choose your role</Label>
-                            <RadioGroup defaultValue="student" className="mt-2">
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="student" id="radio-student" />
-                                    <Label htmlFor="radio-student" className="font-normal cursor-pointer text-white">Student</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="faculty" id="radio-faculty" />
-                                    <Label htmlFor="radio-faculty" className="font-normal cursor-pointer text-white">Faculty</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="admin" id="radio-admin" />
-                                    <Label htmlFor="radio-admin" className="font-normal cursor-pointer text-white">Admin</Label>
-                                </div>
+                        <div className="bg-white p-6 rounded-lg max-w-md">
+                            <Label className="text-gray-900 mb-3 block">Choose your role</Label>
+                            <RadioGroup defaultValue="student" className="gap-4">
+                                <RadioGroupItemWithLabel value="student" id="radio-student" label="Student" />
+                                <RadioGroupItemWithLabel value="faculty" id="radio-faculty" label="Faculty" />
+                                <RadioGroupItemWithLabel value="admin" id="radio-admin" label="Admin" />
                             </RadioGroup>
                         </div>
                     </section>
@@ -192,24 +185,11 @@ export default function UIShowcase() {
                     {/* Checkboxes */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Checkboxes</h2>
-                        <div className="space-y-3 max-w-md">
-                            <div className="flex items-center space-x-2">
-                                <Checkbox id="terms" />
-                                <Label htmlFor="terms" className="font-normal cursor-pointer text-white">
-                                    Accept terms and conditions
-                                </Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <Checkbox id="marketing" defaultChecked />
-                                <Label htmlFor="marketing" className="font-normal cursor-pointer text-white">
-                                    Receive marketing emails (checked by default)
-                                </Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <Checkbox id="disabled-check" disabled />
-                                <Label htmlFor="disabled-check" className="font-normal text-white">
-                                    Disabled checkbox
-                                </Label>
+                        <div className="bg-white p-6 rounded-lg max-w-md">
+                            <div className="space-y-3">
+                                <CheckboxWithLabel id="terms" label="Accept terms and conditions" />
+                                <CheckboxWithLabel id="marketing" label="Receive marketing emails" defaultChecked />
+                                <CheckboxWithLabel id="newsletter" label="Subscribe to newsletter" />
                             </div>
                         </div>
                     </section>
