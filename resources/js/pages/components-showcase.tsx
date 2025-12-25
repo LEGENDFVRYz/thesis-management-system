@@ -8,6 +8,7 @@ import Heading from '@/components/heading';
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
 import RoleToggle from '@/components/role-toggle';
+import StageSwitchToggle from '@/components/stage-switching';
 import TextLink from '@/components/text-link';
 import { UserInfo } from '@/components/user-info';
 import { Icon } from '@/components/ui/icon';
@@ -194,6 +195,20 @@ export default function ComponentsShowcase() {
                             />
                         </div>
                     </section>
+
+                    {/* Stage Switch Toggle */}
+                    <section className="space-y-4">
+                    <h2 className="text-2xl font-semibold text-white">
+                        Stage Switch Toggle
+                    </h2>
+
+                    <p className="text-sm text-gray-400">
+                        Used to switch between MOR, DP1, and DP2 stages
+                    </p>
+
+                    <StageSwitchToggle />
+                    </section>
+
 
                     {/* Input Error */}
                     <section className="space-y-4">
