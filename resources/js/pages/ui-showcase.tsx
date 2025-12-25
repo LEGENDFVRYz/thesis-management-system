@@ -443,7 +443,7 @@ export default function UIShowcase() {
                         {/* Replaced bg-[#1e1e1e] with sectionClass */}
                         <div className={`grid grid-cols-1 md:grid-cols-2 gap-12 p-8 rounded-2xl border transition-colors duration-300 ${sectionClass}`}>
                             
-                            {/* 1. Default Loading */}
+                            {/* 1. Scanning Loading */}
                             <div className="space-y-4">
                                 <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>1. Default Loading (Scanning)</h3>
                                 <Skeleton variant="default" />
@@ -473,11 +473,45 @@ export default function UIShowcase() {
                                 </div>
                             </div>
 
-                            {/* 4. Loading Contents */}
+                            {/* 4. Loading with Contents and Progress */}
                             <div className="space-y-4">
                                 <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>4. Loading Contents</h3>
                                 <Skeleton variant="contents" progress={contentProgress} statusText="Fetching Thesis Data..." />
                                 <Skeleton variant="contents" progress={contentProgress * 0.7} statusText="Syncing Repository..." />
+                            </div>
+
+                            {/* 5. Added: Minimal Indeterminate */}
+                            <div className="space-y-4">
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>5. System Processing</h3>
+                                <div className="p-4 rounded-lg border border-dashed border-muted-foreground/20">
+                                    <p className="text-[10px] text-muted-foreground mb-2">Initializing System...</p>
+                                    <Skeleton variant="indeterminate" />
+                                </div>
+                            </div>
+
+                            {/* 6. Added: Centered Percentage */}
+                            <div className="space-y-4">
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>6. Metric Loading</h3>
+                                <div className="flex items-center justify-center h-24 rounded-lg bg-muted/5 border">
+                                    <Skeleton variant="centered-pct" progress={contentProgress} className="w-full" />
+                                </div>
+                            </div>
+
+                            {/* 7. Added: Embedded Status (Compact) */}
+                            <div className="space-y-4 md:col-span-2">
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>7. Embedded Task Status</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <Skeleton 
+                                        variant="embedded" 
+                                        progress={uploadProgress} 
+                                        statusText="Database Migration" 
+                                    />
+                                    <Skeleton 
+                                        variant="embedded" 
+                                        progress={contentProgress} 
+                                        statusText="Asset Compression" 
+                                    />
+                                </div>
                             </div>
                         </div>
                     </section>
