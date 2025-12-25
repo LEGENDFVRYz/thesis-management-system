@@ -410,19 +410,101 @@ export default function UIShowcase() {
                     {/* Wizard Stepper */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Wizard Stepper</h2>
+                        <p className="text-sm text-gray-400">Step progress indicator with three states: before, current, and after</p>
                         
-                        <div className="space-y-8">
+                        <div className="space-y-12">
+                            {/* Component States */}
                             <div>
-                                <h3 className="text-lg font-semibold mb-4 text-white">4 Steps</h3>
-                                <InteractiveWizard stepCount={4} />
+                                <h3 className="text-lg font-semibold mb-6 text-white">Component States</h3>
+                                <div className="space-y-8">
+                                    {/* Before State */}
+                                    <div>
+                                        <p className="text-sm text-gray-400 mb-3">Before (Yellow circle, Yellow connector)</p>
+                                        <WizardStepper>
+                                            <WizardSteps>
+                                                <WizardStep
+                                                    stepNumber={1}
+                                                    title="Step 1"
+                                                    description="Step Description"
+                                                    state="before"
+                                                    isLast={false}
+                                                />
+                                                <WizardStep
+                                                    stepNumber={2}
+                                                    title="Step 2"
+                                                    description="Step Description"
+                                                    state="before"
+                                                    isLast={true}
+                                                />
+                                            </WizardSteps>
+                                        </WizardStepper>
+                                    </div>
+
+                                    {/* Current State */}
+                                    <div>
+                                        <p className="text-sm text-gray-400 mb-3">Current (Maroon circle with white text, Gradient connector)</p>
+                                        <WizardStepper>
+                                            <WizardSteps>
+                                                <WizardStep
+                                                    stepNumber={1}
+                                                    title="Step 1"
+                                                    description="Step Description"
+                                                    state="current"
+                                                    isLast={false}
+                                                />
+                                                <WizardStep
+                                                    stepNumber={2}
+                                                    title="Step 2"
+                                                    description="Step Description"
+                                                    state="before"
+                                                    isLast={true}
+                                                />
+                                            </WizardSteps>
+                                        </WizardStepper>
+                                    </div>
+
+                                    {/* After State */}
+                                    <div>
+                                        <p className="text-sm text-gray-400 mb-3">After (Maroon circle with yellow text, Maroon connector)</p>
+                                        <WizardStepper>
+                                            <WizardSteps>
+                                                <WizardStep
+                                                    stepNumber={1}
+                                                    title="Step 1"
+                                                    description="Step Description"
+                                                    state="after"
+                                                    isLast={false}
+                                                />
+                                                <WizardStep
+                                                    stepNumber={2}
+                                                    title="Step 2"
+                                                    description="Step Description"
+                                                    state="after"
+                                                    isLast={true}
+                                                />
+                                            </WizardSteps>
+                                        </WizardStepper>
+                                    </div>
+                                </div>
                             </div>
 
+                            {/* Interactive Demo */}
                             <div>
-                                <h3 className="text-lg font-semibold mb-4 text-white">3 Steps</h3>
-                                <InteractiveWizard stepCount={3} />
+                                <h3 className="text-lg font-semibold mb-6 text-white">Interactive Demo</h3>
+                                <div className="space-y-8">
+                                    <div>
+                                        <p className="text-sm text-gray-400 mb-4">4 Steps (Click buttons to navigate)</p>
+                                        <InteractiveWizard stepCount={4} />
+                                    </div>
+
+                                    <div>
+                                        <p className="text-sm text-gray-400 mb-4">3 Steps (Click buttons to navigate)</p>
+                                        <InteractiveWizard stepCount={3} />
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </section>              
+                    </section>  
 
                     {/* Input OTP */}
                     <section className="space-y-4">
