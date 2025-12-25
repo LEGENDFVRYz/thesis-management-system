@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Spinner } from '@/components/ui/spinner';
+import { Spinner, SpinnerCard, StatusBadge } from '@/components/ui/spinner';
 import { Alert } from '@/components/ui/alert';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -29,6 +29,7 @@ import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from '@/components/ui/sidebar';
 import { HomeIcon, SettingsIcon, UsersIcon, Moon, Sun, Plus, Trash2, ArrowRight, Loader2, Settings, ChevronDown} from 'lucide-react';
 import { SwitchButton } from '@/components/ui/switch-button';
+import { cn } from '@/lib/utils';
 
 export default function UIShowcase() {
     const [isCollapsibleOpen, setIsCollapsibleOpen] = useState(false);
@@ -518,10 +519,27 @@ export default function UIShowcase() {
 
                     {/* Spinner */}
                     <section className="space-y-4">
-                        <h2 className="text-2xl font-semibold text-white">Spinner</h2>
-                        <div className="flex gap-4 items-center">
-                            <Spinner />
-                            <span className="text-sm text-gray-400">Loading...</span>
+                        <h2 className="text-2xl font-semibold text-white">Spinners</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            
+                            {/* Base Spinner with Theme Colors */}
+                            <div className={cn("p-6 rounded-xl border flex items-center gap-4", sectionClass)}>
+                                <Spinner className={theme === 'dark' ? "text-yellow-500" : "text-red-700"} />
+                                <span className={subTextClass}>System Loading...</span>
+                            </div>
+
+                            {/* Spinner Card Variant */}
+                            <SpinnerCard 
+                                size="md" 
+                                variant={theme === 'dark' ? 'red' : 'gray'} 
+                                label="Database Sync" 
+                            />
+
+                            {/* Status Badge Variant */}
+                            <div className="flex flex-col gap-2">
+                                <StatusBadge label="Processing" variant="yellow" />
+                                <StatusBadge label="Error Found" variant="red" />
+                            </div>
                         </div>
                     </section>
 
