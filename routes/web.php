@@ -24,16 +24,6 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
-
-/*
-==================================================================================
-UI TEST ROUTES (temporary)
-==================================================================================
-*/
-Route::get('/dialog-test', function () {
-    return Inertia::render('DialogTest');
-});
-
 /*
 ==================================================================================
 WEB STATIC ROUTES       (global routes)

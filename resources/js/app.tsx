@@ -6,14 +6,6 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
 
-import DialogTest from './pages/DialogTest'; // TEMPORARY
-
-const rootElement = document.getElementById('app');
-if (rootElement) {
-    const root = createRoot(rootElement);
-    root.render(<DialogTest />);
-}
-
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
