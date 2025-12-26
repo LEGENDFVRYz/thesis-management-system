@@ -11,7 +11,7 @@ import { Alert } from '@/components/ui/alert';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, CardIcon, CardBadge, ArchiveCard, GroupCard, CommitteeCard, EndorsementCard, AdviseeGroupCard } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -27,9 +27,11 @@ import { Icon } from '@/components/ui/icon';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from '@/components/ui/sidebar';
-import { HomeIcon, SettingsIcon, UsersIcon, Moon, Sun, Plus, Trash2, ArrowRight, Loader2, Settings, ChevronDown} from 'lucide-react';
+import { HomeIcon, SettingsIcon, UsersIcon, Moon, Sun, Plus, Trash2, ArrowRight, Loader2, Settings, ChevronDown, CheckCircleIcon, FileText, TrendingUp, Users, Calendar1Icon, BookAIcon, BookIcon, BookOpen, Eye, ClockIcon, PinIcon} from 'lucide-react';
 import { SwitchButton } from '@/components/ui/switch-button';
 import { Toast, ToastTitle, ToastDescription } from "@/components/ui/toast"
+import { Calendar } from '@/components/ui/calendar';
+import { MenuButton } from '@headlessui/react';
 
 
 export default function UIShowcase() {
@@ -249,7 +251,7 @@ export default function UIShowcase() {
                         destructive: "Destructive",
                         }
                         const descriptions = {
-                        info: "This is an info toast.",
+                        info: "This is an informational toast.",
                         success: "Your action was successful.",
                         warning: "This is a warning toast.",
                         error: "This is an error toast.",
@@ -320,24 +322,85 @@ export default function UIShowcase() {
                         </Breadcrumb>
                     </section>
 
-                    {/* Card */}
+                    {/* Cards */}
                     <section className="space-y-4">
-                        <h2 className="text-2xl font-semibold text-white">Card</h2>
+                        <h2 className="text-2xl font-semibold text-white">Cards</h2>
                         <div className="max-w-md">
-                            <Card>
+
+                            {/* Metric Card */}
+                            <h2 className="text-lg font-semibold text-white mb-4">Metric Card</h2>
+                            <Card variant="metric">
                                 <CardHeader>
-                                    <CardTitle className="text-white">Card Title</CardTitle>
-                                    <CardDescription>Card description goes here</CardDescription>
+                                    <div className="w-[36px] h-[28px] bg-sidebar-gradient-mid rounded flex items-center justify-center">
+                                        <div className="w-5 h-5" /> {/* Icon placeholder */}
+                                    </div>
+                                    <CardTitle> Metric Title Here </CardTitle>
                                 </CardHeader>
-                                <CardContent>
-                                    <p className="text-white">This is the card content area.</p>
+                                <CardContent className="py-2">
+                                    <div className="w-full h-22 overflow-hidden">
+                                        {/* Content Area */}
+                                    </div>
                                 </CardContent>
-                                <CardFooter>
-                                    <Button>Action</Button>
-                                </CardFooter>
                             </Card>
+                    
+                            {/* Committee Card - Proposal Review */}
+                            <h2 className="text-lg font-semibold text-white">Committee Card</h2>
+                            <CommitteeCard
+                                thesisTitle="Thesis Title"
+                                adviserName="Adviser Name"
+                                blockSection="Block/Section"
+                                progress={50}
+                                currentStage={3}
+                                totalStages={6}
+                            />
+
+                            {/* Archive Card */}
+                            <div>
+                            <h2 className="text-lg font-semibold text-white mb-4">Archive Card</h2>
+                            
+                            <ArchiveCard
+                                title="Thesis Title "
+                                members={["Member 1", "Member 2", "Member 3", "Member 4"]}
+                                date="Sample Date"
+                                badges={["Sample Badge 1", "Sample Badge 2", "Sample Badge 3"]}
+                            />
+                            </div>
+
+                            {/* Group Card (Used in Student Management)*/}
+                            <h2 className="text-lg font-semibold text-white">Group Card (Student Management)</h2>
+                            <GroupCard
+                                groupCode="Group Code"
+                                groupDescription="Group Description"
+                                thesisTitle="Thesis Title"
+                                thesisStage="Thesis Stage"
+                                members={["Member 1", "Member 2", "Member 3", "Member 4"]}
+                                adviserName="Adviser Name"
+                                />
+
+                            {/* Panel Endorsement Card */}
+                            <h2 className="text-lg font-semibold text-white"> Panel Endorsement Card </h2>
+
+                            <EndorsementCard
+                                thesisTitle="Thesis Title Here"
+                                groupCode="Group Code"
+                                badge="Badge Here"
+                                proponents={["Proponent 1", "Proponent 2", "Proponent 3", "Proponent 4"]}
+                                block="BSCPE 3-3"
+                                adviserName="Adviser Name"
+                                approvalDate={new Date('2025-12-05')}
+                            />
+
+                            {/* Advisee Group Card (Thesis Adviser/Panel) */}
+                            <h2 className="text-lg font-semibold text-white">Advisee Group Card (Thesis Adviser/Panel)</h2>
+                            <AdviseeGroupCard
+                                groupCode="Group Code"
+                                badge="Badge Here"
+                                thesisTitle="Thesis Title Here"
+                                section="Section"
+                            />
                         </div>
                     </section>
+                                    
 
                     {/* Collapsible */}
                     <section className="space-y-4">
