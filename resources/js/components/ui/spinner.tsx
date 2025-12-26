@@ -2,19 +2,23 @@ import React from "react"
 import { Loader2Icon } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-// --- Base Spinner Component ---
-function Spinner({ className, ...props }: React.ComponentProps<"svg">) {
+// 1. Base Spinner: Added explicit Lucide icon typing
+export interface SpinnerProps extends React.ComponentProps<"svg"> {
+    size?: number | string;
+}
+
+function Spinner({ className, ...props }: SpinnerProps) {
   return (
     <Loader2Icon
       role="status"
       aria-label="Loading"
-      className={cn("size-4 animate-spin", className)}
+      className={cn("animate-spin text-primary", className)}
       {...props}
     />
   )
 }
 
-// --- Spinner Card Wrapper (Matches your UI) ---
+// 2. Spinner Card: Useful for "Loading State" screens
 interface SpinnerCardProps {
   size?: 'sm' | 'md' | 'lg';
   variant?: 'gray' | 'red';
@@ -30,53 +34,32 @@ const SpinnerCard = ({ size = 'md', variant = 'gray', label }: SpinnerCardProps)
 
   return (
     <div className={cn(
-      "flex flex-col items-center justify-center rounded-md p-8 min-w-[150px] border transition-colors",
+      "flex flex-col items-center justify-center rounded-md p-8 border transition-colors",
       variant === 'red' 
         ? "bg-red-950/80 border-red-900" 
-        : "bg-slate-500/20 border-white/5"
+        : "bg-slate-500/10 border-slate-200"
     )}>
-      <span className="text-[10px] text-gray-500 mb-6 self-start uppercase font-semibold tracking-tighter">
-        {label || `${size.charAt(0).toUpperCase() + size.slice(1)}Spinner`}
+      <span className="text-[10px] text-muted-foreground mb-4 uppercase font-bold tracking-widest">
+        {label || `${size} Spinner`}
       </span>
-      <Spinner 
-        className={cn(
-          sizeClasses[size], 
-          variant === 'red' ? "text-yellow-500" : "text-red-700"
-        )} 
-      />
+      <Spinner className={cn(sizeClasses[size], variant === 'red' ? "text-yellow-500" : "text-red-700")} />
     </div>
   )
 }
 
-// --- Progress Bar ---
-const ProgressBar = ({ label, percent, className }: { label: string, percent: number, className?: string }) => (
-  <div className={cn("w-full mb-4", className)}>
-    <div className="flex justify-between mb-1.5">
-      <span className="text-[10px] uppercase tracking-tighter text-red-800 font-bold">{label}</span>
-      <span className="text-[10px] text-red-800 font-bold">{percent}%</span>
-    </div>
-    <div className="w-full bg-black/30 rounded-full h-1">
-      <div 
-        className="bg-red-700 h-full rounded-full transition-all duration-1000 ease-in-out" 
-        style={{ width: `${percent}%` }}
-      />
-    </div>
-  </div>
-)
-
-// --- Status Badge ---
-const StatusBadge = ({ label, variant }: { label: string, variant: 'red' | 'yellow' | 'orange' }) => {
+// 3. Status Badge: For table rows or button states
+const StatusBadge = ({ label, variant = 'red' }: { label: string, variant?: 'red' | 'yellow' | 'orange' }) => {
   const variants = {
-    red: "bg-red-950/50 text-red-500 border-red-900",
-    yellow: "bg-yellow-500/10 text-yellow-500 border-yellow-700/50",
-    orange: "bg-orange-500/10 text-orange-500 border-orange-700/50",
+    red: "bg-red-100 text-red-700 border-red-200",
+    yellow: "bg-yellow-50 text-yellow-700 border-yellow-200",
+    orange: "bg-orange-50 text-orange-700 border-orange-200",
   }
   return (
-    <div className={cn("flex items-center px-2.5 py-1 rounded border text-[10px] font-medium", variants[variant])}>
-      <Spinner className="size-3 mr-2" />
+    <div className={cn("inline-flex items-center px-3 py-1 rounded-full border text-xs font-semibold", variants[variant])}>
+      <Spinner className="size-3 mr-2 animate-spin" />
       {label}
     </div>
   )
 }
 
-export { Spinner, SpinnerCard, ProgressBar, StatusBadge }
+export { Spinner, SpinnerCard, StatusBadge }

@@ -8,7 +8,7 @@ import { CheckboxWithLabel } from '@/components/ui/checkbox-with-label';
 import { RadioGroup } from '@/components/ui/radio-group';
 import { RadioGroupItemWithLabel } from '@/components/ui/radio-group-with-label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Spinner } from '@/components/ui/spinner';
+import { Spinner, SpinnerCard, StatusBadge } from '@/components/ui/spinner';
 import { Alert } from '@/components/ui/alert';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -35,6 +35,7 @@ import { HomeIcon, SettingsIcon, UsersIcon, Moon, Sun, Plus, Trash2, ArrowRight,
 import { SwitchButton } from '@/components/ui/switch-button';
 import { Toast, ToastTitle, ToastDescription } from "@/components/ui/toast"
 
+import { cn } from '@/lib/utils';
 
 export default function UIShowcase() {
     const [isCollapsibleOpen, setIsCollapsibleOpen] = useState(false);
@@ -569,7 +570,7 @@ export default function UIShowcase() {
                         {/* Replaced bg-[#1e1e1e] with sectionClass */}
                         <div className={`grid grid-cols-1 md:grid-cols-2 gap-12 p-8 rounded-2xl border transition-colors duration-300 ${sectionClass}`}>
                             
-                            {/* 1. Default Loading */}
+                            {/* 1. Scanning Loading */}
                             <div className="space-y-4">
                                 <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>1. Default Loading (Scanning)</h3>
                                 <Skeleton variant="default" />
@@ -599,21 +600,72 @@ export default function UIShowcase() {
                                 </div>
                             </div>
 
-                            {/* 4. Loading Contents */}
+                            {/* 4. Loading with Contents and Progress */}
                             <div className="space-y-4">
                                 <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>4. Loading Contents</h3>
                                 <Skeleton variant="contents" progress={contentProgress} statusText="Fetching Thesis Data..." />
                                 <Skeleton variant="contents" progress={contentProgress * 0.7} statusText="Syncing Repository..." />
+                            </div>
+
+                            {/* 5. Added: Minimal Indeterminate */}
+                            <div className="space-y-4">
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>5. System Processing</h3>
+                                <div className="p-4 rounded-lg border border-dashed border-muted-foreground/20">
+                                    <p className="text-[10px] text-muted-foreground mb-2">Initializing System...</p>
+                                    <Skeleton variant="indeterminate" />
+                                </div>
+                            </div>
+
+                            {/* 6. Added: Centered Percentage */}
+                            <div className="space-y-4">
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>6. Metric Loading</h3>
+                                <div className="flex items-center justify-center h-24 rounded-lg bg-muted/5 border">
+                                    <Skeleton variant="centered-pct" progress={contentProgress} className="w-full" />
+                                </div>
+                            </div>
+
+                            {/* 7. Added: Embedded Status (Compact) */}
+                            <div className="space-y-4 md:col-span-2">
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>7. Embedded Task Status</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <Skeleton 
+                                        variant="embedded" 
+                                        progress={uploadProgress} 
+                                        statusText="Database Migration" 
+                                    />
+                                    <Skeleton 
+                                        variant="embedded" 
+                                        progress={contentProgress} 
+                                        statusText="Asset Compression" 
+                                    />
+                                </div>
                             </div>
                         </div>
                     </section>
 
                     {/* Spinner */}
                     <section className="space-y-4">
-                        <h2 className="text-2xl font-semibold text-white">Spinner</h2>
-                        <div className="flex gap-4 items-center">
-                            <Spinner />
-                            <span className="text-sm text-gray-400">Loading...</span>
+                        <h2 className="text-2xl font-semibold text-white">Spinners</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            
+                            {/* Base Spinner with Theme Colors */}
+                            <div className={cn("p-6 rounded-xl border flex items-center gap-4", sectionClass)}>
+                                <Spinner className={theme === 'dark' ? "text-yellow-500" : "text-red-700"} />
+                                <span className={subTextClass}>System Loading...</span>
+                            </div>
+
+                            {/* Spinner Card Variant */}
+                            <SpinnerCard 
+                                size="md" 
+                                variant={theme === 'dark' ? 'red' : 'gray'} 
+                                label="Database Sync" 
+                            />
+
+                            {/* Status Badge Variant */}
+                            <div className="flex flex-col gap-2">
+                                <StatusBadge label="Processing" variant="yellow" />
+                                <StatusBadge label="Error Found" variant="red" />
+                            </div>
                         </div>
                     </section>
 
