@@ -141,11 +141,12 @@ export function ResearchAreaChart({ totalGroups, className = "" }: ResearchAreaC
               left: mousePos.x + 12,
               pointerEvents: "none",
               background: "#fff",
-              border: `1px solid ${activeData.color}`,
+              border: `1px solid #730000`,
               borderRadius: 8,
               padding: "8px 12px",
               boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
               fontSize: 12,
+              color: "#730000",
               zIndex: 10000,
               whiteSpace: "nowrap",
             }}
@@ -153,7 +154,7 @@ export function ResearchAreaChart({ totalGroups, className = "" }: ResearchAreaC
             <div style={{ fontWeight: 600, marginBottom: 2 }}>{activeData.name}</div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ color: activeData.color, fontSize: 14 }}>●</span>
-              <span>Groups: {activeData.value}</span>
+              <span style={{color: "#4b5563"}}>Groups: {activeData.value}</span>
             </div>
             <div style={{ color: "#6b7280", marginTop: 2 }}>
               {((activeData.value / total) * 100).toFixed(1)}%

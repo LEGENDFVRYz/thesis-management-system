@@ -46,7 +46,7 @@ const CustomTooltip = ({ active, payload }: TooltipProps) => {
           style={{
             margin: "0 0 6px 0",
             fontWeight: 700,
-            color: "#111827",
+            color: "#730000",
             fontSize: "14px",
           }}
         >
