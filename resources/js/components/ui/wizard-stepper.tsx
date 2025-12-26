@@ -4,25 +4,33 @@ import { cn } from '@/lib/utils';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 
 // Wizard Container
-const WizardStepper = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
+const WizardStepper = React.forwardRef<
+    HTMLDivElement,
+    React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
     <div ref={ref} className={cn('relative', className)} {...props} />
 ));
 WizardStepper.displayName = 'WizardStepper';
 
 // Wizard Steps Container
-const WizardSteps = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
+const WizardSteps = React.forwardRef<
+    HTMLDivElement,
+    React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
     <div
         ref={ref}
-        className={cn('flex items-start justify-between w-full', className)}
+        className={cn(
+            'flex items-start w-full relative pb-20', // ⬅ reserve space for labels
+            className,
+        )}
         {...props}
     />
 ));
 WizardSteps.displayName = 'WizardSteps';
 
-// Individual Step
+// Individual Step (One circle + one connector)
 interface WizardStepProps extends React.HTMLAttributes<HTMLDivElement> {
-    isCompleted?: boolean;
-    isCurrent?: boolean;
+    state?: 'before' | 'current' | 'after';
     isLast?: boolean;
     stepNumber: number;
     title: string;
@@ -33,8 +41,7 @@ const WizardStep = React.forwardRef<HTMLDivElement, WizardStepProps>(
     (
         {
             className,
-            isCompleted = false,
-            isCurrent = false,
+            state = 'before',
             isLast = false,
             stepNumber,
             title,
@@ -43,74 +50,101 @@ const WizardStep = React.forwardRef<HTMLDivElement, WizardStepProps>(
         },
         ref,
     ) => {
+        // Determine state
+        const isBefore = state === 'before';
+        const isCurrent = state === 'current';
+        const isAfter = state === 'after';
+
+        // Colors
+        const circleColor = isBefore
+            ? 'bg-primary-foreground-2'
+            : 'bg-primary';
+
+        const numberColor = isCurrent
+            ? 'text-primary-foreground'
+            : isAfter
+            ? 'text-primary-foreground-2'
+            : 'text-foreground';
+
+        const connectorBg = isBefore
+            ? 'bg-primary-foreground-2'
+            : 'bg-primary';
+
+        const titleColor =
+            isCurrent || isAfter
+                ? 'text-primary font-semibold'
+                : 'text-foreground font-medium';
+
         return (
             <div
                 ref={ref}
                 className={cn(
-                    'flex flex-col items-center relative w-full',
+                    'flex flex-col',
+                    isLast ? 'flex-shrink-0' : 'flex-1',
                     className,
                 )}
                 {...props}
             >
-                {/* Step Circle and Connector Line */}
-                <div className="relative w-full flex justify-center mb-3">
-                    {/* Circle */}
-                    <div
-                        className={cn(
-                            'relative z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-[0px_2px_4px_0px_rgba(0,0,0,0.10)]',
-                            isCompleted || isCurrent
-                                ? 'bg-primary'
-                                : 'bg-primary-foreground-2',
-                        )}
-                    >
-                        <span
+                {/* Timeline Row */}
+                <div className="flex items-center w-full">
+                    {/* Circle anchor */}
+                    <div className="relative w-10 h-10 flex-shrink-0">
+                        <div
                             className={cn(
-                                'text-base font-medium font-dm',
-                                isCurrent
-                                    ? 'text-primary-foreground'
-                                    : isCompleted
-                                      ? 'text-primary-foreground-2'
-                                      : 'text-foreground',
+                                'w-10 h-10 rounded-full flex items-center justify-center shadow-[0px_2px_4px_0px_rgba(0,0,0,0.10)]',
+                                circleColor,
                             )}
                         >
-                            {stepNumber}
-                        </span>
-                    </div>
+                            <span
+                                className={cn(
+                                    'text-base font-medium font-dm',
+                                    numberColor,
+                                )}
+                            >
+                                {stepNumber}
+                            </span>
+                        </div>
 
-                    {/* Connector Line */}
-                    {!isLast && (
-                        <div className="absolute top-5 left-[calc(50%+20px)] right-[-50%] h-0.5 bg-primary-foreground-2 z-0">
+                        {/* Label */}
+                        <div className="absolute top-full left-1/2 mt-3 -translate-x-1/2 w-15 text-center">
                             <div
                                 className={cn(
-                                    'h-full bg-primary transition-all duration-300',
-                                    isCompleted
-                                        ? 'w-full'
-                                        : isCurrent
-                                          ? 'w-[10px]'
-                                          : 'w-0',
+                                    'text-[13px] mb-1 font-dm',
+                                    titleColor,
                                 )}
-                            />
+                            >
+                                {title}
+                            </div>
+                            <div className="text-xs font-medium text-foreground font-dm leading-tight">
+                                {description.split('\n').map((line, i) => (
+                                    <div key={i}>{line}</div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Connector aligned strictly to circle center */}
+                    {!isLast && (
+                        <div className="flex-1 mx-2">
+                            <div className="w-full h-0.5">
+                                {isCurrent ? (
+                                    <div className="relative w-full h-full bg-primary-foreground-2">
+                                        <div
+                                            className="absolute left-0 h-full bg-primary transition-all duration-300"
+                                            style={{ width: '20%' }}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div
+                                        className={cn(
+                                            'w-full h-full',
+                                            connectorBg,
+                                        )}
+                                    />
+                                )}
+                            </div>
                         </div>
                     )}
-                </div>
-
-                {/* Step Text */}
-                <div className="text-center">
-                    <div
-                        className={cn(
-                            'text-[13px] mb-1 font-dm',
-                            isCompleted || isCurrent
-                                ? 'text-primary font-semibold'
-                                : 'text-foreground font-medium',
-                        )}
-                    >
-                        {title}
-                    </div>
-                    <div className="text-xs font-medium text-foreground font-dm leading-tight">
-                        {description.split('\n').map((line, i) => (
-                            <div key={i}>{line}</div>
-                        ))}
-                    </div>
                 </div>
             </div>
         );
@@ -119,7 +153,10 @@ const WizardStep = React.forwardRef<HTMLDivElement, WizardStepProps>(
 WizardStep.displayName = 'WizardStep';
 
 // Navigation Buttons
-const WizardNavigation = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
+const WizardNavigation = React.forwardRef<
+    HTMLDivElement,
+    React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
     <div
         ref={ref}
         className={cn('flex items-center justify-between', className)}
@@ -161,7 +198,7 @@ interface InteractiveWizardProps {
 const InteractiveWizard = ({ stepCount = 4 }: InteractiveWizardProps) => {
     const [currentStep, setCurrentStep] = useState(1);
 
-    // Generate steps dynamically based on stepCount
+    // Generate steps dynamically
     const steps = Array.from({ length: stepCount }, (_, i) => ({
         number: i + 1,
         title: `Step ${i + 1}`,
@@ -180,35 +217,40 @@ const InteractiveWizard = ({ stepCount = 4 }: InteractiveWizardProps) => {
         }
     };
 
+    // Determine state for each step
+    const getStepState = (
+        stepNumber: number,
+    ): 'before' | 'current' | 'after' => {
+        if (stepNumber < currentStep) return 'after';
+        if (stepNumber === currentStep) return 'current';
+        return 'before';
+    };
+
     return (
         <div className="space-y-8">
             {/* Stepper */}
             <WizardStepper>
                 <WizardSteps>
-                    {steps.map((step, index) => {
-                        const isCompleted = currentStep > step.number;
-                        const isCurrent = currentStep === step.number;
-                        const isLast = index === steps.length - 1;
-
-                        return (
-                            <WizardStep
-                                key={step.number}
-                                stepNumber={step.number}
-                                title={step.title}
-                                description={step.description}
-                                isCompleted={isCompleted}
-                                isCurrent={isCurrent}
-                                isLast={isLast}
-                            />
-                        );
-                    })}
+                    {steps.map((step, index) => (
+                        <WizardStep
+                            key={step.number}
+                            stepNumber={step.number}
+                            title={step.title}
+                            description={step.description}
+                            state={getStepState(step.number)}
+                            isLast={index === steps.length - 1}
+                        />
+                    ))}
                 </WizardSteps>
             </WizardStepper>
 
             {/* Navigation */}
             <WizardNavigation>
                 {currentStep > 1 ? (
-                    <WizardButton variant="secondary" onClick={handlePrevious}>
+                    <WizardButton
+                        variant="secondary"
+                        onClick={handlePrevious}
+                    >
                         <ArrowLeft className="w-6 h-6" strokeWidth={2} />
                         <span>Previous</span>
                     </WizardButton>
