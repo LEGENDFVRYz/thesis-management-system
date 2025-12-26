@@ -31,6 +31,8 @@ import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from '@/components/ui/sidebar';
 import { HomeIcon, SettingsIcon, UsersIcon, Moon, Sun, Plus, Trash2, ArrowRight, Loader2, Settings, ChevronDown} from 'lucide-react';
 import { SwitchButton } from '@/components/ui/switch-button';
+import { Toast, ToastTitle, ToastDescription } from "@/components/ui/toast"
+
 
 export default function UIShowcase() {
     const [isCollapsibleOpen, setIsCollapsibleOpen] = useState(false);
@@ -213,17 +215,41 @@ export default function UIShowcase() {
                         </div>
                     </section>
 
-                    {/* Alert */}
-                    <section className="space-y-4">
-                        <h2 className="text-2xl font-semibold text-white">Alert</h2>
-                        <div className="max-w-md space-y-4">
-                            <Alert>
-                                <div className="text-white">
-                                    <div className="font-semibold">Note</div>
-                                    <div className="text-sm">This is an informational alert message.</div>
-                                </div>
-                            </Alert>
+                    {/* Toast */}
+                    <section className="space-y-6">
+                    <h2 className="text-2xl font-semibold text-white">Toast</h2>
+
+                    {(["small", "medium", "large"] as const).map((size) => {
+                        const titles = {
+                        info: "Information",
+                        success: "Success",
+                        warning: "Warning",
+                        error: "Error",
+                        default: "Default",
+                        destructive: "Destructive",
+                        }
+                        const descriptions = {
+                        info: "This is an info toast.",
+                        success: "Your action was successful.",
+                        warning: "This is a warning toast.",
+                        error: "This is an error toast.",
+                        default: "This is a default toast.",
+                        destructive: "This is a destructive toast.",
+                        }
+
+                        const variants = ["info", "success", "warning", "error", "default", "destructive"] as const
+
+                        return (
+                        <div key={size} className="flex flex-row gap-4 flex-wrap items-start">
+                            {variants.map((variant) => (
+                            <Toast key={`${variant}-${size}`} variant={variant} size={size}>
+                                <ToastTitle>{titles[variant]}</ToastTitle>
+                                <ToastDescription>{descriptions[variant]}</ToastDescription>
+                            </Toast>
+                            ))}
                         </div>
+                        )
+                    })}
                     </section>
 
                     {/* Avatar */}
