@@ -1,16 +1,54 @@
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 import { Download, FileText, Pencil, Trash2 } from 'lucide-react';
 import { HTMLAttributes } from 'react';
 
+// --- UTILITY ---
+function cn(...classes: (string | undefined | null | false)[]) {
+  return classes.filter(Boolean).join(' ');
+}
+
+// --- SUB-COMPONENT: BUTTON (Local version to ensure global compatibility) ---
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    variant?: 'default' | 'outline' | 'ghost';
+    size?: 'default' | 'sm';
+}
+
+function Button({ children, onClick, variant = 'default', size = 'default', className = '', ...props }: ButtonProps) {
+  const baseStyles = 'inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#730000] disabled:opacity-50 disabled:pointer-events-none';
+  
+  // VARIANTS
+  const variants = {
+    default: 'bg-[#730000] text-white hover:bg-[#5a0000]',
+    outline: 'border border-neutral-300 bg-transparent hover:bg-neutral-100 text-neutral-900',
+    ghost:   'bg-transparent hover:bg-neutral-100 text-neutral-700', // Perfect for icons
+  };
+
+  // SIZES
+  const sizes = {
+    default: 'h-10 py-2 px-4',
+    sm:      'h-8 px-3 text-xs', 
+  };
+  
+  return (
+    <button 
+        type="button" // <--- CRITICAL: Prevents accidental form submission
+        className={cn(baseStyles, variants[variant], sizes[size], className)} 
+        onClick={onClick}
+        {...props}
+    >
+      {children}
+    </button>
+  );
+}
+
+// --- MAIN GLOBAL COMPONENT ---
 interface FilePreviewProps extends HTMLAttributes<HTMLDivElement> {
     fileUrl: string;
     fileName: string;
     fileType?: 'pdf' | string; 
     fileSize?: string;
     onDownload?: () => void;
-    onEdit?: () => void;
-    onDelete?: () => void;
+    onEdit?: () => void;   // If provided, shows Edit button
+    onDelete?: () => void; // If provided, shows Delete button
 }
 
 export default function FilePreview({
@@ -28,41 +66,50 @@ export default function FilePreview({
     return (
         <div
             className={cn(
-                'flex h-[600px] w-full max-w-4xl flex-col overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm animate-in fade-in zoom-in-95 duration-200',
+                'flex h-[600px] w-full flex-col overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm animate-in fade-in zoom-in-95 duration-200',
                 className
             )}
             {...props}
         >
             {/* 1. HEADER / TOOLBAR */}
-            <div className="relative z-50 flex h-14 shrink-0 items-center justify-between border-b border-neutral-100 bg-white px-4">
+            <div className="relative z-10 flex h-14 shrink-0 items-center justify-between border-b border-neutral-100 bg-white px-4">
                 
                 {/* Left: File Info */}
                 <div className="flex items-center gap-3 overflow-hidden">
+                    {/* Icon Box */}
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#730000]/10">
                         <FileText className="h-4 w-4 text-[#730000]" />
                     </div>
+                    
+                    {/* Text Info */}
                     <div className="flex flex-col min-w-0">
-                        <h3 className="truncate text-sm font-semibold text-neutral-900 max-w-[200px]" title={fileName}>
+                        <h3 
+                            className="truncate text-sm font-semibold text-neutral-900 max-w-[200px] sm:max-w-[300px]" 
+                            title={fileName}
+                        >
                             {fileName}
                         </h3>
+                        {fileSize && (
+                            <span className="text-xs text-neutral-400">{fileSize}</span>
+                        )}
                     </div>
                 </div>
 
-                {/* Right: THE 3 BUTTONS */}
+                {/* Right: ACTION BUTTONS */}
                 <div className="flex items-center gap-1">
                     
-                    {/* 1. DOWNLOAD */}
+                    {/* A. DOWNLOAD */}
                     <Button
                         variant="ghost"
                         size="sm"
                         onClick={onDownload || (() => window.open(fileUrl, '_blank'))}
-                        className="h-8 w-8 text-neutral-500 hover:bg-neutral-100 hover:text-[#730000]"
+                        className="h-8 w-8 p-0 text-neutral-500 hover:bg-neutral-100 hover:text-[#730000]"
                         title="Download"
                     >
                         <Download className="h-4 w-4" />
                     </Button>
 
-                    {/* 2. EDIT / REPLACE */}
+                    {/* B. EDIT / REPLACE */}
                     {onEdit && (
                         <Button
                             variant="ghost"
@@ -71,14 +118,14 @@ export default function FilePreview({
                                 e.preventDefault();
                                 onEdit();
                             }}
-                            className="h-8 w-8 text-neutral-500 hover:bg-neutral-100 hover:text-blue-600"
+                            className="h-8 w-8 p-0 text-neutral-500 hover:bg-neutral-100 hover:text-blue-600"
                             title="Replace File"
                         >
                             <Pencil className="h-4 w-4" />
                         </Button>
                     )}
 
-                    {/* 3. DELETE */}
+                    {/* C. DELETE */}
                     {onDelete && (
                         <Button
                             variant="ghost"
@@ -87,7 +134,7 @@ export default function FilePreview({
                                 e.preventDefault();
                                 onDelete();
                             }}
-                            className="h-8 w-8 text-neutral-500 hover:bg-red-50 hover:text-red-600"
+                            className="h-8 w-8 p-0 text-neutral-500 hover:bg-red-50 hover:text-red-600"
                             title="Delete File"
                         >
                             <Trash2 className="h-4 w-4" />

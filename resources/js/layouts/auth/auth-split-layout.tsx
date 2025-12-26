@@ -1,5 +1,5 @@
-import AppLogoIcon from '@/components/app-logo-icon';
-import IconCheckLogin from '../../components/check-icon-login';
+import Logo from '@/components/icons/logo';
+import CheckCircle from '@/components/icons/check-circle';
 import { home } from '@/routes';
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
@@ -29,7 +29,7 @@ export default function AuthSplitLayout({
                 {/* Top PART */}
                 <div className="space-y-5">
                     <div className="flex h-[77px] w-[50px]">
-                        <AppLogoIcon
+                        <Logo
                             className="h-[77px] w-[50px]"
                             variant="light"
                         />
@@ -51,15 +51,15 @@ export default function AuthSplitLayout({
                 {/* Bot PART */}
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
-                        <IconCheckLogin className="shrink-0" />
+                        <CheckCircle className="shrink-0" />
                         <span className="font-['DM_Sans:Medium',sans-serif] font-medium text-[16px] text-white" style={{ fontVariationSettings: "'opsz' 14" }}>Secure & Reliable</span>
                     </div>
                     <div className="flex items-center gap-3">
-                        <IconCheckLogin className="shrink-0" />
+                        <CheckCircle className="shrink-0" />
                         <span className="font-['DM_Sans:Medium',sans-serif] font-medium text-[16px] text-white" style={{ fontVariationSettings: "'opsz' 14" }}>24/7 Access</span>
                     </div>
                     <div className="flex items-center gap-3">
-                        <IconCheckLogin className="shrink-0" />
+                        <CheckCircle className="shrink-0" />
                         <span className="font-['DM_Sans:Medium',sans-serif] font-medium text-[16px] text-white" style={{ fontVariationSettings: "'opsz' 14" }}>Real-time Updates</span>
                     </div>
                 </div>
@@ -71,7 +71,7 @@ export default function AuthSplitLayout({
                 <div className="flex flex-col items-center justify-center px-4">
                     <Link href={home()} className="flex flex-col items-center gap-2 font-medium">
                         <div className="mb-1 flex h-[60px] w-[60px] md:h-[70px] md:w-[70px] lg:h-[80px] lg:w-[80px] items-center justify-center rounded-full bg-primary/10">
-                            <AppLogoIcon
+                            <Logo
                                 className="h-[60px] w-[60px] md:h-[70px] md:w-[70px] lg:h-[80px] lg:w-[80px]"
                                 variant="dark"
                             />

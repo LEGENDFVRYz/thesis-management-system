@@ -39,8 +39,11 @@ class StudentController extends Controller
             
             // 5. Join Faculty Assignments (For School Year)
             ->leftJoin('tbl_faculty_assignments', 'tbl_section_advisers.faculty_assign_id', '=', 'tbl_faculty_assignments.id')
-            
-            // 6. Join Faculties (For Adviser Name)
+
+            // 6. Join School Years (To get the actual Year string e.g., 2025)
+            ->leftJoin('tbl_school_years', 'tbl_faculty_assignments.sy_id', '=', 'tbl_school_years.id')
+
+            // 7. Join Faculties (For Adviser Name)
             ->leftJoin('tbl_faculties', 'tbl_faculty_assignments.faculty_id', '=', 'tbl_faculties.id')
             
             ->select(
@@ -60,16 +63,17 @@ class StudentController extends Controller
                 // Logic: IF year=2025 THEN Prefix '3' + Section + Padded Group Number (09)
                 // ELSE: Section + Padded Group Number (09)
                 DB::raw("
-                    CASE 
-                        WHEN tbl_faculty_assignments.school_year = '2025' THEN 
-                            CONCAT('3', tbl_section_advisers.section, LPAD(tbl_thesis_groups.group_number, 2, '0'))
-                        ELSE 
-                            CONCAT(tbl_section_advisers.section, LPAD(tbl_thesis_groups.group_number, 2, '0')) 
-                    END as group_code
-                ")
+                    CONCAT(
+                        3 - (tbl_school_years.year - 2025), 
+                        tbl_section_advisers.section,
+                        LPAD(tbl_thesis_groups.group_number, 2, '0')
+                    )  AS group_code
+                "),
             )
             ->orderBy('tbl_students.id', 'asc')
             ->get(); // Use ->paginate(10) if you want pagination
+        
+        // dd($students);
 
         return Inertia::render('Admin/management/student', [
             'students' => $students

@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Theses;
+use App\Models\Endorsement;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,14 +18,9 @@ class DefenseMatrixFactory extends Factory
     public function definition(): array
     {
         return [
-            // Safety Net: If run standalone, find/create a valid thesis.
-            'thesis_id' => Theses::inRandomOrder()->first()?->id ?? Theses::factory(),
-            
+            'endorsement_id' => Endorsement::factory(),
             'course' => $this->faker->randomElement(['MOR', 'DP1', 'DP2']),
-            
-            // Schedule defense between next week and next month
             'defense_schedule' => $this->faker->dateTimeBetween('+1 day', '+1 week'),
-            
             'defense_room' => $this->faker->numberBetween(300, 316),
         ];
     }

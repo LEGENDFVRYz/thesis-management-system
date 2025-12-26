@@ -1,34 +1,48 @@
 import { Check, CloudUpload, FileText, X } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useRef, useState, DragEvent, ChangeEvent } from 'react';
 
-function cn(...classes) {
+// --- UTILITY ---
+function cn(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(' ');
 }
 
-function Button({ children, onClick, variant = 'default', className = '' }) {
-  const baseStyles = 'px-4 py-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
+// --- SUB-COMPONENTS ---
+// 1. Button (Themed for Thesis System)
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    variant?: 'default' | 'outline';
+}
+
+function Button({ children, onClick, variant = 'default', className = '', ...props }: ButtonProps) {
+  const baseStyles = 'px-4 py-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#730000]';
+  
   const variantStyles = variant === 'outline' 
-    ? 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-blue-500'
-    : 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500';
+    ? 'border border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50'
+    : 'bg-[#730000] text-white hover:bg-[#5a0000] shadow-md'; // Maroon Theme
   
   return (
-    <button className={cn(baseStyles, variantStyles, className)} onClick={onClick}>
+    <button 
+        type="button" 
+        className={cn(baseStyles, variantStyles, className)} 
+        onClick={onClick}
+        {...props}
+    >
       {children}
     </button>
   );
 }
 
-function Toast({ message, description, type = 'success' }) {
+// 2. Toast (Local notification for this component)
+function Toast({ message, description, type = 'success' }: { message: string, description?: string, type?: 'success' | 'error' }) {
   return (
     <div className={cn(
-      'fixed top-4 right-4 z-50 rounded-lg p-4 shadow-lg animate-in slide-in-from-top-2 duration-300',
-      type === 'success' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
+      'absolute top-4 right-4 z-[50] rounded-lg p-4 shadow-xl animate-in slide-in-from-top-2 duration-300 border bg-white',
+      type === 'success' ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'
     )}>
-      <div className={cn('font-semibold', type === 'success' ? 'text-green-900' : 'text-red-900')}>
+      <div className={cn('font-bold', type === 'success' ? 'text-green-800' : 'text-red-800')}>
         {message}
       </div>
       {description && (
-        <div className={cn('text-sm mt-1', type === 'success' ? 'text-green-700' : 'text-red-700')}>
+        <div className={cn('text-xs mt-1 font-medium', type === 'success' ? 'text-green-600' : 'text-red-600')}>
           {description}
         </div>
       )}
@@ -36,30 +50,39 @@ function Toast({ message, description, type = 'success' }) {
   );
 }
 
-export default function FileUpload() {
+// --- MAIN GLOBAL COMPONENT ---
+interface FileUploadProps {
+    acceptedTypes?: string; // e.g. ".pdf,.docx"
+    maxSizeMB?: number;     // e.g. 50
+    onFilesSelected?: (files: File[]) => void; // Communication with Parent
+}
+
+export default function FileUpload({ 
+    acceptedTypes = '.pdf,.docx,.jpg,.png', 
+    maxSizeMB = 100,
+    onFilesSelected 
+}: FileUploadProps) {
+  
   const [isDragging, setIsDragging] = useState(false);
-  const [files, setFiles] = useState([]);
-  const [status, setStatus] = useState('idle');
+  const [files, setFiles] = useState<File[]>([]);
+  const [status, setStatus] = useState<'idle' | 'uploading' | 'success'>('idle');
   const [progress, setProgress] = useState(0);
-  const [toast, setToast] = useState(null);
-  const inputRef = useRef(null);
+  const [toast, setToast] = useState<{message: string, description: string, type: 'success' | 'error'} | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const maxSizeMB = 100;
-  const acceptedTypes = '.pdf,.docx,.jpg,.png';
-
-  const showToast = (message, description, type = 'success') => {
+  const showToast = (message: string, description: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, description, type });
     setTimeout(() => setToast(null), 3000);
   };
 
-  const handleDrag = (e, dragging) => {
+  const handleDrag = (e: DragEvent, dragging: boolean) => {
     e.preventDefault();
     e.stopPropagation();
     if (status !== 'idle') return;
     setIsDragging(dragging);
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = (e: DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
@@ -70,24 +93,23 @@ export default function FileUpload() {
     }
   };
 
-  const handleFileInput = (e) => {
+  const handleFileInput = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       validateAndStartUpload(Array.from(e.target.files));
     }
   };
 
-  const validateAndStartUpload = (uploadedFiles) => {
-    const validFiles = [];
+  const validateAndStartUpload = (uploadedFiles: File[]) => {
+    const validFiles: File[] = [];
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
     uploadedFiles.forEach((file) => {
-      // Size Check
+      // 1. Check Size
       if (file.size > maxSizeBytes) {
         showToast(`File too large: ${file.name}`, `Max size is ${maxSizeMB}MB.`, 'error');
         return;
       }
-
-      // Type Check
+      // 2. Check Type
       if (acceptedTypes) {
         const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
         const allowedExtensions = acceptedTypes.split(',').map((t) => t.trim().toLowerCase());
@@ -96,32 +118,37 @@ export default function FileUpload() {
           return;
         }
       }
-
       validFiles.push(file);
     });
 
     if (validFiles.length === 0) return;
 
-    // Start Upload Simulation
+    // Start Simulation
     setFiles(validFiles);
     setStatus('uploading');
     setProgress(0);
 
     const interval = setInterval(() => {
       setProgress((prev) => {
-        const nextProgress = prev + 15;
+        const nextProgress = prev + 10; 
 
-        // Check if the NEXT value reaches or exceeds 100
         if (nextProgress >= 100) {
           clearInterval(interval);
           setStatus('success');
-          showToast('Upload complete', `${validFiles.length} file(s) uploaded successfully.`);
+          showToast('Upload Complete', `${validFiles.length} file(s) ready.`);
+          
+          // DELAY: Wait 1s so user sees the 100% Red Bar before logic runs
+          setTimeout(() => {
+              if (onFilesSelected) {
+                  onFilesSelected(validFiles); 
+              }
+          }, 1000); 
+          
           return 100; 
         }
-        
         return nextProgress;
       });
-    }, 150);
+    }, 120);
   };
 
   const resetUpload = () => {
@@ -129,25 +156,30 @@ export default function FileUpload() {
     setStatus('idle');
     setProgress(0);
     if (inputRef.current) inputRef.current.value = '';
+    if (onFilesSelected) onFilesSelected([]);
   };
 
-  const removeFile = (indexToRemove) => {
+  const removeFile = (indexToRemove: number) => {
     const updatedFiles = files.filter((_, index) => index !== indexToRemove);
     setFiles(updatedFiles);
+    
+    if (onFilesSelected) onFilesSelected(updatedFiles);
+
     if (updatedFiles.length === 0) {
       resetUpload();
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8 flex items-center justify-center">
+    <div className="w-full relative">
       {toast && <Toast message={toast.message} description={toast.description} type={toast.type} />}
       
       <div
         className={cn(
-          'relative flex min-h-[300px] w-full max-w-lg flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all duration-300 ease-in-out',
-          isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white',
-          status === 'success' && 'border-yellow-500 bg-gray-50'
+          'relative flex min-h-[300px] w-full flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all duration-300 ease-in-out bg-white',
+          // THEME: Blue -> Maroon/Red Logic
+          isDragging ? 'border-[#730000] bg-red-50' : 'border-neutral-300',
+          status === 'success' && 'border-green-500 bg-neutral-50'
         )}
         onDragOver={(e) => handleDrag(e, true)}
         onDragLeave={(e) => handleDrag(e, false)}
@@ -155,57 +187,57 @@ export default function FileUpload() {
       >
         {/* STATE 1: IDLE */}
         {status === 'idle' && (
-          <div className="flex flex-col items-center p-6 text-center">
-            <div className="mb-4 rounded-xl bg-gray-100 p-4 shadow-sm">
-              <CloudUpload className="h-8 w-8 text-gray-600" />
+          <div className="flex flex-col items-center p-6 text-center animate-in fade-in zoom-in-95">
+            <div className="mb-4 rounded-xl bg-neutral-100 p-4 shadow-sm">
+              <CloudUpload className="h-8 w-8 text-neutral-600" />
             </div>
-            <p className="mb-2 text-lg font-medium text-gray-700">
+            <p className="mb-2 text-lg font-medium text-neutral-700">
               Drag and drop files here, or{' '}
               <button
                 type="button"
-                className="cursor-pointer font-semibold text-blue-600 hover:underline"
+                className="cursor-pointer font-bold text-[#730000] hover:underline"
                 onClick={() => inputRef.current?.click()}
               >
                 click to select
               </button>
             </p>
-            <p className="text-sm text-gray-400">
-              Supported: {acceptedTypes || 'PDF, DOCX, JPG'}
+            <p className="text-sm text-neutral-400">
+              Supported: {acceptedTypes}
             </p>
-            <p className="mt-1 text-xs text-gray-400 font-medium">
+            <p className="mt-1 text-xs text-neutral-400 font-medium">
               Max size: {maxSizeMB} MB
             </p>
           </div>
         )}
 
-        {/* STATE 2: UPLOADING */}
+        {/* STATE 2: UPLOADING (With the RED BAR you wanted) */}
         {status === 'uploading' && (
-          <div className="flex w-full max-w-xs flex-col items-center justify-center p-6">
+          <div className="flex w-full max-w-xs flex-col items-center justify-center p-6 animate-in fade-in zoom-in-95">
             <div className="mb-2 flex w-full justify-between text-sm">
-              <span className="font-medium text-gray-700">
+              <span className="font-semibold text-neutral-700">
                 Uploading {files.length} file{files.length > 1 ? 's' : ''}...
               </span>
-              <span className="text-gray-500">{progress}%</span>
+              <span className="text-neutral-500 font-mono">{progress}%</span>
             </div>
             
-            <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-100 border border-gray-200">
+            <div className="h-3 w-full overflow-hidden rounded-full bg-neutral-100 border border-neutral-200">
               <div
-                className="h-full bg-red-900 transition-all duration-300 ease-out"
+                className="h-full bg-[#730000] transition-all duration-300 ease-out rounded-full"
                 style={{ width: `${progress}%` }}
               />
             </div>
-            <p className="mt-2 text-xs text-gray-400">Please wait...</p>
+            <p className="mt-2 text-xs text-neutral-400">Please wait while we process your document.</p>
           </div>
         )}
 
         {/* STATE 3: SUCCESS */}
         {status === 'success' && (
-          <div className="flex w-full flex-col items-center p-6">
-            <div className="mb-4 rounded-xl border border-yellow-500 bg-yellow-50 p-3 text-yellow-600">
+          <div className="flex w-full flex-col items-center p-6 animate-in fade-in zoom-in-95">
+            <div className="mb-4 rounded-xl border border-green-200 bg-green-50 p-3 text-green-700">
               <Check className="h-8 w-8" />
             </div>
 
-            <h3 className="mb-4 text-lg font-semibold text-gray-800">
+            <h3 className="mb-4 text-lg font-bold text-neutral-800">
               Upload Successful!
             </h3>
 
@@ -214,20 +246,21 @@ export default function FileUpload() {
               {files.map((file, index) => (
                 <div 
                   key={`${file.name}-${index}`}
-                  className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-sm"
+                  className="flex items-center gap-3 rounded-lg border border-neutral-200 bg-white px-4 py-3 shadow-sm"
                 >
-                  <FileText className="h-5 w-5 shrink-0 text-red-600" />
+                  <FileText className="h-5 w-5 shrink-0 text-[#730000]" />
                   <div className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate text-sm font-medium text-gray-900">
+                    <span className="truncate text-sm font-medium text-neutral-900">
                       {file.name}
                     </span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-neutral-500">
                       {(file.size / (1024 * 1024)).toFixed(2)} MB
                     </span>
                   </div>
                   <button
+                    type="button"
                     onClick={() => removeFile(index)}
-                    className="ml-2 text-gray-400 hover:text-red-500 transition-colors"
+                    className="ml-2 text-neutral-400 hover:text-red-600 transition-colors"
                     title="Remove file"
                   >
                     <X className="h-4 w-4" />
@@ -239,7 +272,7 @@ export default function FileUpload() {
             <Button 
               onClick={resetUpload} 
               variant="outline" 
-              className="h-9 min-w-[120px] rounded-full border-gray-300 hover:bg-gray-100 hover:text-blue-600"
+              className="h-9 min-w-[120px] rounded-full text-neutral-600 hover:text-[#730000] border-neutral-300"
             >
               Upload New
             </Button>
