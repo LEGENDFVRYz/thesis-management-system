@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { CheckboxWithLabel } from '@/components/ui/checkbox-with-label';
+import { RadioGroup } from '@/components/ui/radio-group';
+import { RadioGroupItemWithLabel } from '@/components/ui/radio-group-with-label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Spinner } from '@/components/ui/spinner';
+import { Spinner, SpinnerCard, StatusBadge } from '@/components/ui/spinner';
 import { Alert } from '@/components/ui/alert';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +23,8 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { Skeleton } from '@/components/ui/skeleton';
 import { Toggle } from '@/components/ui/toggle';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Tabs } from '@/components/ui/tabs';
+import { TimelineState } from '@/components/ui/wizard-timeline';
 import { WizardStepper, WizardSteps, WizardStep, InteractiveWizard } from '@/components/ui/wizard-stepper';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Icon } from '@/components/ui/icon';
@@ -33,6 +37,7 @@ import { Toast, ToastTitle, ToastDescription } from "@/components/ui/toast"
 import { Calendar } from '@/components/ui/calendar';
 import { MenuButton } from '@headlessui/react';
 
+import { cn } from '@/lib/utils';
 
 export default function UIShowcase() {
     const [isCollapsibleOpen, setIsCollapsibleOpen] = useState(false);
@@ -174,21 +179,12 @@ export default function UIShowcase() {
                     {/* Radio Group */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Radio Group</h2>
-                        <div className="max-w-md">
-                            <Label className="text-white">Choose your role</Label>
-                            <RadioGroup defaultValue="student" className="mt-2">
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="student" id="radio-student" />
-                                    <Label htmlFor="radio-student" className="font-normal cursor-pointer text-white">Student</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="faculty" id="radio-faculty" />
-                                    <Label htmlFor="radio-faculty" className="font-normal cursor-pointer text-white">Faculty</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="admin" id="radio-admin" />
-                                    <Label htmlFor="radio-admin" className="font-normal cursor-pointer text-white">Admin</Label>
-                                </div>
+                        <div className="bg-white p-6 rounded-lg max-w-md">
+                            <Label className="text-gray-900 mb-3 block">Choose your role</Label>
+                            <RadioGroup defaultValue="student" className="gap-4">
+                                <RadioGroupItemWithLabel value="student" id="radio-student" label="Student" />
+                                <RadioGroupItemWithLabel value="faculty" id="radio-faculty" label="Faculty" />
+                                <RadioGroupItemWithLabel value="admin" id="radio-admin" label="Admin" />
                             </RadioGroup>
                         </div>
                     </section>
@@ -196,24 +192,11 @@ export default function UIShowcase() {
                     {/* Checkboxes */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Checkboxes</h2>
-                        <div className="space-y-3 max-w-md">
-                            <div className="flex items-center space-x-2">
-                                <Checkbox id="terms" />
-                                <Label htmlFor="terms" className="font-normal cursor-pointer text-white">
-                                    Accept terms and conditions
-                                </Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <Checkbox id="marketing" defaultChecked />
-                                <Label htmlFor="marketing" className="font-normal cursor-pointer text-white">
-                                    Receive marketing emails (checked by default)
-                                </Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <Checkbox id="disabled-check" disabled />
-                                <Label htmlFor="disabled-check" className="font-normal text-white">
-                                    Disabled checkbox
-                                </Label>
+                        <div className="bg-white p-6 rounded-lg max-w-md">
+                            <div className="space-y-3">
+                                <CheckboxWithLabel id="terms" label="Accept terms and conditions" />
+                                <CheckboxWithLabel id="marketing" label="Receive marketing emails" defaultChecked />
+                                <CheckboxWithLabel id="newsletter" label="Subscribe to newsletter" />
                             </div>
                         </div>
                     </section>
@@ -457,23 +440,141 @@ export default function UIShowcase() {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </section>
-                    
+
+                    {/* Tabs */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Tabs</h2>
+                        
+                        <div className="space-y-8">
+                            {/* Two Tabs */}
+                            <div>
+                                <h3 className="text-lg font-semibold mb-4 text-white">Two Tabs</h3>
+                                <Tabs tabs={['Tab 1', 'Tab 2']} defaultTab="Tab 1" />
+                            </div>
+
+                            {/* Multiple Tabs */}
+                            <div>
+                                <h3 className="text-lg font-semibold mb-4 text-white">Multiple Tabs</h3>
+                                <Tabs tabs={['Current', 'Upcoming', 'Past']} defaultTab="Current" />
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Wizard Timeline */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Wizard Timeline</h2>
+                        
+                        <div className="space-y-8">
+                            {/* Timeline States */}
+                            <div>
+                                <h3 className="text-lg font-semibold mb-4 text-white">Timeline States</h3>
+                                <div className="flex items-start justify-center gap-12 p-6 rounded-lg">
+                                    <TimelineState state="past" label="Past (Filled, lighter connector)" />
+                                    <TimelineState state="current" label="Current (Filled)" />
+                                    <TimelineState state="upcoming" label="Upcoming (Hollow)" />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
                     {/* Wizard Stepper */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Wizard Stepper</h2>
+                        <p className="text-sm text-gray-400">Step progress indicator with three states: before, current, and after</p>
                         
-                        <div className="space-y-8">
+                        <div className="space-y-12">
+                            {/* Component States */}
                             <div>
-                                <h3 className="text-lg font-semibold mb-4 text-white">4 Steps</h3>
-                                <InteractiveWizard stepCount={4} />
+                                <h3 className="text-lg font-semibold mb-6 text-white">Component States</h3>
+                                <div className="space-y-8">
+                                    {/* Before State */}
+                                    <div>
+                                        <p className="text-sm text-gray-400 mb-3">Before (Yellow circle, Yellow connector)</p>
+                                        <WizardStepper>
+                                            <WizardSteps>
+                                                <WizardStep
+                                                    stepNumber={1}
+                                                    title="Step 1"
+                                                    description="Step Description"
+                                                    state="before"
+                                                    isLast={false}
+                                                />
+                                                <WizardStep
+                                                    stepNumber={2}
+                                                    title="Step 2"
+                                                    description="Step Description"
+                                                    state="before"
+                                                    isLast={true}
+                                                />
+                                            </WizardSteps>
+                                        </WizardStepper>
+                                    </div>
+
+                                    {/* Current State */}
+                                    <div>
+                                        <p className="text-sm text-gray-400 mb-3">Current (Maroon circle with white text, Gradient connector)</p>
+                                        <WizardStepper>
+                                            <WizardSteps>
+                                                <WizardStep
+                                                    stepNumber={1}
+                                                    title="Step 1"
+                                                    description="Step Description"
+                                                    state="current"
+                                                    isLast={false}
+                                                />
+                                                <WizardStep
+                                                    stepNumber={2}
+                                                    title="Step 2"
+                                                    description="Step Description"
+                                                    state="before"
+                                                    isLast={true}
+                                                />
+                                            </WizardSteps>
+                                        </WizardStepper>
+                                    </div>
+
+                                    {/* After State */}
+                                    <div>
+                                        <p className="text-sm text-gray-400 mb-3">After (Maroon circle with yellow text, Maroon connector)</p>
+                                        <WizardStepper>
+                                            <WizardSteps>
+                                                <WizardStep
+                                                    stepNumber={1}
+                                                    title="Step 1"
+                                                    description="Step Description"
+                                                    state="after"
+                                                    isLast={false}
+                                                />
+                                                <WizardStep
+                                                    stepNumber={2}
+                                                    title="Step 2"
+                                                    description="Step Description"
+                                                    state="after"
+                                                    isLast={true}
+                                                />
+                                            </WizardSteps>
+                                        </WizardStepper>
+                                    </div>
+                                </div>
                             </div>
 
+                            {/* Interactive Demo */}
                             <div>
-                                <h3 className="text-lg font-semibold mb-4 text-white">3 Steps</h3>
-                                <InteractiveWizard stepCount={3} />
+                                <h3 className="text-lg font-semibold mb-6 text-white">Interactive Demo</h3>
+                                <div className="space-y-8">
+                                    <div>
+                                        <p className="text-sm text-gray-400 mb-4">4 Steps (Click buttons to navigate)</p>
+                                        <InteractiveWizard stepCount={4} />
+                                    </div>
+
+                                    <div>
+                                        <p className="text-sm text-gray-400 mb-4">3 Steps (Click buttons to navigate)</p>
+                                        <InteractiveWizard stepCount={3} />
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </section>              
+                    </section>  
 
                     {/* Input OTP */}
                     <section className="space-y-4">
@@ -532,7 +633,7 @@ export default function UIShowcase() {
                         {/* Replaced bg-[#1e1e1e] with sectionClass */}
                         <div className={`grid grid-cols-1 md:grid-cols-2 gap-12 p-8 rounded-2xl border transition-colors duration-300 ${sectionClass}`}>
                             
-                            {/* 1. Default Loading */}
+                            {/* 1. Scanning Loading */}
                             <div className="space-y-4">
                                 <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>1. Default Loading (Scanning)</h3>
                                 <Skeleton variant="default" />
@@ -562,21 +663,72 @@ export default function UIShowcase() {
                                 </div>
                             </div>
 
-                            {/* 4. Loading Contents */}
+                            {/* 4. Loading with Contents and Progress */}
                             <div className="space-y-4">
                                 <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>4. Loading Contents</h3>
                                 <Skeleton variant="contents" progress={contentProgress} statusText="Fetching Thesis Data..." />
                                 <Skeleton variant="contents" progress={contentProgress * 0.7} statusText="Syncing Repository..." />
+                            </div>
+
+                            {/* 5. Added: Minimal Indeterminate */}
+                            <div className="space-y-4">
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>5. System Processing</h3>
+                                <div className="p-4 rounded-lg border border-dashed border-muted-foreground/20">
+                                    <p className="text-[10px] text-muted-foreground mb-2">Initializing System...</p>
+                                    <Skeleton variant="indeterminate" />
+                                </div>
+                            </div>
+
+                            {/* 6. Added: Centered Percentage */}
+                            <div className="space-y-4">
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>6. Metric Loading</h3>
+                                <div className="flex items-center justify-center h-24 rounded-lg bg-muted/5 border">
+                                    <Skeleton variant="centered-pct" progress={contentProgress} className="w-full" />
+                                </div>
+                            </div>
+
+                            {/* 7. Added: Embedded Status (Compact) */}
+                            <div className="space-y-4 md:col-span-2">
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>7. Embedded Task Status</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <Skeleton 
+                                        variant="embedded" 
+                                        progress={uploadProgress} 
+                                        statusText="Database Migration" 
+                                    />
+                                    <Skeleton 
+                                        variant="embedded" 
+                                        progress={contentProgress} 
+                                        statusText="Asset Compression" 
+                                    />
+                                </div>
                             </div>
                         </div>
                     </section>
 
                     {/* Spinner */}
                     <section className="space-y-4">
-                        <h2 className="text-2xl font-semibold text-white">Spinner</h2>
-                        <div className="flex gap-4 items-center">
-                            <Spinner />
-                            <span className="text-sm text-gray-400">Loading...</span>
+                        <h2 className="text-2xl font-semibold text-white">Spinners</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            
+                            {/* Base Spinner with Theme Colors */}
+                            <div className={cn("p-6 rounded-xl border flex items-center gap-4", sectionClass)}>
+                                <Spinner className={theme === 'dark' ? "text-yellow-500" : "text-red-700"} />
+                                <span className={subTextClass}>System Loading...</span>
+                            </div>
+
+                            {/* Spinner Card Variant */}
+                            <SpinnerCard 
+                                size="md" 
+                                variant={theme === 'dark' ? 'red' : 'gray'} 
+                                label="Database Sync" 
+                            />
+
+                            {/* Status Badge Variant */}
+                            <div className="flex flex-col gap-2">
+                                <StatusBadge label="Processing" variant="yellow" />
+                                <StatusBadge label="Error Found" variant="red" />
+                            </div>
                         </div>
                     </section>
 

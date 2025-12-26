@@ -8,13 +8,13 @@ import Heading from '@/components/heading';
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
 import RoleToggle from '@/components/role-toggle';
-import TextLink from '@/components/text-link';
+import StageSwitchToggle from '@/components/stage-switching';
+import { TextLink } from '@/components/text-link';
 import { UserInfo } from '@/components/user-info';
 import { Icon } from '@/components/ui/icon';
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import AppearanceToggleTab from '@/components/appearance-tabs';
 import DeleteUser from '@/components/delete-user';
-import { WizardStepper } from '@/components/wizard-stepper';
 import TwoFactorRecoveryCodes from '@/components/two-factor-recovery-codes';
 import { NavMain } from '@/components/nav-main';
 import { NavFooter } from '@/components/nav-footer';
@@ -169,16 +169,35 @@ export default function ComponentsShowcase() {
                         </div>
                     </section>
 
-                    {/* Text Link */}
+                    {/* Text Link Section */}
                     <section className="space-y-4">
-                        <h2 className="text-2xl font-semibold text-white">Text Link</h2>
-                        <div className="flex gap-4 items-center">
-                            <TextLink href="#" className="text-[#730000]">
-                                This is a custom text link
-                            </TextLink>
-                            <TextLink href="#" className="text-blue-600">
-                                Click here to learn more
-                            </TextLink>
+                        <h2 className="text-2xl font-semibold text-white">Text Link Variants</h2>
+                        
+                        <div className="flex flex-col gap-8 p-6 bg-white/5 rounded-lg border border-white/10">
+                            
+                            {/* Sample Template */}
+                            <div className="flex flex-col gap-2 items-start text-left">
+                                <span className="text-xs text-slate-400 uppercase tracking-wider">Sample Template</span>
+                                <TextLink href="#" variant="template">
+                                    Download Sample Template
+                                </TextLink>
+                            </div>
+
+                            {/* Archive Restrictions */}
+                            <div className="flex flex-col gap-2 items-start text-left">
+                                <span className="text-xs text-slate-400 uppercase tracking-wider">Archive Restrictions</span>
+                                <TextLink href="#" variant="restriction">
+                                    Manage archive restrictions
+                                </TextLink>
+                            </div>
+
+                            {/* View Group */}
+                            <div className="flex flex-col gap-2 items-start text-left">
+                                <span className="text-xs text-slate-400 uppercase tracking-wider">View Group</span>
+                                <TextLink href="#" variant="group">
+                                    View Group
+                                </TextLink>
+                            </div>
                         </div>
                     </section>
 
@@ -194,6 +213,20 @@ export default function ComponentsShowcase() {
                             />
                         </div>
                     </section>
+
+                    {/* Stage Switch Toggle */}
+                    <section className="space-y-4">
+                    <h2 className="text-2xl font-semibold text-white">
+                        Stage Switch Toggle
+                    </h2>
+
+                    <p className="text-sm text-gray-400">
+                        Used to switch between MOR, DP1, and DP2 stages
+                    </p>
+
+                    <StageSwitchToggle />
+                    </section>
+
 
                     {/* Input Error */}
                     <section className="space-y-4">
@@ -222,68 +255,32 @@ export default function ComponentsShowcase() {
                     </section>
 
                     {/* Breadcrumbs */}
-                    <section className="space-y-4">
-                        <h2 className="text-2xl font-semibold text-white">Breadcrumbs</h2>
-                        <Breadcrumbs
-                            breadcrumbs={[
-                                { title: 'Home', href: '/' },
-                                { title: 'Dashboard', href: '/dashboard' },
-                                { title: 'Settings', href: '/settings' },
-                                { title: 'Profile', href: '' }
-                            ]}
-                        />
-                    </section>
-
-                    {/* Wizard Stepper */}
                     <section className="space-y-6">
-                        <h2 className="text-2xl font-semibold text-white">
-                            Wizard Stepper Component
-                        </h2>
-                        <p className="text-sm text-gray-400">
-                            Fully responsive wizard with customizable steps and content
-                        </p>
+                        <h2 className="text-2xl font-semibold text-white">Breadcrumbs</h2>
 
-                        <div className="space-y-10">
-                            {/* Version 1: Default Demo */}
-                            <div>
-                                <p className="text-sm text-gray-400 mb-4">
-                                    Default Wizard (4 Steps)
-                                </p>
-                                <div className="flex items-center justify-center p-4 sm:p-6">
-                                    <WizardStepper />
-                                </div>
-                            </div>
+                        {[
+                            { title: 'Home', href: '/' },
+                            { title: 'Components', href: '/components' },
+                            { title: 'Dashboard', href: '/dashboard' },
+                            { title: 'Settings', href: '/settings' },
+                            { title: 'Profile', href: '/profile' },
+                            { title: 'Delete Account', href: '' },
+                        ]
+                            // limit to max 6 items (5 ">")
+                            .slice(0, 6)
+                            // render variants incrementally
+                            .map((_, index, all) => {
+                                const items = all.slice(0, index + 2);
 
-                            {/* Version 2: Example / Specific */}
-                            <div>
-                                <p className="text-sm text-gray-400 mb-4">
-                                    Example Wizard (Student Account Setup)
-                                </p>
-                                <div className="flex items-center justify-center p-4 sm:p-6">
-                                    <WizardStepper
-                                        title="Import Student Account"
-                                        steps={[
-                                            { number: 1, title: 'Step 1', description: 'Import File' },
-                                            { number: 2, title: 'Step 2', description: 'Map Columns' },
-                                            { number: 3, title: 'Step 3', description: 'Review & Import' },
-                                        ]}
-                                    >
-                                    
-                                        {/* Custom Content Area */}
-                                        <div className="w-full max-w-full space-y-4 rounded-lg border border-border bg-accent/30 p-4 sm:p-6">
-                                            <h3 className="text-base sm:text-lg font-semibold text-foreground">
-                                                Step Content
-                                            </h3>
-
-                                            <p className="text-sm text-muted-foreground">
-                                                Add custom content for each step.
-                                                Forms, instructions, or any other components can go here.
-                                            </p>
-                                        </div>
-                                    </WizardStepper>
-                                </div>
-                            </div>
-                        </div>
+                                return (
+                                    items.length >= 2 && (
+                                        <Breadcrumbs
+                                            key={index}
+                                            breadcrumbs={items}
+                                        />
+                                    )
+                                );
+                            })}
                     </section>
 
                     {/* User Info */}
@@ -371,16 +368,8 @@ export default function ComponentsShowcase() {
                     {/* Nav Footer */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Navigation Footer</h2>
-                        <p className="text-sm text-gray-400">Footer navigation for sidebar with external links</p>
-                        <div className="max-w-md border border-gray-600 rounded-lg p-4 bg-gray-700">
-                            <SidebarProvider>
-                                <NavFooter
-                                    items={[
-                                        { title: 'Help Center', href: '/help' },
-                                        { title: 'Support', href: '/support' },
-                                    ]}
-                                />
-                            </SidebarProvider>
+                        <div className="border border-white/10 rounded-lg overflow-hidden">
+                            <NavFooter />
                         </div>
                     </section>
 
