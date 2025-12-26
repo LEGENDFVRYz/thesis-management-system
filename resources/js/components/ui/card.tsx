@@ -1,4 +1,5 @@
 import * as React from "react"
+
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 import { Users, Calendar, User2Icon, User2, Users2, BookOpen, CheckCircleIcon, Eye } from "lucide-react"
@@ -12,13 +13,12 @@ const cardVariants = cva(
     variants: {
       variant: {
         default: "gap-6 rounded-xl py-6 shadow-sm",
-        metric: "rounded-lg overflow-hidden border-primary w-75 h-40 shadow-md",
-        committee: "rounded-lg bg-white border-gray border-2 gap-3 py-3 w-52 h-40 shadow-md transition-all duration-300 hover:scale-101 hover:shadow-primary/50",
-        archive: "rounded-lg bg-accent border-gray border-2 gap-4 py-3 w-110 h-56 shadow-md transition-all duration-300 hover:scale-101 hover:shadow-black/40",
-        endorsement: "rounded-lg bg-white border-gray-200 py-3 px-4 gap-5 w-110 h-111 shadow-md transition-all duration-300 hover:scale-101 hover:shadow-primary/40",
-        group: "rounded-lg bg-white border-primary border-1 gap-3 py-2 px-3 w-52 h-48 shadow-md transition-all duration-300 hover:scale-101 hover:shadow-primary/40",
-        adviseeGroup: "rounded-lg bg-white border-l-primary border-l-5 gap-3 py-1 px-3 w-[416px] h-[134px] shadow-md transition-all duration-300 hover:bg-breadcrumb",
-        // dataCard: "rounded-md bg-accent border-primary/25 gap-4 py-6 w-81 h-36 shadow-md",
+        metric: "rounded-lg overflow-hidden border-primary w-full sm:w-75 h-40 shadow-md",
+        committee: "rounded-lg bg-white border-gray border-2 gap-3 py-3 w-full sm:w-52 h-auto sm:h-40 shadow-md transition-all duration-300 hover:scale-101 hover:shadow-primary/50",
+        archive: "rounded-lg bg-accent border-gray border-2 gap-4 py-3 w-full sm:w-110 h-auto sm:h-56 shadow-md transition-all duration-300 hover:scale-101 hover:shadow-black/40",
+        endorsement: "rounded-lg bg-white border-gray-200 py-3 px-4 gap-5 w-full lg:w-110 h-auto lg:h-111 shadow-md transition-all duration-300 hover:scale-101 hover:shadow-primary/40",
+        group: "rounded-lg bg-white border-primary border-1 gap-3 py-2 px-3 w-full sm:w-52 h-auto sm:h-48 shadow-md transition-all duration-300 hover:scale-101 hover:shadow-primary/40",
+        adviseeGroup: "rounded-lg bg-white border-l-primary border-l-5 gap-3 py-1 px-3 w-full md:w-[416px] h-auto md:h-[134px] shadow-md transition-all duration-300 hover:bg-breadcrumb",
       },
     },
     defaultVariants: {
@@ -56,10 +56,10 @@ const cardTitleVariants = cva("leading-none", {
     variant: {
       default: "font-semibold",
       metric: "font-bold text-md text-primary-foreground-2",
-      committee: "font-semibold text-sm text-primary leading-tight break-words",
-      archive: "font-bold text-md text-primary leading-tight break-words",
-      endorsement: "font-semibold text-xl text-gray-900",
-      group: "font-semibold text-md text-primary",    
+      committee: "font-semibold text-xs sm:text-sm text-primary leading-tight break-words",
+      archive: "font-bold text-sm sm:text-md text-primary leading-tight break-words",
+      endorsement: "font-semibold text-lg sm:text-xl text-gray-900",
+      group: "font-semibold text-sm sm:text-md text-primary",    
       dataCard: "font-bold text-[19px] text-center",
       adviseeGroup: "",
     },
@@ -76,7 +76,7 @@ const cardDescriptionVariants = cva("", {
       metric: "",
       committee: "",
       archive: "",
-      endorsement: "text-sm text-gray-600",
+      endorsement: "text-xs sm:text-sm text-gray-600",
       group: "text-[8px] text-gray-500",
       dataCard: "",
       adviseeGroup: "",
@@ -240,46 +240,47 @@ function ArchiveCard({
 }: ArchiveCardProps) {
   return (
     <Card variant="archive" className={className}>
-      <div className="px-5 w-full h-50 overflow-hidden relative">
-      <CardHeader>
-          <div className="w-full h-15 overflow-hidden relative">
-          <CardTitle>{title}</CardTitle>
+      <div className="px-3 sm:px-5 w-full h-auto sm:h-50 overflow-hidden relative">
+        <CardHeader>
+          <div className="w-full h-auto sm:h-15 overflow-hidden relative">
+            <CardTitle>{title}</CardTitle>
           </div>
         </CardHeader>
 
         <CardContent>
-          <div className="w-full h-21 overflow-hidden relative">
-              <CardDescription className="text-black text-sm">
+          <div className="w-full h-auto sm:h-21 overflow-hidden relative">
+            <CardDescription className="text-black text-xs sm:text-sm">
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <Users className="w-3 sm:w-4 h-3 sm:h-4 text-primary flex-shrink-0" />
+                <p className="truncate text-xs sm:text-sm">{members.join(", ")}</p>
+              </div>
 
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <Users className="w-4 h-4 text-primary" />
-                  <p className="truncate">{members.join(", ")}</p>
-                </div>
+              <div className="flex items-center gap-2 py-2">
+                <Calendar className="w-3 sm:w-4 h-3 sm:h-4 text-primary flex-shrink-0" />
+                <p className="text-xs sm:text-sm">{date}</p>
+              </div>
 
-                <div className="flex items-center gap-2 py-2">
-                  <Calendar className="w-4 h-4 text-primary" />
-                  <p>{date}</p>
-                </div>
-
-                <div className="flex flex-wrap gap-2 mt-1">
-                  {badges.map((badge, index) => (
-                    <Badge 
-                      key={index} 
-                      variant="outline" 
-                      className="border-primary text-primary h-4.5"
-                    >
-                      {badge}
-                    </Badge>
-                  ))}
-                </div>
-              </CardDescription>
-            </div>
-      </CardContent>
+              <div className="flex flex-wrap gap-2 mt-1">
+                {badges.map((badge, index) => (
+                  <Badge 
+                    key={index} 
+                    variant="outline" 
+                    className="border-primary text-primary h-auto sm:h-4.5 text-[10px] sm:text-xs"
+                  >
+                    {badge}
+                  </Badge>
+                ))}
+              </div>
+            </CardDescription>
+          </div>
+        </CardContent>
       </div>
 
-      <CardFooter className="px-5 py-0.5">
-        <div className="w-full h-9 relative">
-          <Button onClick={onViewAbstract}>View Abstract</Button>
+      <CardFooter className="px-3 sm:px-5 py-0.5">
+        <div className="w-full sm:h-9 relative">
+          <Button onClick={onViewAbstract} className="w-full sm:w-auto text-xs sm:text-sm">
+            View Abstract
+          </Button>
         </div>
       </CardFooter>
     </Card>
@@ -291,7 +292,7 @@ interface CommitteeCardProps {
   thesisTitle: string
   adviserName: string
   blockSection: string
-  progress: number  // 0-100
+  progress: number  
   currentStage: number
   totalStages: number
   className?: string
@@ -309,22 +310,22 @@ function CommitteeCard({
   return (
     <Card variant="committee" className={className}>
       <CardHeader className="px-3">
-        <div className="w-full h-13 overflow-hidden relative">
+        <div className="w-full h-auto sm:h-13 overflow-hidden relative">
           <CardTitle>{thesisTitle}</CardTitle>
         </div>
       </CardHeader>
 
       <CardContent>
-        <div className="w-full h-8 overflow-hidden relative">
+        <div className="w-full h-auto sm:h-8 overflow-hidden relative space-y-1">
           <div className="flex items-center gap-2 flex-shrink-0">
-            <Users className="w-3 h-3 text-black/50" />
+            <Users className="w-3 h-3 text-black/50 flex-shrink-0" />
             <p className="text-[10px] text-black/50 text-semibold truncate">
               {adviserName}
             </p>
           </div>
 
           <div className="flex items-center gap-2 flex-shrink-0">
-            <BookOpen className="w-3 h-3 text-black/50" />
+            <BookOpen className="w-3 h-3 text-black/50 flex-shrink-0" />
             <p className="text-[10px] text-black/50">{blockSection}</p>
           </div>
         </div>
@@ -337,7 +338,7 @@ function CommitteeCard({
           {currentStage}/{totalStages}
         </span>
         <div className="flex-1 flex justify-end">
-          <Skeleton variant="progress" progress={progress} className="w-25 h-1 bg-gray-300" />
+          <Skeleton variant="progress" progress={progress} className="w-20 sm:w-25 h-1 bg-gray-300" />
         </div>
       </CardFooter>
     </Card>
@@ -370,8 +371,8 @@ function GroupCard({
     <Card variant="group" className={className}>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <Users className="w-5 h-5 fill-primary text-primary flex-shrink-0" />
-          <div className="flex flex-col">
+          <Users className="w-4 sm:w-5 h-4 sm:h-5 fill-primary text-primary flex-shrink-0" />
+          <div className="flex flex-col min-w-0">
             <CardTitle className="text-primary">{groupCode}</CardTitle>
             <CardDescription>{groupDescription}</CardDescription>
           </div>
@@ -381,22 +382,22 @@ function GroupCard({
       </CardHeader>
 
       <CardContent>
-        <div className="w-full h-22">
-          <div className="w-full h-10 overflow-hidden relative">
-          <p className="text-black text-semibold text-[10px]">{thesisTitle}</p>
+        <div className="w-full h-auto sm:h-22">
+          <div className="w-full h-auto sm:h-10 overflow-hidden relative">
+            <p className="text-black text-semibold text-[10px]">{thesisTitle}</p>
           </div>
           
           <div className="px-2 py-1 flex flex-col gap-1">
             <p className="text-[7px] text-black/50">{thesisStage}</p>
             <div className="flex items-center gap-2 flex-shrink-0">
-              <Users className="w-2.5 h-2.5 text-black/50" />
+              <Users className="w-2.5 h-2.5 text-black/50 flex-shrink-0" />
               <p className="text-[7.5px] text-black/50 truncate">
                 {members.join(", ")}
               </p>
             </div>
 
             <div className="flex items-center gap-2 flex-shrink-0">
-              <Users className="w-2.5 h-2.5 text-black/50" />
+              <Users className="w-2.5 h-2.5 text-black/50 flex-shrink-0" />
               <p className="text-[7.5px] text-black/50 truncate">{adviserName}</p>
             </div>
           </div>
@@ -425,7 +426,7 @@ interface EndorsementCardProps {
   block: string
   adviserName: string
   approvalDate: string | Date
-  panelMembers?: string[]  // Optional for now since there are no dropdowns yet
+  panelMembers?: string[]
   onViewManuscript?: () => void
   onEndorse?: () => void
   className?: string
@@ -451,86 +452,76 @@ function EndorsementCard({
 
   return (
     <Card variant="endorsement" className={className}>
-      <div className="w-full h-22 overflow-hidden">
-        <CardHeader>
-          <div className="w-full h-17 overflow-hidden flex items-start justify-between">
-            <CardTitle className="text-md font-semibold">{thesisTitle}</CardTitle>
-            {badge && (
-              <div className="border border-border w-[94px] h-[23px] text-xs flex-shrink-0 flex items-center justify-center">
-                {badge}
-              </div>
-            )}
-          </div>
-          <CardDescription>{groupCode}</CardDescription>
-        </CardHeader>
-      </div>
-
-      <CardContent>
-        <div className="w-full h-21 overflow-hidden relative">
-          <div className="w-full h-10 overflow-hidden relative">
-            <p className="text-[12px] text-gray-600">Proponents</p>
-            <p className="text-sm truncate font-semibold">{proponents.join(", ")}</p>
-          </div>
-
-          <div className="w-full h-11 overflow-hidden relative">
-            <div className="grid grid-cols-3 gap-4">
-              {/* Block */}
-              <div>
-                <p className="text-[12px] text-gray-600 mb-1">Block</p>
-                <p className="text-sm font-semibold">{block}</p>
-              </div>
-
-              {/* Adviser */}
-              <div>
-                <p className="text-[12px] text-gray-600 mb-1">Adviser</p>
-                <p className="text-sm font-semibold truncate">{adviserName}</p>
-              </div>
-
-              {/* Approval Date */}
-              <div>
-                <p className="text-[12px] text-gray-600 mb-1">Approval Date</p>
-                <p className="text-sm font-semibold">{formattedDate}</p>
-              </div>
+      <CardHeader>
+        <div className="flex flex-col sm:flex-row items-start justify-between gap-2">
+          <CardTitle className="text-md font-semibold">{thesisTitle}</CardTitle>
+          {badge && (
+            <div className="border border-border w-auto sm:w-[94px] h-auto sm:h-[23px] text-xs flex-shrink-0 flex items-center justify-center px-2 py-1">
+              {badge}
             </div>
+          )}
+        </div>
+        <CardDescription>{groupCode}</CardDescription>
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        {/* Proponents */}
+        <div>
+          <p className="text-[12px] text-gray-600 mb-1">Proponents</p>
+          <p className="text-xs sm:text-sm font-semibold">{proponents.join(", ")}</p>
+        </div>
+
+        {/* Block, Adviser, Approval Date*/}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
+          <div>
+            <p className="text-[12px] text-gray-600 mb-1">Block</p>
+            <p className="text-xs sm:text-sm font-semibold">{block}</p>
+          </div>
+
+          <div>
+            <p className="text-[12px] text-gray-600 mb-1">Adviser</p>
+            <p className="text-xs sm:text-sm font-semibold">{adviserName}</p>
+          </div>
+
+          <div>
+            <p className="text-[12px] text-gray-600 mb-1">Approval Date</p>
+            <p className="text-xs sm:text-sm font-semibold">{formattedDate}</p>
           </div>
         </div>
 
         {/* Panel Members */}
-        <div className="w-full h-40 border border-border overflow-hidden relative">
-          <p className="text-[12px] text-gray-600">Panel Members</p>
+        <div className="border border-border p-3 min-h-[170px]">
+          <p className="text-[12px] text-gray-600 mb-2">Panel Members</p>
           {!panelMembers || panelMembers.length === 0 ? (
             <p className="text-[12px] text-gray-600 text-center">No Dropdowns Yet</p>
           ) : (
             <div className="space-y-2">
               {panelMembers.map((member, index) => (
-                <p key={index} className="text-sm">{member}</p>
+                <p key={index} className="text-xs sm:text-sm">{member}</p>
               ))}
             </div>
           )}
-          {/* Dropdowns Here */}
         </div>
       </CardContent>
 
       <CardFooter>
-        <div className="w-full h-11 overflow-hidden relative">
-          <div className="grid grid-cols-2 gap-4">
-            <Button 
-              variant="negativelight" 
-              className="w-full text-black flex items-center justify-center gap-2"
-              onClick={onViewManuscript}
-            >
-              <Eye className="w-4 h-4" />
-              View Manuscript
-            </Button>
-            <Button 
-              variant="negativelight" 
-              className="w-full text-black flex items-center justify-center gap-2"
-              onClick={onEndorse}
-            >
-              <CheckCircleIcon className="w-4 h-4" />
-              Endorse
-            </Button>
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 w-full">
+          <Button 
+            variant="negativelight" 
+            className="w-full text-black flex items-center justify-center gap-2 text-xs sm:text-sm"
+            onClick={onViewManuscript}
+          >
+            <Eye className="w-3 sm:w-4 h-3 sm:h-4" />
+            View Manuscript
+          </Button>
+          <Button 
+            variant="negativelight" 
+            className="w-full text-black flex items-center justify-center gap-2 text-xs sm:text-sm"
+            onClick={onEndorse}
+          >
+            <CheckCircleIcon className="w-3 sm:w-4 h-3 sm:h-4" />
+            Endorse
+          </Button>
         </div>
       </CardFooter>
     </Card>
@@ -560,19 +551,19 @@ function AdviseeGroupCard({
       <CardHeader>
         {/* Group Code and Badge */}
         <div className="flex items-center justify-between">
-          <CardTitle className="text-primary font-bold text-lg">{groupCode}</CardTitle>
-          {badge && <Badge>{badge}</Badge>}
+          <CardTitle className="text-primary font-bold text-base sm:text-lg">{groupCode}</CardTitle>
+          {badge && <Badge className="text-[10px] sm:text-xs">{badge}</Badge>}
         </div>
         
         {/* Thesis Title */}
         <div className="flex items-center gap-2">
-          <CardTitle className="text-primary font-semibold text-sm truncate">
+          <CardTitle className="text-primary font-semibold text-xs sm:text-sm truncate">
             {thesisTitle}
           </CardTitle>
         </div>
         
         {/* Block/Section Badge */}
-        <Badge className="h-3 text-xs">{section}</Badge>
+        <Badge className="h-3 text-[10px] sm:text-xs">{section}</Badge>
       </CardHeader>
 
       {/* Divider Line */}
