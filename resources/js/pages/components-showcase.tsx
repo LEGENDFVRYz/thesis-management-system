@@ -9,7 +9,7 @@ import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
 import RoleToggle from '@/components/role-toggle';
 import StageSwitchToggle from '@/components/stage-switching';
-import TextLink from '@/components/text-link';
+import { TextLink } from '@/components/text-link';
 import { UserInfo } from '@/components/user-info';
 import { Icon } from '@/components/ui/icon';
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
@@ -169,16 +169,35 @@ export default function ComponentsShowcase() {
                         </div>
                     </section>
 
-                    {/* Text Link */}
+                    {/* Text Link Section */}
                     <section className="space-y-4">
-                        <h2 className="text-2xl font-semibold text-white">Text Link</h2>
-                        <div className="flex gap-4 items-center">
-                            <TextLink href="#" className="text-[#730000]">
-                                This is a custom text link
-                            </TextLink>
-                            <TextLink href="#" className="text-blue-600">
-                                Click here to learn more
-                            </TextLink>
+                        <h2 className="text-2xl font-semibold text-white">Text Link Variants</h2>
+                        
+                        <div className="flex flex-col gap-8 p-6 bg-white/5 rounded-lg border border-white/10">
+                            
+                            {/* Sample Template */}
+                            <div className="flex flex-col gap-2 items-start text-left">
+                                <span className="text-xs text-slate-400 uppercase tracking-wider">Sample Template</span>
+                                <TextLink href="#" variant="template">
+                                    Download Sample Template
+                                </TextLink>
+                            </div>
+
+                            {/* Archive Restrictions */}
+                            <div className="flex flex-col gap-2 items-start text-left">
+                                <span className="text-xs text-slate-400 uppercase tracking-wider">Archive Restrictions</span>
+                                <TextLink href="#" variant="restriction">
+                                    Manage archive restrictions
+                                </TextLink>
+                            </div>
+
+                            {/* View Group */}
+                            <div className="flex flex-col gap-2 items-start text-left">
+                                <span className="text-xs text-slate-400 uppercase tracking-wider">View Group</span>
+                                <TextLink href="#" variant="group">
+                                    View Group
+                                </TextLink>
+                            </div>
                         </div>
                     </section>
 
@@ -349,16 +368,8 @@ export default function ComponentsShowcase() {
                     {/* Nav Footer */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Navigation Footer</h2>
-                        <p className="text-sm text-gray-400">Footer navigation for sidebar with external links</p>
-                        <div className="max-w-md border border-gray-600 rounded-lg p-4 bg-gray-700">
-                            <SidebarProvider>
-                                <NavFooter
-                                    items={[
-                                        { title: 'Help Center', href: '/help' },
-                                        { title: 'Support', href: '/support' },
-                                    ]}
-                                />
-                            </SidebarProvider>
+                        <div className="border border-white/10 rounded-lg overflow-hidden">
+                            <NavFooter />
                         </div>
                     </section>
 
