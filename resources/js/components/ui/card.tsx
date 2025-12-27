@@ -252,7 +252,7 @@ function HeaderCard({
           {icon ? (
             icon
           ) : (
-            <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-primary/30 rounded" />
+            <div className="w-4 h-4 sm:w-5 sm:h-5 rounded" />
           )}
         </div>
         <div className="flex flex-col min-w-0 flex-1">
