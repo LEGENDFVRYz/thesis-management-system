@@ -1,9 +1,8 @@
 import React from 'react';
-import { X, Bell, Calendar, Users, Info, ExternalLink } from 'lucide-react';
+import { X, Bell, ExternalLink } from 'lucide-react';
+import { NotificationList, NotificationListItem, type NotificationType } from '@/components/ui/notification-list';
 
 // --- Types ---
-export type NotificationType = 'schedule' | 'assignment' | 'reminder' | 'system';
-
 export interface NotificationItem {
   id: string;
   title: string;
@@ -18,37 +17,6 @@ interface NotificationModalProps {
   onClose?: () => void;
   notifications?: NotificationItem[];
 }
-
-// --- Helper to get Icon and Colors based on type ---
-const getNotificationStyles = (type: NotificationType) => {
-  switch (type) {
-    case 'schedule':
-      return {
-        icon: <Calendar className="w-5 h-5 text-red-700" />,
-        bg: 'bg-red-50',
-      };
-    case 'assignment':
-      return {
-        icon: <Users className="w-5 h-5 text-red-900" />,
-        bg: 'bg-red-100', 
-      };
-    case 'reminder':
-      return {
-        icon: <Bell className="w-5 h-5 text-yellow-600" />,
-        bg: 'bg-yellow-50',
-      };
-    case 'system':
-      return {
-        icon: <Info className="w-5 h-5 text-green-600" />,
-        bg: 'bg-green-50',
-      };
-    default:
-      return {
-        icon: <Bell className="w-5 h-5 text-gray-600" />,
-        bg: 'bg-gray-100',
-      };
-  }
-};
 
 export default function NotificationModal({
   isOpen = true, // Default to true for visualization
@@ -74,45 +42,18 @@ export default function NotificationModal({
       </div>
 
       {/* Notification List - Scrollable Area */}
-      <div className="max-h-[500px] overflow-y-auto">
-        {notifications.map((item) => {
-          const style = getNotificationStyles(item.type);
-
-          return (
-            <div
-              key={item.id}
-              className={`relative flex gap-4 px-6 py-5 border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer ${
-                item.isUnread ? 'bg-blue-50/30' : 'bg-white'
-              }`}
-            >
-              {/* Unread Indicator Dot */}
-              {item.isUnread && (
-                <span className="absolute left-2 top-8 w-2 h-2 rounded-full bg-red-700" />
-              )}
-
-              {/* Icon Container */}
-              <div
-                className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${style.bg}`}
-              >
-                {style.icon}
-              </div>
-
-              {/* Content */}
-              <div className="flex flex-col gap-1">
-                <h3 className="text-sm font-semibold text-gray-900 leading-tight">
-                  {item.title}
-                </h3>
-                <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">
-                  {item.description}
-                </p>
-                <span className="text-xs text-gray-400 mt-1">
-                  {item.timestamp}
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <NotificationList maxHeight="500px">
+        {notifications.map((item) => (
+          <NotificationListItem
+            key={item.id}
+            type={item.type}
+            title={item.title}
+            description={item.description}
+            timestamp={item.timestamp}
+            isUnread={item.isUnread}
+          />
+        ))}
+      </NotificationList>
 
       {/* Footer */}
       <div className="p-4 bg-white border-t border-gray-100">
