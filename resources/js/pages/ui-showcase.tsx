@@ -13,7 +13,7 @@ import { Alert } from '@/components/ui/alert';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, CardIcon, CardBadge, ArchiveCard, GroupCard, CommitteeCard, EndorsementCard, AdviseeGroupCard } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, CardIcon, CardBadge, HeaderCard, MetricCard, ArchiveCard, GroupCard, CommitteeCard, EndorsementCard, AdviseeGroupCard } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -310,24 +310,43 @@ export default function UIShowcase() {
                         <h2 className="text-2xl font-semibold text-white">Cards</h2>
                         <div className="max-w-md">
 
-                            {/* Metric Card */}
-                            <h2 className="text-lg font-semibold text-white mb-4">Metric Card</h2>
-                            <Card variant="metric">
-                                <CardHeader>
-                                    <div className="w-[36px] h-[28px] bg-sidebar-gradient-mid rounded flex items-center justify-center">
-                                        <div className="w-5 h-5" /> {/* Icon placeholder */}
-                                    </div>
-                                    <CardTitle> Metric Title Here </CardTitle>
-                                </CardHeader>
-                                <CardContent className="py-2">
-                                    <div className="w-full h-22 overflow-hidden">
-                                        {/* Content Area */}
-                                    </div>
-                                </CardContent>
-                            </Card>
-                    
+                            {/* Header Card (per page) */}
+                            <h2 className="text-lg font-semibold text-white mb-4"> Header Card </h2>
+
+                           {/* Without icon */}
+                            <HeaderCard
+                            title="Card Title Here"
+                            description="Card Description"
+                            />
+
+                            {/* Card with Header Color*/}
+                            <h2 className="text-lg font-semibold text-white mb-4">Card with Header Color (Mostly used as metric cards) </h2>
+                            
+                            {/* Default Size / Metric Card */}
+                            <h2 className='px-4'> - Default Size / Metric Card </h2>
+                            <MetricCard
+                            title="Card Title Here"
+                            >
+                            <div className='flex items-center justify-center h-full'>
+                                <p> Content Here </p>
+                            </div>
+                            </MetricCard>
+
+                            {/* Custom size and w/o an icon */}
+                            <h2 className='px-4'> - Custom Size </h2>
+                            <MetricCard
+                            title="Card Title Here"
+                            className="!w-100 h-48"  
+                            contentClassName="h-32"  
+                            >
+                            <div className='flex items-center justify-center h-full'>
+                                <p> Content Here </p>
+
+                            </div>
+                            </MetricCard>
+
                             {/* Committee Card - Proposal Review */}
-                            <h2 className="text-lg font-semibold text-white">Committee Card</h2>
+                            <h2 className="py-4 text-lg font-semibold text-white">Committee Card</h2>
                             <CommitteeCard
                                 thesisTitle="Thesis Title"
                                 adviserName="Adviser Name"
@@ -380,6 +399,9 @@ export default function UIShowcase() {
                                 badge="Badge Here"
                                 thesisTitle="Thesis Title Here"
                                 section="Section"
+                                numberofMembers='Number of Members Here'
+                                numberofSubmissions="5"
+                                lastSubmissionDate="Date Here"
                             />
                         </div>
                     </section>

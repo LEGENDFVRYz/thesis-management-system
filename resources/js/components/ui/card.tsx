@@ -1,8 +1,7 @@
 import * as React from "react"
-
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
-import { Users, Calendar, User2Icon, User2, Users2, BookOpen, CheckCircleIcon, Eye } from "lucide-react"
+import { Users, Calendar, BookOpen, CheckCircleIcon, Eye, FileTextIcon, ClockIcon } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "./skeleton"
@@ -13,6 +12,7 @@ const cardVariants = cva(
     variants: {
       variant: {
         default: "gap-6 rounded-xl py-6 shadow-sm",
+        header: "bg-white shadow-sm w-full lg:w-[1441px] h-auto lg:h-[124px]",
         metric: "rounded-lg overflow-hidden border-primary w-full sm:w-75 h-40 shadow-md",
         committee: "rounded-lg bg-white border-gray border-2 gap-3 py-3 w-full sm:w-52 h-auto sm:h-40 shadow-md transition-all duration-300 hover:scale-101 hover:shadow-primary/50",
         archive: "rounded-lg bg-accent border-gray border-2 gap-4 py-3 w-full sm:w-110 h-auto sm:h-56 shadow-md transition-all duration-300 hover:scale-101 hover:shadow-black/40",
@@ -37,6 +37,7 @@ const cardHeaderVariants = cva("flex flex-col", {
   variants: {
     variant: {
       default: "gap-1.5 px-6",
+      header: "",
       metric: "bg-primary text-primary-foreground-2 font-bold px-4 py-3 flex-row items-center gap-2",
       committee: "",
       archive: "",
@@ -55,6 +56,7 @@ const cardTitleVariants = cva("leading-none", {
   variants: {
     variant: {
       default: "font-semibold",
+      header: "",
       metric: "font-bold text-md text-primary-foreground-2",
       committee: "font-semibold text-xs sm:text-sm text-primary leading-tight break-words",
       archive: "font-bold text-sm sm:text-md text-primary leading-tight break-words",
@@ -73,10 +75,11 @@ const cardDescriptionVariants = cva("", {
   variants: {
     variant: {
       default: "text-muted-foreground text-sm",
+      header: "",
       metric: "",
       committee: "",
       archive: "",
-      endorsement: "text-xs sm:text-sm text-gray-600",
+      endorsement: "text-[10px] sm:text-[10px] text-gray-600",
       group: "text-[8px] text-gray-500",
       dataCard: "",
       adviseeGroup: "",
@@ -91,6 +94,7 @@ const cardContentVariants = cva("", {
   variants: {
     variant: {
       default: "px-6",
+      header: "",
       metric: "px-4",
       committee: "px-3 text-[10px] text-bold",
       archive: "",
@@ -109,6 +113,7 @@ const cardFooterVariants = cva("flex items-center", {
   variants: {
     variant: {
       default: "px-6",
+      header: "",
       metric: "",
       committee: "px-3",
       archive: "",
@@ -217,6 +222,86 @@ function CardIcon({ className, ...props }: React.ComponentProps<"div">) {
       className={cn("flex items-center justify-center", className)}
       {...props}
     />
+  )
+}
+
+// Header Card Component
+interface HeaderCardProps {
+  icon?: React.ReactNode
+  title: string
+  description?: string
+  className?: string
+}
+
+function HeaderCard({
+  icon,
+  title,
+  description,
+  className
+}: HeaderCardProps) {
+  return (
+    <Card 
+      variant="header" 
+      className={cn(
+        "w-full lg:w-[1441px] h-auto lg:h-[124px] px-4 py-4 sm:px-6 sm:py-6 bg-background border border-b-2 border-primary",
+        className
+      )}
+    >
+      <CardHeader className="flex flex-row items-start gap-3 p-0 h-full">
+        <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center shrink-0">
+          {icon ? (
+            icon
+          ) : (
+            <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-primary/30 rounded" />
+          )}
+        </div>
+        <div className="flex flex-col min-w-0 flex-1">
+          <CardTitle className="text-xl sm:text-2xl lg:text-[30px] text-primary-foreground-2 leading-tight break-words">
+            {title}
+          </CardTitle>
+          {description && (
+            <CardDescription className="text-sm sm:text-base text-primary break-words">
+              {description}
+            </CardDescription>
+          )}
+        </div>
+      </CardHeader>
+    </Card>
+  )
+}
+
+// Metric Card Component (Used for metric/statistics cards)
+interface MetricCardProps {
+  icon?: React.ReactNode
+  title: string
+  children?: React.ReactNode
+  className?: string
+  contentClassName?: string
+}
+
+function MetricCard({
+  icon,
+  title,
+  children,
+  className,
+  contentClassName
+}: MetricCardProps) {
+  return (
+    <Card variant="metric" className={className}>
+      <CardHeader>
+        {icon && (  
+          <div className="w-[36px] h-[28px] bg-sidebar-gradient-mid rounded flex items-center justify-center">
+            {icon}
+          </div>
+        )}
+        <CardTitle>{title}</CardTitle>
+      </CardHeader>
+      <CardContent className={cn("py-2", contentClassName)}>
+        <div className="w-full h-full overflow-hidden">
+          {children || <div>{/* Content Area */}</div>}
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -534,6 +619,9 @@ interface AdviseeGroupCardProps {
   badge?: string
   thesisTitle: string
   section: string
+  numberofMembers: string
+  numberofSubmissions: string
+  lastSubmissionDate: string
   contentPlaceholder?: string
   className?: string
 }
@@ -543,7 +631,9 @@ function AdviseeGroupCard({
   badge,
   thesisTitle,
   section,
-  contentPlaceholder = "Content goes here",
+  numberofMembers,
+  numberofSubmissions,
+  lastSubmissionDate,
   className
 }: AdviseeGroupCardProps) {
   return (
@@ -551,8 +641,8 @@ function AdviseeGroupCard({
       <CardHeader>
         {/* Group Code and Badge */}
         <div className="flex items-center justify-between">
-          <CardTitle className="text-primary font-bold text-base sm:text-lg">{groupCode}</CardTitle>
-          {badge && <Badge className="text-[10px] sm:text-xs">{badge}</Badge>}
+          <CardTitle className="text-primary font-bold text-[12px] sm:text-[12px]">{groupCode}</CardTitle>
+          {badge && <Badge className="text-[9px] sm:text-[8px]">{badge}</Badge>}
         </div>
         
         {/* Thesis Title */}
@@ -563,24 +653,27 @@ function AdviseeGroupCard({
         </div>
         
         {/* Block/Section Badge */}
-        <Badge className="h-3 text-[10px] sm:text-xs">{section}</Badge>
+        <Badge className="h-2.5 text-[8px] sm:text-[7px]">{section}</Badge>
       </CardHeader>
 
       {/* Divider Line */}
-      <div className="w-full border-t border-gray-300" />
+      
       
       <CardContent>
         {/* Content */}
-        <div className="space-y-0.5 text-[8px] text-gray-600">
-          <h1>{contentPlaceholder}</h1>
-          <div className="flex items-center gap-1.5">
-            
+        
+        <div className="space-y-0.5 text-[6px] text-gray-600">
+          <div className="flex items-center">
+            <Users className="w-2 h-2" />
+            <span>{numberofMembers}</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            
+          <div className="flex items-center">
+            <FileTextIcon className="w-2 h-2" />
+            <span> {numberofSubmissions} </span>
           </div>
-          <div className="flex items-center gap-1.5">
-            
+          <div className="flex items-center">
+            <ClockIcon className="w-2 h-2" />
+            <span> {lastSubmissionDate} </span>
           </div>
         </div>
       </CardContent>
@@ -597,6 +690,8 @@ export {
   CardContent,
   CardBadge,
   CardIcon,
+  HeaderCard,
+  MetricCard,
   ArchiveCard,
   CommitteeCard,
   GroupCard,
