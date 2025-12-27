@@ -118,22 +118,22 @@ export function YearRangePicker({
           placeholder={placeholder}
           readOnly
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full px-3 py-2 pr-10 bg-[#f3efd0] border border-[#d4c5a0] rounded cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#730000] focus:border-transparent text-[#730000] font-semibold year-range-picker-input"
+          className="w-full px-3 py-2 pr-10 bg-breadcrumb border border-[#d4c5a0] rounded cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-primary font-semibold year-range-picker-input"
           style={{ fontSize: "13.33px" }}
         />
-        <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#730000] pointer-events-none" />
+        <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary pointer-events-none" />
       </div>
 
       {/* Year Range Dropdown */}
       {isOpen && mode === "dropdown" && (
-        <div className="absolute z-50 mt-2 left-0 w-full bg-[#f3efd0] rounded-lg border border-[#d4c5a0] shadow-lg overflow-hidden">
+        <div className="absolute z-50 mt-2 left-0 w-full bg-breadcrumb rounded-lg border border-[#d4c5a0] shadow-lg overflow-hidden">
           {/* Header */}
-          <div style={{ fontSize: "13.33px" }} className="bg-[#730000] text-[#ffbd00] font-semibold px-4 py-2 text-center year-range-picker-dropdown-header">
+          <div style={{ fontSize: "13.33px" }} className="bg-primary text-primary-foreground-2 font-semibold px-4 py-2 text-center year-range-picker-dropdown-header">
             {selectedYearValue} - {selectedYearValue + 1}
           </div>
 
           {/* Year Range List */}
-          <div className="max-h-48 overflow-y-auto bg-[#F3EFFD0]">
+          <div className="max-h-48 overflow-y-auto bg-breadcrumb">
             {yearRanges.map((range, idx) => (
               <button
                 key={idx}
@@ -143,8 +143,8 @@ export function YearRangePicker({
                   w-full px-4 py-2 text-center transition-colors year-range-picker-dropdown-button
                   ${
                     range.start === selectedYearValue
-                      ? "bg-[#730000] text-[#ffbd00]"
-                      : "text-[#730000] hover:bg-[#e8e4c5]"
+                      ? "bg-primary text-primary-foreground-2"
+                      : "text-primary hover:bg-[#e8e4c5]"
                   }
                 `}
               >
@@ -157,9 +157,9 @@ export function YearRangePicker({
 
       {/* Year Grid Dropdown */}
       {isOpen && mode === "grid" && (
-        <div className="absolute z-50 mt-2 left-0 bg-[#f3efd0] rounded-lg border border-[#d4c5a0] shadow-lg overflow-hidden">
+        <div className="absolute z-50 mt-2 left-0 bg-breadcrumb rounded-lg border border-[#d4c5a0] shadow-lg overflow-hidden">
           {/* Header */}
-          <div className="bg-[#730000] text-[#ffbd00] px-4 py-2.5 flex items-center justify-between">
+          <div className="bg-primary text-primary-foreground-2 px-4 py-2.5 flex items-center justify-between">
             <button
               onClick={handlePrevRange}
               className="hover:opacity-80 transition-opacity"
@@ -180,7 +180,7 @@ export function YearRangePicker({
           </div>
 
           {/* Year Grid */}
-          <div className="p-4 bg-[#F3EFFD0]">
+          <div className="p-4 bg-breadcrumb">
             <div className="grid grid-cols-3 gap-3">
               {years.map((year) => (
                 <button
@@ -190,7 +190,7 @@ export function YearRangePicker({
                     px-6 py-3 rounded transition-colors year-range-picker-grid-button
                     ${
                       isSelected(year)
-                        ? "bg-[#730000]/10 text-[#730000] font-semibold"
+                        ? "bg-primary/10 text-primary font-semibold"
                         : "text-[#444444] hover:bg-[#e8e4c5]"
                     }
                   `}
