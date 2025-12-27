@@ -27,7 +27,7 @@ import { Icon } from '@/components/ui/icon';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from '@/components/ui/sidebar';
-import { HomeIcon, SettingsIcon, UsersIcon, Moon, Sun, Plus, Trash2, ArrowRight, Loader2, Settings, ChevronDown} from 'lucide-react';
+import { HomeIcon, SettingsIcon, UsersIcon, Moon, Sun, Plus, Trash2, ArrowRight, Loader2, Settings, ChevronDown, ChevronRight } from 'lucide-react';   
 import { SwitchButton } from '@/components/ui/switch-button';
 import { cn } from '@/lib/utils';
 import { Tabs, TabButton } from '@/components/ui/tabs';
@@ -45,6 +45,7 @@ import NotificationModal from '@/components/modal/notification-modal';
 import { NotificationList, NotificationListItem } from '@/components/ui/notification-list';
 import StageSwitchToggle from '@/components/stage-toggle';
 import { toast } from 'sonner';
+import { AppHeader } from '@/components/app-header';
 
 export default function UIShowcase() {
     const [isCollapsibleOpen, setIsCollapsibleOpen] = useState(false);
@@ -672,29 +673,12 @@ export default function UIShowcase() {
                         </div>
                     </section>
 
-                    {/* Navigation Menu */}
+                    {/* Navigation Menu*/}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Navigation Menu</h2>
-                        <p className="text-sm text-gray-400">Horizontal navigation with dropdown menus</p>
-                        <NavigationMenu>
-                            <NavigationMenuList>
-                                <NavigationMenuItem>
-                                    <NavigationMenuTrigger className="text-white">Getting Started</NavigationMenuTrigger>
-                                    <NavigationMenuContent>
-                                        <div className="p-4 w-[400px]">
-                                            <NavigationMenuLink className="text-white">
-                                                Introduction
-                                            </NavigationMenuLink>
-                                        </div>
-                                    </NavigationMenuContent>
-                                </NavigationMenuItem>
-                                <NavigationMenuItem>
-                                    <NavigationMenuLink className="text-white">
-                                        Documentation
-                                    </NavigationMenuLink>
-                                </NavigationMenuItem>
-                            </NavigationMenuList>
-                        </NavigationMenu>
+                        <p className="text-sm text-gray-400">Main application header with branding, top navigation, and utility actions.</p>
+
+                        <AppHeader breadcrumbs={[{ title: 'Home', href: '#' }, { title: 'Showcase', href: '#' }]} />
                     </section>
 
                     {/* Placeholder Pattern */}
