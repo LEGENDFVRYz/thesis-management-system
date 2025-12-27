@@ -317,18 +317,43 @@ export default function UIShowcase() {
                     {/* Collapsible */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Collapsible</h2>
-                        <div className="max-w-md">
-                            <Collapsible open={isCollapsibleOpen} onOpenChange={setIsCollapsibleOpen}>
-                                <CollapsibleTrigger asChild>
-                                    <Button variant="tertiary" className="w-full justify-between">
-                                        <span>Can I use this in my project?</span>
-                                        <span>{isCollapsibleOpen ? '−' : '+'}</span>
-                                    </Button>
+                        <div className="max-w-5xl space-y-4">
+                            {/* FAQ ITEM 1 */}
+                            <Collapsible>
+                                <CollapsibleTrigger>
+                                    <div className="flex items-center gap-3">
+                                        <Badge className={cn("transition-colors duration-200 uppercase text-[10px] font-bold tracking-tight",
+                                            "group-data-[state=open]:bg-primary-foreground-2 group-data-[state=open]:text-primary" )}>
+                                            General
+                                        </Badge>
+                                        <span className="font-medium text-left">
+                                            How do I view defense schedules for my block?
+                                        </span>
+                                    </div>
                                 </CollapsibleTrigger>
-                                <CollapsibleContent className="mt-2 p-4 border rounded-md">
-                                    <p className="text-gray-900 text-sm">
-                                        Yes! You can use all these components in your project. They are built with Radix UI and styled with Tailwind CSS.
-                                    </p>
+                                
+                                <CollapsibleContent>
+                                    Use the 'Filter by Block' dropdown at the top of the page to select your specific block. 
+                                    The table will automatically update to show only defenses for your selected block.
+                                </CollapsibleContent>
+                            </Collapsible>
+
+                            {/* FAQ ITEM 2 */}
+                            <Collapsible>
+                                <CollapsibleTrigger>
+                                    <div className="flex items-center gap-3">
+                                        <Badge className={cn("transition-colors duration-200 uppercase text-[10px] font-bold tracking-tight",
+                                            "group-data-[state=open]:bg-primary-foreground-2 group-data-[state=open]:text-primary" )}>
+                                            General
+                                        </Badge>
+                                        <span className="font-medium text-left">
+                                            Can I request a change in my defense schedule?
+                                        </span>
+                                    </div>
+                                </CollapsibleTrigger>
+                                <CollapsibleContent>
+                                    Defense schedule changes must be coordinated through your section adviser 
+                                    and approved by the department head.
                                 </CollapsibleContent>
                             </Collapsible>
                         </div>
@@ -441,7 +466,6 @@ export default function UIShowcase() {
                     {/* Skeleton */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Skeleton</h2>
-                        {/* Replaced bg-[#1e1e1e] with sectionClass */}
                         <div className={`grid grid-cols-1 md:grid-cols-2 gap-12 p-8 rounded-2xl border transition-colors duration-300 ${sectionClass}`}>
                             
                             {/* 1. Scanning Loading */}
