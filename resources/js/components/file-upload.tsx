@@ -7,7 +7,7 @@ function cn(...classes: (string | undefined | null | false)[]) {
 }
 
 // --- SUB-COMPONENTS ---
-// 1. Button (Themed for Thesis System)
+// 1. Button
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: 'default' | 'outline';
 }
@@ -17,7 +17,7 @@ function Button({ children, onClick, variant = 'default', className = '', ...pro
   
   const variantStyles = variant === 'outline' 
     ? 'border border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50'
-    : 'bg-[#730000] text-white hover:bg-[#5a0000] shadow-md'; // Maroon Theme
+    : 'bg-[#730000] text-white hover:bg-[#5a0000] shadow-md'; 
   
   return (
     <button 
@@ -54,7 +54,7 @@ function Toast({ message, description, type = 'success' }: { message: string, de
 interface FileUploadProps {
     acceptedTypes?: string; // e.g. ".pdf,.docx"
     maxSizeMB?: number;     // e.g. 50
-    onFilesSelected?: (files: File[]) => void; // Communication with Parent
+    onFilesSelected?: (files: File[]) => void; 
 }
 
 export default function FileUpload({ 
@@ -177,7 +177,6 @@ export default function FileUpload({
       <div
         className={cn(
           'relative flex min-h-[300px] w-full flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all duration-300 ease-in-out bg-white',
-          // THEME: Blue -> Maroon/Red Logic
           isDragging ? 'border-[#730000] bg-red-50' : 'border-neutral-300',
           status === 'success' && 'border-green-500 bg-neutral-50'
         )}

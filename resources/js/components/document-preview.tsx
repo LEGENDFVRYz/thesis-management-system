@@ -6,7 +6,7 @@ function cn(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(' ');
 }
 
-// --- SUB-COMPONENT: BUTTON (Local version to ensure global compatibility) ---
+// --- SUB-COMPONENT: BUTTON 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: 'default' | 'outline' | 'ghost';
     size?: 'default' | 'sm';
@@ -19,7 +19,7 @@ function Button({ children, onClick, variant = 'default', size = 'default', clas
   const variants = {
     default: 'bg-[#730000] text-white hover:bg-[#5a0000]',
     outline: 'border border-neutral-300 bg-transparent hover:bg-neutral-100 text-neutral-900',
-    ghost:   'bg-transparent hover:bg-neutral-100 text-neutral-700', // Perfect for icons
+    ghost:   'bg-transparent hover:bg-neutral-100 text-neutral-700', 
   };
 
   // SIZES
@@ -30,7 +30,7 @@ function Button({ children, onClick, variant = 'default', size = 'default', clas
   
   return (
     <button 
-        type="button" // <--- CRITICAL: Prevents accidental form submission
+        type="button" 
         className={cn(baseStyles, variants[variant], sizes[size], className)} 
         onClick={onClick}
         {...props}
