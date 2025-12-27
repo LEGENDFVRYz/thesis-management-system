@@ -1,11 +1,14 @@
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { 
+  SidebarProvider, 
+  SidebarTrigger,
+  Sidebar,
+  SidebarContent,
+  SidebarHeader as SidebarHeaderUI,
+  SidebarFooter as SidebarFooterUI,
+} from '@/components/ui/sidebar';
 import { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
-import { AppSidebar } from '@/components/app-sidebar';
-
-
-import { SidebarInset } from '@/components/ui/sidebar'
-import * as React from 'react'
+import * as React from 'react';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -13,28 +16,27 @@ import {
   BreadcrumbLink,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { NavFooter } from "@/components/nav-footer" 
+} from "@/components/ui/breadcrumb";
+import { Separator } from "@/components/ui/separator";
+import { NavMain } from '@/components/nav-main';
 
 function ThesisHeader() {
   return (
-    <div className="w-full bg-[#730000] h-[150px]">
+    <div className="w-full h-[150px]" style={{ backgroundColor: 'var(--primary)' }}>
       <div className="h-[100px] flex items-center justify-center">
-        <p className="text-white text-lg">Header Placeholder</p>
+        <p className= "text-lg" style={{ color: 'var(--primary-foreground)' }}>Header Placeholder</p>
       </div>
-
-      {/* Sub-bar with Breadcrumb */}
-      <div className="bg-[#F3EFD0] h-[50px] flex items-center px-6 style={{ fontSize: 'var(--body-3)">
+      <div className="h-[50px] flex items-center px-6" style={{ backgroundColor: 'var(--breadcrumb)' }}>
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/" className="text-[#730000]">
+              <BreadcrumbLink href="/" style={{ color: 'var(--primary)' }}>
                 Module Title
               </BreadcrumbLink>
             </BreadcrumbItem>
-            <BreadcrumbSeparator className="text-[#730000]" />
+            <BreadcrumbSeparator style={{ color: 'var(--primary)' }} />
             <BreadcrumbItem>
-              <BreadcrumbPage className="text-[#730000] font-semibold">
+              <BreadcrumbPage className="font-semibold" style={{ color: 'var(--primary)' }}>
                 Page Title
               </BreadcrumbPage>
             </BreadcrumbItem>
@@ -42,78 +44,94 @@ function ThesisHeader() {
         </Breadcrumb>
       </div>
     </div>
-  )
+  );
 }
 
-function HeaderCard() {
+function AppSidebar() {
+  const navItems = [
+    { title: 'Dashboard', href: '/'},
+    { title: 'Documents', href: '/documents'},
+    { title: 'Settings', href: '/settings'},
+  ];
+
   return (
-    <div className="w-full h-[124px] bg-white border-b border-[#9B000A] flex flex-row items-center px-6 py-8">
-        <div className="flex flex-col gap-3">
-            {/* Container with logo and title */}
-            <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-[#730000] rounded"></div>
-                <h2 className="text-[30px] font-normal leading-[36px] text-[#FFBD00]">
-                    Page Title
-                </h2>
-            </div>
-            {/* Subtitle below */}
-            <p className="text-[18px] font-normal leading-[16px] text-[#730000] ml-11">
-                Subtitle
-            </p>
+    <Sidebar>
+      <SidebarHeaderUI>
+        <div className="flex items-center gap-2 px-4 py-2">
+          <div className="w-8 h-8 rounded" style={{ color: 'var(--primary)' }}></div>
         </div>
-    </div>
-  )
+      </SidebarHeaderUI>
+      
+      <SidebarContent>
+        <NavMain items={navItems} />
+      </SidebarContent>      
+      <SidebarFooterUI>
+      </SidebarFooterUI>
+    </Sidebar>
+  );
 }
 
-function ThesisFooter() {
-  return <NavFooter />
-}
-interface AppContentProps extends React.ComponentProps<'main'> {
-  variant?: 'header' | 'sidebar'
-}
-
-export function AppContent({
-  variant = 'header',
-  children,
-  ...props
-}: AppContentProps) {
-  if (variant === 'sidebar') {
-    return <SidebarInset {...props}>{children}</SidebarInset>
-  }
-
+// Header for sidebar variant with toggle button
+function SidebarHeader() {
   return (
-    <main
-      className="mx-auto flex h-full w-full max-w-[1440px] flex-1 flex-col justify-between gap-4 rounded-xl bg-white min-h-[1800px]"
-      {...props}
-    >
-        <ThesisHeader />
-        <HeaderCard />
-        <ThesisFooter />
-    </main>
-  )
+    <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+      <SidebarTrigger className="-ml-1" />
+      <Separator orientation="vertical" className="mr-2 h-4" />
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem className="hidden md:block">
+            <BreadcrumbLink href="/">
+              Module Title
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator className="hidden md:block" />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Page Title</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+    </header>
+  );
 }
-
-
 
 interface AppShellProps {
-    children: React.ReactNode;
-    variant?: 'header' | 'sidebar';
+  children: React.ReactNode;
+  variant?: 'header' | 'sidebar';
 }
 
 export function AppShell({ children, variant = 'header' }: AppShellProps) {
-    const isOpen = usePage<SharedData>().props.sidebarOpen;
+  let isOpen = true;
+  try {
+    isOpen = usePage<SharedData>().props.sidebarOpen ?? true;
+  } catch {
+    isOpen = true;
+  }
 
-    if (variant === 'header') {
-        return (
-            <div className="flex min-h-screen w-full flex-col">
-                <ThesisHeader />
-                <main className="flex-1 bg-white min-h-[1000px]">
-                    {children}
-                </main>
-                <ThesisFooter />
-            </div>
-        );
-    }
+  // Header variant: includes ThesisHeader
+  if (variant === 'header') {
+    return (
+      <div className="flex min-h-screen w-full flex-col" style={{ backgroundColor: 'var(--primary-foreground)' }}>
+        <ThesisHeader />
+        <main className="flex-1">
+          {children}
+        </main>
+      </div>
+    );
+  }
 
-    return <SidebarProvider defaultOpen={isOpen}>{children}</SidebarProvider>;
+  // Sidebar variant: provides sidebar structure
+  // Wrapped in a container so it displays properly in showcases
+  return (
+    <div className="flex h-screen w-full">
+      <SidebarProvider defaultOpen={isOpen}>
+        <AppSidebar />
+        <div className="flex flex-1 flex-col">
+          <SidebarHeader />
+          <main className="flex-1 overflow-auto">
+            {children}
+          </main>
+        </div>
+      </SidebarProvider>
+    </div>
+  );
 }
