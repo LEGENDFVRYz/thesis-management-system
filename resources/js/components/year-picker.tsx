@@ -49,9 +49,9 @@ export function YearPicker({
   };
 
   return (
-    <div className={`inline-block w-[260px] bg-[#f3efd0] rounded-xl border border-[#d4c5a0] shadow-md overflow-hidden ${className}`}>
+    <div className={`inline-block w-[260px] bg-breadcrumb rounded-xl border border-[#d4c5a0] shadow-md overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="bg-[#730000] text-[#ffbd00] font-semibold px-4 py-2.5 flex items-center justify-between" style={{ fontSize: "13.33px" }}>
+      <div className="bg-primary text-primary-foreground-2 font-semibold px-4 py-2.5 flex items-center justify-between" style={{ fontSize: "13.33px" }}>
         <button
           onClick={handlePrevRange}
           disabled={!canGoPrev}
@@ -74,7 +74,7 @@ export function YearPicker({
       </div>
 
       {/* Year Grid */}
-      <div className="p-4 bg-[#F3EFD0]">
+      <div className="p-4 bg-breadcrumb">
         <div className="grid grid-cols-3 gap-3">
           {years.map((year) => {
             const selected = selectedYear === year;
@@ -84,7 +84,7 @@ export function YearPicker({
                 onClick={() => handleYearClick(year)}
                 className={`py-3 rounded transition-colors flex items-center justify-center ${
                   selected
-                    ? "bg-[#730000]/10 text-[#730000] font-semibold"
+                    ? "bg-primary/10 text-primary font-semibold"
                     : "text-[#444444] hover:bg-[#e8e4c5]"
                 }`}
                 style={{ fontSize: "13.33px" }}

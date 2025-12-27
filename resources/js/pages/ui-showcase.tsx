@@ -30,6 +30,21 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupConte
 import { HomeIcon, SettingsIcon, UsersIcon, Moon, Sun, Plus, Trash2, ArrowRight, Loader2, Settings, ChevronDown} from 'lucide-react';
 import { SwitchButton } from '@/components/ui/switch-button';
 import { cn } from '@/lib/utils';
+import { Tabs, TabButton } from '@/components/ui/tabs';
+import { DatePicker } from '@/components/date-picker';
+import { SubmissionStatusChart } from '@/components/submission-status-bar';
+import { PerformanceOverviewChart } from '@/components/performance-overview-ver-bar';
+import { ResearchAreaChart } from '@/components/research-area-distribution-pie';
+import { ArchivedJournalsChart } from '@/components/archived-journals-line';
+import { Toast, ToastTitle, ToastDescription } from '@/components/ui/toast';
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell, TableCaption } from '@/components/ui/table';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { Toaster } from '@/components/ui/sonner';
+import { TimelineStepper, TimelineConnector, TimelineState } from '@/components/ui/wizard-timeline';
+import NotificationModal from '@/components/modal/notification-modal';
+import { NotificationList, NotificationListItem } from '@/components/ui/notification-list';
+import StageSwitchToggle from '@/components/stage-toggle';
+import { toast } from 'sonner';
 
 export default function UIShowcase() {
     const [isCollapsibleOpen, setIsCollapsibleOpen] = useState(false);
@@ -89,7 +104,7 @@ export default function UIShowcase() {
                     <header className="flex justify-between items-end border-b border-gray-700 pb-8">
                         <div>
                             <h1 className="text-4xl font-bold mb-2 text-white">UI Components Showcase</h1>
-                            <p className="text-gray-300">Preview of all available UI components (26 total)</p>
+                            <p className="text-gray-300">Preview of all available UI components (37 total + 4 charts)</p>
                         </div>
                         <Button variant="tertiary" size="icon" onClick={toggleTheme} className="rounded-full shadow-inner border-2">
                             {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
@@ -468,6 +483,7 @@ export default function UIShowcase() {
                         <h2 className="text-2xl font-semibold text-white">Skeleton</h2>
                         <div className={`grid grid-cols-1 md:grid-cols-2 gap-12 p-8 rounded-2xl border transition-colors duration-300 ${sectionClass}`}>
                             
+                            {/* 1. Scanning Loading */}
                             <div className="space-y-4">
                                 <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>1. Default Loading</h3>
                                 <Skeleton variant="default" />
@@ -499,29 +515,33 @@ export default function UIShowcase() {
                                 </div>
                             </div>
 
+                            {/* 4. Loading with Contents and Progress */}
                             <div className="space-y-4">
                                 <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>5. Loading Contents</h3>
                                 <Skeleton variant="contents" progress={contentProgress} statusText="Fetching Thesis Data..." />
                                 <Skeleton variant="contents" progress={contentProgress * 0.7} statusText="Syncing Repository..." />
                             </div>
 
+                            {/* 5. Added: Minimal Indeterminate */}
                             <div className="space-y-4">
-                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>6. System Processing</h3>
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>5. System Processing</h3>
                                 <div className="p-4 rounded-lg border border-dashed border-muted-foreground/20">
-                                    <p className="text-xs text-muted-foreground mb-2">Initializing System...</p>
+                                    <p className="text-[10px] text-muted-foreground mb-2">Initializing System...</p>
                                     <Skeleton variant="indeterminate" />
                                 </div>
                             </div>
 
+                            {/* 6. Added: Centered Percentage */}
                             <div className="space-y-4">
-                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>7. Metric Loading</h3>
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>6. Metric Loading</h3>
                                 <div className="flex items-center justify-center h-24 rounded-lg bg-muted/5 border">
                                     <Skeleton variant="centered-pct" progress={contentProgress} className="w-full" />
                                 </div>
                             </div>
 
+                            {/* 7. Added: Embedded Status (Compact) */}
                             <div className="space-y-4 md:col-span-2">
-                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>8. Embedded Task Status</h3>
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>7. Embedded Task Status</h3>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <Skeleton 
                                         variant="embedded" 
@@ -542,7 +562,11 @@ export default function UIShowcase() {
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Spinners</h2>
                         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        
+                            
+                            {/* NOTE: Di ko sure if need pa itong component na ito or placeholder lang... uncomment nyo nalang if ever salamats */}
+                            {/* <Spinner />
+                            <span className="text-sm text-gray-400">Loading...</span> */}
+
                             <SpinnerCard type="ring" label="Standard Circular" />
                             <SpinnerCard type="spokes" label="Spokes Spinner" />
                             <SpinnerCard type="dots" label="Bouncing Dots Spinner" />
@@ -608,6 +632,21 @@ export default function UIShowcase() {
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
+                    </section>
+
+                    {/* Tabs */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Tabs (Custom Figma Design)</h2>
+                        <p className="text-sm text-gray-400">Custom styled tab buttons with maroon colors and inset shadow</p>
+                        <div className="max-w-2xl space-y-4">
+                            <Tabs tabs={['Overview', 'Details', 'Settings']} defaultTab="Overview" />
+                            <div className="bg-white p-6 rounded-lg">
+                                <p className="text-sm text-gray-600">
+                                    These are custom-styled tabs matching the Figma design with maroon background (#730000),
+                                    gold text (#FFBD00), rounded tops, and inset shadows. Active tabs use a lighter maroon (#9b000a).
+                                </p>
+                            </div>
+                        </div>
                     </section>
 
                     {/* Switch Button */}
@@ -704,6 +743,248 @@ export default function UIShowcase() {
                                 </Sidebar>
                             </SidebarProvider>
                         </div>
+                    </section>
+
+                    {/* Date Picker */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Date Picker & Calendar</h2>
+                        <div className="max-w-md space-y-4">
+                            <div className="space-y-2">
+                                <Label className="text-white">Short Format (Month Year)</Label>
+                                <DatePicker displayFormat="short" placeholder="Select date" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-white">Full Format (MM-DD-YY)</Label>
+                                <DatePicker displayFormat="full" placeholder="Select date" />
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Graphs Section */}
+                    <section className="space-y-8">
+                        <h2 className="text-2xl font-semibold text-white border-l-4 border-[#FFBD00] pl-4">Graphs & Charts</h2>
+
+                        {/* Submission Status Bar Chart */}
+                        <div>
+                            <h3 className="text-lg font-semibold mb-4 text-white">1. Submission Status (Horizontal Bar)</h3>
+                            <SubmissionStatusChart />
+                        </div>
+
+                        {/* Performance Overview Vertical Bar Chart */}
+                        <div>
+                            <h3 className="text-lg font-semibold mb-4 text-white">2. Performance Overview (Vertical Stacked Bar)</h3>
+                            <PerformanceOverviewChart />
+                        </div>
+
+                        {/* Research Area Pie Chart */}
+                        <div>
+                            <h3 className="text-lg font-semibold mb-4 text-white">3. Research Area Distribution (Donut Chart)</h3>
+                            <ResearchAreaChart />
+                        </div>
+
+                        {/* Archived Journals Line Chart */}
+                        <div>
+                            <h3 className="text-lg font-semibold mb-4 text-white">4. Archived Journals Trend (Line Chart)</h3>
+                            <ArchivedJournalsChart />
+                        </div>
+                    </section>
+
+                    {/* Toast */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Toast Notifications</h2>
+                        <p className="text-sm text-gray-400">Alert notifications with different variants and dismissible functionality</p>
+                        <div className="space-y-4 max-w-2xl">
+                            <Toast variant="info" size="medium">
+                                <ToastTitle>Information</ToastTitle>
+                                <ToastDescription>This is an informational toast message.</ToastDescription>
+                            </Toast>
+                            <Toast variant="success" size="medium">
+                                <ToastTitle>Success</ToastTitle>
+                                <ToastDescription>Your action was completed successfully.</ToastDescription>
+                            </Toast>
+                            <Toast variant="warning" size="medium">
+                                <ToastTitle>Warning</ToastTitle>
+                                <ToastDescription>Please be cautious with this action.</ToastDescription>
+                            </Toast>
+                            <Toast variant="error" size="medium">
+                                <ToastTitle>Error</ToastTitle>
+                                <ToastDescription>Something went wrong. Please try again.</ToastDescription>
+                            </Toast>
+                        </div>
+                    </section>
+
+                    {/* Sonner Toast Library */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Sonner (Toast Library)</h2>
+                        <p className="text-sm text-gray-400">Modern toast notifications with animations</p>
+                        <div className="flex flex-wrap gap-3">
+                            <Button onClick={() => toast.success('Operation completed successfully!')}>
+                                Show Success Toast
+                            </Button>
+                            <Button onClick={() => toast.error('An error occurred')}>
+                                Show Error Toast
+                            </Button>
+                            <Button onClick={() => toast.info('This is an info message')}>
+                                Show Info Toast
+                            </Button>
+                            <Button onClick={() => toast.warning('Warning: Please review')}>
+                                Show Warning Toast
+                            </Button>
+                            <Button onClick={() => toast.loading('Loading...')}>
+                                Show Loading Toast
+                            </Button>
+                        </div>
+                        <Toaster />
+                    </section>
+
+                    {/* Table */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Table</h2>
+                        <p className="text-sm text-gray-400">Data table component with header, body, and footer</p>
+                        <div className="bg-white p-4 rounded-lg">
+                            <Table>
+                                <TableCaption>A list of recent thesis submissions</TableCaption>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Student Name</TableHead>
+                                        <TableHead>Thesis Title</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead className="text-right">Grade</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    <TableRow>
+                                        <TableCell className="font-medium">John Doe</TableCell>
+                                        <TableCell>Machine Learning in Healthcare</TableCell>
+                                        <TableCell>Approved</TableCell>
+                                        <TableCell className="text-right">95</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell className="font-medium">Jane Smith</TableCell>
+                                        <TableCell>Blockchain Applications</TableCell>
+                                        <TableCell>Pending</TableCell>
+                                        <TableCell className="text-right">-</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell className="font-medium">Bob Johnson</TableCell>
+                                        <TableCell>IoT Smart Systems</TableCell>
+                                        <TableCell>Approved</TableCell>
+                                        <TableCell className="text-right">92</TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </section>
+
+                    {/* Popover */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Popover</h2>
+                        <p className="text-sm text-gray-400">Floating content container triggered by a button</p>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button>Open Popover</Button>
+                            </PopoverTrigger>
+                            <PopoverContent>
+                                <div className="space-y-2">
+                                    <h4 className="font-medium text-sm text-white">Thesis Guidelines</h4>
+                                    <p className="text-sm text-gray-600">
+                                        Please ensure your thesis follows the formatting guidelines and includes all required sections.
+                                    </p>
+                                </div>
+                            </PopoverContent>
+                        </Popover>
+                    </section>
+
+                    {/* Wizard Timeline */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Wizard Timeline</h2>
+                        <p className="text-sm text-gray-400">Vertical timeline stepper with state indicators</p>
+                        <div className="flex gap-8 items-start max-w-2xl">
+                            <TimelineState state="past" label="Completed" />
+                            <TimelineState state="current" label="In Progress" />
+                            <TimelineState state="upcoming" label="Upcoming" />
+                        </div>
+                    </section>
+
+                    {/* Notification Modal */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Notification Modal</h2>
+                        <p className="text-sm text-gray-400">Full-featured notification panel with different notification types</p>
+                        <div className="max-w-md">
+                            <NotificationModal isOpen={true} />
+                        </div>
+                    </section>
+
+                    {/* Notification List Items */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Notification List Items</h2>
+                        <p className="text-sm text-gray-400">Individual notification items with variants for different types and states</p>
+                        <div className="max-w-2xl space-y-6">
+                            <div>
+                                <h3 className="text-lg font-semibold mb-3 text-white">Notification Types</h3>
+                                <div className="bg-white rounded-lg overflow-hidden">
+                                    <NotificationList maxHeight="auto">
+                                        <NotificationListItem
+                                            type="schedule"
+                                            title="Defense Schedule Updated"
+                                            description="Defense for 'Machine Learning Applications in Healthcare Diagnostics' has been updated."
+                                            timestamp="2d ago"
+                                            isUnread={true}
+                                        />
+                                        <NotificationListItem
+                                            type="assignment"
+                                            title="New Panel Assignment"
+                                            description="You have been assigned as a panel member for the defense of 'Blockchain-Based Voting System'."
+                                            timestamp="2d ago"
+                                            isUnread={true}
+                                        />
+                                        <NotificationListItem
+                                            type="reminder"
+                                            title="Upcoming Defense Reminder"
+                                            description="Reminder: Defense for 'IoT-Enabled Smart Home Energy Management System' is tomorrow."
+                                            timestamp="3d ago"
+                                            isUnread={false}
+                                        />
+                                        <NotificationListItem
+                                            type="system"
+                                            title="System Maintenance Scheduled"
+                                            description="The Defense Management System will undergo scheduled maintenance on December 5, 2025."
+                                            timestamp="3d ago"
+                                            isUnread={false}
+                                        />
+                                    </NotificationList>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 className="text-lg font-semibold mb-3 text-white">Read vs Unread States</h3>
+                                <div className="bg-white rounded-lg overflow-hidden">
+                                    <NotificationList maxHeight="auto">
+                                        <NotificationListItem
+                                            type="reminder"
+                                            title="Unread Notification"
+                                            description="This notification has not been read yet. Notice the blue background and red dot indicator."
+                                            timestamp="1h ago"
+                                            isUnread={true}
+                                        />
+                                        <NotificationListItem
+                                            type="reminder"
+                                            title="Read Notification"
+                                            description="This notification has been read. It has a white background with no indicator dot."
+                                            timestamp="2h ago"
+                                            isUnread={false}
+                                        />
+                                    </NotificationList>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Stage Switching */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Stage Switching Toggle</h2>
+                        <p className="text-sm text-gray-400">Three-option toggle for MOR, DP1, and DP2 stages</p>
+                        <StageSwitchToggle />
                     </section>
 
                     {/* Color Palette */}

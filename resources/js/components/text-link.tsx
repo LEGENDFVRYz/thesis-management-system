@@ -14,12 +14,12 @@ export function TextLink({ variant = 'template', children, className, ...props }
     };
 
     return (
-        <a 
+        <a
             {...props}
             className={cn(
                 "font-dm transition-all duration-200 inline-block",
-                "hover:text-[#730000] hover:underline",
-                "active:text-[#730000] active:underline",
+                "hover:text-primary hover:underline",
+                "active:text-primary active:underline",
                 variants[variant],
                 className
             )}
@@ -28,3 +28,5 @@ export function TextLink({ variant = 'template', children, className, ...props }
         </a>
     );
 }
+
+export default TextLink;
