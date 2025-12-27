@@ -13,12 +13,12 @@ const cardVariants = cva(
       variant: {
         default: "gap-6 rounded-xl py-6 shadow-sm",
         header: "bg-white shadow-sm w-full lg:w-[1441px] h-auto lg:h-[124px]",
-        metric: "rounded-lg overflow-hidden border-primary w-full sm:w-75 h-40 shadow-md",
+        metric: "rounded-lg overflow-hidden border-primary w-full sm:w-75 h-40 shadow-md", 
         committee: "rounded-lg bg-white border-gray border-2 gap-3 py-3 w-full sm:w-52 h-auto sm:h-40 shadow-md transition-all duration-300 hover:scale-101 hover:shadow-primary/50",
         archive: "rounded-lg bg-accent border-gray border-2 gap-4 py-3 w-full sm:w-110 h-auto sm:h-56 shadow-md transition-all duration-300 hover:scale-101 hover:shadow-black/40",
         endorsement: "rounded-lg bg-white border-gray-200 py-3 px-4 gap-5 w-full lg:w-110 h-auto lg:h-111 shadow-md transition-all duration-300 hover:scale-101 hover:shadow-primary/40",
         group: "rounded-lg bg-white border-primary border-1 gap-3 py-2 px-3 w-full sm:w-52 h-auto sm:h-48 shadow-md transition-all duration-300 hover:scale-101 hover:shadow-primary/40",
-        adviseeGroup: "rounded-lg bg-white border-l-primary border-l-5 gap-3 py-1 px-3 w-full md:w-[416px] h-auto md:h-[134px] shadow-md transition-all duration-300 hover:bg-breadcrumb",
+        adviseeGroup: "rounded-lg bg-white border-l-primary border-l-5 gap-3 py-3 px-3 w-full md:w-[416px] h-auto md:h-[134px] shadow-md transition-all duration-300 hover:bg-breadcrumb",
       },
     },
     defaultVariants: {
@@ -128,6 +128,19 @@ const cardFooterVariants = cva("flex items-center", {
   },
 })
 
+// Add metric card variants
+const metricCardVariants = cva("", {
+  variants: {
+    variant: {
+      default: "",
+      progress: "",
+    },
+  },
+  defaultVariants: {
+    variant: "default",
+  },
+})
+
 // Card Component
 interface CardProps
   extends React.ComponentProps<"div">,
@@ -225,7 +238,7 @@ function CardIcon({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
-// Header Card Component
+{/* ================= Header Card ================= */}
 interface HeaderCardProps {
   icon?: React.ReactNode
   title: string
@@ -270,25 +283,88 @@ function HeaderCard({
   )
 }
 
-// Metric Card Component (Used for metric/statistics cards)
+{/* =================Metric Card w progress variant ================= */}
 interface MetricCardProps {
-  icon?: React.ReactNode
-  title: string
   children?: React.ReactNode
   className?: string
   contentClassName?: string
+  variant?: "default" | "progress"
+  
+  icon?: React.ReactNode
+  title?: string
+
+  // Progress-specific props
+  groupCode?: string
+  thesisTitle?: string
+  currentStage?: string
+  progress?: number
+  statusBadge?: string
 }
 
 function MetricCard({
-  icon,
-  title,
   children,
   className,
-  contentClassName
+  contentClassName,
+  variant = "default",
+  
+  icon,
+  title,
+
+  // Progress props
+  groupCode,
+  thesisTitle,
+  currentStage,
+  progress,
+  statusBadge
 }: MetricCardProps) {
+  
+  // Progress metric card variant
+  if (variant === "progress") {
   return (
-    <Card variant="metric" className={className}>
-      <CardHeader>
+    <Card 
+      variant="metric" 
+      className={cn(metricCardVariants({ variant }), className)}
+    >
+      <div className="bg-primary px-4 py-2 flex flex-row justify-between items-start">
+        <div className="flex flex-col gap-1">
+          <div className="text-lg text-primary-foreground-2 leading-none">{groupCode}</div>
+          {thesisTitle && <p className="text-sm text-white truncate">{thesisTitle}</p>}
+        </div>
+        {statusBadge && <Badge variant="secondary">{statusBadge}</Badge>}
+      </div>
+
+      <div className="bg-white px-4 py-3">
+        <div className="flex flex-col gap-0.5 w-full">
+          {currentStage && (
+            <div>
+              <p className="text-sm">
+                Current Stage: <span className="font-semibold text-primary">{currentStage}</span>
+              </p>
+            </div>
+          )}
+
+          {progress !== undefined && (
+            <div>
+              <p className="text-sm">Progress:</p>
+              <p className="text-primary-foreground-2 font-bold text-xs">{progress}% Complete</p>
+              
+              {/* Progress Bar */}
+              <div className="w-full h-2 overflow-hidden">
+                <Skeleton variant="progress" progress={progress}/>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </Card>
+  )
+}
+  return (
+    <Card 
+      variant="metric" 
+      className={cn(metricCardVariants({ variant }), className)}
+    >
+      <CardHeader className="metric-header">
         {icon && (  
           <div className="w-[36px] h-[28px] bg-sidebar-gradient-mid rounded flex items-center justify-center">
             {icon}
@@ -305,7 +381,7 @@ function MetricCard({
   )
 }
 
-// Archive Card Component
+{/* ================= Archive Card ================= */}
 interface ArchiveCardProps {
   title: string
   members: string[]
@@ -372,7 +448,7 @@ function ArchiveCard({
   )
 }
 
-// Committee Card Component
+{/* ================= Committee Card ================= */}
 interface CommitteeCardProps {
   thesisTitle: string
   adviserName: string
@@ -430,7 +506,8 @@ function CommitteeCard({
   )
 }
 
-// Group Card Component (Used in Student Management)
+{/* ================= Group Card ================= */}
+//Used in Student Management
 interface GroupCardProps {
   groupCode: string
   groupDescription: string
@@ -502,7 +579,7 @@ function GroupCard({
   )
 }
 
-// Endorsement Card Component
+{/* ================= Endorsement Card ================= */}
 interface EndorsementCardProps {
   thesisTitle: string
   groupCode: string
@@ -540,10 +617,7 @@ function EndorsementCard({
       <CardHeader>
         <div className="flex flex-col sm:flex-row items-start justify-between gap-2">
           <CardTitle className="text-md font-semibold">{thesisTitle}</CardTitle>
-          {badge && (
-            <div className="border border-border w-auto sm:w-[94px] h-auto sm:h-[23px] text-xs flex-shrink-0 flex items-center justify-center px-2 py-1">
-              {badge}
-            </div>
+          {badge && (<Badge variant="secondary">{badge}</Badge>
           )}
         </div>
         <CardDescription>{groupCode}</CardDescription>
@@ -613,7 +687,8 @@ function EndorsementCard({
   )
 }
 
-// Advisee Group Card Component (Thesis Adviser/Panel)
+{/* ================= Advisee Group Card ================= */}
+// Thesis Adviser/Panel
 interface AdviseeGroupCardProps {
   groupCode: string
   badge?: string
@@ -656,24 +731,21 @@ function AdviseeGroupCard({
         <Badge className="h-2.5 text-[8px] sm:text-[7px]">{section}</Badge>
       </CardHeader>
 
-      {/* Divider Line */}
-      
-      
       <CardContent>
         {/* Content */}
         
-        <div className="space-y-0.5 text-[6px] text-gray-600">
+        <div className="space-y-0.5 text-[8px] text-gray-600">
           <div className="flex items-center">
             <Users className="w-2 h-2" />
-            <span>{numberofMembers}</span>
+            <span>{numberofMembers}</span>
           </div>
           <div className="flex items-center">
             <FileTextIcon className="w-2 h-2" />
-            <span> {numberofSubmissions} </span>
+            <span> {numberofSubmissions} </span>
           </div>
           <div className="flex items-center">
             <ClockIcon className="w-2 h-2" />
-            <span> {lastSubmissionDate} </span>
+            <span> {lastSubmissionDate} </span>
           </div>
         </div>
       </CardContent>

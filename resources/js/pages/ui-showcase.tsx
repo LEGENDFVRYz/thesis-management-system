@@ -224,37 +224,119 @@ export default function UIShowcase() {
                     <section className="space-y-6">
                     <h2 className="text-2xl font-semibold text-white">Toast</h2>
 
-                    {(["small", "medium", "large"] as const).map((size) => {
-                        const titles = {
-                        info: "Information",
-                        success: "Success",
-                        warning: "Warning",
-                        error: "Error",
-                        default: "Default",
-                        destructive: "Destructive",
-                        }
-                        const descriptions = {
-                        info: "This is an informational toast.",
-                        success: "Your action was successful.",
-                        warning: "This is a warning toast.",
-                        error: "This is an error toast.",
-                        default: "This is a default toast.",
-                        destructive: "This is a destructive toast.",
-                        }
-
-                        const variants = ["info", "success", "warning", "error", "default", "destructive"] as const
-
-                        return (
-                        <div key={size} className="flex flex-row gap-4 flex-wrap items-start">
-                            {variants.map((variant) => (
-                            <Toast key={`${variant}-${size}`} variant={variant} size={size}>
-                                <ToastTitle>{titles[variant]}</ToastTitle>
-                                <ToastDescription>{descriptions[variant]}</ToastDescription>
+                        {/* Info Toasts */}
+                        <div className="space-y-2">
+                            <h3 className="text-lg font-medium text-gray-300">Info</h3>
+                            <div className="flex flex-row gap-4 flex-wrap items-start">
+                            <Toast variant="info" size="small">
+                                <ToastTitle>Information</ToastTitle>
+                                <ToastDescription>This is an informational toast.</ToastDescription>
                             </Toast>
-                            ))}
+                            <Toast variant="info" size="medium">
+                                <ToastTitle>Information</ToastTitle>
+                                <ToastDescription>This is an informational toast.</ToastDescription>
+                            </Toast>
+                            <Toast variant="info" size="large">
+                                <ToastTitle>Information</ToastTitle>
+                                <ToastDescription>This is an informational toast.</ToastDescription>
+                            </Toast>
+                            </div>
                         </div>
-                        )
-                    })}
+
+                        {/* Success Toasts */}
+                        <div className="space-y-2">
+                            <h3 className="text-lg font-medium text-gray-300">Success</h3>
+                            <div className="flex flex-row gap-4 flex-wrap items-start">
+                            <Toast variant="success" size="small">
+                                <ToastTitle>Success</ToastTitle>
+                                <ToastDescription>Your action was successful.</ToastDescription>
+                            </Toast>
+                            <Toast variant="success" size="medium">
+                                <ToastTitle>Success</ToastTitle>
+                                <ToastDescription>Your action was successful.</ToastDescription>
+                            </Toast>
+                            <Toast variant="success" size="large">
+                                <ToastTitle>Success</ToastTitle>
+                                <ToastDescription>Your action was successful.</ToastDescription>
+                            </Toast>
+                            </div>
+                        </div>
+
+                        {/* Warning Toasts */}
+                        <div className="space-y-2">
+                            <h3 className="text-lg font-medium text-gray-300">Warning</h3>
+                            <div className="flex flex-row gap-4 flex-wrap items-start">
+                            <Toast variant="warning" size="small">
+                                <ToastTitle>Warning</ToastTitle>
+                                <ToastDescription>This is a warning toast.</ToastDescription>
+                            </Toast>
+                            <Toast variant="warning" size="medium">
+                                <ToastTitle>Warning</ToastTitle>
+                                <ToastDescription>This is a warning toast.</ToastDescription>
+                            </Toast>
+                            <Toast variant="warning" size="large">
+                                <ToastTitle>Warning</ToastTitle>
+                                <ToastDescription>This is a warning toast.</ToastDescription>
+                            </Toast>
+                            </div>
+                        </div>
+
+                        {/* Error Toasts */}
+                        <div className="space-y-2">
+                            <h3 className="text-lg font-medium text-gray-300">Error</h3>
+                            <div className="flex flex-row gap-4 flex-wrap items-start">
+                            <Toast variant="error" size="small">
+                                <ToastTitle>Error</ToastTitle>
+                                <ToastDescription>This is an error toast.</ToastDescription>
+                            </Toast>
+                            <Toast variant="error" size="medium">
+                                <ToastTitle>Error</ToastTitle>
+                                <ToastDescription>This is an error toast.</ToastDescription>
+                            </Toast>
+                            <Toast variant="error" size="large">
+                                <ToastTitle>Error</ToastTitle>
+                                <ToastDescription>This is an error toast.</ToastDescription>
+                            </Toast>
+                            </div>
+                        </div>
+
+                        {/* Default Toasts */}
+                        <div className="space-y-2">
+                            <h3 className="text-lg font-medium text-gray-300">Default</h3>
+                            <div className="flex flex-row gap-4 flex-wrap items-start">
+                            <Toast variant="default" size="small">
+                                <ToastTitle>Default</ToastTitle>
+                                <ToastDescription>This is a default toast.</ToastDescription>
+                            </Toast>
+                            <Toast variant="default" size="medium">
+                                <ToastTitle>Default</ToastTitle>
+                                <ToastDescription>This is a default toast.</ToastDescription>
+                            </Toast>
+                            <Toast variant="default" size="large">
+                                <ToastTitle>Default</ToastTitle>
+                                <ToastDescription>This is a default toast.</ToastDescription>
+                            </Toast>
+                            </div>
+                        </div>
+
+                        {/* Destructive Toasts */}
+                        <div className="space-y-2">
+                            <h3 className="text-lg font-medium text-gray-300">Destructive</h3>
+                            <div className="flex flex-row gap-4 flex-wrap items-start">
+                            <Toast variant="destructive" size="small">
+                                <ToastTitle>Destructive</ToastTitle>
+                                <ToastDescription>This is a destructive toast.</ToastDescription>
+                            </Toast>
+                            <Toast variant="destructive" size="medium">
+                                <ToastTitle>Destructive</ToastTitle>
+                                <ToastDescription>This is a destructive toast.</ToastDescription>
+                            </Toast>
+                            <Toast variant="destructive" size="large">
+                                <ToastTitle>Destructive</ToastTitle>
+                                <ToastDescription>This is a destructive toast.</ToastDescription>
+                            </Toast>
+                            </div>
+                        </div>
                     </section>
 
                     {/* Avatar */}
@@ -305,26 +387,29 @@ export default function UIShowcase() {
                         </Breadcrumb>
                     </section>
 
-                    {/* Cards */}
+                    {/* ===== Cards ===== */}
                     <section className="space-y-4">
-                        <h2 className="text-2xl font-semibold text-white">Cards</h2>
+                        <h2 className="text-2xl font-semibold text-white"> Cards </h2>
                         <div className="max-w-md">
 
-                            {/* Header Card (per page) */}
-                            <h2 className="text-lg font-semibold text-white mb-4"> Header Card </h2>
+                            {/* ===== Header Card (per page) ===== */}
+                            <h2 className="text-lg font-semibold text-white mb-4"> -- Header Card </h2>
 
-                           {/* Without icon */}
+                           {/* Without icon yet */}
+                           {/* icon={} -> for adding an icon */} 
                             <HeaderCard
                             title="Card Title Here"
                             description="Card Description"
                             />
 
-                            {/* Card with Header Color*/}
-                            <h2 className="text-lg font-semibold text-white mb-4">Card with Header Color (Mostly used as metric cards) </h2>
-                            
-                            {/* Default Size / Metric Card */}
-                            <h2 className='px-4'> - Default Size / Metric Card </h2>
+                            {/* Metric Cards */}
+                            <h2 className="text-lg font-semibold text-white mb-4"> Metric Cards </h2>
+                        
+                            {/* Metric Card */}
+                            {/* icon={} -> for adding an icon */} 
+                            <h2 className='px-4'> - Metric Card </h2>
                             <MetricCard
+                            icon={<TrendingUp className="text-primary-foreground-2" />} 
                             title="Card Title Here"
                             >
                             <div className='flex items-center justify-center h-full'>
@@ -345,18 +430,28 @@ export default function UIShowcase() {
                             </div>
                             </MetricCard>
 
-                            {/* Committee Card - Proposal Review */}
+                            {/* Progress Card - Metric Card variant*/}
+                            <MetricCard 
+                                variant="progress"
+                                groupCode="Group Code"
+                                thesisTitle="Thesis Title"
+                                currentStage="Stage Here"
+                                progress={80}
+                                statusBadge= "Badge Here"
+                            />
+
+                            {/* ===== Committee Card - Proposal Review ===== */}
                             <h2 className="py-4 text-lg font-semibold text-white">Committee Card</h2>
                             <CommitteeCard
                                 thesisTitle="Thesis Title"
                                 adviserName="Adviser Name"
                                 blockSection="Block/Section"
-                                progress={50}
+                                progress={10}
                                 currentStage={3}
                                 totalStages={6}
                             />
 
-                            {/* Archive Card */}
+                            {/* ===== Archive Card ===== */}
                             <div>
                             <h2 className="text-lg font-semibold text-white mb-4">Archive Card</h2>
                             
@@ -368,7 +463,7 @@ export default function UIShowcase() {
                             />
                             </div>
 
-                            {/* Group Card (Used in Student Management)*/}
+                            {/* ===== Group Card (Used in Student Management) ===== */}
                             <h2 className="text-lg font-semibold text-white">Group Card (Student Management)</h2>
                             <GroupCard
                                 groupCode="Group Code"
@@ -379,7 +474,7 @@ export default function UIShowcase() {
                                 adviserName="Adviser Name"
                                 />
 
-                            {/* Panel Endorsement Card */}
+                            {/* ===== Panel Endorsement Card ===== */}
                             <h2 className="text-lg font-semibold text-white"> Panel Endorsement Card </h2>
 
                             <EndorsementCard
@@ -392,7 +487,7 @@ export default function UIShowcase() {
                                 approvalDate={new Date('2025-12-05')}
                             />
 
-                            {/* Advisee Group Card (Thesis Adviser/Panel) */}
+                            {/* ===== Advisee Group Card (Thesis Adviser/Panel) ===== */}
                             <h2 className="text-lg font-semibold text-white">Advisee Group Card (Thesis Adviser/Panel)</h2>
                             <AdviseeGroupCard
                                 groupCode="Group Code"
@@ -406,7 +501,6 @@ export default function UIShowcase() {
                         </div>
                     </section>
                                     
-
                     {/* Collapsible */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Collapsible</h2>
