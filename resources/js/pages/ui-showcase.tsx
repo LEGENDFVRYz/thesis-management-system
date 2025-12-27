@@ -4,9 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { CheckboxWithLabel } from '@/components/ui/checkbox-with-label';
-import { RadioGroup } from '@/components/ui/radio-group';
-import { RadioGroupItemWithLabel } from '@/components/ui/radio-group-with-label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Spinner, SpinnerCard, StatusBadge } from '@/components/ui/spinner';
 import { Alert } from '@/components/ui/alert';
@@ -23,8 +21,6 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { Skeleton } from '@/components/ui/skeleton';
 import { Toggle } from '@/components/ui/toggle';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { Tabs } from '@/components/ui/tabs';
-import { TimelineState } from '@/components/ui/wizard-timeline';
 import { WizardStepper, WizardSteps, WizardStep, InteractiveWizard } from '@/components/ui/wizard-stepper';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Icon } from '@/components/ui/icon';
@@ -33,9 +29,22 @@ import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from '@/components/ui/sidebar';
 import { HomeIcon, SettingsIcon, UsersIcon, Moon, Sun, Plus, Trash2, ArrowRight, Loader2, Settings, ChevronDown} from 'lucide-react';
 import { SwitchButton } from '@/components/ui/switch-button';
-import { Toast, ToastTitle, ToastDescription } from "@/components/ui/toast"
-
 import { cn } from '@/lib/utils';
+import { Tabs, TabButton } from '@/components/ui/tabs';
+import { DatePicker } from '@/components/date-picker';
+import { SubmissionStatusChart } from '@/components/submission-status-bar';
+import { PerformanceOverviewChart } from '@/components/performance-overview-ver-bar';
+import { ResearchAreaChart } from '@/components/research-area-distribution-pie';
+import { ArchivedJournalsChart } from '@/components/archived-journals-line';
+import { Toast, ToastTitle, ToastDescription } from '@/components/ui/toast';
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell, TableCaption } from '@/components/ui/table';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { Toaster } from '@/components/ui/sonner';
+import { TimelineStepper, TimelineConnector, TimelineState } from '@/components/ui/wizard-timeline';
+import NotificationModal from '@/components/modal/notification-modal';
+import { NotificationList, NotificationListItem } from '@/components/ui/notification-list';
+import StageSwitchToggle from '@/components/stage-toggle';
+import { toast } from 'sonner';
 
 export default function UIShowcase() {
     const [isCollapsibleOpen, setIsCollapsibleOpen] = useState(false);
@@ -95,7 +104,7 @@ export default function UIShowcase() {
                     <header className="flex justify-between items-end border-b border-gray-700 pb-8">
                         <div>
                             <h1 className="text-4xl font-bold mb-2 text-white">UI Components Showcase</h1>
-                            <p className="text-gray-300">Preview of all available UI components (26 total)</p>
+                            <p className="text-gray-300">Preview of all available UI components (37 total + 4 charts)</p>
                         </div>
                         <Button variant="tertiary" size="icon" onClick={toggleTheme} className="rounded-full shadow-inner border-2">
                             {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
@@ -104,7 +113,7 @@ export default function UIShowcase() {
 
                     {/* Buttons */}
                     <div className="space-y-12 text-white">
-                        <h2 className="text-2xl font-bold border-l-4 border-[#FFBD00] pl-4">Button Variants</h2>
+                        <h2 className="text-2xl font-bold">Button Variants</h2>
                         
                         <VariantRow 
                             title="Primary" 
@@ -177,12 +186,21 @@ export default function UIShowcase() {
                     {/* Radio Group */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Radio Group</h2>
-                        <div className="bg-white p-6 rounded-lg max-w-md">
-                            <Label className="text-gray-900 mb-3 block">Choose your role</Label>
-                            <RadioGroup defaultValue="student" className="gap-4">
-                                <RadioGroupItemWithLabel value="student" id="radio-student" label="Student" />
-                                <RadioGroupItemWithLabel value="faculty" id="radio-faculty" label="Faculty" />
-                                <RadioGroupItemWithLabel value="admin" id="radio-admin" label="Admin" />
+                        <div className="max-w-md">
+                            <Label className="text-white">Choose your role</Label>
+                            <RadioGroup defaultValue="student" className="mt-2">
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="student" id="radio-student" />
+                                    <Label htmlFor="radio-student" className="font-normal cursor-pointer text-white">Student</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="faculty" id="radio-faculty" />
+                                    <Label htmlFor="radio-faculty" className="font-normal cursor-pointer text-white">Faculty</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="admin" id="radio-admin" />
+                                    <Label htmlFor="radio-admin" className="font-normal cursor-pointer text-white">Admin</Label>
+                                </div>
                             </RadioGroup>
                         </div>
                     </section>
@@ -190,11 +208,24 @@ export default function UIShowcase() {
                     {/* Checkboxes */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Checkboxes</h2>
-                        <div className="bg-white p-6 rounded-lg max-w-md">
-                            <div className="space-y-3">
-                                <CheckboxWithLabel id="terms" label="Accept terms and conditions" />
-                                <CheckboxWithLabel id="marketing" label="Receive marketing emails" defaultChecked />
-                                <CheckboxWithLabel id="newsletter" label="Subscribe to newsletter" />
+                        <div className="space-y-3 max-w-md">
+                            <div className="flex items-center space-x-2">
+                                <Checkbox id="terms" />
+                                <Label htmlFor="terms" className="font-normal cursor-pointer text-white">
+                                    Accept terms and conditions
+                                </Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <Checkbox id="marketing" defaultChecked />
+                                <Label htmlFor="marketing" className="font-normal cursor-pointer text-white">
+                                    Receive marketing emails (checked by default)
+                                </Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <Checkbox id="disabled-check" disabled />
+                                <Label htmlFor="disabled-check" className="font-normal text-white">
+                                    Disabled checkbox
+                                </Label>
                             </div>
                         </div>
                     </section>
@@ -218,41 +249,17 @@ export default function UIShowcase() {
                         </div>
                     </section>
 
-                    {/* Toast */}
-                    <section className="space-y-6">
-                    <h2 className="text-2xl font-semibold text-white">Toast</h2>
-
-                    {(["small", "medium", "large"] as const).map((size) => {
-                        const titles = {
-                        info: "Information",
-                        success: "Success",
-                        warning: "Warning",
-                        error: "Error",
-                        default: "Default",
-                        destructive: "Destructive",
-                        }
-                        const descriptions = {
-                        info: "This is an info toast.",
-                        success: "Your action was successful.",
-                        warning: "This is a warning toast.",
-                        error: "This is an error toast.",
-                        default: "This is a default toast.",
-                        destructive: "This is a destructive toast.",
-                        }
-
-                        const variants = ["info", "success", "warning", "error", "default", "destructive"] as const
-
-                        return (
-                        <div key={size} className="flex flex-row gap-4 flex-wrap items-start">
-                            {variants.map((variant) => (
-                            <Toast key={`${variant}-${size}`} variant={variant} size={size}>
-                                <ToastTitle>{titles[variant]}</ToastTitle>
-                                <ToastDescription>{descriptions[variant]}</ToastDescription>
-                            </Toast>
-                            ))}
+                    {/* Alert */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Alert</h2>
+                        <div className="max-w-md space-y-4">
+                            <Alert>
+                                <div className="text-white">
+                                    <div className="font-semibold">Note</div>
+                                    <div className="text-sm">This is an informational alert message.</div>
+                                </div>
+                            </Alert>
                         </div>
-                        )
-                    })}
                     </section>
 
                     {/* Avatar */}
@@ -325,18 +332,43 @@ export default function UIShowcase() {
                     {/* Collapsible */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Collapsible</h2>
-                        <div className="max-w-md">
-                            <Collapsible open={isCollapsibleOpen} onOpenChange={setIsCollapsibleOpen}>
-                                <CollapsibleTrigger asChild>
-                                    <Button variant="tertiary" className="w-full justify-between">
-                                        <span>Can I use this in my project?</span>
-                                        <span>{isCollapsibleOpen ? '−' : '+'}</span>
-                                    </Button>
+                        <div className="max-w-5xl space-y-4">
+                            {/* FAQ ITEM 1 */}
+                            <Collapsible>
+                                <CollapsibleTrigger>
+                                    <div className="flex items-center gap-3">
+                                        <Badge className={cn("transition-colors duration-200 uppercase text-[10px] font-bold tracking-tight",
+                                            "group-data-[state=open]:bg-primary-foreground-2 group-data-[state=open]:text-primary" )}>
+                                            General
+                                        </Badge>
+                                        <span className="font-medium text-left">
+                                            How do I view defense schedules for my block?
+                                        </span>
+                                    </div>
                                 </CollapsibleTrigger>
-                                <CollapsibleContent className="mt-2 p-4 border rounded-md">
-                                    <p className="text-gray-900 text-sm">
-                                        Yes! You can use all these components in your project. They are built with Radix UI and styled with Tailwind CSS.
-                                    </p>
+                                
+                                <CollapsibleContent>
+                                    Use the 'Filter by Block' dropdown at the top of the page to select your specific block. 
+                                    The table will automatically update to show only defenses for your selected block.
+                                </CollapsibleContent>
+                            </Collapsible>
+
+                            {/* FAQ ITEM 2 */}
+                            <Collapsible>
+                                <CollapsibleTrigger>
+                                    <div className="flex items-center gap-3">
+                                        <Badge className={cn("transition-colors duration-200 uppercase text-[10px] font-bold tracking-tight",
+                                            "group-data-[state=open]:bg-primary-foreground-2 group-data-[state=open]:text-primary" )}>
+                                            General
+                                        </Badge>
+                                        <span className="font-medium text-left">
+                                            Can I request a change in my defense schedule?
+                                        </span>
+                                    </div>
+                                </CollapsibleTrigger>
+                                <CollapsibleContent>
+                                    Defense schedule changes must be coordinated through your section adviser 
+                                    and approved by the department head.
                                 </CollapsibleContent>
                             </Collapsible>
                         </div>
@@ -377,141 +409,23 @@ export default function UIShowcase() {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </section>
-
-                    {/* Tabs */}
-                    <section className="space-y-4">
-                        <h2 className="text-2xl font-semibold text-white">Tabs</h2>
-                        
-                        <div className="space-y-8">
-                            {/* Two Tabs */}
-                            <div>
-                                <h3 className="text-lg font-semibold mb-4 text-white">Two Tabs</h3>
-                                <Tabs tabs={['Tab 1', 'Tab 2']} defaultTab="Tab 1" />
-                            </div>
-
-                            {/* Multiple Tabs */}
-                            <div>
-                                <h3 className="text-lg font-semibold mb-4 text-white">Multiple Tabs</h3>
-                                <Tabs tabs={['Current', 'Upcoming', 'Past']} defaultTab="Current" />
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* Wizard Timeline */}
-                    <section className="space-y-4">
-                        <h2 className="text-2xl font-semibold text-white">Wizard Timeline</h2>
-                        
-                        <div className="space-y-8">
-                            {/* Timeline States */}
-                            <div>
-                                <h3 className="text-lg font-semibold mb-4 text-white">Timeline States</h3>
-                                <div className="flex items-start justify-center gap-12 p-6 rounded-lg">
-                                    <TimelineState state="past" label="Past (Filled, lighter connector)" />
-                                    <TimelineState state="current" label="Current (Filled)" />
-                                    <TimelineState state="upcoming" label="Upcoming (Hollow)" />
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
+                    
                     {/* Wizard Stepper */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Wizard Stepper</h2>
-                        <p className="text-sm text-gray-400">Step progress indicator with three states: before, current, and after</p>
                         
-                        <div className="space-y-12">
-                            {/* Component States */}
+                        <div className="space-y-8">
                             <div>
-                                <h3 className="text-lg font-semibold mb-6 text-white">Component States</h3>
-                                <div className="space-y-8">
-                                    {/* Before State */}
-                                    <div>
-                                        <p className="text-sm text-gray-400 mb-3">Before (Yellow circle, Yellow connector)</p>
-                                        <WizardStepper>
-                                            <WizardSteps>
-                                                <WizardStep
-                                                    stepNumber={1}
-                                                    title="Step 1"
-                                                    description="Step Description"
-                                                    state="before"
-                                                    isLast={false}
-                                                />
-                                                <WizardStep
-                                                    stepNumber={2}
-                                                    title="Step 2"
-                                                    description="Step Description"
-                                                    state="before"
-                                                    isLast={true}
-                                                />
-                                            </WizardSteps>
-                                        </WizardStepper>
-                                    </div>
-
-                                    {/* Current State */}
-                                    <div>
-                                        <p className="text-sm text-gray-400 mb-3">Current (Maroon circle with white text, Gradient connector)</p>
-                                        <WizardStepper>
-                                            <WizardSteps>
-                                                <WizardStep
-                                                    stepNumber={1}
-                                                    title="Step 1"
-                                                    description="Step Description"
-                                                    state="current"
-                                                    isLast={false}
-                                                />
-                                                <WizardStep
-                                                    stepNumber={2}
-                                                    title="Step 2"
-                                                    description="Step Description"
-                                                    state="before"
-                                                    isLast={true}
-                                                />
-                                            </WizardSteps>
-                                        </WizardStepper>
-                                    </div>
-
-                                    {/* After State */}
-                                    <div>
-                                        <p className="text-sm text-gray-400 mb-3">After (Maroon circle with yellow text, Maroon connector)</p>
-                                        <WizardStepper>
-                                            <WizardSteps>
-                                                <WizardStep
-                                                    stepNumber={1}
-                                                    title="Step 1"
-                                                    description="Step Description"
-                                                    state="after"
-                                                    isLast={false}
-                                                />
-                                                <WizardStep
-                                                    stepNumber={2}
-                                                    title="Step 2"
-                                                    description="Step Description"
-                                                    state="after"
-                                                    isLast={true}
-                                                />
-                                            </WizardSteps>
-                                        </WizardStepper>
-                                    </div>
-                                </div>
+                                <h3 className="text-lg font-semibold mb-4 text-white">4 Steps</h3>
+                                <InteractiveWizard stepCount={4} />
                             </div>
 
-                            {/* Interactive Demo */}
                             <div>
-                                <h3 className="text-lg font-semibold mb-6 text-white">Interactive Demo</h3>
-                                <div className="space-y-8">
-                                    <div>
-                                        <p className="text-sm text-gray-400 mb-4">4 Steps (Click buttons to navigate)</p>
-                                        <InteractiveWizard stepCount={4} />
-                                    </div>
-
-                                    <div>
-                                        <p className="text-sm text-gray-400 mb-4">3 Steps (Click buttons to navigate)</p>
-                                        <InteractiveWizard stepCount={3} />
-                                    </div>
-                                </div>
+                                <h3 className="text-lg font-semibold mb-4 text-white">3 Steps</h3>
+                                <InteractiveWizard stepCount={3} />
                             </div>
                         </div>
-                    </section>  
+                    </section>              
 
                     {/* Input OTP */}
                     <section className="space-y-4">
@@ -566,11 +480,10 @@ export default function UIShowcase() {
 
                     {/* Skeleton */}
                     <section className="space-y-4">
-                        <h2 className="text-2xl font-semibold">Skeleton</h2>
-                        {/* Replaced bg-[#1e1e1e] with sectionClass */}
+                        <h2 className="text-2xl font-semibold text-white">Skeleton</h2>
                         <div className={`grid grid-cols-1 md:grid-cols-2 gap-12 p-8 rounded-2xl border transition-colors duration-300 ${sectionClass}`}>
                             
-                            {/* 1. Scanning Loading */}
+                            {/* 1. Default Loading */}
                             <div className="space-y-4">
                                 <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>1. Default Loading (Scanning)</h3>
                                 <Skeleton variant="default" />
@@ -600,45 +513,11 @@ export default function UIShowcase() {
                                 </div>
                             </div>
 
-                            {/* 4. Loading with Contents and Progress */}
+                            {/* 4. Loading Contents */}
                             <div className="space-y-4">
                                 <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>4. Loading Contents</h3>
                                 <Skeleton variant="contents" progress={contentProgress} statusText="Fetching Thesis Data..." />
                                 <Skeleton variant="contents" progress={contentProgress * 0.7} statusText="Syncing Repository..." />
-                            </div>
-
-                            {/* 5. Added: Minimal Indeterminate */}
-                            <div className="space-y-4">
-                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>5. System Processing</h3>
-                                <div className="p-4 rounded-lg border border-dashed border-muted-foreground/20">
-                                    <p className="text-[10px] text-muted-foreground mb-2">Initializing System...</p>
-                                    <Skeleton variant="indeterminate" />
-                                </div>
-                            </div>
-
-                            {/* 6. Added: Centered Percentage */}
-                            <div className="space-y-4">
-                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>6. Metric Loading</h3>
-                                <div className="flex items-center justify-center h-24 rounded-lg bg-muted/5 border">
-                                    <Skeleton variant="centered-pct" progress={contentProgress} className="w-full" />
-                                </div>
-                            </div>
-
-                            {/* 7. Added: Embedded Status (Compact) */}
-                            <div className="space-y-4 md:col-span-2">
-                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>7. Embedded Task Status</h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <Skeleton 
-                                        variant="embedded" 
-                                        progress={uploadProgress} 
-                                        statusText="Database Migration" 
-                                    />
-                                    <Skeleton 
-                                        variant="embedded" 
-                                        progress={contentProgress} 
-                                        statusText="Asset Compression" 
-                                    />
-                                </div>
                             </div>
                         </div>
                     </section>
@@ -646,25 +525,40 @@ export default function UIShowcase() {
                     {/* Spinner */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Spinners</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             
-                            {/* Base Spinner with Theme Colors */}
-                            <div className={cn("p-6 rounded-xl border flex items-center gap-4", sectionClass)}>
-                                <Spinner className={theme === 'dark' ? "text-yellow-500" : "text-red-700"} />
-                                <span className={subTextClass}>System Loading...</span>
-                            </div>
+                            {/* NOTE: Di ko sure if need pa itong component na ito or placeholder lang... uncomment nyo nalang if ever salamats */}
+                            {/* <Spinner />
+                            <span className="text-sm text-gray-400">Loading...</span> */}
 
-                            {/* Spinner Card Variant */}
+                            <SpinnerCard type="ring" label="Standard Circular" />
+                            <SpinnerCard type="spokes" label="Spokes Spinner" />
+                            <SpinnerCard type="dots" label="Bouncing Dots Spinner" />
+                            <SpinnerCard type="pulse" label="Refresh Spinner" />
+
                             <SpinnerCard 
+                                type="bars-pulse" 
                                 size="md" 
-                                variant={theme === 'dark' ? 'red' : 'gray'} 
-                                label="Database Sync" 
+                                label="Pulsing Bars" 
+                            />
+                            
+                            <SpinnerCard 
+                                type="bars-scale" 
+                                size="md" 
+                                label="Scaling Bars" 
                             />
 
-                            {/* Status Badge Variant */}
-                            <div className="flex flex-col gap-2">
-                                <StatusBadge label="Processing" variant="yellow" />
-                                <StatusBadge label="Error Found" variant="red" />
+                            <SpinnerCard 
+                                type="ring" 
+                                variant="red" 
+                                label="Critical Load" 
+                            />
+                            
+                            <div className="flex flex-col gap-3 justify-center">
+                                <p className="text-[10px] font-bold uppercase opacity-40 text-white">Status Badges</p>
+                                <StatusBadge label="Pending Task" variant="orange" />
+                                <StatusBadge label="Syncing Data" variant="yellow" />
+                                <StatusBadge label="System Error" variant="red" />
                             </div>
                         </div>
                     </section>
@@ -702,6 +596,21 @@ export default function UIShowcase() {
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
+                    </section>
+
+                    {/* Tabs */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Tabs (Custom Figma Design)</h2>
+                        <p className="text-sm text-gray-400">Custom styled tab buttons with maroon colors and inset shadow</p>
+                        <div className="max-w-2xl space-y-4">
+                            <Tabs tabs={['Overview', 'Details', 'Settings']} defaultTab="Overview" />
+                            <div className="bg-white p-6 rounded-lg">
+                                <p className="text-sm text-gray-600">
+                                    These are custom-styled tabs matching the Figma design with maroon background (#730000),
+                                    gold text (#FFBD00), rounded tops, and inset shadows. Active tabs use a lighter maroon (#9b000a).
+                                </p>
+                            </div>
+                        </div>
                     </section>
 
                     {/* Switch Button */}
@@ -798,6 +707,248 @@ export default function UIShowcase() {
                                 </Sidebar>
                             </SidebarProvider>
                         </div>
+                    </section>
+
+                    {/* Date Picker */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Date Picker & Calendar</h2>
+                        <div className="max-w-md space-y-4">
+                            <div className="space-y-2">
+                                <Label className="text-white">Short Format (Month Year)</Label>
+                                <DatePicker displayFormat="short" placeholder="Select date" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-white">Full Format (MM-DD-YY)</Label>
+                                <DatePicker displayFormat="full" placeholder="Select date" />
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Graphs Section */}
+                    <section className="space-y-8">
+                        <h2 className="text-2xl font-semibold text-white border-l-4 border-[#FFBD00] pl-4">Graphs & Charts</h2>
+
+                        {/* Submission Status Bar Chart */}
+                        <div>
+                            <h3 className="text-lg font-semibold mb-4 text-white">1. Submission Status (Horizontal Bar)</h3>
+                            <SubmissionStatusChart />
+                        </div>
+
+                        {/* Performance Overview Vertical Bar Chart */}
+                        <div>
+                            <h3 className="text-lg font-semibold mb-4 text-white">2. Performance Overview (Vertical Stacked Bar)</h3>
+                            <PerformanceOverviewChart />
+                        </div>
+
+                        {/* Research Area Pie Chart */}
+                        <div>
+                            <h3 className="text-lg font-semibold mb-4 text-white">3. Research Area Distribution (Donut Chart)</h3>
+                            <ResearchAreaChart />
+                        </div>
+
+                        {/* Archived Journals Line Chart */}
+                        <div>
+                            <h3 className="text-lg font-semibold mb-4 text-white">4. Archived Journals Trend (Line Chart)</h3>
+                            <ArchivedJournalsChart />
+                        </div>
+                    </section>
+
+                    {/* Toast */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Toast Notifications</h2>
+                        <p className="text-sm text-gray-400">Alert notifications with different variants and dismissible functionality</p>
+                        <div className="space-y-4 max-w-2xl">
+                            <Toast variant="info" size="medium">
+                                <ToastTitle>Information</ToastTitle>
+                                <ToastDescription>This is an informational toast message.</ToastDescription>
+                            </Toast>
+                            <Toast variant="success" size="medium">
+                                <ToastTitle>Success</ToastTitle>
+                                <ToastDescription>Your action was completed successfully.</ToastDescription>
+                            </Toast>
+                            <Toast variant="warning" size="medium">
+                                <ToastTitle>Warning</ToastTitle>
+                                <ToastDescription>Please be cautious with this action.</ToastDescription>
+                            </Toast>
+                            <Toast variant="error" size="medium">
+                                <ToastTitle>Error</ToastTitle>
+                                <ToastDescription>Something went wrong. Please try again.</ToastDescription>
+                            </Toast>
+                        </div>
+                    </section>
+
+                    {/* Sonner Toast Library */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Sonner (Toast Library)</h2>
+                        <p className="text-sm text-gray-400">Modern toast notifications with animations</p>
+                        <div className="flex flex-wrap gap-3">
+                            <Button onClick={() => toast.success('Operation completed successfully!')}>
+                                Show Success Toast
+                            </Button>
+                            <Button onClick={() => toast.error('An error occurred')}>
+                                Show Error Toast
+                            </Button>
+                            <Button onClick={() => toast.info('This is an info message')}>
+                                Show Info Toast
+                            </Button>
+                            <Button onClick={() => toast.warning('Warning: Please review')}>
+                                Show Warning Toast
+                            </Button>
+                            <Button onClick={() => toast.loading('Loading...')}>
+                                Show Loading Toast
+                            </Button>
+                        </div>
+                        <Toaster />
+                    </section>
+
+                    {/* Table */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Table</h2>
+                        <p className="text-sm text-gray-400">Data table component with header, body, and footer</p>
+                        <div className="bg-white p-4 rounded-lg">
+                            <Table>
+                                <TableCaption>A list of recent thesis submissions</TableCaption>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Student Name</TableHead>
+                                        <TableHead>Thesis Title</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead className="text-right">Grade</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    <TableRow>
+                                        <TableCell className="font-medium">John Doe</TableCell>
+                                        <TableCell>Machine Learning in Healthcare</TableCell>
+                                        <TableCell>Approved</TableCell>
+                                        <TableCell className="text-right">95</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell className="font-medium">Jane Smith</TableCell>
+                                        <TableCell>Blockchain Applications</TableCell>
+                                        <TableCell>Pending</TableCell>
+                                        <TableCell className="text-right">-</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell className="font-medium">Bob Johnson</TableCell>
+                                        <TableCell>IoT Smart Systems</TableCell>
+                                        <TableCell>Approved</TableCell>
+                                        <TableCell className="text-right">92</TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </section>
+
+                    {/* Popover */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Popover</h2>
+                        <p className="text-sm text-gray-400">Floating content container triggered by a button</p>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button>Open Popover</Button>
+                            </PopoverTrigger>
+                            <PopoverContent>
+                                <div className="space-y-2">
+                                    <h4 className="font-medium text-sm text-white">Thesis Guidelines</h4>
+                                    <p className="text-sm text-gray-600">
+                                        Please ensure your thesis follows the formatting guidelines and includes all required sections.
+                                    </p>
+                                </div>
+                            </PopoverContent>
+                        </Popover>
+                    </section>
+
+                    {/* Wizard Timeline */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Wizard Timeline</h2>
+                        <p className="text-sm text-gray-400">Vertical timeline stepper with state indicators</p>
+                        <div className="flex gap-8 items-start max-w-2xl">
+                            <TimelineState state="past" label="Completed" />
+                            <TimelineState state="current" label="In Progress" />
+                            <TimelineState state="upcoming" label="Upcoming" />
+                        </div>
+                    </section>
+
+                    {/* Notification Modal */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Notification Modal</h2>
+                        <p className="text-sm text-gray-400">Full-featured notification panel with different notification types</p>
+                        <div className="max-w-md">
+                            <NotificationModal isOpen={true} />
+                        </div>
+                    </section>
+
+                    {/* Notification List Items */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Notification List Items</h2>
+                        <p className="text-sm text-gray-400">Individual notification items with variants for different types and states</p>
+                        <div className="max-w-2xl space-y-6">
+                            <div>
+                                <h3 className="text-lg font-semibold mb-3 text-white">Notification Types</h3>
+                                <div className="bg-white rounded-lg overflow-hidden">
+                                    <NotificationList maxHeight="auto">
+                                        <NotificationListItem
+                                            type="schedule"
+                                            title="Defense Schedule Updated"
+                                            description="Defense for 'Machine Learning Applications in Healthcare Diagnostics' has been updated."
+                                            timestamp="2d ago"
+                                            isUnread={true}
+                                        />
+                                        <NotificationListItem
+                                            type="assignment"
+                                            title="New Panel Assignment"
+                                            description="You have been assigned as a panel member for the defense of 'Blockchain-Based Voting System'."
+                                            timestamp="2d ago"
+                                            isUnread={true}
+                                        />
+                                        <NotificationListItem
+                                            type="reminder"
+                                            title="Upcoming Defense Reminder"
+                                            description="Reminder: Defense for 'IoT-Enabled Smart Home Energy Management System' is tomorrow."
+                                            timestamp="3d ago"
+                                            isUnread={false}
+                                        />
+                                        <NotificationListItem
+                                            type="system"
+                                            title="System Maintenance Scheduled"
+                                            description="The Defense Management System will undergo scheduled maintenance on December 5, 2025."
+                                            timestamp="3d ago"
+                                            isUnread={false}
+                                        />
+                                    </NotificationList>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 className="text-lg font-semibold mb-3 text-white">Read vs Unread States</h3>
+                                <div className="bg-white rounded-lg overflow-hidden">
+                                    <NotificationList maxHeight="auto">
+                                        <NotificationListItem
+                                            type="reminder"
+                                            title="Unread Notification"
+                                            description="This notification has not been read yet. Notice the blue background and red dot indicator."
+                                            timestamp="1h ago"
+                                            isUnread={true}
+                                        />
+                                        <NotificationListItem
+                                            type="reminder"
+                                            title="Read Notification"
+                                            description="This notification has been read. It has a white background with no indicator dot."
+                                            timestamp="2h ago"
+                                            isUnread={false}
+                                        />
+                                    </NotificationList>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Stage Switching */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Stage Switching Toggle</h2>
+                        <p className="text-sm text-gray-400">Three-option toggle for MOR, DP1, and DP2 stages</p>
+                        <StageSwitchToggle />
                     </section>
 
                     {/* Color Palette */}
