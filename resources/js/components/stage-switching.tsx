@@ -22,8 +22,8 @@ export default function StageSwitchToggle({
         className={cn(
           'flex-1 rounded-[10px] text-[12px] font-medium transition-all duration-200',
           currentStage === 'mor'
-            ? 'bg-[#730000] text-white'
-            : 'bg-transparent text-[#730000] hover:bg-white hover:border hover:border-[#730000]'
+            ? 'bg-primary text-white'
+            : 'bg-transparent text-primary hover:bg-white hover:border hover:border-primary'
         )}
       >
         MOR
@@ -36,8 +36,8 @@ export default function StageSwitchToggle({
         className={cn(
           'flex-1 rounded-[10px] text-[12px] font-medium transition-all duration-200',
           currentStage === 'dp1'
-            ? 'bg-[#730000] text-white'
-            : 'bg-transparent text-[#730000] hover:bg-white hover:border hover:border-[#730000]'
+            ? 'bg-primary text-white'
+            : 'bg-transparent text-primary hover:bg-white hover:border hover:border-primary'
         )}
       >
         DP1
@@ -50,8 +50,8 @@ export default function StageSwitchToggle({
         className={cn(
           'flex-1 rounded-[10px] text-[12px] font-medium transition-all duration-200',
           currentStage === 'dp2'
-            ? 'bg-[#730000] text-white'
-            : 'bg-transparent text-[#730000] hover:bg-white hover:border hover:border-[#730000]'
+            ? 'bg-primary text-white'
+            : 'bg-transparent text-primary hover:bg-white hover:border hover:border-primary'
         )}
       >
         DP2
