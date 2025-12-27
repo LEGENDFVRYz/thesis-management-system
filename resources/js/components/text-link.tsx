@@ -14,7 +14,7 @@ export function TextLink({ variant = 'template', children, className, ...props }
     };
 
     return (
-        <a 
+        <a
             {...props}
             className={cn(
                 "font-dm transition-all duration-200 inline-block",
@@ -28,3 +28,5 @@ export function TextLink({ variant = 'template', children, className, ...props }
         </a>
     );
 }
+
+export default TextLink;
