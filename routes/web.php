@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AcademicSettingController;
 use App\Http\Controllers\Admin\DefenseController;
 use App\Http\Controllers\Admin\DepartmentPoliciesController;
 use App\Http\Controllers\Admin\FacultyController;
@@ -228,9 +229,7 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
 
         Route::get('faculty', [FacultyController::class, 'index'])->name('admin.management.faculty');
 
-        Route::get('academic-settings', function () {
-            return Inertia::render('Admin/management/academic');
-        })->name('admin.management.academic');
+        Route::get('academic-settings', [AcademicSettingController::class, 'index'])->name('admin.management.academic');
 
         Route::get('deadline', function () {
             return Inertia::render('Admin/management/deadline');
