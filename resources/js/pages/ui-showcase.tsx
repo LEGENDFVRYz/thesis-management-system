@@ -312,7 +312,7 @@ export default function UIShowcase() {
 
                     {/* ===== Cards ===== */}
                     <section className="space-y-4">
-                        <h2 className="text-2xl font-semibold text-white"> Cards </h2>
+                        <h2 className="text-2xl font-semibold text-white border-l-4 border-[#FFBD00] pl-4"> Cards </h2>
                         <div className="max-w-md">
 
                             {/* ===== Header Card (per page) ===== */}
@@ -326,7 +326,7 @@ export default function UIShowcase() {
                             />
 
                             {/* Metric Cards */}
-                            <h2 className="text-lg font-semibold text-white py-4 mb-4"> -- Metric Cards </h2>
+                            <h2 className="text-lg font-semibold text-white py-4 mb-4"> Metric Cards </h2>
                         
                             {/* Metric Card */}
                             {/* icon={} -> for adding an icon */} 
@@ -337,19 +337,6 @@ export default function UIShowcase() {
                             >
                             <div className='flex items-center justify-center h-full'>
                                 <p> Content Here </p>
-                            </div>
-                            </MetricCard>
-
-                            {/* Custom size and w/o an icon */}
-                            <h2 className='px-4'> Custom Size </h2>
-                            <MetricCard
-                            title="Card Title Here"
-                            className="!w-100 h-48"  
-                            contentClassName="h-32"  
-                            >
-                            <div className='flex items-center justify-center h-full'>
-                                <p> Content Here </p>
-
                             </div>
                             </MetricCard>
 
@@ -365,7 +352,7 @@ export default function UIShowcase() {
                             />
 
                             {/* ===== Committee Card - Proposal Review ===== */}
-                            <h2 className="py-4 text-lg font-semibold text-white"> -- Committee Card</h2>
+                            <h2 className="py-4 text-lg font-semibold text-white"> Committee Card</h2>
                             <CommitteeCard
                                 thesisTitle="Thesis Title"
                                 adviserName="Adviser Name"
@@ -377,7 +364,7 @@ export default function UIShowcase() {
 
                             {/* ===== Archive Card ===== */}
                             <div>
-                            <h2 className="text-lg font-semibold text-white mb-4"> -- Archive Card</h2>
+                            <h2 className="text-lg font-semibold text-white mb-4"> Archive Card</h2>
                             
                             <ArchiveCard
                                 title="Thesis Title "
@@ -387,8 +374,9 @@ export default function UIShowcase() {
                             />
                             </div>
 
-                            {/* ===== Group Card (Used in Student Management) ===== */}
-                            <h2 className="text-lg font-semibold text-white"> -- Group Card (Student Management)</h2>
+                            {/* ===== Group Card ===== */}
+                            <h2 className="text-lg font-semibold text-white"> Group Card </h2>
+                            <p className="text-sm text-gray-400"> Used in Student Management </p>
                             <GroupCard
                                 groupCode="Group Code"
                                 groupDescription="Group Description"
@@ -399,7 +387,7 @@ export default function UIShowcase() {
                                 />
 
                             {/* ===== Advisee Group Card (Thesis Adviser/Panel) ===== */}
-                            <h2 className="text-lg font-semibold text-white"> -- Advisee Group Card (Thesis Adviser/Panel)</h2>
+                            <h2 className="text-lg font-semibold text-white"> Advisee Group Card </h2>
                             <AdviseeGroupCard
                                 groupCode="Group Code"
                                 badge="Badge Here"
@@ -411,7 +399,7 @@ export default function UIShowcase() {
                             />
 
                             {/* ===== Panel Endorsement Card ===== */}
-                            <h2 className="text-lg font-semibold text-white"> -- Panel Endorsement Card </h2>
+                            <h2 className="text-lg font-semibold text-white"> Panel Endorsement Card </h2>
 
                             <EndorsementCard
                                 thesisTitle="Thesis Title Here"
