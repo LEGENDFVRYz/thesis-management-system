@@ -1,0 +1,207 @@
+import { useState, useRef, useEffect } from "react";
+import {
+  Calendar as CalendarIcon,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+
+interface YearRangePickerProps {
+  value?: Date;
+  onChange?: (date: Date) => void;
+  placeholder?: string;
+  className?: string;
+  mode?: "dropdown" | "grid"; 
+}
+
+export function YearRangePicker({
+  value,
+  onChange,
+  placeholder = "Academic Year",
+  className = "",
+  mode = "dropdown",
+}: YearRangePickerProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedYear, setSelectedYear] = useState<Date | null>(
+    value || null,
+  );
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // For grid mode
+  const currentYear = new Date().getFullYear();
+  const MIN_YEAR = 1900; // Set a reasonable minimum year
+  const MAX_YEAR = 2026; // Set a reasonable maximum year
+
+  const initialStartYear = value
+    ? Math.floor(value.getFullYear() / 9) * 9
+    : Math.floor(currentYear / 9) * 9;
+  const [startYear, setStartYear] = useState(initialStartYear);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener(
+        "mousedown",
+        handleClickOutside,
+      );
+  }, []);
+
+  const handleYearChange = (year: number) => {
+    const date = new Date(year, 0, 1);
+    setSelectedYear(date);
+    onChange?.(date);
+    setIsOpen(false);
+  };
+
+  const formatYearRange = (date: Date | null) => {
+    if (!date) return "";
+    const year = date.getFullYear();
+    return `${year} - ${year + 1}`;
+  };
+
+  // Generate year ranges for dropdown
+  const generateYearRanges = () => {
+    const ranges = [];
+    for (let year = MAX_YEAR; year >= MIN_YEAR; year--) {
+      ranges.push({ start: year, end: year + 1 });
+    }
+    return ranges;
+  };
+
+  const yearRanges = generateYearRanges();
+  const selectedYearValue = selectedYear
+    ? selectedYear.getFullYear()
+    : currentYear;
+
+  // For grid mode
+  const years = Array.from(
+    { length: 9 },
+    (_, i) => startYear + i,
+  ).filter((year) => year >= MIN_YEAR && year <= MAX_YEAR);
+
+  const handlePrevRange = () => {
+    const prevStart = startYear - 9;
+    if (prevStart >= MIN_YEAR) {
+      setStartYear(prevStart);
+    }
+  };
+
+  const handleNextRange = () => {
+    const nextStart = startYear + 9;
+    if (nextStart + 8 <= MAX_YEAR) {
+      setStartYear(nextStart);
+    }
+  };
+
+  const isSelected = (year: number) => {
+    return selectedYear && selectedYear.getFullYear() === year;
+  };
+
+  return (
+    <div
+      ref={containerRef}
+      className={`relative ${className} year-range-picker-root`}
+    >
+      {/* Input */}
+      <div className="relative">
+        <input
+          type="text"
+          value={formatYearRange(selectedYear)}
+          placeholder={placeholder}
+          readOnly
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full px-3 py-2 pr-10 bg-[#f3efd0] border border-[#d4c5a0] rounded cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#730000] focus:border-transparent text-[#730000] font-semibold year-range-picker-input"
+          style={{ fontSize: "13.33px" }}
+        />
+        <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#730000] pointer-events-none" />
+      </div>
+
+      {/* Year Range Dropdown */}
+      {isOpen && mode === "dropdown" && (
+        <div className="absolute z-50 mt-2 left-0 w-full bg-[#f3efd0] rounded-lg border border-[#d4c5a0] shadow-lg overflow-hidden">
+          {/* Header */}
+          <div style={{ fontSize: "13.33px" }} className="bg-[#730000] text-[#ffbd00] font-semibold px-4 py-2 text-center year-range-picker-dropdown-header">
+            {selectedYearValue} - {selectedYearValue + 1}
+          </div>
+
+          {/* Year Range List */}
+          <div className="max-h-48 overflow-y-auto bg-[#F3EFFD0]">
+            {yearRanges.map((range, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleYearChange(range.start)}
+                style={{ fontSize: "13.33px" }}
+                className={`
+                  w-full px-4 py-2 text-center transition-colors year-range-picker-dropdown-button
+                  ${
+                    range.start === selectedYearValue
+                      ? "bg-[#730000] text-[#ffbd00]"
+                      : "text-[#730000] hover:bg-[#e8e4c5]"
+                  }
+                `}
+              >
+                {range.start} - {range.end}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Year Grid Dropdown */}
+      {isOpen && mode === "grid" && (
+        <div className="absolute z-50 mt-2 left-0 bg-[#f3efd0] rounded-lg border border-[#d4c5a0] shadow-lg overflow-hidden">
+          {/* Header */}
+          <div className="bg-[#730000] text-[#ffbd00] px-4 py-2.5 flex items-center justify-between">
+            <button
+              onClick={handlePrevRange}
+              className="hover:opacity-80 transition-opacity"
+              aria-label="Previous year range"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <div className="flex-1 text-center year-range-picker-grid-header-center">
+              {startYear} – {startYear + 8}
+            </div>
+            <button
+              onClick={handleNextRange}
+              className="hover:opacity-80 transition-opacity"
+              aria-label="Next year range"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Year Grid */}
+          <div className="p-4 bg-[#F3EFFD0]">
+            <div className="grid grid-cols-3 gap-3">
+              {years.map((year) => (
+                <button
+                  key={year}
+                  onClick={() => handleYearChange(year)}
+                  className={`
+                    px-6 py-3 rounded transition-colors year-range-picker-grid-button
+                    ${
+                      isSelected(year)
+                        ? "bg-[#730000]/10 text-[#730000] font-semibold"
+                        : "text-[#444444] hover:bg-[#e8e4c5]"
+                    }
+                  `}
+                >
+                  {year}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

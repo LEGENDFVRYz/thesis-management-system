@@ -18,11 +18,31 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
+        // TASK 4.2: Maryel     --part 1/2
+        // Note: Granted permission, you can add new route in routes/web.php dependent on your logic
+
+        // Main Query: Get all the user (faculty/student) current information 
+        
         return Inertia::render('settings/profile', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
         ]);
     }
+
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function updateInfo(Request $request, string $id)
+    {
+        // TASK 4.2: Maryel     --part 2/2
+        // Note: Granted permission, you can add new route in routes/web.php dependent on your logic
+
+        // Update logic
+    }
+
+
+
 
     /**
      * Update the user's profile settings.
@@ -60,4 +80,6 @@ class ProfileController extends Controller
 
         return redirect('/');
     }
+
+
 }

@@ -1,6 +1,6 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
-import { theses } from '@/routes/admin/repository';
+import { theses } from '@/routes/repository';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import RepositoryLayout from '@/pages/Shared/repository';

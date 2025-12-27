@@ -1,7 +1,7 @@
 import RoleToggle from '@/components/role-toggle';
 import { login as studentLogin } from '@/routes/student';
 import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
+import { TextLink } from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -118,7 +118,7 @@ export default function Login({
 
                             <Button
                                 type="submit"
-                                variant="destructive"
+                                variant="negative"
                                 className="w-full sm:w-[384px] h-[36px] font-['DM_Sans'] font-medium text-[13.33px] text-justify rounded-[8px]"
                                 tabIndex={4}
                                 disabled={processing}
@@ -141,7 +141,16 @@ export default function Login({
                     </>
                 )}
             </Form>
-            
+
+            {canRegister && (
+                <div className="text-center text-sm text-muted-foreground mt-4">
+                    Don't have an account?{' '}
+                    <TextLink href={register()} className="text-[#730000] hover:underline" tabIndex={6}>
+                        Sign up
+                    </TextLink>
+                </div>
+            )}
+
             {status && (
                 <div className="mb-4 text-center text-sm font-medium text-green-600">
                     {status}
