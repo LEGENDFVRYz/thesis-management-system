@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Spinner } from '@/components/ui/spinner';
+import { Spinner, SpinnerCard, StatusBadge } from '@/components/ui/spinner';
 import { Alert } from '@/components/ui/alert';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -43,7 +43,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { TimelineStepper, TimelineConnector, TimelineState } from '@/components/ui/wizard-timeline';
 import NotificationModal from '@/components/modal/notification-modal';
 import { NotificationList, NotificationListItem } from '@/components/ui/notification-list';
-import StageSwitchToggle from '@/components/stage-switching';
+import StageSwitchToggle from '@/components/stage-toggle';
 import { toast } from 'sonner';
 
 export default function UIShowcase() {
