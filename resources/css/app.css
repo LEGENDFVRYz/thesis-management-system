@@ -79,6 +79,47 @@
     --color-alert-default: var(--alert-default);
     --color-alert-desc: var(--alert-desc);
 
+    /* Committee Badge */
+
+    --color-revision-bg: var(--revision-bg);
+    --color-revision-border: var(--revision-border);
+    --color-revision-font-color: var(--revision-font-color);
+
+    --color-under-eval-bg: var(--under-eval-bg);
+    --color-under-eval-border: var(--under-eval-border);
+    --color-under-eval-font-color: var(--under-eval-font-color);
+
+    --color-evaluated-bg: var(--evaluated-bg);
+    --color-evaluated-border: var(--evaluated-border);
+    --color-evaluated-font-color: var(--evaluated-font-color);
+
+    /* Changes Badge */
+
+    --color-changes-badge-bg: var(--changes-badge-bg);
+    --color-changes-badge-border: var(--changes-badge-border);
+    --color-changes-badge-font-color: var(--changes-badge-font-color);
+
+    /* Scheduled Badge */
+    --color-scheduled-bg: var(--scheduled-bg);
+    --color-scheduled-border: var(--scheduled-border);
+    --color-scheduled-font-color: var(--scheduled-font-color);
+
+    --color-completed-bg: var(--completed-bg);
+    --color-completed-border: var(--completed-border);
+    --color-completed-font-color: var(--completed-font-color); 
+
+    --color-cancelled-bg: var(--canceled-bg);
+    --color-cancelled-border: var(--canceled-border);
+    --color-cancelled-font-color: var(--canceled-font-color);
+
+    /* Endorsement Badge */
+    --color-pending-bg: var(--pending-bg);
+    --color-pending-border: var(--pending-border);
+    --color-pending-font-color: var(--pending-font-color);
+
+    --color-endorsed-bg: var(--endorsed-bg);
+    --color-endorsed-border: var(--endorsed-border);
+    --color-endorsed-font-color: var(--endorsed-font-color);
 
 }
 
@@ -135,6 +176,42 @@
     
     --primary-rgb: 115 0 0;
 
+    --revision-bg: #FEF9C2;         /* Light yellow for revision background */
+    --revision-border: #FFDF20;     /* Yellow for revision border */
+    --revision-font-color: #894B00; /* Dark yellow/brown for revision font color */
+
+    --under-eval-bg: #DBEAFE;         /* Light cyan for under evaluation background */
+    --under-eval-border: #8EC5FF;     /* Blue for under evaluation border */
+    --under-eval-font-color: #193CB8; /* Dark blue for under evaluation font color */
+
+    --evaluated-bg: #DCFCE7;         /* Light green for evaluated background */
+    --evaluated-border: #7BF1A8;     /* Green for evaluated border */
+    --evaluated-font-color: #016630; /* Dark green for evaluated font color */
+
+    --changes-badge-bg: #FAF5FF;         
+    --changes-badge-border: #E9D4FF;     
+    --changes-badge-font-color: #8200DB; 
+
+    --scheduled-bg: #8EC5FF;         
+    --scheduled-border: #193CB8;     
+    --scheduled-font-color: #193CB8;
+
+    --completed-bg: #7BF1A8;         
+    --completed-border: #083C1E;     
+    --completed-font-color: #083C1E;
+
+    --canceled-bg: #FFA2A2;         
+    --canceled-border: var(--primary);     
+    --canceled-font-color: var(--primary);
+
+    --pending-bg: #F9FAFB;         
+    --pending-border: #E5E7EB;     
+    --pending-font-color: #364153;
+
+    --endorsed-bg: #EFF6FF;         
+    --endorsed-border: #BEDBFF;     
+    --endorsed-font-color: #1447E6;
+
     --title-1: 2.825rem;                          /* 45.2px */
     --title-2: 2.125rem;                          /* 34px */
     --title-3: 1.5rem;                            /* 24px */
@@ -143,8 +220,6 @@
     --body-3: 0.9375rem;                          /* 15px */
     --body-4: 0.75rem;                            /* 12px */
     --body-5: 0.5625rem;                          /* 9px */
-
-
 }
 
 [data-theme='dark'] {
@@ -190,7 +265,53 @@
     --alert-yellow-warning: oklch(0.85 0.15 85);   
     --alert-yellow-selected: oklch(0.75 0.14 80); 
     --alert-default: oklch(0.95 0 0);             
-    --alert-desc: oklch(0.75 0.01 250);           
+    --alert-desc: oklch(0.75 0.01 250);        
+
+    --revision-bg: #3A2F00;
+    --revision-border: #8A6A00;
+    --revision-font-color: #FFE58A;
+
+    --under-eval-bg: #0F1F3D;
+    --under-eval-border: #2F5FCC;
+    --under-eval-font-color: #B6CCFF;
+
+    --evaluated-bg: #0F2A1B;
+    --evaluated-border: #2FAE72;
+    --evaluated-font-color: #9AF0C2;
+
+    --changes-badge-bg: #241030;
+    --changes-badge-border: #6A3BCF;
+    --changes-badge-font-color: #D8B4FF;
+
+    --scheduled-bg: #102A4D;
+    --scheduled-border: #3B82F6;
+    --scheduled-font-color: #BFDBFE;
+
+    --completed-bg: #0B2E1A;
+    --completed-border: #22C55E;
+    --completed-font-color: #A7F3D0;
+
+    --canceled-bg: #3A0F0F;
+    --canceled-border: #9B000A; 
+    --canceled-font-color: #FFB3B3;
+
+    --pending-bg: #1F2933;
+    --pending-border: #374151;
+    --pending-font-color: #D1D5DB;
+
+    --endorsed-bg: #0F1E3A;
+    --endorsed-border: #2563EB;
+    --endorsed-font-color: #C7D2FE;
+
+
+
+
+
+
+
+
+    
+    
 
 }
 
@@ -575,12 +696,69 @@
         border-color: var(--secondary-foreground-2);
     }
 
+    /* Committee Badge v1 and v2 */
+
+    .badge-revision {
+        background-color: var(--revision-bg);
+        color: var(--revision-font-color);
+    }
+
+    .badge-under-eval {
+        background-color: var(--under-eval-bg);
+        color: var(--under-eval-font-color);
+    }
+
+    .badge-evaluated {
+        background-color: var(--evaluated-bg);
+        color: var(--evaluated-font-color);
+    }
+
+    /* Changes Badge*/
+
+    .badge-changes {
+        background-color: var(--changes-badge-bg);
+        color: var(--changes-badge-font-color);
+        border-color: var(--changes-badge-border);
+    }
+
+    /* Scheduled Badge */
+    .badge-scheduled {
+        background-color: var(--scheduled-bg);
+        color: var(--scheduled-font-color);
+        border-color: var(--scheduled-border);
+    }
+
+    .badge-completed {
+        background-color: var(--completed-bg);
+        color: var(--completed-font-color);
+        border-color: var(--completed-border);
+    }
+
+    .badge-cancelled {
+        background-color: var(--canceled-bg);
+        color: var(--canceled-font-color);
+        border-color: var(--canceled-border);
+    }
+
+    /* Endorsement Badge */
+
+    .badge-pending-assignment {
+        background-color: var(--pending-bg);
+        color: var(--pending-font-color);
+        border-color: var(--pending-border);
+    }
+
+    .badge-endorsed {
+        background-color: var(--endorsed-bg);
+        color: var(--endorsed-font-color);
+        border-color: var(--endorsed-border);
+    }
+
     .dropdown-btn {
         background-color: var(--breadcrumb);
         color: var(--foreground);
     }
     
-
 }
 
 /**
