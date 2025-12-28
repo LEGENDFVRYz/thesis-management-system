@@ -414,8 +414,7 @@ export default function ComponentsShowcase() {
                                 <p className="text-sm text-gray-400 mb-2">Header Variant</p>
                                 <div className="border border-gray-600 rounded-lg p-4 bg-gray-700">
                                     <AppShell variant="header">
-                                        <div className="p-4 bg-gray-600 rounded text-white text-center">
-                                            Content goes here (with header variant)
+                                        <div className="p-4 rounded text-white text-center">
                                         </div>
                                     </AppShell>
                                 </div>
@@ -424,8 +423,7 @@ export default function ComponentsShowcase() {
                                 <p className="text-sm text-gray-400 mb-2">Sidebar Variant (with SidebarProvider)</p>
                                 <div className="border border-gray-600 rounded-lg p-4 bg-gray-700">
                                     <AppShell variant="sidebar">
-                                        <div className="p-4 bg-gray-600 rounded text-white text-center">
-                                            Content goes here (with sidebar variant)
+                                        <div className="p-4 rounded text-white text-center">
                                         </div>
                                     </AppShell>
                                 </div>
