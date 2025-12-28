@@ -11,7 +11,7 @@ import { Alert } from '@/components/ui/alert';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, CardIcon, CardBadge, HeaderCard, MetricCard, ArchiveCard, GroupCard, CommitteeCard, EndorsementCard, AdviseeGroupCard } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -27,7 +27,7 @@ import { Icon } from '@/components/ui/icon';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from '@/components/ui/sidebar';
-import { HomeIcon, SettingsIcon, UsersIcon, Moon, Sun, Plus, Trash2, ArrowRight, Loader2, Settings, ChevronDown} from 'lucide-react';
+import { HomeIcon, SettingsIcon, UsersIcon, Moon, Sun, Plus, Trash2, ArrowRight, Loader2, Settings, ChevronDown, ChevronRight , CheckCircleIcon, FileText, TrendingUp, Users, Calendar1Icon, BookAIcon, BookIcon, BookOpen, Eye, ClockIcon, PinIcon} from 'lucide-react';   
 import { SwitchButton } from '@/components/ui/switch-button';
 import { cn } from '@/lib/utils';
 import { Tabs, TabButton } from '@/components/ui/tabs';
@@ -44,7 +44,11 @@ import { TimelineStepper, TimelineConnector, TimelineState } from '@/components/
 import NotificationModal from '@/components/modal/notification-modal';
 import { NotificationList, NotificationListItem } from '@/components/ui/notification-list';
 import StageSwitchToggle from '@/components/stage-toggle';
+import FileUpload from '@/components/file-upload';
+import FilePreview from '@/components/document-preview';
+import { Timeline } from '@/components/timeline';
 import { toast } from 'sonner';
+import { AppHeader } from '@/components/app-header';
 
 export default function UIShowcase() {
     const [isCollapsibleOpen, setIsCollapsibleOpen] = useState(false);
@@ -296,25 +300,109 @@ export default function UIShowcase() {
                         <Breadcrumb items={["Home", "Components", "Dashboard"]} />
                     </section>
 
-                    {/* Card */}
+                    {/* ===== Cards ===== */}
                     <section className="space-y-4">
-                        <h2 className="text-2xl font-semibold text-white">Card</h2>
+                        <h2 className="text-2xl font-semibold text-white border-l-4 border-[#FFBD00] pl-4"> Cards </h2>
                         <div className="max-w-md">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="text-white">Card Title</CardTitle>
-                                    <CardDescription>Card description goes here</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-white">This is the card content area.</p>
-                                </CardContent>
-                                <CardFooter>
-                                    <Button>Action</Button>
-                                </CardFooter>
-                            </Card>
+
+                            {/* ===== Header Card (per page) ===== */}
+                            <h2 className="text-lg font-semibold text-white mb-4"> -- Header Card </h2>
+
+                           {/* Without icon yet */}
+                           {/* icon={} -> for adding an icon */} 
+                            <HeaderCard
+                            title="Card Title Here"
+                            description="Card Description"
+                            />
+
+                            {/* Metric Cards */}
+                            <h2 className="text-lg font-semibold text-white py-4 mb-4"> Metric Cards </h2>
+                        
+                            {/* Metric Card */}
+                            {/* icon={} -> for adding an icon */} 
+                            <h2 className='px-4'> Metric Card </h2>
+                            <MetricCard
+                            icon={<TrendingUp className="text-primary-foreground-2" />} 
+                            title="Card Title Here"
+                            >
+                            <div className='flex items-center justify-center h-full'>
+                                <p> Content Here </p>
+                            </div>
+                            </MetricCard>
+
+                            {/* Progress Card - Metric Card variant*/}
+                            <h2 className='px-4'> Progress Card  </h2>
+                            <MetricCard 
+                                variant="progress"
+                                groupCode="Group Code"
+                                thesisTitle="Thesis Title"
+                                currentStage="Stage Here"
+                                progress={80}
+                                statusBadge= "Badge Here"
+                            />
+
+                            {/* ===== Committee Card - Proposal Review ===== */}
+                            <h2 className="py-4 text-lg font-semibold text-white"> Committee Card</h2>
+                            <CommitteeCard
+                                thesisTitle="Thesis Title"
+                                adviserName="Adviser Name"
+                                blockSection="Block/Section"
+                                progress={10}
+                                currentStage={3}
+                                totalStages={6}
+                            />
+
+                            {/* ===== Archive Card ===== */}
+                            <div>
+                            <h2 className="text-lg font-semibold text-white mb-4"> Archive Card</h2>
+                            
+                            <ArchiveCard
+                                title="Thesis Title "
+                                members={["Member 1", "Member 2", "Member 3", "Member 4"]}
+                                date="Sample Date"
+                                badges={["Sample Badge 1", "Sample Badge 2", "Sample Badge 3"]}
+                            />
+                            </div>
+
+                            {/* ===== Group Card ===== */}
+                            <h2 className="text-lg font-semibold text-white"> Group Card </h2>
+                            <p className="text-sm text-gray-400"> Used in Student Management </p>
+                            <GroupCard
+                                groupCode="Group Code"
+                                groupDescription="Group Description"
+                                thesisTitle="Thesis Title"
+                                thesisStage="Thesis Stage"
+                                members={["Member 1", "Member 2", "Member 3", "Member 4"]}
+                                adviserName="Adviser Name"
+                                />
+
+                            {/* ===== Advisee Group Card (Thesis Adviser/Panel) ===== */}
+                            <h2 className="text-lg font-semibold text-white"> Advisee Group Card </h2>
+                            <AdviseeGroupCard
+                                groupCode="Group Code"
+                                badge="Badge Here"
+                                thesisTitle="Thesis Title Here"
+                                section="Section"
+                                numberofMembers='Number of Members Here'
+                                numberofSubmissions="5"
+                                lastSubmissionDate="Date Here"
+                            />
+
+                            {/* ===== Panel Endorsement Card ===== */}
+                            <h2 className="text-lg font-semibold text-white"> Panel Endorsement Card </h2>
+
+                            <EndorsementCard
+                                thesisTitle="Thesis Title Here"
+                                groupCode="Group Code"
+                                badge="Badge Here"
+                                proponents={["Proponent 1", "Proponent 2", "Proponent 3", "Proponent 4"]}
+                                block="BSCPE 3-3"
+                                adviserName="Adviser Name"
+                                approvalDate={new Date('2025-12-05')}
+                            />
                         </div>
                     </section>
-
+                                    
                     {/* Collapsible */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Collapsible</h2>
@@ -469,16 +557,19 @@ export default function UIShowcase() {
                         <h2 className="text-2xl font-semibold text-white">Skeleton</h2>
                         <div className={`grid grid-cols-1 md:grid-cols-2 gap-12 p-8 rounded-2xl border transition-colors duration-300 ${sectionClass}`}>
                             
-                            {/* 1. Default Loading */}
+                            {/* 1. Scanning Loading */}
                             <div className="space-y-4">
-                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>1. Default Loading (Scanning)</h3>
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>1. Default Loading</h3>
                                 <Skeleton variant="default" />
-                                <Skeleton variant="default" className="w-3/4" />
                             </div>
 
-                            {/* 2. Upload Loading */}
                             <div className="space-y-4">
-                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>2. Upload Loading</h3>
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>2. Scan Loading</h3>
+                                <Skeleton variant="scanning" />
+                            </div>
+
+                            <div className="space-y-4">
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>3. Upload Loading</h3>
                                 <Skeleton variant="progress" progress={uploadProgress} />
                                 <Button 
                                     variant="primary" 
@@ -490,20 +581,53 @@ export default function UIShowcase() {
                                 </Button>
                             </div>
 
-                            {/* 3. Eval Progress */}
                             <div className="space-y-4">
-                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>3. Eval Progress (Step Based)</h3>
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>4. Eval Progress (Step Based)</h3>
                                 <div className="grid grid-cols-1 gap-6">
                                     <Skeleton variant="eval" progress={evalValue} />
                                     <Skeleton variant="eval" progress={6} />
                                 </div>
                             </div>
 
-                            {/* 4. Loading Contents */}
+                            {/* 4. Loading with Contents and Progress */}
                             <div className="space-y-4">
-                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>4. Loading Contents</h3>
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>5. Loading Contents</h3>
                                 <Skeleton variant="contents" progress={contentProgress} statusText="Fetching Thesis Data..." />
                                 <Skeleton variant="contents" progress={contentProgress * 0.7} statusText="Syncing Repository..." />
+                            </div>
+
+                            {/* 5. Added: Minimal Indeterminate */}
+                            <div className="space-y-4">
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>5. System Processing</h3>
+                                <div className="p-4 rounded-lg border border-dashed border-muted-foreground/20">
+                                    <p className="text-[10px] text-muted-foreground mb-2">Initializing System...</p>
+                                    <Skeleton variant="indeterminate" />
+                                </div>
+                            </div>
+
+                            {/* 6. Added: Centered Percentage */}
+                            <div className="space-y-4">
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>6. Metric Loading</h3>
+                                <div className="flex items-center justify-center h-24 rounded-lg bg-muted/5 border">
+                                    <Skeleton variant="centered-pct" progress={contentProgress} className="w-full" />
+                                </div>
+                            </div>
+
+                            {/* 7. Added: Embedded Status (Compact) */}
+                            <div className="space-y-4 md:col-span-2">
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${subTextClass}`}>7. Embedded Task Status</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <Skeleton 
+                                        variant="embedded" 
+                                        progress={uploadProgress} 
+                                        statusText="Database Migration" 
+                                    />
+                                    <Skeleton 
+                                        variant="embedded" 
+                                        progress={contentProgress} 
+                                        statusText="Asset Compression" 
+                                    />
+                                </div>
                             </div>
                         </div>
                     </section>
@@ -552,6 +676,7 @@ export default function UIShowcase() {
                     {/* Toggle */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Toggle</h2>
+                        <p className="text-sm text-gray-400">Single toggle buttons with normal, pressed, and disabled states</p>
                         <div className="flex gap-3">
                             <Toggle>Normal</Toggle>
                             <Toggle defaultPressed>Pressed</Toggle>
@@ -562,6 +687,7 @@ export default function UIShowcase() {
                     {/* Toggle Group */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Toggle Group</h2>
+                        <p className="text-sm text-gray-400">Group of connected toggle buttons for mutually exclusive options</p>
                         <ToggleGroup type="single" defaultValue="left">
                             <ToggleGroupItem value="left">Left</ToggleGroupItem>
                             <ToggleGroupItem value="center">Center</ToggleGroupItem>
@@ -622,29 +748,12 @@ export default function UIShowcase() {
                         </div>
                     </section>
 
-                    {/* Navigation Menu */}
+                    {/* Navigation Menu*/}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Navigation Menu</h2>
-                        <p className="text-sm text-gray-400">Horizontal navigation with dropdown menus</p>
-                        <NavigationMenu>
-                            <NavigationMenuList>
-                                <NavigationMenuItem>
-                                    <NavigationMenuTrigger className="text-white">Getting Started</NavigationMenuTrigger>
-                                    <NavigationMenuContent>
-                                        <div className="p-4 w-[400px]">
-                                            <NavigationMenuLink className="text-white">
-                                                Introduction
-                                            </NavigationMenuLink>
-                                        </div>
-                                    </NavigationMenuContent>
-                                </NavigationMenuItem>
-                                <NavigationMenuItem>
-                                    <NavigationMenuLink className="text-white">
-                                        Documentation
-                                    </NavigationMenuLink>
-                                </NavigationMenuItem>
-                            </NavigationMenuList>
-                        </NavigationMenu>
+                        <p className="text-sm text-gray-400">Main application header with branding, top navigation, and utility actions.</p>
+
+                        <AppHeader breadcrumbs={[{ title: 'Home', href: '#' }, { title: 'Showcase', href: '#' }]} />
                     </section>
 
                     {/* Placeholder Pattern */}
@@ -935,6 +1044,36 @@ export default function UIShowcase() {
                         <h2 className="text-2xl font-semibold text-white">Stage Switching Toggle</h2>
                         <p className="text-sm text-gray-400">Three-option toggle for MOR, DP1, and DP2 stages</p>
                         <StageSwitchToggle />
+                    </section>
+
+                    {/* File Upload */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">File Upload</h2>
+                        <p className="text-sm text-gray-400">Drag and drop or click to upload files with progress tracking</p>
+                        <div className="max-w-2xl">
+                            <FileUpload />
+                        </div>
+                    </section>
+
+                    {/* Document Preview */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Document Preview</h2>
+                        <p className="text-sm text-gray-400">Preview uploaded documents with action buttons</p>
+                        <div className="max-w-2xl">
+                            <FilePreview
+                                fileUrl="#"
+                                fileName="No document yet"
+                            />
+                        </div>
+                    </section>
+
+                    {/* Timeline */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Timeline View</h2>
+                        <p className="text-sm text-gray-400">Academic timeline with events and milestones</p>
+                        <div className="max-w-4xl">
+                            <Timeline />
+                        </div>
                     </section>
 
                     {/* Color Palette */}

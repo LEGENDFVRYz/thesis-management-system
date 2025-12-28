@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { Facebook, Twitter, Linkedin, Youtube, MapPin, Phone, Mail } from 'lucide-react'; {/* icons currently implemented in the footer are placeholders onlyyy. will replace once the icon components have been made */}
+import { Facebook, Twitter, Linkedin, Youtube, MapPin, Phone, Mail } from 'lucide-react';
 
 const NavFooterLink = ({ href = "#", children }: { href?: string; children: React.ReactNode }) => (
     <li>
-        <a 
-            href={href} 
+        <a
+            href={href}
             onClick={(e) => { if (href === "#") e.preventDefault(); }}
-            className="text-white/80 hover:text-[var(--primary-foreground-2)] transition-colors text-[16px] font-medium font-dm leading-normal"
+            className="text-white hover:text-white/80 transition-colors text-base font-normal font-['DM_Sans'] leading-normal"
         >
             {children}
         </a>
@@ -18,16 +18,15 @@ export function NavFooter({ className }: { className?: string }) {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className={cn("bg-[var(--primary)] w-full h-[675px] flex flex-col overflow-hidden mt-auto", className)}>
-            
+        <footer className={cn("bg-primary w-full flex flex-col", className)}>
             {/* Main Content Area */}
-            <div className="flex-grow flex items-center justify-center px-6">
-                <div className="w-full max-w-[1000px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-20 items-start">
-                    
+            <div className="w-full py-16 px-6">
+                <div className="w-full max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-16">
+
                     {/* Quick Links */}
                     <div className="flex flex-col gap-6">
-                        <h2 className="text-[32px] font-medium text-white font-dm">Quick Links</h2>
-                        <ul className="flex flex-col gap-3 pl-8">
+                        <h2 className="text-[20px] font-semibold text-white font-['DM_Sans']">Quick Links</h2>
+                        <ul className="flex flex-col gap-3">
                             <NavFooterLink>About Us</NavFooterLink>
                             <NavFooterLink>Thesis Archive</NavFooterLink>
                             <NavFooterLink>Defense Schedule</NavFooterLink>
@@ -38,8 +37,8 @@ export function NavFooter({ className }: { className?: string }) {
 
                     {/* Resources */}
                     <div className="flex flex-col gap-6">
-                        <h2 className="text-[32px] font-medium text-white font-dm">Resources</h2>
-                        <ul className="flex flex-col gap-3 pl-8">
+                        <h2 className="text-[20px] font-semibold text-white font-['DM_Sans']">Resources</h2>
+                        <ul className="flex flex-col gap-3">
                             <NavFooterLink>Downloadable Forms</NavFooterLink>
                             <NavFooterLink>Thesis Guideline</NavFooterLink>
                             <NavFooterLink>Ethics Review Board</NavFooterLink>
@@ -47,46 +46,55 @@ export function NavFooter({ className }: { className?: string }) {
                         </ul>
                     </div>
 
+                    {/* Follow Us & Contact Us */}
                     <div className="flex flex-col gap-10">
                         {/* Follow Us */}
                         <div className="flex flex-col gap-4">
-                            <h2 className="text-[32px] font-medium text-white font-dm">Follow Us</h2>
-                            <div className="flex gap-4 pl-8">
-                                <a href="#" className="text-white hover:text-[var(--primary-foreground-2)] transition-colors"><Facebook size={40} fill="currentColor" /></a>
-                                <a href="#" className="text-white hover:text-[var(--primary-foreground-2)] transition-colors"><Twitter size={40} fill="currentColor" /></a>
-                                <a href="#" className="text-white hover:text-[var(--primary-foreground-2)] transition-colors"><Linkedin size={40} fill="currentColor" /></a>
-                                <a href="#" className="text-white hover:text-[var(--primary-foreground-2)] transition-colors"><Youtube size={40} fill="currentColor" /></a>
+                            <h2 className="text-[20px] font-semibold text-white font-['DM_Sans']">Follow Us</h2>
+                            <div className="flex gap-4">
+                                <a href="#" className="w-12 h-12 bg-white rounded-full flex items-center justify-center hover:opacity-80 transition-opacity">
+                                    <Facebook className="w-6 h-6 text-primary" fill="currentColor" />
+                                </a>
+                                <a href="#" className="w-12 h-12 bg-white rounded-full flex items-center justify-center hover:opacity-80 transition-opacity">
+                                    <Twitter className="w-6 h-6 text-primary" fill="currentColor" />
+                                </a>
+                                <a href="#" className="w-12 h-12 bg-white rounded-full flex items-center justify-center hover:opacity-80 transition-opacity">
+                                    <Linkedin className="w-6 h-6 text-primary" fill="currentColor" />
+                                </a>
+                                <a href="#" className="w-12 h-12 bg-white rounded-full flex items-center justify-center hover:opacity-80 transition-opacity">
+                                    <Youtube className="w-6 h-6 text-primary" fill="currentColor" />
+                                </a>
                             </div>
                         </div>
 
                         {/* Contact Us */}
-                        <div className="flex flex-col gap-4 pt-4">
-                            <h2 className="text-[32px] font-medium text-white font-dm">Contact Us</h2>
-                            <div className="space-y-4 text-white font-dm text-[15px] pl-8">
+                        <div className="flex flex-col gap-4">
+                            <h2 className="text-[20px] font-semibold text-white font-['DM_Sans']">Contact Us</h2>
+                            <div className="flex flex-col gap-3 text-white font-['DM_Sans'] text-base">
                                 <div className="flex gap-3 items-start">
-                                    <MapPin className="shrink-0 mt-1" size={24} />
-                                    <p className="leading-tight max-w-[280px]">NDC Campus Anonas Cor. Pureza St. Sta. Mesa, Manila, Philippines 01008</p>
+                                    <MapPin className="shrink-0 mt-1 w-5 h-5" />
+                                    <p className="leading-relaxed">NDC Campus Anonas cor. Pureza Sts. Sta. Mesa, Manila, Philippines 01008</p>
                                 </div>
                                 <div className="flex gap-3 items-center">
-                                    <Phone className="shrink-0" size={24} />
+                                    <Phone className="shrink-0 w-5 h-5" />
                                     <p>(+63 2) 713 6009</p>
                                 </div>
                                 <div className="flex gap-3 items-center">
-                                    <Mail className="shrink-0" size={24} />
+                                    <Mail className="shrink-0 w-5 h-5" />
                                     <p>ce@pup.edu.ph</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
 
             {/* Bottom Bar */}
-            <div className="w-full bg-[#717182] py-8 px-4 mt-auto">
-                <div className="max-w-[1000px] mx-auto text-center text-white font-dm space-y-1">
-                    <p className="text-[16px] font-medium">Thesis Management System © {currentYear}</p>
-                    <p className="text-[14px] opacity-80">For technical support, contact the system administrator</p>
+            <div className="w-full bg-[#717182] py-6 px-4">
+                <div className="max-w-[1200px] mx-auto text-center text-white font-['DM_Sans'] space-y-1">
+                    <p className="text-base font-medium">Thesis Management System © {currentYear}</p>
+                    <p className="text-sm">For technical support, contact the system administrator</p>
                 </div>
             </div>
         </footer>
