@@ -20,32 +20,6 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { NavMain } from '@/components/nav-main';
 
-function ThesisHeader() {
-  return (
-    <div className="w-full h-[150px]" style={{ backgroundColor: 'var(--primary)' }}>
-      <div className="h-[100px] flex items-center justify-center">
-        <p className= "text-lg" style={{ color: 'var(--primary-foreground)' }}>Header Placeholder</p>
-      </div>
-      <div className="h-[50px] flex items-center px-6" style={{ backgroundColor: 'var(--breadcrumb)' }}>
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/" style={{ color: 'var(--primary)' }}>
-                Module Title
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator style={{ color: 'var(--primary)' }} />
-            <BreadcrumbItem>
-              <BreadcrumbPage className="font-semibold" style={{ color: 'var(--primary)' }}>
-                Page Title
-              </BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-      </div>
-    </div>
-  );
-}
 
 function AppSidebar() {
   const navItems = [
@@ -107,11 +81,10 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
     isOpen = true;
   }
 
-  // Header variant: includes ThesisHeader
+  // Header variant
   if (variant === 'header') {
     return (
       <div className="flex min-h-screen w-full flex-col" style={{ backgroundColor: 'var(--primary-foreground)' }}>
-        <ThesisHeader />
         <main className="flex-1">
           {children}
         </main>
