@@ -1,10 +1,12 @@
 import ManagementLayout from '@/pages/Admin/management/index';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { academic } from '@/routes/admin/management/index';
+import { update } from '@/routes/admin/management/academic';
 import { Label } from '@/components/ui/label';
 import { DatePicker } from '@/components/date-picker';
+import { formatLocal } from '@/lib/utils';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -32,10 +34,11 @@ type AcademicPageProps = {
 };
 
 // HELPER: Create Valid and Scoped Range of possible s.y.
-interface AcademicYear {
-    value: number;
-    label: string;
-}
+type AcademicYearForm = {
+    year: number | null;
+    start_date: string | null;
+    end_date: string | null;
+};
 
 // Mampping Array for semester props
 const mapSemester: Record<number, string> = {
@@ -57,17 +60,24 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
     // HELPER: change the datepicker value default dependent on the selected year
     const handleSyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const newYearId = Number(e.target.value);
-        setSelectedSy(newYearId); 
+        setSelectedSy(newYearId);
 
         const selectedRecord = school_year[newYearId];
-
         if (selectedRecord) {
-            setAcadDate({
-                start: selectedRecord.start ? new Date(selectedRecord.start) : null,
-                end: selectedRecord.end ? new Date(selectedRecord.end) : null,
-            });
+            const start = selectedRecord.start ? new Date(selectedRecord.start) : null;
+            const end = selectedRecord.end ? new Date(selectedRecord.end) : null;
+
+            setAcadDate({ start, end });
         }
     };
+
+    // FORM HANDLER
+    const { data, setData, put, processing, errors } = useForm<AcademicYearForm>({
+        year: active_sy,
+        start_date: acadDate.start ? formatLocal(acadDate.start) : null,
+        end_date: acadDate.end ? formatLocal(acadDate.end) : null,
+    });
+    
 
     return (
         <ManagementLayout 
@@ -79,6 +89,21 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
                 <div className="flex flex-1 flex-col gap-4">
                     <div className="flex flex-1 flex-col p-4 py-6 rounded-xl border border-sidebar-border/70 gap-5">
                         {/* Academic year settings */}
+                        <div className='flex flex-1 justify-between align-middle'>
+                            <h1>Academic Year Management</h1>
+                            <button 
+                                disabled={processing}
+                                onClick={() =>
+                                    put(update().url, {
+                                        preserveScroll: true,
+                                    })
+                                }
+                                className='bg-primary text-primary-foreground py-2 px-8 text-sm rounded-md cursor-pointer'
+                            >
+                                {processing ? 'Saving...' : 'Save'}
+                            </button>
+                        </div>
+
                         <div>
                             <label className="mb-2 block text-sm font-medium text-muted-foreground">
                                 Set the Active Academic Year:
@@ -111,10 +136,13 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
                                     value={acadDate.start ?? undefined}
                                     placeholder="Select Start Date"
                                     onChange={(date) => {
-                                        setAcadDate((prev) => ({ ...prev, start: date })); 
-                                        console.log("Updated Acad Date:", acadDate);
+                                        setAcadDate((prev) => ({ ...prev, start: date }));  // render feedbackl
+                                        setData('start_date', formatLocal(date));           // form feedback
                                     }}
                                 />
+                                {errors.start_date && (
+                                    <p className="text-red-500 text-xs">{errors.start_date}</p>
+                                )}
                             </div>
                             <div className='flex-1'>
                                 <Label className="text-primary">End Date</Label>
@@ -124,10 +152,13 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
                                     value={acadDate.end ?? undefined}
                                     placeholder="Select End Date"
                                     onChange={(date) => {
-                                        setAcadDate((prev) => ({ ...prev, end: date })); 
-                                        console.log("Updated Acad Date:", acadDate);
+                                        setAcadDate((prev) => ({ ...prev, start: date }));  // render feedbackl
+                                        setData('end_date', formatLocal(date));           // form feedback
                                     }}
                                 />
+                                {errors.end_date && (
+                                    <p className="text-red-500 text-xs">{errors.end_date}</p>
+                                )}
                             </div>
                         </div>
                         
@@ -138,6 +169,10 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
                     
                     <div className="flex flex-1 flex-col p-4 py-6 rounded-xl border border-sidebar-border/70 gap-5">
                         {/* Semestral settings */}
+                        <div className='flex flex-1 justify-between align-middle'>
+                            <h1>Semestral Management</h1>
+                            <button className='bg-primary text-primary-foreground py-2 px-8 text-sm rounded-md cursor-pointer'>Save</button>
+                        </div>
                         <div>
                             <label className="mb-2 block text-sm font-medium text-muted-foreground">
                                 Set the Active Semestral:

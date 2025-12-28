@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\SchoolYear;
 use App\Models\Semester;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -99,9 +100,28 @@ class AcademicSettingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        //
+        $request->validate([
+            'year'       => 'required|integer',
+            'start_date' => 'required|date',
+            'end_date'   => 'required|date|after:start_date',
+        ]);
+
+        // dd($request->all());
+        
+        // 🔑 Extract the year from the END DATE
+        SchoolYear::updateOrCreate(
+            ['year' => $request->year], // unique identifier
+            [
+                'start_date' => $request->start_date,
+                'end_date'   => $request->end_date,
+            ]
+        );
+        
+        // dd($schoolYear);
+        
+        return redirect()->route('admin.management.academic.update');
     }
 
     /**

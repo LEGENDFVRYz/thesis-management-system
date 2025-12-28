@@ -235,6 +235,7 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
         Route::get('faculty', [FacultyController::class, 'index'])->name('admin.management.faculty');
 
         Route::get('academic-settings', [AcademicSettingController::class, 'index'])->name('admin.management.academic');
+        Route::put('academic-settings', [AcademicSettingController::class, 'update'])->name('admin.management.academic.update');
 
         Route::get('deadline', function () {
             return Inertia::render('Admin/management/deadline');

@@ -30,3 +30,8 @@ export function isSectionUrl(
     // Check if the path starts with the parent prefix
     return path.startsWith(parentPrefix);
 }
+
+// Convert Date Object to a string for backend (sync the timezone difference)
+export function formatLocal(date: Date) {
+    return date.toLocaleDateString('en-CA');
+};
