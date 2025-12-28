@@ -7,6 +7,7 @@ use App\Models\SchoolYear;
 use App\Models\Semester;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class AcademicSettingController extends Controller
@@ -56,7 +57,7 @@ class AcademicSettingController extends Controller
             ];
         };
 
-        // dd($schoolYears);
+        // dd($active_semestral);
 
         return Inertia::render('Admin/management/academic', [
             'active_sy'     => $active_acad_year,
@@ -100,28 +101,87 @@ class AcademicSettingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
+public function update(Request $request)
     {
-        $request->validate([
-            'year'       => 'required|integer',
-            'start_date' => 'required|date',
-            'end_date'   => 'required|date|after:start_date',
-        ]);
+        // SCENARIO 1: UPDATING A SEMESTER
+        if ($request->filled('sem_index')) {
+            
+            $validated = $request->validate([
+                'sy_year'    => 'required|integer',
+                'sem_index'  => 'required|integer|in:0,1',
+                'start_date' => 'required|date',
+                'end_date'   => 'required|date|after:start_date',
+            ]);
 
-        // dd($request->all());
+            // dd($request);
+
+            $schoolYear = SchoolYear::where('year', $validated['sy_year'])->first();
+
+            if (!$schoolYear) {
+                return back()->withErrors(['year' => 'School year not found. Create the year first.']);
+            }
+
+            // Ensures to deactivate ALL semesters in the database
+            DB::transaction(function () use ($schoolYear, $validated) {
+                
+                Semester::query()->update(['is_active' => false]);
+
+                // Update or Create the Semester record linked to that School Year
+                Semester::updateOrCreate(
+                    [
+                        'school_year_id' => $schoolYear->id,
+                        'semester'       => $validated['sem_index']
+                    ],
+                    [
+                        'start_date' => $validated['start_date'],
+                        'end_date'   => $validated['end_date'],
+                        'is_active' => true 
+                    ]
+                );
+            });
+
+            return redirect()->route('admin.management.academic');
+        } 
         
-        // 🔑 Extract the year from the END DATE
-        SchoolYear::updateOrCreate(
-            ['year' => $request->year], // unique identifier
-            [
-                'start_date' => $request->start_date,
-                'end_date'   => $request->end_date,
-            ]
-        );
-        
-        // dd($schoolYear);
-        
-        return redirect()->route('admin.management.academic.update');
+        // SCENARIO 2: UPDATING ACADEMIC YEAR
+        else {
+            $validated = $request->validate([
+                'year'       => 'required|integer',
+                'start_date' => 'required|date',
+                'end_date'   => 'required|date|after:start_date',
+            ]);
+
+            // Update or create the school year
+            $schoolYear =SchoolYear::updateOrCreate(
+                ['year' => $validated['year']],     // Search by unique year
+                [
+                    'start_date' => $validated['start_date'],
+                    'end_date'   => $validated['end_date'],
+                ]
+            );
+
+            // Get the currently active semester
+            // $activeSemester = Semester::where('is_active', true)->value('semester');
+
+            // Ensures to deactivate ALL semesters in the database
+            DB::transaction(function () use ($schoolYear, $validated) {
+                
+                Semester::query()->update(['is_active' => false]);
+
+                // Force Activate the First Semester (temporary soln -- depends, maybe we used the activeSemester)
+                Semester::updateOrCreate(
+                    [
+                        'school_year_id' => $schoolYear->id,
+                        'semester'       => 0,              
+                    ],
+                    [
+                        'is_active' => true,
+                    ]
+                );
+            });
+
+            return redirect()->route('admin.management.academic');
+        }
     }
 
     /**
