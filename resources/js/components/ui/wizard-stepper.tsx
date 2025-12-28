@@ -1,22 +1,16 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { ArrowRight, ArrowLeft } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Check } from 'lucide-react';
 
 // Wizard Container
-const WizardStepper = React.forwardRef<
-    HTMLDivElement,
-    React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
+const WizardStepper = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
     <div ref={ref} className={cn('relative', className)} {...props} />
 ));
 WizardStepper.displayName = 'WizardStepper';
 
 // Wizard Steps Container
-const WizardSteps = React.forwardRef<
-    HTMLDivElement,
-    React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
+const WizardSteps = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
     <div
         ref={ref}
         className={cn(
@@ -153,10 +147,7 @@ const WizardStep = React.forwardRef<HTMLDivElement, WizardStepProps>(
 WizardStep.displayName = 'WizardStep';
 
 // Navigation Buttons
-const WizardNavigation = React.forwardRef<
-    HTMLDivElement,
-    React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
+const WizardNavigation = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
     <div
         ref={ref}
         className={cn('flex items-center justify-between', className)}
@@ -165,8 +156,7 @@ const WizardNavigation = React.forwardRef<
 ));
 WizardNavigation.displayName = 'WizardNavigation';
 
-interface WizardButtonProps
-    extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface WizardButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: 'primary' | 'secondary';
 }
 
@@ -273,6 +263,91 @@ const InteractiveWizard = ({ stepCount = 4 }: InteractiveWizardProps) => {
     );
 };
 
+// Wizard Progress Component
+interface WizardProgressProps extends React.HTMLAttributes<HTMLDivElement> {
+    stepNumber: number;
+    stepLabel: string;
+    state: 'before' | 'current' | 'after';
+    progress?: number;
+}
+
+const WizardProgress = React.forwardRef<HTMLDivElement, WizardProgressProps>(
+    ({ className, stepNumber, stepLabel, state, progress = 20, ...props }, ref) => {
+        const renderCircle = () => {
+            switch (state) {
+                case 'after':
+                    return (
+                        <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                            <Check className="w-6 h-6 text-primary-foreground-2" strokeWidth={3} />
+                        </div>
+                    );
+                case 'current':
+                    return (
+                        <div className="w-10 h-10 rounded-full bg-primary/90 flex items-center justify-center flex-shrink-0">
+                            <span className="text-primary-foreground-2 font-medium text-[23px] leading-none font-dm">
+                                {stepNumber}
+                            </span>
+                        </div>
+                    );
+                case 'before':
+                    return (
+                        <div className="w-10 h-10 rounded-full bg-[rgba(149,150,151,0.5)] flex items-center justify-center flex-shrink-0">
+                            <span className="text-muted-foreground font-medium text-[23px] leading-none font-dm">
+                                {stepNumber}
+                            </span>
+                        </div>
+                    );
+            }
+        };
+
+        const getProgressWidth = () => {
+            switch (state) {
+                case 'after':
+                    return '100%';
+                case 'current':
+                    return `${progress}%`;
+                case 'before':
+                    return '0%';
+            }
+        };
+
+        const isGridLayout = className?.includes('contents');
+
+        if (isGridLayout) {
+            return (
+                <>
+                    {renderCircle()}
+                    <span className="text-primary font-bold text-[19px] leading-none font-dm whitespace-nowrap">
+                        {stepLabel}
+                    </span>
+                    <div className="h-2 rounded-lg bg-muted relative overflow-hidden">
+                        <div
+                            className="h-full rounded-lg bg-primary-foreground-2 transition-all duration-300 ease-in-out"
+                            style={{ width: getProgressWidth() }}
+                        />
+                    </div>
+                </>
+            );
+        }
+
+        return (
+            <div ref={ref} className={cn('flex items-center gap-3', className)} {...props}>
+                {renderCircle()}
+                <span className="text-primary font-bold text-[19px] leading-none font-dm whitespace-nowrap">
+                    {stepLabel}
+                </span>
+                <div className="flex-1 h-2 rounded-lg bg-muted relative overflow-hidden">
+                    <div
+                        className="h-full rounded-lg bg-primary-foreground-2 transition-all duration-300 ease-in-out"
+                        style={{ width: getProgressWidth() }}
+                    />
+                </div>
+            </div>
+        );
+    },
+);
+WizardProgress.displayName = 'WizardProgress';
+
 export {
     WizardStepper,
     WizardSteps,
@@ -280,4 +355,5 @@ export {
     WizardNavigation,
     WizardButton,
     InteractiveWizard,
+    WizardProgress,
 };
