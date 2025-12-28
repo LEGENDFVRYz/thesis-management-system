@@ -259,29 +259,40 @@ export default function ComponentsShowcase() {
                     <section className="space-y-6">
                         <h2 className="text-2xl font-semibold text-white">Breadcrumbs</h2>
 
-                        {[
+                        <Breadcrumbs breadcrumbs={[
+                            { title: 'Home', href: '/' },
+                            { title: 'Components', href: '/components' }
+                        ]} />
+
+                        <Breadcrumbs breadcrumbs={[
+                            { title: 'Home', href: '/' },
+                            { title: 'Components', href: '/components' },
+                            { title: 'Dashboard', href: '/dashboard' }
+                        ]} />
+
+                        <Breadcrumbs breadcrumbs={[
+                            { title: 'Home', href: '/' },
+                            { title: 'Components', href: '/components' },
+                            { title: 'Dashboard', href: '/dashboard' },
+                            { title: 'Settings', href: '/settings' }
+                        ]} />
+
+                        <Breadcrumbs breadcrumbs={[
+                            { title: 'Home', href: '/' },
+                            { title: 'Components', href: '/components' },
+                            { title: 'Dashboard', href: '/dashboard' },
+                            { title: 'Settings', href: '/settings' },
+                            { title: 'Profile', href: '/profile' }
+                        ]} />
+
+                        <Breadcrumbs breadcrumbs={[
                             { title: 'Home', href: '/' },
                             { title: 'Components', href: '/components' },
                             { title: 'Dashboard', href: '/dashboard' },
                             { title: 'Settings', href: '/settings' },
                             { title: 'Profile', href: '/profile' },
-                            { title: 'Delete Account', href: '' },
-                        ]
-                            // limit to max 6 items (5 ">")
-                            .slice(0, 6)
-                            // render variants incrementally
-                            .map((_, index, all) => {
-                                const items = all.slice(0, index + 2);
-
-                                return (
-                                    items.length >= 2 && (
-                                        <Breadcrumbs
-                                            key={index}
-                                            breadcrumbs={items}
-                                        />
-                                    )
-                                );
-                            })}
+                            { title: 'Delete Account', href: '' }
+                        ]} />
                     </section>
 
                     {/* User Info */}

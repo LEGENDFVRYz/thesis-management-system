@@ -15,7 +15,12 @@ const TabButton = React.forwardRef<HTMLButtonElement, TabButtonProps>(
                 'h-9 px-[15px] flex flex-col justify-center items-center gap-2.5',
                 'rounded-t-[10px] transition-colors',
                 'shadow-[inset_0_4px_4px_rgba(0,0,0,0.25)]',
-                isActive ? 'bg-[#9b000a]' : 'bg-primary', // Lighter when active (opposite)
+
+                // Base background
+                isActive
+                    ? 'bg-[#9b000a]'
+                    : 'bg-primary hover:bg-[#9b000a]',
+
                 className
             )}
             {...props}
