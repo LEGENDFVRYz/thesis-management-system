@@ -11,7 +11,7 @@ import { Alert } from '@/components/ui/alert';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, CardIcon, CardBadge, HeaderCard, MetricCard, ArchiveCard, GroupCard, CommitteeCard, EndorsementCard, AdviseeGroupCard } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -27,7 +27,7 @@ import { Icon } from '@/components/ui/icon';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from '@/components/ui/sidebar';
-import { HomeIcon, SettingsIcon, UsersIcon, Moon, Sun, Plus, Trash2, ArrowRight, Loader2, Settings, ChevronDown} from 'lucide-react';
+import { HomeIcon, SettingsIcon, UsersIcon, Moon, Sun, Plus, Trash2, ArrowRight, Loader2, Settings, ChevronDown, CheckCircleIcon, FileText, TrendingUp, Users, Calendar1Icon, BookAIcon, BookIcon, BookOpen, Eye, ClockIcon, PinIcon} from 'lucide-react';
 import { SwitchButton } from '@/components/ui/switch-button';
 import { cn } from '@/lib/utils';
 import { Tabs, TabButton } from '@/components/ui/tabs';
@@ -310,25 +310,109 @@ export default function UIShowcase() {
                         </Breadcrumb>
                     </section>
 
-                    {/* Card */}
+                    {/* ===== Cards ===== */}
                     <section className="space-y-4">
-                        <h2 className="text-2xl font-semibold text-white">Card</h2>
+                        <h2 className="text-2xl font-semibold text-white border-l-4 border-[#FFBD00] pl-4"> Cards </h2>
                         <div className="max-w-md">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="text-white">Card Title</CardTitle>
-                                    <CardDescription>Card description goes here</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-white">This is the card content area.</p>
-                                </CardContent>
-                                <CardFooter>
-                                    <Button>Action</Button>
-                                </CardFooter>
-                            </Card>
+
+                            {/* ===== Header Card (per page) ===== */}
+                            <h2 className="text-lg font-semibold text-white mb-4"> -- Header Card </h2>
+
+                           {/* Without icon yet */}
+                           {/* icon={} -> for adding an icon */} 
+                            <HeaderCard
+                            title="Card Title Here"
+                            description="Card Description"
+                            />
+
+                            {/* Metric Cards */}
+                            <h2 className="text-lg font-semibold text-white py-4 mb-4"> Metric Cards </h2>
+                        
+                            {/* Metric Card */}
+                            {/* icon={} -> for adding an icon */} 
+                            <h2 className='px-4'> Metric Card </h2>
+                            <MetricCard
+                            icon={<TrendingUp className="text-primary-foreground-2" />} 
+                            title="Card Title Here"
+                            >
+                            <div className='flex items-center justify-center h-full'>
+                                <p> Content Here </p>
+                            </div>
+                            </MetricCard>
+
+                            {/* Progress Card - Metric Card variant*/}
+                            <h2 className='px-4'> Progress Card  </h2>
+                            <MetricCard 
+                                variant="progress"
+                                groupCode="Group Code"
+                                thesisTitle="Thesis Title"
+                                currentStage="Stage Here"
+                                progress={80}
+                                statusBadge= "Badge Here"
+                            />
+
+                            {/* ===== Committee Card - Proposal Review ===== */}
+                            <h2 className="py-4 text-lg font-semibold text-white"> Committee Card</h2>
+                            <CommitteeCard
+                                thesisTitle="Thesis Title"
+                                adviserName="Adviser Name"
+                                blockSection="Block/Section"
+                                progress={10}
+                                currentStage={3}
+                                totalStages={6}
+                            />
+
+                            {/* ===== Archive Card ===== */}
+                            <div>
+                            <h2 className="text-lg font-semibold text-white mb-4"> Archive Card</h2>
+                            
+                            <ArchiveCard
+                                title="Thesis Title "
+                                members={["Member 1", "Member 2", "Member 3", "Member 4"]}
+                                date="Sample Date"
+                                badges={["Sample Badge 1", "Sample Badge 2", "Sample Badge 3"]}
+                            />
+                            </div>
+
+                            {/* ===== Group Card ===== */}
+                            <h2 className="text-lg font-semibold text-white"> Group Card </h2>
+                            <p className="text-sm text-gray-400"> Used in Student Management </p>
+                            <GroupCard
+                                groupCode="Group Code"
+                                groupDescription="Group Description"
+                                thesisTitle="Thesis Title"
+                                thesisStage="Thesis Stage"
+                                members={["Member 1", "Member 2", "Member 3", "Member 4"]}
+                                adviserName="Adviser Name"
+                                />
+
+                            {/* ===== Advisee Group Card (Thesis Adviser/Panel) ===== */}
+                            <h2 className="text-lg font-semibold text-white"> Advisee Group Card </h2>
+                            <AdviseeGroupCard
+                                groupCode="Group Code"
+                                badge="Badge Here"
+                                thesisTitle="Thesis Title Here"
+                                section="Section"
+                                numberofMembers='Number of Members Here'
+                                numberofSubmissions="5"
+                                lastSubmissionDate="Date Here"
+                            />
+
+                            {/* ===== Panel Endorsement Card ===== */}
+                            <h2 className="text-lg font-semibold text-white"> Panel Endorsement Card </h2>
+
+                            <EndorsementCard
+                                thesisTitle="Thesis Title Here"
+                                groupCode="Group Code"
+                                badge="Badge Here"
+                                proponents={["Proponent 1", "Proponent 2", "Proponent 3", "Proponent 4"]}
+                                block="BSCPE 3-3"
+                                adviserName="Adviser Name"
+                                approvalDate={new Date('2025-12-05')}
+                            />
                         </div>
                     </section>
-
+                                    
                     {/* Collapsible */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Collapsible</h2>
