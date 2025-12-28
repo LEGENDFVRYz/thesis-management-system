@@ -44,6 +44,9 @@ import { TimelineStepper, TimelineConnector, TimelineState } from '@/components/
 import NotificationModal from '@/components/modal/notification-modal';
 import { NotificationList, NotificationListItem } from '@/components/ui/notification-list';
 import StageSwitchToggle from '@/components/stage-toggle';
+import FileUpload from '@/components/file-upload';
+import FilePreview from '@/components/document-preview';
+import { Timeline } from '@/components/timeline';
 import { toast } from 'sonner';
 
 export default function UIShowcase() {
@@ -650,6 +653,7 @@ export default function UIShowcase() {
                     {/* Toggle */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Toggle</h2>
+                        <p className="text-sm text-gray-400">Single toggle buttons with normal, pressed, and disabled states</p>
                         <div className="flex gap-3">
                             <Toggle>Normal</Toggle>
                             <Toggle defaultPressed>Pressed</Toggle>
@@ -660,6 +664,7 @@ export default function UIShowcase() {
                     {/* Toggle Group */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Toggle Group</h2>
+                        <p className="text-sm text-gray-400">Group of connected toggle buttons for mutually exclusive options</p>
                         <ToggleGroup type="single" defaultValue="left">
                             <ToggleGroupItem value="left">Left</ToggleGroupItem>
                             <ToggleGroupItem value="center">Center</ToggleGroupItem>
@@ -1033,6 +1038,33 @@ export default function UIShowcase() {
                         <h2 className="text-2xl font-semibold text-white">Stage Switching Toggle</h2>
                         <p className="text-sm text-gray-400">Three-option toggle for MOR, DP1, and DP2 stages</p>
                         <StageSwitchToggle />
+                    </section>
+
+                    {/* File Upload */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">File Upload</h2>
+                        <p className="text-sm text-gray-400">Drag and drop or click to upload files with progress tracking</p>
+                        <div className="max-w-2xl">
+                            <FileUpload />
+                        </div>
+                    </section>
+
+                    {/* Document Preview */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Document Preview</h2>
+                        <p className="text-sm text-gray-400">Preview uploaded documents with action buttons</p>
+                        <div className="max-w-2xl">
+                            <FilePreview />
+                        </div>
+                    </section>
+
+                    {/* Timeline */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Timeline View</h2>
+                        <p className="text-sm text-gray-400">Academic timeline with events and milestones</p>
+                        <div className="max-w-4xl">
+                            <Timeline />
+                        </div>
                     </section>
 
                     {/* Color Palette */}
