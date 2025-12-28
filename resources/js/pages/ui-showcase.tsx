@@ -49,6 +49,7 @@ import FilePreview from '@/components/document-preview';
 import { Timeline } from '@/components/timeline';
 import { toast } from 'sonner';
 import { AppHeader } from '@/components/app-header';
+import { GlobalNavDropdown } from '@/components/app-header-management';
 
 export default function UIShowcase() {
     const [isCollapsibleOpen, setIsCollapsibleOpen] = useState(false);
@@ -97,6 +98,41 @@ export default function UIShowcase() {
     const bgClass = theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900";
     const sectionClass = theme === "dark" ? "bg-gray-800/50 border-gray-700" : "bg-white border-gray-200";
     const subTextClass = theme === "dark" ? "text-gray-400" : "text-gray-500";
+
+    // Faculty Management Dropdown Items (href to corresponding pages later)
+    const facultyManagementItems = [
+        { 
+            id: 'adviser', 
+            title: 'Adviser', 
+            children: [
+                { title: 'Advisee Management', href: '#', isHeader: true },
+                { title: 'My Advisees', href: '/adviser/my-advisees' },
+                { title: 'Group Composition', href: '/adviser/groups' },
+                { title: 'Thesis Review', href: '/adviser/review' },
+                { title: 'Progress Monitoring', href: '/adviser/monitoring' },
+                { title: 'Defense Management', href: '/adviser/defense' },
+                { title: 'Panel Endorsement', href: '/adviser/endorsement' },
+                { title: 'Evaluation and Grading', href: '#', isHeader: true },
+                { title: 'Grade Input', href: '/adviser/grades' },
+                { title: 'Rubrics and Guidelines', href: '/adviser/rubrics' }
+            ] 
+        },
+        { 
+            id: 'committee', 
+            title: 'Committee', 
+            children: [
+                { title: 'Proposal Review', href: '/committee/proposals' }
+            ] 
+        },
+        { 
+            id: 'panel', 
+            title: 'Panel', 
+            children: [
+                { title: 'Panel Thesis Review', href: '/panel/review' },
+                { title: 'Defense Management', href: '/panel/defense' }
+            ] 
+        }
+    ];
         
     return (
         <div className={`min-h-screen transition-colors duration-300 ${bgClass}`}>
@@ -754,6 +790,21 @@ export default function UIShowcase() {
                         <p className="text-sm text-gray-400">Main application header with branding, top navigation, and utility actions.</p>
 
                         <AppHeader breadcrumbs={[{ title: 'Home', href: '#' }, { title: 'Showcase', href: '#' }]} />
+                    </section>
+
+                    {/* Faculty List Dropdown Variants Section */}
+                    <section className="space-y-4" onMouseLeave={() => {/* Option to close menu when leaving section */}}>
+                        <h2 className="text-2xl font-semibold text-white">Faculty Management Dropdown</h2>
+                        <p className="text-sm text-muted-foreground">
+                            Hover over the tabs to see the specific management variants (Adviser, Committee, or Panel).
+                        </p>
+
+                        <div className="p-5 bg-background rounded-xl border border-border flex justify-start items-start min-h-[50px]">
+                            <GlobalNavDropdown 
+                                label="Management" 
+                                items={facultyManagementItems} 
+                            />
+                        </div>
                     </section>
 
                     {/* Placeholder Pattern */}
