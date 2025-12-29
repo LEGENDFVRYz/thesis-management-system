@@ -8,7 +8,7 @@ import Heading from '@/components/heading';
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
 import RoleToggle from '@/components/role-toggle';
-import StageSwitchToggle from '@/components/stage-switching';
+import StageSwitchToggle from '@/components/stage-toggle';
 import { TextLink } from '@/components/text-link';
 import { UserInfo } from '@/components/user-info';
 import { Icon } from '@/components/ui/icon';
@@ -43,6 +43,7 @@ import { SubmissionStatusChart } from "@/components/submission-status-bar";
 import { ArchivedJournalsChart } from "@/components/archived-journals-line";
 import { PerformanceOverviewChart } from "@/components/performance-overview-ver-bar";
 import { SubmissionStatusNonAdminChart } from "@/components/submission-status-bar-nonadmin";
+import { Timeline } from '@/components/timeline';
 
 
 export default function ComponentsShowcase() {
@@ -258,29 +259,40 @@ export default function ComponentsShowcase() {
                     <section className="space-y-6">
                         <h2 className="text-2xl font-semibold text-white">Breadcrumbs</h2>
 
-                        {[
+                        <Breadcrumbs breadcrumbs={[
+                            { title: 'Home', href: '/' },
+                            { title: 'Components', href: '/components' }
+                        ]} />
+
+                        <Breadcrumbs breadcrumbs={[
+                            { title: 'Home', href: '/' },
+                            { title: 'Components', href: '/components' },
+                            { title: 'Dashboard', href: '/dashboard' }
+                        ]} />
+
+                        <Breadcrumbs breadcrumbs={[
+                            { title: 'Home', href: '/' },
+                            { title: 'Components', href: '/components' },
+                            { title: 'Dashboard', href: '/dashboard' },
+                            { title: 'Settings', href: '/settings' }
+                        ]} />
+
+                        <Breadcrumbs breadcrumbs={[
+                            { title: 'Home', href: '/' },
+                            { title: 'Components', href: '/components' },
+                            { title: 'Dashboard', href: '/dashboard' },
+                            { title: 'Settings', href: '/settings' },
+                            { title: 'Profile', href: '/profile' }
+                        ]} />
+
+                        <Breadcrumbs breadcrumbs={[
                             { title: 'Home', href: '/' },
                             { title: 'Components', href: '/components' },
                             { title: 'Dashboard', href: '/dashboard' },
                             { title: 'Settings', href: '/settings' },
                             { title: 'Profile', href: '/profile' },
-                            { title: 'Delete Account', href: '' },
-                        ]
-                            // limit to max 6 items (5 ">")
-                            .slice(0, 6)
-                            // render variants incrementally
-                            .map((_, index, all) => {
-                                const items = all.slice(0, index + 2);
-
-                                return (
-                                    items.length >= 2 && (
-                                        <Breadcrumbs
-                                            key={index}
-                                            breadcrumbs={items}
-                                        />
-                                    )
-                                );
-                            })}
+                            { title: 'Delete Account', href: '' }
+                        ]} />
                     </section>
 
                     {/* User Info */}
@@ -413,8 +425,7 @@ export default function ComponentsShowcase() {
                                 <p className="text-sm text-gray-400 mb-2">Header Variant</p>
                                 <div className="border border-gray-600 rounded-lg p-4 bg-gray-700">
                                     <AppShell variant="header">
-                                        <div className="p-4 bg-gray-600 rounded text-white text-center">
-                                            Content goes here (with header variant)
+                                        <div className="p-4 rounded text-white text-center">
                                         </div>
                                     </AppShell>
                                 </div>
@@ -423,8 +434,7 @@ export default function ComponentsShowcase() {
                                 <p className="text-sm text-gray-400 mb-2">Sidebar Variant (with SidebarProvider)</p>
                                 <div className="border border-gray-600 rounded-lg p-4 bg-gray-700">
                                     <AppShell variant="sidebar">
-                                        <div className="p-4 bg-gray-600 rounded text-white text-center">
-                                            Content goes here (with sidebar variant)
+                                        <div className="p-4 rounded text-white text-center">
                                         </div>
                                     </AppShell>
                                 </div>
@@ -787,6 +797,23 @@ export default function ComponentsShowcase() {
                                     <SubmissionStatusNonAdminChart />
                                 </CardContent>
                             </Card>
+
+
+
+                            {/* Timeline */}
+                            <section className="space-y-4">
+                            <h2 className="text-2xl font-semibold text-white">Timeline</h2>
+                            <Card className="bg-transparent border-gray-600">
+                                <CardHeader>
+                                <CardTitle className="text-white">Thesis Events Timeline</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                <div className="max-w-[820px]">
+                                    <Timeline />
+                                </div>
+                                </CardContent>
+                            </Card>
+                            </section>
                         </div>
                     </section>
                 </div>

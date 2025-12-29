@@ -34,8 +34,8 @@ export default function RoleToggle({
                 className={cn(
                     "flex-1 h-full rounded-[10px] transition-all duration-200 font-['DM_Sans:Medium',sans-serif] font-medium text-[12px]",
                     currentRole === 'student'
-                        ? "bg-[#730000] text-white"
-                        : "bg-transparent text-[#730000] hover:bg-white hover:border hover:border-[#730000]"
+                        ? "bg-primary text-white"
+                        : "bg-transparent text-primary hover:bg-white hover:border hover:border-primary"
                 )}
             >
                 Student
@@ -48,8 +48,8 @@ export default function RoleToggle({
                 className={cn(
                     "flex-1 h-full rounded-[10px] transition-all duration-200 font-['DM_Sans:Medium',sans-serif] font-medium text-[12px]",
                     currentRole === 'faculty'
-                        ? "bg-[#730000] text-white"
-                        : "bg-transparent text-[#730000] hover:bg-white hover:border hover:border-[#730000]"
+                        ? "bg-primary text-white"
+                        : "bg-transparent text-primary hover:bg-white hover:border hover:border-primary"
                 )}
             >
                 Faculty
