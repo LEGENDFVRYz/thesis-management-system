@@ -15,15 +15,21 @@ interface NavItem {
     }[];
 }
 
+interface Props {
+    label?: string;
+    items: NavItem[];
+    variant?: 'faculty' | 'admin';
+}
+
 export function GlobalNavDropdown({ 
     label = "Management", 
-    items = [] 
-}: { 
-    label: string; 
-    items: NavItem[] 
-}) {
+    items = [],
+    variant = 'faculty'
+}: Props) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<string | null>(null);
+
+    const isAdmin = variant === 'admin';
 
     return (
         <div 
@@ -34,74 +40,123 @@ export function GlobalNavDropdown({
                 setActiveTab(null);
             }}
         >
-            {/* TRIGGER BUTTON: Primary variant gamit ang maroon/yellow variables */}
+            {/* --- TRIGGER BUTTON --- */}
             <Button
                 variant="primary"
                 className={cn(
-                    "w-40 text-sm font-medium transition-all rounded-md flex items-center justify-between",
-                    isMenuOpen && "text-[var(--primary-foreground-2)] bg-primary"
+                    "w-fit h-10 px-4 transition-all rounded-md flex items-center justify-start gap-5 border-none shadow-md",
+                    /* Combined the hover states for clarity */
+                    "bg-primary text-background hover:bg-destructive", 
+                    /* Added underline and ensured text remains yellow on hover */
+                    "hover:text-primary-foreground-2 hover:underline", 
+                    "text-sm font-semibold tracking-wide"
                 )}
             >
-                {label}
-                <ChevronDown className={cn("size-3 transition-transform duration-200", isMenuOpen && "rotate-180")} />
+                <span>{label}</span>
+                <ChevronDown className={cn(
+                    "size-4 transition-transform duration-300", 
+                    isMenuOpen && "rotate-180"
+                )} />
             </Button>
 
-            {/* MAIN DROPDOWN */}
+            {/* --- MAIN DROPDOWN CONTAINER --- */}
             {isMenuOpen && (
-                <div className="absolute left-0 top-full mt-1 flex items-start animate-in fade-in zoom-in-95 duration-200 z-[100]">
-                    <div className="w-40 rounded-b-xl bg-[var(--primary)] border border-white/10 overflow-visible">
-                        {items.map((item) => (
-                            <div key={item.id} onMouseEnter={() => setActiveTab(item.id)} className="relative">
-                                <Link 
-                                    href={item.href || '#'} 
-                                    className={cn(
-                                        "flex items-center justify-between px-4 py-2.5 cursor-pointer transition-all duration-200 no-underline hover:no-underline",
-                                        activeTab === item.id 
-                                            ? "bg-[var(--sidebar-gradient-mid)] text-[var(--primary-foreground-2)]" 
-                                            : "text-white/80 hover:text-white"
-                                    )}
-                                >
-                                    <span className="text-xs font-bold uppercase tracking-wider">{item.title}</span>
-                                    {item.children && <ChevronRight className="size-3 opacity-50" />}
-                                </Link>
+                <div className={cn(
+                    "absolute left-0 top-full mt-1 flex flex-col animate-in fade-in zoom-in-95 duration-200 z-[100]",
+                    "w-full"
+                )}>
+                    
+                    {isAdmin ? (
+                        /* --- ADMIN VARIANT --- */
+                        <div className="w-full rounded-b-xl bg-primary borderbackdrop-blur-sm">
+                            {items[0]?.children?.map((sub, idx) => {
+                                const isCategory = sub.isHeader || 
+                                    ["User Management", "System Configuration", "Defense Management", "Panel Endorsement"].includes(sub.title);
 
-                                {/* SUB-MENU DRILL DOWN */}
-                                {activeTab === item.id && item.children && (
-                                    <div className="absolute left-full top-0 ml-1 w-48 z-[110]">
-                                        <div className="rounded-r-xl py-2 bg-[var(--primary)] border border-white/10 shadow-2xl animate-in fade-in slide-in-from-left-1 duration-150">
-                                            {item.children.map((sub, idx) => {
-                                                {/* Logic para sa Indentation: Pantay sa header (pl-4) kung ito ay header o special clickable item */}
-                                                const isHeaderLevel = sub.isHeader || 
-                                                    ["Defense Management", "Panel Endorsement", "Proposal Review", "Panel Thesis Review"].includes(sub.title);
-
-                                                return (
-                                                    <div key={idx} className={cn(
-                                                        "px-4 transition-colors",
-                                                        sub.isHeader 
-                                                            ? "text-white/40 pt-3 pb-1 text-[9px] uppercase tracking-widest font-black pointer-events-none" 
-                                                            : "text-white py-1.5 text-[11px] hover:bg-[var(--sidebar-gradient-mid)] cursor-pointer",
-                                                        /* Indentation logic: pl-4 para sa headers/main items, pl-10 para sa nested */
-                                                        isHeaderLevel ? "pl-4" : "pl-10"
-                                                    )}>
-                                                        {sub.isHeader ? (
-                                                            sub.title
-                                                        ) : (
-                                                            <Link 
-                                                                href={sub.href} 
-                                                                className="text-sm text-white no-underline hover:no-underline block w-full"
-                                                            >
-                                                                {sub.title}
-                                                            </Link>
-                                                        )}
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
+                                return (
+                                    <div key={idx} className={cn(
+                                        "px-4 transition-all duration-200",
+                                        sub.isHeader 
+                                            ? "text-primary-foreground-2 pt-2 pb-2 text-[10px] uppercase font-bold tracking-[0.15em] pointer-events-none" 
+                                            : "text-background/90 py-1.5 hover:bg-background/10 hover:text-background cursor-pointer group",
+                                        isCategory ? "pl-4" : "pl-10"
+                                    )}>
+                                        {sub.isHeader ? (
+                                            sub.title
+                                        ) : (
+                                            <Link href={sub.href} className="text-[13px] text-background no-underline block w-full">
+                                                {sub.title}
+                                            </Link>
+                                        )}
                                     </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        /* --- FACULTY VARIANT --- */
+                        <div className="w-full rounded-b-xl bg-primary border border-background/10 overflow-visible shadow-xl">
+                            {items.map((item) => (
+                                <div 
+                                    key={item.id} 
+                                    onMouseEnter={() => setActiveTab(item.id)} 
+                                    className="relative"
+                                >
+                                    <div 
+                                        className={cn(
+                                            "flex items-center justify-between px-4 py-2.5 cursor-default transition-all duration-200",
+                                            activeTab === item.id 
+                                                ? "bg-background/10 text-primary-foreground-2" 
+                                                : "text-background/80 hover:text-background hover:bg-background/5"
+                                        )}
+                                    >
+                                        <span className="text-[11px] font-bold uppercase tracking-wider">{item.title}</span>
+                                        {item.children && <ChevronRight className="size-3 opacity-50" />}
+                                    </div>
+
+                                    {/* --- Sub-Menu Fly-out --- */}
+                                    {activeTab === item.id && item.children && (
+                                        <div className="absolute left-full top-0 ml-1 h-full w-full z-[110]">
+                                            <div className="rounded-r-xl bg-primary border border-background/10 shadow-2xl animate-in fade-in slide-in-from-left-2 duration-200">
+                                                {item.children.map((sub, idx) => {
+                                                    /* INDENTATION LOGIC:
+                                                       These titles are aligned to the left (pl-4). 
+                                                       Everything else is indented (pl-10).
+                                                    */
+                                                    const isSubCategory = sub.isHeader || 
+                                                        [
+                                                            "Advisee Management", 
+                                                            "Evaluation and Grading", 
+                                                            "Defense Management", 
+                                                            "Panel Endorsement",
+                                                            "Proposal Review",
+                                                            "Panel Thesis Review"
+                                                        ].includes(sub.title);
+
+                                                    return (
+                                                        <div key={idx} className={cn(
+                                                            "px-4 transition-colors",
+                                                            sub.isHeader 
+                                                                ? "text-primary-foreground-2 pt-2 pb-2 text-[10px] uppercase font-bold tracking-[0.15em] pointer-events-none" 
+                                                                : "text-background/90 py-2.5 hover:bg-background/10 hover:text-background",
+                                                            isSubCategory ? "pl-4" : "pl-10"
+                                                        )}>
+                                                            {sub.isHeader ? (
+                                                                sub.title
+                                                            ) : (
+                                                                <Link href={sub.href} className="text-background text-xs block w-full no-underline">
+                                                                    {sub.title}
+                                                                </Link>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             )}
         </div>

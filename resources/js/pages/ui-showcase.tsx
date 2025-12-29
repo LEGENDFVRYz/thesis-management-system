@@ -137,6 +137,23 @@ export default function UIShowcase() {
             ] 
         }
     ];
+
+    const adminManagementItems = [
+        { 
+            id: 'admin-root', 
+            title: 'Root', // This label won't show in Admin mode
+            children: [
+                { title: 'User Management', href: '#', isHeader: true },
+                { title: 'Faculty', href: '/admin/faculty' },
+                { title: 'Student', href: '/admin/student' },
+                { title: 'System Configuration', href: '#', isHeader: true },
+                { title: 'Academic Settings', href: '/admin/academic' },
+                { title: 'Deadline', href: '/admin/deadline' },
+                { title: 'Department Policies', href: '/admin/policies' },
+                { title: 'Defense Management', href: '/admin/defense' }, // No header needed, it's a main item
+            ] 
+        }
+    ];
     
     return (
         <div className={`min-h-screen transition-colors duration-300 ${bgClass}`}>
@@ -901,10 +918,17 @@ export default function UIShowcase() {
                             Hover over the tabs to see the specific management variants (Adviser, Committee, or Panel).
                         </p>
 
-                        <div className="p-5 bg-background rounded-xl border border-border flex justify-start items-start min-h-[50px]">
+                        <div className="p-5 bg-background rounded-xl border border-border flex justify-start gap-10 items-start min-h-[50px]">
                             <GlobalNavDropdown 
-                                label="Management" 
-                                items={facultyManagementItems} 
+                            label="Management" 
+                            variant="admin" 
+                            items={adminManagementItems} 
+                            />
+
+                            <GlobalNavDropdown 
+                            label="Management" 
+                            variant="faculty" 
+                            items={facultyManagementItems} 
                             />
                         </div>
                     </section>
