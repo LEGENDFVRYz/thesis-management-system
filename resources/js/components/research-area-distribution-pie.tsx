@@ -186,7 +186,7 @@ export function ResearchAreaChart({ totalGroups, className = "" }: ResearchAreaC
                 flexShrink: 0,
               }}
             />
-            {item.name}
+            <span style={{ color: "#000000" }}>{item.name}</span>
           </div>
         ))}
       </div>

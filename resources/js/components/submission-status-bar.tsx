@@ -82,7 +82,7 @@ const CustomLegend = () => (
       gap: "16px",
       marginTop: "16px",
       fontSize: "13px",
-      color: "#374151",
+      color: "#000000",
       alignItems: "center",
     }}
   >
