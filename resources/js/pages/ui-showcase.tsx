@@ -12,8 +12,8 @@ import { Spinner, SpinnerCard, StatusBadge } from '@/components/ui/spinner';
 import { Alert } from '@/components/ui/alert';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, CardIcon, CardBadge, HeaderCard, MetricCard, ArchiveCard, GroupCard, CommitteeCard, EndorsementCard, AdviseeGroupCard } from '@/components/ui/card';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, CardIcon, CardBadge, HeaderCard, MetricCard, ArchiveCard, GroupCard, CommitteeCard, EndorsementCard, AdviseeGroupCard} from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -326,21 +326,7 @@ export default function UIShowcase() {
                     {/* Breadcrumb */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Breadcrumb</h2>
-                        <Breadcrumb>
-                            <BreadcrumbList>
-                                <BreadcrumbItem>
-                                    <BreadcrumbLink href="/" className="text-white">Home</BreadcrumbLink>
-                                </BreadcrumbItem>
-                                <BreadcrumbSeparator />
-                                <BreadcrumbItem>
-                                    <BreadcrumbLink href="/components" className="text-white">Components</BreadcrumbLink>
-                                </BreadcrumbItem>
-                                <BreadcrumbSeparator />
-                                <BreadcrumbItem>
-                                    <BreadcrumbPage className="text-white">Breadcrumb</BreadcrumbPage>
-                                </BreadcrumbItem>
-                            </BreadcrumbList>
-                        </Breadcrumb>
+                        <Breadcrumb items={["Home", "Components", "Dashboard"]} />
                     </section>
 
                     {/* ===== Cards ===== */}
