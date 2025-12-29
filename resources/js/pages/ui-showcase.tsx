@@ -4,7 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { CheckboxWithLabel } from '@/components/ui/checkbox-with-label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { RadioGroupItemWithLabel } from '@/components/ui/radio-group-with-label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Spinner, SpinnerCard, StatusBadge } from '@/components/ui/spinner';
 import { Alert } from '@/components/ui/alert';
@@ -21,12 +23,14 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { Skeleton } from '@/components/ui/skeleton';
 import { Toggle } from '@/components/ui/toggle';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { WizardStepper, WizardSteps, WizardStep, InteractiveWizard } from '@/components/ui/wizard-stepper';
+import { WizardStepper, WizardSteps, WizardStep, InteractiveWizard, WizardProgress } from '@/components/ui/wizard-stepper';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Icon } from '@/components/ui/icon';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from '@/components/ui/sidebar';
+import { DefaultHeader, RowColumn1Header, MethodologyHeader, ScheduledHeader, RevisionHeader, GradedHeader } from '@/components/ui/headers';
+import { DefaultRows, RowColumn1, MethodologyRow, ScheduledRow, RevisionRow, GradedRow } from '@/components/ui/rows';
 import { HomeIcon, SettingsIcon, UsersIcon, Moon, Sun, Plus, Trash2, ArrowRight, Loader2, Settings, ChevronDown, ChevronRight , CheckCircleIcon, FileText, TrendingUp, Users, Calendar1Icon, BookAIcon, BookIcon, BookOpen, Eye, ClockIcon, PinIcon} from 'lucide-react';   
 import { SwitchButton } from '@/components/ui/switch-button';
 import { cn } from '@/lib/utils';
@@ -108,7 +112,7 @@ export default function UIShowcase() {
                     <header className="flex justify-between items-end border-b border-gray-700 pb-8">
                         <div>
                             <h1 className="text-4xl font-bold mb-2 text-white">UI Components Showcase</h1>
-                            <p className="text-gray-300">Preview of all available UI components (37 total + 4 charts)</p>
+                            <p className="text-gray-300">Preview of all available UI components (40+ UI primitives + 4 charts + 12 table variants)</p>
                         </div>
                         <Button variant="tertiary" size="icon" onClick={toggleTheme} className="rounded-full shadow-inner border-2">
                             {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
@@ -209,6 +213,20 @@ export default function UIShowcase() {
                         </div>
                     </section>
 
+                    {/* Radio Group With Label */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Radio Group With Label (Integrated)</h2>
+                        <p className="text-sm text-gray-400">Radio items with labels that change weight and color on selection</p>
+                        <div className="max-w-md bg-white p-6 rounded-lg">
+                            <Label className="text-black mb-3 block">Select your preferred contact method</Label>
+                            <RadioGroup defaultValue="email" className="space-y-3">
+                                <RadioGroupItemWithLabel value="email" id="contact-email" label="Email" />
+                                <RadioGroupItemWithLabel value="phone" id="contact-phone" label="Phone" />
+                                <RadioGroupItemWithLabel value="sms" id="contact-sms" label="SMS" />
+                            </RadioGroup>
+                        </div>
+                    </section>
+
                     {/* Checkboxes */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Checkboxes</h2>
@@ -231,6 +249,17 @@ export default function UIShowcase() {
                                     Disabled checkbox
                                 </Label>
                             </div>
+                        </div>
+                    </section>
+
+                    {/* Checkbox With Label */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Checkbox With Label (Integrated)</h2>
+                        <p className="text-sm text-gray-400">Checkbox with label that changes state on hover and checked</p>
+                        <div className="space-y-3 max-w-md bg-white p-6 rounded-lg">
+                            <CheckboxWithLabel id="option1" label="Enable notifications" />
+                            <CheckboxWithLabel id="option2" label="Subscribe to newsletter" defaultChecked />
+                            <CheckboxWithLabel id="option3" label="Remember my preferences" />
                         </div>
                     </section>
 
@@ -483,7 +512,80 @@ export default function UIShowcase() {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </section>
-                    
+
+                    {/* Wizard Progress */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Wizard Progress</h2>
+                        
+                        <div className="space-y-6">
+                            <div>
+                                <h3 className="text-lg font-semibold mb-4 text-white">Individual States</h3>
+                                <div className="space-y-4">
+                                    <div className="bg-transparent rounded-xl p-6">
+                                        <p className="text-sm text-gray-400 mb-4 font-dm">After State (Completed)</p>
+                                        <WizardProgress
+                                            stepNumber={1}
+                                            stepLabel="Step 1"
+                                            state="after"
+                                        />
+                                    </div>
+                                    
+                                    <div className="bg-transparent rounded-xl p-6">
+                                        <p className="text-sm text-gray-400 mb-4 font-dm">Current State (In Progress)</p>
+                                        <WizardProgress
+                                            stepNumber={2}
+                                            stepLabel="Step 2"
+                                            state="current"
+                                            progress={50}
+                                        />
+                                    </div>
+                                    
+                                    <div className="bg-transparent rounded-xl p-6">
+                                        <p className="text-sm text-gray-400 mb-4 font-dm">Before State (Incomplete)</p>
+                                        <WizardProgress
+                                            stepNumber={3}
+                                            stepLabel="Step 3"
+                                            state="before"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 className="text-lg font-semibold mb-4 text-white">States Example</h3>
+                                <div className="bg-transparent rounded-xl p-8">
+                                    <div className="grid grid-cols-[auto_auto_1fr] gap-x-3 gap-y-6 items-center">
+                                        <WizardProgress
+                                            stepNumber={1}
+                                            stepLabel="Personal Information"
+                                            state="after"
+                                            className="contents"
+                                        />
+                                        <WizardProgress
+                                            stepNumber={2}
+                                            stepLabel="Academic Background"
+                                            state="after"
+                                            className="contents"
+                                        />
+                                        <WizardProgress
+                                            stepNumber={3}
+                                            stepLabel="Document Upload"
+                                            state="current"
+                                            progress={75}
+                                            className="contents"
+                                        />
+                                        <WizardProgress
+                                            stepNumber={4}
+                                            stepLabel="Review and Submit"
+                                            state="before"
+                                            className="contents"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>    
+
                     {/* Wizard Stepper */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Wizard Stepper</h2>
@@ -935,6 +1037,70 @@ export default function UIShowcase() {
                         </div>
                     </section>
 
+                    {/* Custom Table Headers & Rows */}
+                    <section className="space-y-8">
+                        <h2 className="text-2xl font-semibold text-white">Custom Table Headers & Rows</h2>
+                        <p className="text-sm text-gray-400">Specialized table header and row components with different variants</p>
+
+                        <div className="space-y-6">
+                            {/* Default */}
+                            <div>
+                                <h3 className="text-lg font-semibold mb-3 text-white">Default</h3>
+                                <div className="overflow-hidden rounded-lg">
+                                    <DefaultHeader />
+                                    <DefaultRows />
+                                </div>
+                            </div>
+
+                            {/* Row Column 1 */}
+                            <div>
+                                <h3 className="text-lg font-semibold mb-3 text-white">Extended Row (9 Columns)</h3>
+                                <div className="overflow-x-auto">
+                                    <div className="min-w-[1200px]">
+                                        <RowColumn1Header />
+                                        <RowColumn1 />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Methodology */}
+                            <div>
+                                <h3 className="text-lg font-semibold mb-3 text-white">Methodology Change</h3>
+                                <div className="overflow-hidden rounded-lg">
+                                    <MethodologyHeader />
+                                    <MethodologyRow />
+                                </div>
+                            </div>
+
+                            {/* Scheduled */}
+                            <div>
+                                <h3 className="text-lg font-semibold mb-3 text-white">Scheduled Defenses</h3>
+                                <div className="overflow-hidden rounded-lg">
+                                    <ScheduledHeader />
+                                    <ScheduledRow />
+                                </div>
+                            </div>
+
+                            {/* Revision */}
+                            <div>
+                                <h3 className="text-lg font-semibold mb-3 text-white">For Revision</h3>
+                                <div className="overflow-hidden rounded-lg">
+                                    <RevisionHeader />
+                                    <RevisionRow />
+                                </div>
+                            </div>
+
+                            {/* Graded */}
+                            <div>
+                                <h3 className="text-lg font-semibold mb-3 text-white">Graded Submissions</h3>
+                                <div className="overflow-hidden rounded-lg">
+                                    <GradedHeader />
+                                    <GradedRow />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
                     {/* Popover */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Popover</h2>
@@ -1061,8 +1227,13 @@ export default function UIShowcase() {
                         <p className="text-sm text-gray-400">Preview uploaded documents with action buttons</p>
                         <div className="max-w-2xl">
                             <FilePreview
-                                fileUrl="#"
-                                fileName="No document yet"
+                                fileUrl="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+                                fileName="Sample_Thesis_Document.pdf"
+                                fileType="pdf"
+                                fileSize="2.4 MB"
+                                onDownload={() => console.log('Download clicked')}
+                                onEdit={() => console.log('Edit clicked')}
+                                onDelete={() => console.log('Delete clicked')}
                             />
                         </div>
                     </section>

@@ -45,6 +45,10 @@ Route::get('/components-showcase', function () {
     return Inertia::render('components-showcase');
 })->name('components-showcase');
 
+Route::get('/badges-icons-showcase', function () {
+    return Inertia::render('badges-icons-showcase');
+})->name('badges-icons-showcase');
+
 // FAQ Page
 Route::get('/faq', function () {
     return Inertia::render('faq');
@@ -56,11 +60,29 @@ Route::get('/faq', function () {
 // });
 
 
-// PUBLIC ARCHIVE
-Route::prefix('repository')->group(function () {
-    Route::redirect('/', 'repository/thesis')->name('repository.index');
+// GUEST ROUTES
+Route::prefix('guest')->group(function () {
+    Route::get('/', function () {
+        return Inertia::render('Guest/landing');
+    })->name('guest.landing');
 
-    Route::get('thesis', [ThesisArchive::class, 'index'])->name('repository.theses');
+    Route::get('/repository', function () {
+        return Inertia::render('Guest/repository');
+    })->name('guest.repository');
+
+    Route::get('/search', function () {
+        return Inertia::render('Guest/filter-search');
+    })->name('guest.search');
+
+    Route::get('/preview', function () {
+        return Inertia::render('Guest/document-preview');
+    })->name('guest.preview');
+});
+
+// PUBLIC ARCHIVE (legacy routes - redirect to guest)
+Route::prefix('repository')->group(function () {
+    Route::redirect('/', '/guest/repository')->name('repository.index');
+    Route::redirect('thesis', '/guest/repository')->name('repository.theses');
 });
 
 

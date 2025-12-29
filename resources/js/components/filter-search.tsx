@@ -2,8 +2,12 @@ import { useState } from "react";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { RadioGroupItemWithLabel } from "@/components/ui/radio-group-with-label";
 import { CheckboxWithLabel } from "@/components/ui/checkbox-with-label";
-import { Button } from "@/components/ui/button"; 
-import { Search } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { YearRangePicker } from "@/components/acad-year-range-picker";
+import { Search, X, Calendar, Plus } from 'lucide-react';
+import { SecondarySort } from './icons/secondary-sort';
 
 
 /* =======================
@@ -316,6 +320,188 @@ export function SearchBar() {
       {/* Search button */}
       <div className="flex items-center justify-center h-[44px] w-[46px] bg-primary rounded-r-md cursor-pointer">
         <Search className="w-6 h-6 text-white" />
+      </div>
+    </div>
+  );
+}
+
+/* =======================
+   REPO FILTER - Repository Filter
+======================= */
+export function RepoFilter({ onClose, onApply }: { onClose?: () => void; onApply?: (tags: string[]) => void }) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedYear, setSelectedYear] = useState<Date | undefined>(new Date(2024, 0, 1));
+  const [removableTags, setRemovableTags] = useState([
+    "Computer Vision",
+    "Deep Learning",
+    "Internet of Things",
+    "Machine Learning",
+    "Neural Networks"
+  ]);
+  const [selectedSpecializations, setSelectedSpecializations] = useState<string[]>([]);
+  const [sortState, setSortState] = useState<'default' | 'hovered' | 'clicked'>('default');
+
+  const specializationOptions = [
+    "Big Data",
+    "Computer Network",
+    "Machine Learning",
+    "System Development"
+  ];
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setRemovableTags(removableTags.filter(tag => tag !== tagToRemove));
+  };
+
+  const handleToggleSpecialization = (spec: string) => {
+    if (selectedSpecializations.includes(spec)) {
+      setSelectedSpecializations(selectedSpecializations.filter(s => s !== spec));
+    } else {
+      setSelectedSpecializations([...selectedSpecializations, spec]);
+    }
+  };
+
+  const handleReset = () => {
+    setSearchTerm("");
+    setSelectedYear(new Date(2024, 0, 1));
+    setRemovableTags([]);
+    setSelectedSpecializations([]);
+  };
+
+  const handleApplyClick = () => {
+    onApply?.(removableTags);
+    onClose?.();
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+      {/* Header with Close Button */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-bold text-primary font-['DM_Sans']">
+          Apply Filter
+        </h2>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        )}
+      </div>
+
+      <div className="border-t mb-6" />
+
+      {/* Search Term */}
+      <div className="mb-6">
+        <label className="block font-medium text-gray-900 mb-2 font-['DM_Sans']">
+          Search Term
+        </label>
+        <Input
+          type="text"
+          inputSize="filter"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Keywords, Titles, Students..."
+        />
+      </div>
+
+      {/* Year */}
+      <div className="mb-6">
+        <label className="block font-medium text-gray-900 mb-2 font-['DM_Sans']">
+          Year
+        </label>
+        <YearRangePicker
+          value={selectedYear}
+          onChange={setSelectedYear}
+          placeholder="Academic Year"
+          mode="dropdown"
+          inputSize="filter"
+        />
+      </div>
+
+      {/* Removable Tags */}
+      <div className="mb-6">
+        <label className="block font-medium text-gray-900 mb-2 font-['DM_Sans']">
+          Removable Tags
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {removableTags.map((tag) => (
+            <span
+              key={tag}
+              className="inline-flex items-center gap-1 px-3 py-1 bg-white border border-primary text-primary rounded-full text-xs font-medium font-['DM_Sans']"
+            >
+              {tag}
+              <button
+                onClick={() => handleRemoveTag(tag)}
+                className="hover:bg-primary/10 rounded-full p-0.5 transition-colors"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          ))}
+          <button className="inline-flex items-center gap-1 px-3 py-1 bg-white border border-dashed border-gray-400 text-gray-600 rounded-full text-xs font-medium font-['DM_Sans'] hover:border-primary hover:text-primary transition-colors">
+            <Plus className="w-3 h-3" />
+            Add Tag
+          </button>
+        </div>
+      </div>
+
+      {/* Specialization */}
+      <div className="mb-6">
+        <label className="block font-medium text-gray-900 mb-2 font-['DM_Sans']">
+          Specialization
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {specializationOptions.map((spec) => (
+            <button
+              key={spec}
+              onClick={() => handleToggleSpecialization(spec)}
+              className={`px-3 py-1 rounded-full text-xs font-medium font-['DM_Sans'] transition-colors ${
+                selectedSpecializations.includes(spec)
+                  ? 'bg-primary text-white border border-primary'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:border-primary hover:text-primary'
+              }`}
+            >
+              {spec}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Bottom Action Buttons */}
+      <div className="flex items-center justify-end gap-3 pt-4 border-t">
+        <button
+          onClick={() => {
+            setSortState('clicked');
+            setTimeout(() => setSortState('default'), 200);
+            console.log('Sort clicked');
+          }}
+          onMouseEnter={() => sortState === 'default' && setSortState('hovered')}
+          onMouseLeave={() => sortState === 'hovered' && setSortState('default')}
+          className="transition-colors"
+        >
+          <SecondarySort state={sortState} />
+        </button>
+        <Button
+          variant="outline"
+          onClick={handleReset}
+        >
+          Reset
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={onClose}
+          className="font-['DM_Sans']"
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="negative"
+          onClick={handleApplyClick}
+          className="font-['DM_Sans']"
+        >
+          Apply All Filters
+        </Button>
       </div>
     </div>
   );
