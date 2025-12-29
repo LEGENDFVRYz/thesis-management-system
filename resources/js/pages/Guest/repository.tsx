@@ -6,11 +6,21 @@ import { NavFooter } from '@/components/nav-footer';
 import { ArchiveCard } from '@/components/ui/card';
 import { RepositoryFilterBar } from '@/components/repository-filter-bar';
 
-interface RepositoryProps {
-    search?: string;
+interface Archive {
+    journal_id: number;
+    title: string;
+    date_archived: string;
+    tags: string | null;
+    authors: string | null;
+    author_user_ids: string | null;
 }
 
-export default function GuestRepository({ search = '' }: RepositoryProps) {
+interface RepositoryProps {
+    search?: string;
+    archives?: Archive[];
+}
+
+export default function GuestRepository({ search = '', archives = [] }: RepositoryProps) {
     const [filters, setFilters] = React.useState<{
         searchTerm: string;
         selectedYear: Date | undefined;
@@ -23,117 +33,16 @@ export default function GuestRepository({ search = '' }: RepositoryProps) {
         tags: []
     });
 
-    // Sample repository data
-    const allRepositories = [
-        {
-            title: 'Machine Learning Applications in Healthcare Diagnostics',
-            members: ['John Doe', 'Jane Smith', 'Mike Johnson', 'John Doe'],
-            date: 'December 2025',
-            badges: ['Computer Vision', 'Neural Networks']
-        },
-        {
-            title: 'IoT-Based Smart Home Automation System',
-            members: ['Alice Brown', 'Bob Wilson'],
-            date: 'March 2023',
-            badges: ['Internet of Things', 'Embedded Systems']
-        },
-        {
-            title: 'Web-Based E-Commerce Platform with AI Recommendations',
-            members: ['Charlie Davis', 'Diana Evans', 'Frank Green'],
-            date: 'October 2024',
-            badges: ['Web Development', 'Machine Learning']
-        },
-        {
-            title: 'Mobile Application for Real-Time Traffic Monitoring',
-            members: ['Grace Harris', 'Henry Lee'],
-            date: 'June 2022',
-            badges: ['Mobile Development', 'Big Data']
-        },
-        {
-            title: 'Blockchain-Based Voting System',
-            members: ['Ivy Martinez', 'Jack Nelson'],
-            date: 'August 2025',
-            badges: ['Blockchain', 'Cybersecurity']
-        },
-        {
-            title: 'Natural Language Processing for Sentiment Analysis',
-            members: ['Kate Robinson', 'Leo Turner'],
-            date: 'January 2024',
-            badges: ['Deep Learning', 'Machine Learning']
-        },
-        {
-            title: 'Augmented Reality Educational Tool',
-            members: ['Maya White', 'Noah Young'],
-            date: 'November 2023',
-            badges: ['AR', 'Computer Vision']
-        },
-        {
-            title: 'Cloud-Based Student Information System',
-            members: ['Olivia Anderson', 'Peter Clark'],
-            date: 'May 2025',
-            badges: ['Cloud Computing', 'System Development']
-        },
-        {
-            title: 'Predictive Maintenance System Using Deep Learning',
-            members: ['Sarah Johnson', 'Tom Baker'],
-            date: 'September 2022',
-            badges: ['Deep Learning', 'Internet of Things']
-        },
-        {
-            title: 'Automated Code Review Tool with Neural Networks',
-            members: ['Emma Wilson', 'James Miller'],
-            date: 'April 2024',
-            badges: ['Neural Networks', 'System Development']
-        },
-        {
-            title: 'Smart Agriculture Monitoring Platform',
-            members: ['Lucas Garcia', 'Sophia Martinez'],
-            date: 'February 2023',
-            badges: ['Internet of Things', 'Big Data']
-        },
-        {
-            title: 'Computer Vision for Autonomous Vehicle Navigation',
-            members: ['Oliver Taylor', 'Ava Anderson'],
-            date: 'July 2025',
-            badges: ['Computer Vision', 'Machine Learning']
-        },
-        {
-            title: 'Distributed Computing Framework for Big Data Processing',
-            members: ['Liam Thomas', 'Isabella Jackson'],
-            date: 'December 2024',
-            badges: ['Big Data', 'Computer Network']
-        },
-        {
-            title: 'Real-Time Fraud Detection System',
-            members: ['Mason White', 'Mia Harris'],
-            date: 'May 2023',
-            badges: ['Machine Learning', 'Computer Network']
-        },
-        {
-            title: 'Smart City Traffic Management with IoT Sensors',
-            members: ['Ethan Martin', 'Charlotte Thompson'],
-            date: 'October 2022',
-            badges: ['Internet of Things', 'System Development']
-        },
-        {
-            title: 'Medical Image Analysis Using Deep Neural Networks',
-            members: ['Alexander Garcia', 'Amelia Rodriguez'],
-            date: 'March 2025',
-            badges: ['Deep Learning', 'Computer Vision']
-        },
-        {
-            title: 'Recommendation Engine for Online Learning Platforms',
-            members: ['Benjamin Lee', 'Harper Walker'],
-            date: 'August 2023',
-            badges: ['Machine Learning', 'Big Data']
-        },
-        {
-            title: 'Network Security Monitoring System',
-            members: ['Daniel Hall', 'Evelyn Allen'],
-            date: 'June 2024',
-            badges: ['Computer Network', 'Cybersecurity']
-        }
-    ];
+    // Transform archives data from backend to match the card format
+    const allRepositories = archives.map((archive) => ({
+        id: archive.journal_id,
+        title: archive.title || 'Untitled',
+        members: archive.authors ? archive.authors.split(', ') : [],
+        date: archive.date_archived
+            ? new Date(archive.date_archived).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+            : 'Unknown',
+        badges: archive.tags ? archive.tags.split(',').map(tag => tag.trim()) : []
+    }));
 
     // Filter repositories based on search query and tags
     const repositories = allRepositories.filter((repo) => {

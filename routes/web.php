@@ -65,9 +65,7 @@ Route::prefix('guest')->group(function () {
         return Inertia::render('Guest/landing');
     })->name('guest.landing');
 
-    Route::get('/repository', function () {
-        return Inertia::render('Guest/repository');
-    })->name('guest.repository');
+    Route::get('/repository', [ThesisArchive::class, 'index'])->name('guest.repository');
 
     Route::get('/search', function () {
         return Inertia::render('Guest/filter-search');
