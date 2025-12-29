@@ -21,7 +21,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { Skeleton } from '@/components/ui/skeleton';
 import { Toggle } from '@/components/ui/toggle';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { WizardStepper, WizardSteps, WizardStep, InteractiveWizard } from '@/components/ui/wizard-stepper';
+import { WizardStepper, WizardSteps, WizardStep, InteractiveWizard, WizardProgress } from '@/components/ui/wizard-stepper';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Icon } from '@/components/ui/icon';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
@@ -519,7 +519,80 @@ export default function UIShowcase() {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </section>
-                    
+
+                    {/* Wizard Progress */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Wizard Progress</h2>
+                        
+                        <div className="space-y-6">
+                            <div>
+                                <h3 className="text-lg font-semibold mb-4 text-white">Individual States</h3>
+                                <div className="space-y-4">
+                                    <div className="bg-transparent rounded-xl p-6">
+                                        <p className="text-sm text-gray-400 mb-4 font-dm">After State (Completed)</p>
+                                        <WizardProgress
+                                            stepNumber={1}
+                                            stepLabel="Step 1"
+                                            state="after"
+                                        />
+                                    </div>
+                                    
+                                    <div className="bg-transparent rounded-xl p-6">
+                                        <p className="text-sm text-gray-400 mb-4 font-dm">Current State (In Progress)</p>
+                                        <WizardProgress
+                                            stepNumber={2}
+                                            stepLabel="Step 2"
+                                            state="current"
+                                            progress={50}
+                                        />
+                                    </div>
+                                    
+                                    <div className="bg-transparent rounded-xl p-6">
+                                        <p className="text-sm text-gray-400 mb-4 font-dm">Before State (Incomplete)</p>
+                                        <WizardProgress
+                                            stepNumber={3}
+                                            stepLabel="Step 3"
+                                            state="before"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 className="text-lg font-semibold mb-4 text-white">States Example</h3>
+                                <div className="bg-transparent rounded-xl p-8">
+                                    <div className="grid grid-cols-[auto_auto_1fr] gap-x-3 gap-y-6 items-center">
+                                        <WizardProgress
+                                            stepNumber={1}
+                                            stepLabel="Personal Information"
+                                            state="after"
+                                            className="contents"
+                                        />
+                                        <WizardProgress
+                                            stepNumber={2}
+                                            stepLabel="Academic Background"
+                                            state="after"
+                                            className="contents"
+                                        />
+                                        <WizardProgress
+                                            stepNumber={3}
+                                            stepLabel="Document Upload"
+                                            state="current"
+                                            progress={75}
+                                            className="contents"
+                                        />
+                                        <WizardProgress
+                                            stepNumber={4}
+                                            stepLabel="Review and Submit"
+                                            state="before"
+                                            className="contents"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>    
+
                     {/* Wizard Stepper */}
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Wizard Stepper</h2>
