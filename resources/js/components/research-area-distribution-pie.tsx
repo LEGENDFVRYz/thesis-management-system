@@ -97,7 +97,7 @@ export function ResearchAreaChart({ totalGroups, className = "" }: ResearchAreaC
               }}
             >
               {displayData.map((entry) => (
-                <Cell key={entry.name} fill={entry.color} />
+                <Cell key={entry.name} fill={entry.color}/>
               ))}
             </Pie>
           </PieChart>
@@ -117,17 +117,18 @@ export function ResearchAreaChart({ totalGroups, className = "" }: ResearchAreaC
             padding: "0 12px",
           }}
         >
-          <div style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.2 }}>
+          <div style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.2, color: "#000000" }}>
             {activeData ? activeData.value : total}
           </div>
           <div
             style={{
-              fontSize: 12,
-              color: "#6b7280",
+              fontSize: 14,
+              color: "#717182",
               lineHeight: 1.3,
               maxWidth: 120,
               whiteSpace: "normal",
               wordBreak: "break-word",
+              marginTop: 4,
             }}
           >
             {activeData ? activeData.name : "Total Groups"}
