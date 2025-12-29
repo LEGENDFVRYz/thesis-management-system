@@ -5,6 +5,7 @@ import { Users, Calendar, BookOpen, CheckCircleIcon, Eye, FileTextIcon, ClockIco
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "./skeleton"
+import { Link } from "@inertiajs/react"
 
 const cardVariants = cva(
   "bg-card text-card-foreground flex flex-col border",
@@ -13,7 +14,7 @@ const cardVariants = cva(
       variant: {
         default: "gap-6 rounded-xl py-6 shadow-sm",
         header: "bg-white shadow-sm w-full lg:w-[1441px] h-auto lg:h-[124px]",
-        metric: "rounded-lg overflow-hidden border-primary w-full sm:w-75 h-40 shadow-md", 
+        metric: "rounded-lg overflow-hidden border-primary w-full sm:w-75 h-auto shadow-md",
         committee: "rounded-lg bg-white border-gray border-2 gap-3 py-3 w-full sm:w-52 h-auto sm:h-40 shadow-md transition-all duration-300 hover:scale-101 hover:shadow-primary/50",
         archive: "rounded-lg bg-accent border-gray border-2 gap-4 py-3 w-full sm:w-110 h-auto sm:h-56 shadow-md transition-all duration-300 hover:scale-101 hover:shadow-black/40",
         endorsement: "rounded-lg bg-white border-gray-200 py-3 px-4 gap-5 w-full lg:w-110 h-auto lg:h-111 shadow-md transition-all duration-300 hover:scale-101 hover:shadow-primary/40",
@@ -134,6 +135,7 @@ const metricCardVariants = cva("", {
     variant: {
       default: "",
       progress: "",
+      about: "w-full max-w-[343px]",
     },
   },
   defaultVariants: {
@@ -288,8 +290,8 @@ interface MetricCardProps {
   children?: React.ReactNode
   className?: string
   contentClassName?: string
-  variant?: "default" | "progress"
-  
+  variant?: "default" | "progress" | "about"
+
   icon?: React.ReactNode
   title?: string
 
@@ -306,7 +308,7 @@ function MetricCard({
   className,
   contentClassName,
   variant = "default",
-  
+
   icon,
   title,
 
@@ -317,12 +319,39 @@ function MetricCard({
   progress,
   statusBadge
 }: MetricCardProps) {
-  
+
+  // About metric card variant
+  if (variant === "about") {
+    return (
+      <Card
+        variant="metric"
+        className={cn(metricCardVariants({ variant }), "border-0", className)}
+      >
+        <CardHeader className="py-4">
+          <div className="w-9 h-9 bg-[#F3EFD0] rounded-md flex items-center justify-center">
+            {icon || <BookOpen className="w-5 h-5 text-primary" />}
+          </div>
+          <CardTitle>{title}</CardTitle>
+        </CardHeader>
+        <CardContent
+          className={cn("p-5", contentClassName)}
+          style={{
+            borderRadius: '0 0 13.969px 13.969px',
+            border: '0.998px solid #730000',
+            background: '#FDFCF6'
+          }}
+        >
+          {children || <div>{/* Content Area */}</div>}
+        </CardContent>
+      </Card>
+    )
+  }
+
   // Progress metric card variant
   if (variant === "progress") {
   return (
-    <Card 
-      variant="metric" 
+    <Card
+      variant="metric"
       className={cn(metricCardVariants({ variant }), className)}
     >
       <div className="bg-primary px-4 py-2 flex flex-row justify-between items-start">
@@ -347,7 +376,7 @@ function MetricCard({
             <div>
               <p className="text-sm">Progress:</p>
               <p className="text-primary-foreground-2 font-bold text-xs">{progress}% Complete</p>
-              
+
               {/* Progress Bar */}
               <div className="w-full h-2 overflow-hidden">
                 <Skeleton variant="progress" progress={progress}/>
@@ -360,12 +389,12 @@ function MetricCard({
   )
 }
   return (
-    <Card 
-      variant="metric" 
+    <Card
+      variant="metric"
       className={cn(metricCardVariants({ variant }), className)}
     >
       <CardHeader className="metric-header">
-        {icon && (  
+        {icon && (
           <div className="w-[36px] h-[28px] bg-sidebar-gradient-mid rounded flex items-center justify-center">
             {icon}
           </div>
@@ -388,6 +417,7 @@ interface ArchiveCardProps {
   date: string
   badges: string[]
   onViewAbstract?: () => void
+  variant?: 'default' | 'with-link'
   className?: string
 }
 
@@ -397,6 +427,7 @@ function ArchiveCard({
   date,
   badges,
   onViewAbstract,
+  variant = 'default',
   className
 }: ArchiveCardProps) {
   return (
@@ -423,9 +454,9 @@ function ArchiveCard({
 
               <div className="flex flex-wrap gap-2 mt-1">
                 {badges.map((badge, index) => (
-                  <Badge 
-                    key={index} 
-                    variant="outline" 
+                  <Badge
+                    key={index}
+                    variant="outline"
                     className="border-primary text-primary h-auto sm:h-4.5 text-[10px] sm:text-xs"
                   >
                     {badge}
@@ -439,9 +470,18 @@ function ArchiveCard({
 
       <CardFooter className="px-3 sm:px-5 py-0.5">
         <div className="w-full sm:h-9 relative">
-          <Button onClick={onViewAbstract} className="w-full sm:w-auto text-xs sm:text-sm">
-            View Abstract
-          </Button>
+          {variant === 'with-link' ? (
+            <Link
+              href="/guest/preview"
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full sm:w-auto text-xs sm:text-sm"
+            >
+              View Abstract
+            </Link>
+          ) : (
+            <Button onClick={onViewAbstract} className="w-full sm:w-auto text-xs sm:text-sm">
+              View Abstract
+            </Button>
+          )}
         </div>
       </CardFooter>
     </Card>

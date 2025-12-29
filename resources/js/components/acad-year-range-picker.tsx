@@ -10,7 +10,8 @@ interface YearRangePickerProps {
   onChange?: (date: Date) => void;
   placeholder?: string;
   className?: string;
-  mode?: "dropdown" | "grid"; 
+  mode?: "dropdown" | "grid";
+  inputSize?: "default" | "filter";
 }
 
 export function YearRangePicker({
@@ -19,6 +20,7 @@ export function YearRangePicker({
   placeholder = "Academic Year",
   className = "",
   mode = "dropdown",
+  inputSize = "default",
 }: YearRangePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedYear, setSelectedYear] = useState<Date | null>(
@@ -105,6 +107,10 @@ export function YearRangePicker({
     return selectedYear && selectedYear.getFullYear() === year;
   };
 
+  const inputSizeClasses = inputSize === "filter"
+    ? "h-9 px-3 text-sm"
+    : "py-2 px-3";
+
   return (
     <div
       ref={containerRef}
@@ -118,8 +124,8 @@ export function YearRangePicker({
           placeholder={placeholder}
           readOnly
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full px-3 py-2 pr-10 bg-breadcrumb border border-[#d4c5a0] rounded cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-primary font-semibold year-range-picker-input"
-          style={{ fontSize: "13.33px" }}
+          className={`w-full pr-10 bg-breadcrumb border border-[#d4c5a0] rounded cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-primary font-semibold year-range-picker-input ${inputSizeClasses}`}
+          style={inputSize === "default" ? { fontSize: "13.33px" } : undefined}
         />
         <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary pointer-events-none" />
       </div>
