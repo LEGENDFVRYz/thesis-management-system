@@ -104,9 +104,10 @@ export function PerformanceOverviewChart({ onViewChange }: PerformanceOverviewCh
   return (
     <div
       style={{
-        backgroundColor: "#ffffff",
+        backgroundColor: "#FDFCF6",
         borderRadius: "0.5rem",
-        boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
+        border: "1px solid #73000042",
+        boxShadow: "0px 4px 12px #00000040",
         padding: "24px",
         fontFamily: '"DM Sans", sans-serif',
       }}

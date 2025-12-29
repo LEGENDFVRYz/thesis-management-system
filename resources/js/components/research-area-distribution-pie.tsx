@@ -43,7 +43,9 @@ export function ResearchAreaChart({ totalGroups, className = "" }: ResearchAreaC
     <div
       className={className}
       style={{
-        backgroundColor: "#ffffff",
+        backgroundColor: "#FDFCF6",
+        border: "1px solid #73000042",
+        boxShadow: "0px 4px 12px #00000040",
         borderRadius: "0.5rem",
         width: "100%",
         maxWidth: 500,

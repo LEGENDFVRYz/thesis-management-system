@@ -31,11 +31,11 @@ const CustomTooltip = ({ active, payload }: TooltipProps) => {
     return (
       <div
         style={{
-          backgroundColor: "#ffffff",
-          border: "1px solid #730000", // inline from CSS block
+          backgroundColor: "#FDFCF6",
           borderRadius: "8px",
+          border: "1px solid #73000042",
+          boxShadow: "0px 4px 12px #00000040",
           padding: "8px 10px",
-          boxShadow: "0 4px 10px rgba(0,0,0,0.08)",
         }}
       >
         <p
