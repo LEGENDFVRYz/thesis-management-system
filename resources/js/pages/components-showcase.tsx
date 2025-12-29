@@ -44,6 +44,7 @@ import { ArchivedJournalsChart } from "@/components/archived-journals-line";
 import { PerformanceOverviewChart } from "@/components/performance-overview-ver-bar";
 import { SubmissionStatusNonAdminChart } from "@/components/submission-status-bar-nonadmin";
 import { Timeline } from '@/components/timeline';
+import { Filter1, Filter2, Sort1, Sort2, Sort3, SearchBar, RepoFilter } from '@/components/filter-search';
 
 
 export default function ComponentsShowcase() {
@@ -126,7 +127,7 @@ export default function ComponentsShowcase() {
                 <div className="max-w-6xl mx-auto space-y-12">
                     <div>
                         <h1 className="text-4xl font-bold mb-2 text-white">Application Components Showcase</h1>
-                        <p className="text-gray-300">Preview of custom application components (33+ total)</p>
+                        <p className="text-gray-300">Preview of custom application components (48 total + 6 filters/sorts)</p>
                     </div>
 
                     {/* App Logo */}
@@ -805,6 +806,61 @@ export default function ComponentsShowcase() {
                                 </CardContent>
                             </Card>
                             </section>
+                        </div>
+                    </section>
+
+                    {/* Search Bar */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Search Bar</h2>
+                        <p className="text-sm text-gray-400">Search input with integrated search button</p>
+                        <div className="max-w-2xl">
+                            <SearchBar />
+                        </div>
+                    </section>
+
+                    {/* Filter Components */}
+                    <section className="space-y-6">
+                        <h2 className="text-2xl font-semibold text-white">Filter Components</h2>
+                        <p className="text-sm text-gray-400">Filter panels for different data types with checkboxes, radio groups, and dropdowns</p>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <h3 className="text-lg font-semibold mb-3 text-white">Filter 1 - Faculty Roles & Type</h3>
+                                <Filter1 />
+                            </div>
+
+                            <div>
+                                <h3 className="text-lg font-semibold mb-3 text-white">Filter 2 - Adviser, Block, Specialization</h3>
+                                <Filter2 />
+                            </div>
+
+                            <div>
+                                <h3 className="text-lg font-semibold mb-3 text-white">Repo Filter - Guest Repository</h3>
+                                <RepoFilter />
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Sort Components */}
+                    <section className="space-y-6">
+                        <h2 className="text-2xl font-semibold text-white">Sort Components</h2>
+                        <p className="text-sm text-gray-400">Sort panels with radio groups for different sorting criteria</p>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <h3 className="text-lg font-semibold mb-3 text-white">Sort 1 - Faculty</h3>
+                                <Sort1 />
+                            </div>
+
+                            <div>
+                                <h3 className="text-lg font-semibold mb-3 text-white">Sort 2 - Students</h3>
+                                <Sort2 />
+                            </div>
+
+                            <div>
+                                <h3 className="text-lg font-semibold mb-3 text-white">Sort 3 - Thesis</h3>
+                                <Sort3 />
+                            </div>
                         </div>
                     </section>
                 </div>
