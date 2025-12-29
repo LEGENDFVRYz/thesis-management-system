@@ -64,7 +64,6 @@ const DEFAULT_EVENTS: TimelineEvent[] = [
     dateRange: 'December 23 - January 5',
     description: 'Students can submit their thesis proposal during this period.',
     status: 'upcoming',
-    isCurrent: true,
   },
   {
     id: '7',
@@ -191,7 +190,7 @@ export function Timeline({ events = DEFAULT_EVENTS, className = '' }: TimelineVi
                   <div className="flex flex-col items-center" style={{ width: '24px', position: 'relative', zIndex: 2 }}>
                     <div className="relative flex items-center justify-center" style={{ width: '24px', height: '24px', flexShrink: 0 }}>
                       {(event.isCurrent || event.status === 'past') ? (
-                        // Current first dot or Past event: 3-layer red circle
+
                         <div className="relative" style={{ width: '24px', height: '24px' }}>
                           {/* Outer layer */}
                           <div
