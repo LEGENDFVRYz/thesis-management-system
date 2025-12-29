@@ -19,8 +19,8 @@ return new class extends Migration
                   ->onDelete('cascade');
 
             $table->tinyInteger('semester'); // 0 = 1st Sem, 1 = 2nd Sem
-            $table->date('start_date');
-            $table->date('end_date');
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
             $table->boolean('is_active')->default(false);
         });
     }
