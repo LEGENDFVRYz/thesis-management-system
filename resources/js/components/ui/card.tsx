@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "./skeleton"
 import { Link } from "@inertiajs/react"
+import { Icon } from "@/components/icon-index"
 
 const cardVariants = cva(
   "bg-card text-card-foreground flex flex-col border",
@@ -326,19 +327,45 @@ function MetricCard({
       <Card
         variant="metric"
         className={cn(metricCardVariants({ variant }), "border-0", className)}
+        style={{
+          width: '343px',
+          height: '263px'
+        }}
       >
-        <CardHeader className="py-4">
-          <div className="w-9 h-9 bg-[#F3EFD0] rounded-md flex items-center justify-center">
-            {icon || <BookOpen className="w-5 h-5 text-primary" />}
-          </div>
-          <CardTitle>{title}</CardTitle>
+        <CardHeader
+          className="flex-row items-center gap-3"
+          style={{
+            height: '58.87px',
+            background: '#730000',
+            padding: '0 16px'
+          }}
+        >
+          <Icon name="about" size={43.903} />
+          <CardTitle
+            className="font-bold font-['DM_Sans']"
+            style={{
+              fontSize: '16px',
+              color: '#FFBD00'
+            }}
+          >
+            {title}
+          </CardTitle>
         </CardHeader>
         <CardContent
-          className={cn("p-5", contentClassName)}
+          className={cn(contentClassName)}
           style={{
+            display: 'flex',
+            height: '204.13px',
+            padding: '19px 22px',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexShrink: 0,
+            alignSelf: 'stretch',
             borderRadius: '0 0 13.969px 13.969px',
             border: '0.998px solid #730000',
-            background: '#FDFCF6'
+            background: '#FDFCF6',
+            textAlign: 'justify',
+            color: '#730000'
           }}
         >
           {children || <div>{/* Content Area */}</div>}

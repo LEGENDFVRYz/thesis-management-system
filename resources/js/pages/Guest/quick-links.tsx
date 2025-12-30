@@ -1,7 +1,10 @@
-import { UserCircle, FileText } from 'lucide-react';
 import { Link } from '@inertiajs/react';
+import { Icon } from '@/components/icon-index';
+import { useState } from 'react';
 
 export default function QuickLinks() {
+    const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+
     return (
         <div
             className="p-6"
@@ -13,16 +16,27 @@ export default function QuickLinks() {
             }}
         >
             <div className="grid grid-cols-2 gap-6">
-                <button className="flex flex-col items-center gap-3 hover:opacity-80 transition-opacity">
-                    <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center border-2 border-primary">
-                        <UserCircle className="w-10 h-10 text-white" />
-                    </div>
+                <button
+                    className="flex flex-col items-center gap-3 transition-all"
+                    onMouseEnter={() => setHoveredItem('login')}
+                    onMouseLeave={() => setHoveredItem(null)}
+                >
+                    <Icon
+                        name={hoveredItem === 'login' ? 'quicklinkPeopleHover' : 'quicklinkPeople'}
+                        size={127}
+                    />
                     <span className="text-primary font-bold font-['DM_Sans']">Login</span>
                 </button>
-                <Link href="/guest/repository" className="flex flex-col items-center gap-3 hover:opacity-80 transition-opacity">
-                    <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center border-2 border-primary">
-                        <FileText className="w-10 h-10 text-white" />
-                    </div>
+                <Link
+                    href="/guest/repository"
+                    className="flex flex-col items-center gap-3 transition-all"
+                    onMouseEnter={() => setHoveredItem('repository')}
+                    onMouseLeave={() => setHoveredItem(null)}
+                >
+                    <Icon
+                        name={hoveredItem === 'repository' ? 'quicklinkRepositoryHover' : 'quicklinkRepository'}
+                        size={127}
+                    />
                     <span className="text-primary font-bold font-['DM_Sans']">Repository</span>
                 </Link>
             </div>
