@@ -29,14 +29,14 @@ interface AdviserOption {
 }
 
 // Main Props Interface
-interface DashboardProps {
-    defenses: any[];             // The main table data
-    adviserOptions: AdviserOption[]; // Dropdown data
-    blockOptions: string[];      // Dropdown data
-    filters: FilterParams;       // Current active filters from URL
+interface DefenseProps {
+    defenses: any[];                    // The main table data
+    adviserOptions: AdviserOption[];    // Dropdown data
+    blockOptions: string[];             // Dropdown data
+    filters: FilterParams;              // Current active filters from URL
 }
 
-export default function Dashboard({ defenses, adviserOptions, blockOptions, filters }: DashboardProps) {
+export default function Defense({ defenses, adviserOptions, blockOptions, filters }: DefenseProps) {
     
     // --- MODAL STATE ---
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -82,10 +82,19 @@ export default function Dashboard({ defenses, adviserOptions, blockOptions, filt
             description="Monitor all defense schedules and panel assignments"
         >
             
+            {/*
+            * =============================================================================
+            * NOTICE: TEMPORARY UI / PLACEHOLDER DESIGN
+            * =============================================================================
+            * The layout and styles in this file are temporary placeholders intended solely
+            * to demonstrate backend logics, data rendering, and verify CRUD functionality.
+            * =============================================================================
+            */}
+
             <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
                 <div className="overflow-x-auto">
 
-                    {/* --- SEARCH & FILTER BAR - TEMPORARY DESIGN --- */}
+                    {/* --- SEARCH & FILTER BAR --- */}
                     <div className="flex flex-row md:flex-row gap-4 bg-white dark:bg-gray-900 p-4">
                         
                         {/* Search Input */}
@@ -151,7 +160,7 @@ export default function Dashboard({ defenses, adviserOptions, blockOptions, filt
                         </div>
                     </div>
 
-                    {/* --- TABLE SECTION - TEMPORARY DESIGN --- */}
+                    {/* --- TABLE SECTION --- */}
                     <table className="min-w-full text-left text-sm whitespace-nowrap">
                         <thead className="uppercase tracking-wider border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
                             <tr>
@@ -178,25 +187,29 @@ export default function Dashboard({ defenses, adviserOptions, blockOptions, filt
                                             </span>
                                         </td>
 
-                                        {/* Title: Allowed to wrap if long, limited width */}
+                                        {/* Title */}
                                         <td className="px-6 py-4 text-gray-900 dark:text-gray-100 max-w-xs whitespace-normal truncate">
                                             <div className="line-clamp-2" title={def.thesis_title}>
                                                 {def.thesis_title}
                                             </div>
                                         </td>
-
+                                        
+                                        {/* Proponents Count */}
                                         <td className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                                             {def.proponents_count}
                                         </td>
 
+                                        {/* Adviser Name */}
                                         <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
                                             {def.adviser_name}
                                         </td>
 
+                                        {/* Block */}
                                         <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
                                             BSCPE {def.year_level}-{def.block}  
                                         </td>
 
+                                        {/* Defense Schedule */}
                                         <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
                                             <div className="font-medium text-gray-500 dark:text-gray-100">
                                                 {def.defense_date}
@@ -216,7 +229,8 @@ export default function Dashboard({ defenses, adviserOptions, blockOptions, filt
                                                 {def.defense_type}
                                             </span>
                                         </td>
-
+                                        
+                                        {/* Action Button */}
                                         <td className="px-6 py-4 text-right">
                                             <button
                                                 type="button"
@@ -240,7 +254,7 @@ export default function Dashboard({ defenses, adviserOptions, blockOptions, filt
                 </div>
             </div>
 
-            {/* TEMPORARY MODAL TO SHOW DEFENSE DETAILS - CHANGE THE DESIGN LATER :>*/}
+            {/* SAMPLE MODAL */}
             {isModalOpen && selectedDefense && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
                     <div className="w-full max-w-2xl rounded-xl bg-white dark:bg-gray-900 shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden flex flex-col max-h-[90vh]">
@@ -274,7 +288,7 @@ export default function Dashboard({ defenses, adviserOptions, blockOptions, filt
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-700">
-                                {/* 1. SEPARATE DATE */}
+                                {/* SEPARATE DATE */}
                                 <div className="flex items-start gap-3">
                                     <div className="mt-0.5">🗓️</div>
                                     <div>
@@ -285,7 +299,7 @@ export default function Dashboard({ defenses, adviserOptions, blockOptions, filt
                                     </div>
                                 </div>
 
-                                {/* 2. SEPARATE TIME */}
+                                {/* SEPARATE TIME */}
                                 <div className="flex items-start gap-3">
                                     <div className="mt-0.5">⏰</div>
                                     <div>
@@ -296,7 +310,7 @@ export default function Dashboard({ defenses, adviserOptions, blockOptions, filt
                                     </div>
                                 </div>
 
-                                {/* 3. VENUE */}
+                                {/* VENUE */}
                                 <div className="flex items-start gap-3">
                                     <div className="mt-0.5">📍</div>
                                     <div>
@@ -307,7 +321,7 @@ export default function Dashboard({ defenses, adviserOptions, blockOptions, filt
                                     </div>
                                 </div>
 
-                                {/* 4. BLOCK */}
+                                {/* BLOCK */}
                                 <div className="flex items-start gap-3">
                                     <div className="mt-0.5">🎓</div>
                                     <div>
@@ -318,7 +332,7 @@ export default function Dashboard({ defenses, adviserOptions, blockOptions, filt
                                     </div>
                                 </div>
 
-                                {/* 5. ADVISER */}
+                                {/* ADVISER */}
                                 <div className="flex items-start gap-3">
                                     <div className="mt-0.5">👨‍🏫</div>
                                     <div>
@@ -329,7 +343,7 @@ export default function Dashboard({ defenses, adviserOptions, blockOptions, filt
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                {/* Proponents List */}
+                                {/* PROPONENTS */}
                                 <div>
                                     <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-100 dark:border-gray-800">
                                         <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase">Proponents</h3>
@@ -348,7 +362,7 @@ export default function Dashboard({ defenses, adviserOptions, blockOptions, filt
                                     </ul>
                                 </div>
 
-                                {/* Panelists List */}
+                                {/* PANELISTS */}
                                 <div>
                                     <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-100 dark:border-gray-800">
                                         <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase">Panelists</h3>
