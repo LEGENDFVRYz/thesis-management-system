@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\GradingCriteria;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class DepartmentPoliciesController extends Controller
@@ -19,6 +21,34 @@ class DepartmentPoliciesController extends Controller
 
         return Inertia::render('Admin/management/dep-policies', [
             'grading' => $data
+        ]);
+    }
+
+    public function index2()
+    {
+        $files = Storage::disk('public')->files();
+        $policyPath = null;
+
+        foreach ($files as $file) {
+            if (Str::startsWith($file, 'CPE_Guidelines_') && Str::endsWith($file, '.pdf')) {
+                $policyPath = $file;
+                break; // Stop after finding the first match
+            }
+        }
+
+        // Generate URL if file exists, otherwise null
+        $guidelineUrl = null;
+
+        if ($policyPath) {
+            $url = asset('storage/' . $policyPath);     // base url
+            
+            // Get the "Last Modified" ts for version param
+            $lastModified = Storage::disk('public')->lastModified($policyPath);
+            $guidelineUrl = $url . '?v=' . $lastModified;
+        }
+        
+        return Inertia::render('Admin/management/dep-policies_guidelines', [
+            'guidelineUrl' => $guidelineUrl,
         ]);
     }
 
@@ -114,5 +144,32 @@ class DepartmentPoliciesController extends Controller
 
         $criteria->delete();
         return redirect()->route('admin.management.dep-policies');
+    }
+
+
+    // GUIDELINES CONTROLS
+    public function updateGuidelines(Request $request)
+    {
+        $request->validate([
+            'pdf_file' => 'required|file|mimes:pdf|max:5120', // 5MB Max
+        ]);
+
+        if ($request->hasFile('pdf_file')) {
+            // CLEANUP: Delete any OLD policy files
+            $files = Storage::disk('public')->files();
+            foreach ($files as $file) {
+                if (Str::startsWith($file, 'CPE_Guidelines_') && Str::endsWith($file, '.pdf')) {
+                    Storage::disk('public')->delete($file);
+                }
+            }
+
+            // REPLACE: Renamed to base + prefix YYYYMMDD (current date)
+            $filename = 'CPE_Guidelines_' . now()->format('Ymd') . '.pdf';
+
+            // STORE: Save the new file
+            $request->file('pdf_file')->storeAs('/', $filename, 'public');
+        }
+
+        return redirect()->back()->with('success', 'Guidelines updated successfully.');
     }
 }
