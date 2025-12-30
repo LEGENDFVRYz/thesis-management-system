@@ -36,4 +36,9 @@ class GradingRubric extends Model
     {
         return $this->hasMany(RubricLevel::class, 'rubrics_id');
     }
+
+    public function scores()
+    {
+        return $this->hasMany(RubricScore::class, 'rubric_id');
+    }
 }
