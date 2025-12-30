@@ -36,6 +36,12 @@ export default function BadgesIconsShowcase() {
       'proponentsDefault', 'proponentsClicked', 'proponentsHover',
       'peopleLinear', 'peopleBold', 'peopleTwotone',
     ],
+    'QuickLink Icons': [
+      'quicklinkPeople', 'quicklinkPeopleHover',
+      'quicklinkManagement', 'quicklinkManagementHover',
+      'quicklinkRepository', 'quicklinkRepositoryHover',
+      'quicklinkCalendar', 'quicklinkCalendarHover',
+    ],
     'System & Settings': [
       'settingsDefault', 'settingsClicked', 'settingsHover',
       'menuDefault', 'menuClicked', 'menuHover',
@@ -149,6 +155,70 @@ export default function BadgesIconsShowcase() {
               </div>
             </div>
           ))}
+        </section>
+
+        {/* QuickLink Icons Demo */}
+        <section className="mb-12">
+          <h2 className="text-3xl font-semibold mb-6 text-gray-800">QuickLink Icons (with built-in circle wrapper)</h2>
+          <div className="bg-white p-8 rounded-lg">
+            <h3 className="text-lg font-medium mb-4 text-gray-700">Default State</h3>
+            <div className="flex gap-8 items-center justify-center mb-8">
+              <div className="flex flex-col items-center gap-2">
+                <Icon name="quicklinkPeople" size={127} />
+                <span className="text-xs text-gray-600">People</span>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <Icon name="quicklinkManagement" size={127} />
+                <span className="text-xs text-gray-600">Management</span>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <Icon name="quicklinkRepository" size={127} />
+                <span className="text-xs text-gray-600">Repository</span>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <Icon name="quicklinkCalendar" size={127} />
+                <span className="text-xs text-gray-600">Calendar</span>
+              </div>
+            </div>
+
+            <h3 className="text-lg font-medium mb-4 text-gray-700">Hover State</h3>
+            <div className="flex gap-8 items-center justify-center mb-6">
+              <div className="flex flex-col items-center gap-2">
+                <Icon name="quicklinkPeopleHover" size={127} />
+                <span className="text-xs text-gray-600">People (Hover)</span>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <Icon name="quicklinkManagementHover" size={127} />
+                <span className="text-xs text-gray-600">Management (Hover)</span>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <Icon name="quicklinkRepositoryHover" size={127} />
+                <span className="text-xs text-gray-600">Repository (Hover)</span>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <Icon name="quicklinkCalendarHover" size={127} />
+                <span className="text-xs text-gray-600">Calendar (Hover)</span>
+              </div>
+            </div>
+
+            <div className="text-sm text-gray-600 border-t pt-4">
+              <p className="font-semibold mb-2">Usage:</p>
+              <pre className="bg-gray-100 p-3 rounded text-xs overflow-x-auto">
+{`// Default state (cream bg, maroon icon)
+<Icon name="quicklinkPeople" size={127} />
+<Icon name="quicklinkManagement" size={127} />
+<Icon name="quicklinkRepository" size={127} />
+<Icon name="quicklinkCalendar" size={127} />
+
+// Hover state (maroon bg, gold icon)
+<Icon name="quicklinkPeopleHover" size={127} />
+<Icon name="quicklinkManagementHover" size={127} />
+<Icon name="quicklinkRepositoryHover" size={127} />
+<Icon name="quicklinkCalendarHover" size={127} />`}
+              </pre>
+              <p className="mt-2 text-xs">Each icon is 127x127px with built-in circle border</p>
+            </div>
+          </div>
         </section>
 
         {/* Badges Section */}
