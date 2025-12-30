@@ -191,8 +191,15 @@ export function AppHeader({ breadcrumbs = [], variant = 'default' }: AppHeaderPr
                                 <div className="size-5 bg-white/10 rounded-full" title="Help" />
                                 <div className="size-5 bg-white/10 rounded-full" title="Settings" />
                             </div>
-                            {/* Avatar Placeholder */}
-                            <div className="size-9 bg-[#FFBD00] rounded-full border-2 border-white/10" />
+                            {/* Avatar with Logout Dropdown */}
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button className="size-9 bg-[#FFBD00] rounded-full border-2 border-white/10 hover:border-white/30 transition-all cursor-pointer" />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <UserMenuContent user={auth.user} />
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                     )}
                 </div>
