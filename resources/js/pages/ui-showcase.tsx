@@ -48,7 +48,7 @@ import { TimelineStepper, TimelineConnector, TimelineState } from '@/components/
 import NotificationModal from '@/components/modal/notification-modal';
 import { NotificationList, NotificationListItem } from '@/components/ui/notification-list';
 import StageSwitchToggle from '@/components/stage-toggle';
-import FileUpload from '@/components/file-upload';
+import { FileUpload } from '@/components/file-upload';
 import FilePreview from '@/components/document-preview';
 import { Timeline } from '@/components/timeline';
 import { toast } from 'sonner';
