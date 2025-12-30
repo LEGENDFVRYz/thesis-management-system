@@ -64,7 +64,6 @@ const DEFAULT_EVENTS: TimelineEvent[] = [
     dateRange: 'December 23 - January 5',
     description: 'Students can submit their thesis proposal during this period.',
     status: 'upcoming',
-    isCurrent: true,
   },
   {
     id: '7',
@@ -187,56 +186,56 @@ export function Timeline({ events = DEFAULT_EVENTS, className = '' }: TimelineVi
         {filteredEvents.map((event) => (
           <div key={event.id} className="relative flex gap-4 pb-4 last:pb-0">
 
-            {/* Timeline Dot */}
-            <div className="flex flex-col items-center" style={{ width: '24px', position: 'relative', zIndex: 2 }}>
-              <div className="relative flex items-center justify-center" style={{ width: '24px', height: '24px', flexShrink: 0 }}>
-                {event.isCurrent ? (
-                  <div className="relative" style={{ width: '24px', height: '24px' }}>
-                    {/* Outer layer */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        inset: 0,
-                        width: '24px',
-                        height: '24px',
-                        borderRadius: '50%',
-                        backgroundColor: '#9B000A63',
-                      }}
-                    />
-                    {/* Middle layer */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        width: '16px',
-                        height: '16px',
-                        borderRadius: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        backgroundColor: '#9B000A',
-                      }}
-                    />
-                    {/* Inner layer */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        width: '10px',
-                        height: '10px',
-                        borderRadius: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        backgroundColor: '#730000',
-                      }}
-                    />
-                  </div>
-                ) : (
-                  // Non-current event: outline circle
-                  <div className="rounded-full" style={{ width: '24px', height: '24px', border: '4px solid #9B000A', backgroundColor: 'white' }} />
-                )}
-              </div>
-            </div>
+                  {/* Timeline Dot */}
+                  <div className="flex flex-col items-center" style={{ width: '24px', position: 'relative', zIndex: 2 }}>
+                    <div className="relative flex items-center justify-center" style={{ width: '24px', height: '24px', flexShrink: 0 }}>
+                      {(event.isCurrent || event.status === 'past') ? (
 
+                        <div className="relative" style={{ width: '24px', height: '24px' }}>
+                          {/* Outer layer */}
+                          <div
+                            style={{
+                              position: 'absolute',
+                              inset: 0,
+                              width: '24px',
+                              height: '24px',
+                              borderRadius: '50%',
+                              backgroundColor: '#9B000A63',
+                            }}
+                          />
+                          {/* Middle layer */}
+                          <div
+                            style={{
+                              position: 'absolute',
+                              top: '50%',
+                              left: '50%',
+                              width: '16px',
+                              height: '16px',
+                              borderRadius: '50%',
+                              transform: 'translate(-50%, -50%)',
+                              backgroundColor: '#9B000A',
+                            }}
+                          />
+                          {/* Inner layer */}
+                          <div
+                            style={{
+                              position: 'absolute',
+                              top: '50%',
+                              left: '50%',
+                              width: '10px',
+                              height: '10px',
+                              borderRadius: '50%',
+                              transform: 'translate(-50%, -50%)',
+                              backgroundColor: '#730000',
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        // Non-current, non-past events (like other upcoming): outline circle
+                        <div className="rounded-full" style={{ width: '24px', height: '24px', border: '4px solid #9B000A', backgroundColor: 'white' }} />
+                      )}
+                    </div>
+                  </div>
             {/* Event Card using shared Card components */}
             <Card
             className="relative flex-1 p-3 overflow-hidden"
