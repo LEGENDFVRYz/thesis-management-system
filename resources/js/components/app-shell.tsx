@@ -99,7 +99,7 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
       <SidebarProvider defaultOpen={isOpen}>
         <AppSidebar />
         <div className="flex flex-1 flex-col">
-          <SidebarHeader />
+          {/* <SidebarHeader /> */}
           <main className="flex-1 overflow-auto">
             {children}
           </main>
