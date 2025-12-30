@@ -127,6 +127,21 @@ Route::prefix('faculty')->group(function () {
                 Route::get('endorsement', [Endorsement::class, 'index'])->name('faculty.management.adviser.endorsement');
 
                 Route::get('eval_n_grading', [EvaluationGrading::class, 'index'])->name('faculty.management.adviser.eval_n_grading');
+
+                // Evaluation and Grading's sub-pages (Document Review & Evaluation Tabs)
+                Route::prefix('eval_n_grading')->group(function () {
+                    
+                    Route::get('document_review/{id}', [EvaluationGrading::class, 'showDocumentReview'])
+                        ->name('faculty.adviser.document_review');
+
+                    Route::get('evaluation/{id}', [EvaluationGrading::class, 'showEvaluation'])
+                        ->name('faculty.adviser.evaluation');
+
+                    Route::post('store', [EvaluationGrading::class, 'store'])
+                        ->name('faculty.adviser.evaluation.store');
+                        
+                });
+
             });
 
 
