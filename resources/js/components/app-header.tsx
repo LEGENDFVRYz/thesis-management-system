@@ -29,10 +29,6 @@ import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { cn, isSameUrl, isSectionUrl, resolveUrl } from '@/lib/utils';
 
-import ProfileIcon from '@/components/icons/ic_profile-Default.svg';
-import NotificationIcon from '@/components/icons/ic_notification-Default-ic_notification2-notification.svg';
-import FAQsIcon from '@/components/icons/ic_faq-Default.svg';
-
 import { dashboard as studentDB } from '@/routes';
 import { dashboard as facultyDB } from '@/routes/faculty';
 import { dashboard as adminDB } from '@/routes/admin';
@@ -186,23 +182,17 @@ export function AppHeader({ breadcrumbs = [], variant = 'default' }: AppHeaderPr
                         </div>
                     ) : (
                         <div className="flex items-center gap-4 text-white">
-                            {/* Profile Icon */}
-                            <img
-                                src={ProfileIcon}
-                                alt="Profile"
-                                className="size-5 cursor-pointer hover:opacity-80 transition-opacity" />
-
-                            {/* Notification Icon */}
-                            <img
-                                src={NotificationIcon}
-                                alt="Notifications"
-                                className="size-5 cursor-pointer hover:opacity-80 transition-opacity" />
-
-                            {/* FAQs Icon */}
-                            <img
-                                src={FAQsIcon}
-                                alt="FAQs"
-                                className="size-5 cursor-pointer hover:opacity-80 transition-opacity" />
+                            <div className="flex items-center gap-3 border-r border-white/20 pr-4">
+                                <div className="size-5 bg-white/10 rounded-full" title="Profile" />
+                                <div className="relative size-5 bg-white/10 rounded-full" title="Notifications">
+                                    {/* Yellow Dot Indicator */}
+                                    <div className="absolute -top-0.5 -right-0.5 size-2 bg-[#FFBD00] rounded-full border border-[#730000]" />
+                                </div>
+                                <div className="size-5 bg-white/10 rounded-full" title="Help" />
+                                <div className="size-5 bg-white/10 rounded-full" title="Settings" />
+                            </div>
+                            {/* Avatar Placeholder */}
+                            <div className="size-9 bg-[#FFBD00] rounded-full border-2 border-white/10" />
                         </div>
                     )}
                 </div>
