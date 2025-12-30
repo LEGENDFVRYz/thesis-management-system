@@ -160,6 +160,16 @@ export default function DeadlinePage({ students }: { students: any[] }) {
             title="Student Management" 
             description="View and Manage Student Accounts and Thesis Group Assignments"
         >
+
+            {/*
+            * =============================================================================
+            * NOTICE: TEMPORARY UI / PLACEHOLDER DESIGN
+            * =============================================================================
+            * The layout and styles in this file are temporary placeholders intended solely
+            * to demonstrate backend logics, data rendering, and verify CRUD functionality.
+            * =============================================================================
+            */}
+            
             {/* TEMPORARY SLOT FOR IMPORT  --- rushed ehh */}
             <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-sidebar-border shadow-sm relative">
                 

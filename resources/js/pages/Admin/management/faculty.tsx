@@ -19,6 +19,15 @@ export default function DeadlinePage({ faculties }: { faculties: any[] }) {
             description="Manage Faculty Accounts and Assign Roles"
         >
 
+            {/*
+            * =============================================================================
+            * NOTICE: TEMPORARY UI / PLACEHOLDER DESIGN
+            * =============================================================================
+            * The layout and styles in this file are temporary placeholders intended solely
+            * to demonstrate backend logics, data rendering, and verify CRUD functionality.
+            * =============================================================================
+            */}
+            
             <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
                 <div className="overflow-x-auto">
                     <table className="min-w-full text-left text-sm whitespace-nowrap">
