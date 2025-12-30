@@ -38,4 +38,9 @@ class DefenseEvaluation extends Model
     {
         return $this->belongsTo(FacultyAssignment::class, 'evaluator_id');
     }
+
+    public function rubricScores()
+    {
+        return $this->hasMany(RubricScore::class, 'evaluation_id');
+    }
 }
