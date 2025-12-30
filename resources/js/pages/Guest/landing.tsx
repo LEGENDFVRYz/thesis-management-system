@@ -83,7 +83,7 @@ export default function GuestLanding() {
     return (
         <>
             <Head title="Thesis Management System" />
-            <AppHeader />
+            <AppHeader variant="guest" />
 
             {/* Main Content */}
             <div className="min-h-screen bg-white">
@@ -181,8 +181,8 @@ export default function GuestLanding() {
                                 variant="about"
                                 title="ABOUT"
                             >
-                                <p className="text-sm leading-relaxed font-['DM_Sans']">
-                                    The <span className="font-bold">Thesis Management and Tracking System</span> is designed to streamline, standardize, and monitor the complete life cycle of undergraduate thesis development within the Polytechnic University of the Philippines – College of Engineering, Department of Computer Engineering.
+                                <p className="font-['DM_Sans']" style={{ fontSize: '16px', fontWeight: 500, lineHeight: '1.4' }}>
+                                    The <span style={{ fontWeight: 700 }}>Thesis Management and Tracking System</span> is designed to streamline, standardize, and monitor the complete life cycle of undergraduate thesis development within the Polytechnic University of the Philippines – College of Engineering, Department of Computer Engineering.
                                 </p>
                             </MetricCard>
 
