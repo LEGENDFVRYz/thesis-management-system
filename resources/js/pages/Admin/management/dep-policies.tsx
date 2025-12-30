@@ -32,7 +32,7 @@ const POLICY_TABS = [
 ];
 
 
-// WORKFLOW DATA 
+// WORKFLOW DATA MOCKUP
 type Stage = 'mor' | 'dp1' | 'dp2';
 
 type WorkflowStepType = {
