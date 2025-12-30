@@ -268,7 +268,6 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
             return Inertia::render('Admin/management/deadline');
         })->name('admin.management.deadline');
 
-
         // FULL CRUD OPERATIONS EXAMPLES
         Route::get('dept-policies', [DepartmentPoliciesController::class, 'index'])->name('admin.management.dep-policies');
         // Route::get('dept-policies/grading-criteria/{id}/edit', [DepartmentPoliciesController::class, 'edit'])->name('admin.management.dep-policies.edit');
