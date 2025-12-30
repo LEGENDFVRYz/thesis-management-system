@@ -7,7 +7,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import ManagementLayout from '.';
 import { defenses as defensesRoute } from '@/routes/admin/management/index';
 import { cn } from '@/lib/utils';
-import SearchSection from '@/components/filter-search-section';
+import FilterSearchSection from '@/components/filter-search-section';
 
 export default function Dashboard({ defenses }: { defenses: any[] }) {
     const [statusFilter, setStatusFilter] = useState('upcoming');
@@ -22,7 +22,7 @@ export default function Dashboard({ defenses }: { defenses: any[] }) {
             <div className="space-y-6">
                 
                 {/* 1. Filters & Search */}
-                <SearchSection />
+                <FilterSearchSection variant="DefenseManagement" />
 
                 {/* 2. Toggle Groups Row (Pill Style) */}
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
