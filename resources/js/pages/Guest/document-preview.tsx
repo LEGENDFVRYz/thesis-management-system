@@ -3,7 +3,17 @@ import { ArrowLeft, FileText } from 'lucide-react';
 import { AppHeader } from '@/components/app-header';
 import { NavFooter } from '@/components/nav-footer';
 
-export default function DocumentPreview() {
+interface Journal {
+    id: number;
+    file_path: string | null;
+    title: string;
+}
+
+interface DocumentPreviewProps {
+    journal?: Journal;
+}
+
+export default function DocumentPreview({ journal }: DocumentPreviewProps) {
     return (
         <>
             <Head title="Document Review" />
@@ -42,7 +52,7 @@ export default function DocumentPreview() {
 
                         {/* Document Title */}
                         <h3 className="text-base font-medium text-gray-900 mb-6 font-['DM_Sans']">
-                            Machine Learning Applications in Healthcare Diagnostics
+                            {journal?.title || 'Untitled Document'}
                         </h3>
 
                         {/* Document Preview Area */}
@@ -54,8 +64,19 @@ export default function DocumentPreview() {
                                 borderRadius: '4px'
                             }}
                         >
-                            <FileText className="w-16 h-16 text-gray-400 mb-4" />
-                            <p className="text-gray-600 font-['DM_Sans']">Document Preview Area</p>
+                            {journal?.file_path ? (
+                                <iframe
+                                    src={`/storage/${journal.file_path}`}
+                                    className="w-full h-full"
+                                    style={{ minHeight: '600px' }}
+                                    title={journal.title}
+                                />
+                            ) : (
+                                <>
+                                    <FileText className="w-16 h-16 text-gray-400 mb-4" />
+                                    <p className="text-gray-600 font-['DM_Sans']">No document available</p>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

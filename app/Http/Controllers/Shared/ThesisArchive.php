@@ -52,7 +52,7 @@ class ThesisArchive extends Controller
             )
             ->orderBy('tbl_archived_journals.created_at', 'desc')
             ->get(); // Use ->paginate(10) if you want pagination
-        
+
         // Render and Send props originally Shared/repository/thesis
         return Inertia::render('Guest/repository', [
             'archives' => $archives
@@ -83,7 +83,23 @@ class ThesisArchive extends Controller
         // TASK 2.1: Arnel      --part 2/2
          // Note: Granted permission, you can add new route in routes/web.php dependent on your logic
 
-        // Show selected archive thesis information
+$journal = DB::table('tbl_archived_journals as aj')  
+            ->join('tbl_theses as t', 'aj.thesis_id', '=', 't.id')
+            ->select(
+                'aj.id',
+                'aj.file_path',
+                't.title'
+            )
+            ->where('aj.id', $id)
+            ->first();
+
+        // Return 404 if journal not found
+        if (!$journal) {
+            abort(404, 'Archived journal not found');
+        }
+        return Inertia::render('Guest/document-preview', [
+            'journal' => $journal
+        ]);
     }
 
     /**

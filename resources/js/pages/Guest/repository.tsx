@@ -117,6 +117,7 @@ export default function GuestRepository({ search = '', archives = [] }: Reposito
                         repositories.map((repo, index) => (
                             <ArchiveCard
                                 key={index}
+                                id={repo.id}
                                 title={repo.title}
                                 members={repo.members}
                                 date={repo.date}
