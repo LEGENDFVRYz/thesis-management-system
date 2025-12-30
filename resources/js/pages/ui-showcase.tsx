@@ -54,6 +54,7 @@ import { Timeline } from '@/components/timeline';
 import { toast } from 'sonner';
 import { AppHeader } from '@/components/app-header';
 import { GlobalNavDropdown } from '@/components/app-header-management';
+import FilterSearchSection from '@/components/filter-search-section';
 
 export default function UIShowcase() {
     const [isCollapsibleOpen, setIsCollapsibleOpen] = useState(false);
@@ -909,6 +910,16 @@ export default function UIShowcase() {
                         <p className="text-sm text-gray-400">Main application header with branding, top navigation, and utility actions.</p>
 
                         <AppHeader breadcrumbs={[{ title: 'Home', href: '#' }, { title: 'Showcase', href: '#' }]} />
+                    </section>
+
+                    {/* Filter Search Section */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Filter Search Section</h2>
+                        <p className="text-sm text-gray-400">Reusable filter and search component</p>
+                        <FilterSearchSection variant="DefenseManagement" />
+                        <FilterSearchSection variant="StudentManagement" />
+                        <FilterSearchSection variant="ThesisArchive" />
+                        <FilterSearchSection variant="Notifications" />
                     </section>
 
                     {/* Faculty List Dropdown Variants Section */}
