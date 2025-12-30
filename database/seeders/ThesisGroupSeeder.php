@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\SchoolYear;
 use App\Models\SectionAdviser;
+use App\Models\Specialization;
+use App\Models\Student;
 use App\Models\ThesisGroup;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -15,6 +17,14 @@ class ThesisGroupSeeder extends Seeder
      */
     public function run(): void
     {
+
+        // Pre-fetch Specs to avoid querying inside loops
+        $specs = Specialization::pluck('id')->toArray();
+        if (empty($specs)) {
+            $this->command->error('No Specializations found.');
+            return;
+        }
+
         // 1. Get all School Years (Active & Past)
         $schoolYears = SchoolYear::all();
 
@@ -35,15 +45,35 @@ class ThesisGroupSeeder extends Seeder
             // 3. Create Groups for EACH Section Adviser in this batch
             foreach ($advisersForBatch as $adviser) {
                 
-                // Create 3 groups per section (Group 1, Group 2, Group 3)
-                // This guarantees every section has data
-                ThesisGroup::factory()->count(3)->sequence(
-                    ['group_number' => 1],
-                    ['group_number' => 2],
-                    ['group_number' => 3]
-                )->create([
-                    'section_adviser_id' => $adviser->id, // Force the correct year link
-                ]);
+                // Determine Specialization based on Adviser's Section
+                $specIndex = ($adviser->section % 2 === 0) ? 0 : 1;
+                $assignedSpecId = $specs[$specIndex] ?? $specs[0];
+
+                // Create 3 Groups per Section
+                for ($groupNum = 1; $groupNum <= 3; $groupNum++) {
+                    
+                    // Create the Group
+                    $group = ThesisGroup::factory()->create([
+                        'section_adviser_id' => $adviser->id,
+                        'group_number' => $groupNum,
+                    ]);
+
+                    // Create EXACTLY ONE Leader
+                    Student::factory()->create([
+                        'group_id'  => $group->id,
+                        'section'   => $adviser->section,
+                        'spec_id'   => $assignedSpecId,
+                        'is_leader' => true, // <--- Force True
+                    ]);
+
+                    // Create remaining Members (Randomly 2 or 3)
+                    // Since factory default is false, these will always be members
+                    Student::factory()->count(rand(2, 3))->create([
+                        'group_id'  => $group->id,
+                        'section'   => $adviser->section,
+                        'spec_id'   => $assignedSpecId,
+                    ]);
+                }
             }
         }
     }
