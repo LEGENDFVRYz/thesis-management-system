@@ -30,7 +30,19 @@ const quickMenuItems = [
     { icon: BookCopy, label: 'Resources'         },
 ];
 
-export default function Dashboard() {
+interface ActiveTerm {
+    semester_id: number;
+    semester: number; // 0 or 1
+    year: number;     // e.g., 2025
+    display_sy: string; // e.g., "2025-2026"
+}
+
+interface DashboardProps {
+    activeTerm: ActiveTerm;
+    currentDate: string;
+}
+
+export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
@@ -59,7 +71,7 @@ export default function Dashboard() {
                                         TODAY
                                     </p>
                                     <p className="font-bold text-gray-800">
-                                        December 3, 2025
+                                        {currentDate}
                                     </p>
                                 </div>
                             </div>
@@ -71,7 +83,7 @@ export default function Dashboard() {
                                         SCHOOL YEAR
                                     </p>
                                     <p className="font-bold text-gray-800">
-                                        2025-2026
+                                        {activeTerm.display_sy}
                                     </p>
                                 </div>
                             </div>
@@ -83,7 +95,7 @@ export default function Dashboard() {
                                         CURRENT SEM
                                     </p>
                                     <p className="font-bold text-gray-800">
-                                        Second Sem
+                                        {activeTerm.semester === 0 ? 'First Semester' : 'Second Semester'}
                                     </p>
                                 </div>
                             </div>

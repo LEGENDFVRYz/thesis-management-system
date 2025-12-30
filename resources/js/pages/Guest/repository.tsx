@@ -91,7 +91,7 @@ export default function GuestRepository({ search = '', archives = [] }: Reposito
     return (
         <>
             <Head title="Repository" />
-            <AppHeader />
+            <AppHeader variant="guest" />
 
             <AppContent
                 title="Thesis Repository"
