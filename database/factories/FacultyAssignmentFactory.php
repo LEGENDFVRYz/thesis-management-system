@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Faculty;
 use App\Models\FacultyRole;
+use App\Models\SchoolYear;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,12 +19,12 @@ class FacultyAssignmentFactory extends Factory
      */
     public function definition(): array
     {
-        $year = fake()->numberBetween(2020, 2025);
+        // $year = fake()->numberBetween(2020, 2025);
 
         return [
             'faculty_id' => Faculty::factory(),
-            'role_id' => FacultyRole::factory(),
-            'school_year' => $year,
+            'role_id' => FacultyRole::inRandomOrder()->first()->id,
+            'sy_id' => SchoolYear::inRandomOrder()->value('id') ?? SchoolYear::factory(),
             'is_active' => fake()->boolean(90),
         ];
     }

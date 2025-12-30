@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('faculties', function (Blueprint $table) {
+        Schema::create('tbl_faculties', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('user_id')
@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('first_name');
             $table->string('middle_name')->nullable();
+            $table->string('suffix')->nullable();
             
             $table->boolean('is_regular')->default(false);
 
@@ -35,6 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('faculties');
+        Schema::dropIfExists('tbl_faculties');
     }
 };

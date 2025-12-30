@@ -23,7 +23,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',     
-        'role'       # depend in final account creation system, temporarily disabled
+        'role',       # depend in final account creation system, temporarily disabled\
+        'identity_no'
     ];
 
     /**
@@ -67,5 +68,10 @@ class User extends Authenticatable
     public function faculty(): HasOne
     {
         return $this->hasOne(Faculty::class);
+    }
+
+    public function student(): HasOne
+    {
+        return $this->hasOne(Student::class);
     }
 }

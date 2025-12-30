@@ -11,10 +11,12 @@ class FacultyAssignment extends Model
     /** @use HasFactory<\Database\Factories\FacultyAssignmentFactory> */
     use HasFactory;
 
+    protected $table = 'tbl_faculty_assignments';
+
     protected $fillable = [
         'faculty_id',
         'role_id',
-        'school_year',
+        'sy_id',
         'is_active',
     ];
 
@@ -35,5 +37,10 @@ class FacultyAssignment extends Model
     public function role(): BelongsTo
     {
         return $this->belongsTo(FacultyRole::class, 'role_id');
+    }
+
+    public function schoolYear(): BelongsTo
+    {
+        return $this->belongsTo(SchoolYear::class, 'sy_id');
     }
 }

@@ -1,5 +1,5 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { Icon } from '@/components/icon';
+import { Icon } from '@/components/icon-index';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -35,14 +35,16 @@ import { dashboard as adminDB } from '@/routes/admin';
 
 import { type BreadcrumbItem, type NavItem, type SharedData} from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { ChevronDown, Search } from 'lucide-react';
+import { ChevronDown, ChevronRight, Search } from 'lucide-react';
 import useUserRole from '@/hooks/use-user-role';
 
 import { adminMainNav } from '@/pages/Admin/_navigation';
 import { facultyMainNav } from '@/pages/Faculty/_navigation';
 import { studentMainNav } from '@/pages/Student/_navigation';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import AppLogoIcon from '@/components/Icons/logo';
 
+const isDarkMode = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
 
 const rightNavItems: NavItem[] = [
     {
@@ -55,12 +57,24 @@ const rightNavItems: NavItem[] = [
     },
 ];
 
+const guestNavItems: NavItem[] = [
+    {
+        title: 'Home',
+        href: '/guest',
+    },
+    {
+        title: 'Repository',
+        href: '/guest/repository',
+    },
+];
+
 interface AppHeaderProps {
     breadcrumbs?: BreadcrumbItem[];
+    variant?: 'default' | 'guest';
 }
 
 
-export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
+export function AppHeader({ breadcrumbs = [], variant = 'default' }: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth } = page.props;
     const getInitials = useInitials();
@@ -68,16 +82,19 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     const url = page.url;
 
     const navItems = useMemo<NavItem[]>(() => {
+        if (variant === 'guest') {
+            return guestNavItems;
+        }
         if (url.startsWith('/admin')) {
-            return adminMainNav; 
+            return adminMainNav;
         } else if (url.startsWith('/faculty')) {
-            return facultyMainNav(); 
+            return facultyMainNav();
         } else if (url === '/' || url.startsWith('/')) {
-            return studentMainNav; 
+            return studentMainNav;
         } else {
             return [];
         }
-    }, [url]);
+    }, [url, variant]);
 
     const home = () => {
         if (url.startsWith('/admin')) {
@@ -89,177 +106,111 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
         }
     };
 
+    const [activeTab, setActiveTab] = useState(0);
 
     return (
-        <>
-            <div className="border-b border-sidebar-border/80 bg-primary">
-                <div className="mx-auto flex h-25 items-center justify-between px-4 md:max-w-[1440px]">
-
-                    {/* NAV LOGO */}
-                    <div>
-                        <Link
-                            href={home()}
-                            prefetch
-                            className="flex items-center gap-3 font-dm-sans hover:opacity-90 transition-opacity"
-                        >
-                            {/* please change it to finalized logo */}
-                            <img
-                                src="https://placehold.co/48/FFBD00/730000/png?text=Logo" 
-                                alt="Thesis Management System Logo"
-                                className="h-12 w-12 object-contain rounded-full"
-                            />
-                            
-                            {/* Text Content */}
-                            <div className="sm:flex flex-col justify-center hidden">
-                                <h1 className="text-[#FFC107] text-xl font-bold leading-tight">
-                                    Thesis Management System
-                                </h1>
-                                <p className="text-white text-sm font-medium">
-                                    Department of Computer Engineering
-                                </p>
-                            </div>
-                        </Link>
-                    </div>
-
-
-                    {/* NAV - Main tabs */}
-                    <div className=" hidden h-full items-center space-x-6 lg:flex">
-                        <NavigationMenu className="flex h-full items-stretch">
-                            <NavigationMenuList className="flex h-full items-stretch space-x-2">
-                                {navItems.map((item, index) => (
-                                    <NavigationMenuItem
-                                        key={index}
-                                        className="relative flex h-full items-center"
-                                    >
-                                        {item.children ? (
-
-                                            // Navtabs with children
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Link
-                                                        href={item.href}
-                                                        className={cn(
-                                                            'hover:bg-[#9B000A] rounded-sm',
-                                                            'bg-primary text-primary-foreground h-9 cursor-pointer px-3 gap-2.5 flex items-center',
-                                                            isSectionUrl(page.url, item.href) && 'text-primary-foreground-2 underline underline-offset-4 bg-[]',
-                                                        )}
-                                                    >
-                                                        {item.title}
-                                                        <ChevronDown className="h-4 w-4 stroke-[3]" />
-                                                    </Link>
-                                                </DropdownMenuTrigger>
-
-                                                <DropdownMenuContent 
-                                                    align="center" 
-                                                    sideOffset={40} 
-                                                    className="w-[200px] rounded-md border shadow-md bg-primary"
-                                                >
-                                                    {item.children.map((child, childIndex) => (
-                                                    <Link
-                                                        key={childIndex}
-                                                        href={child.href}
-                                                        className="block px-3 py-2 text-sm hover:bg-[#9B000A] dark:hover:bg-gray-800 text-center text-primary-foreground"
-                                                    >
-                                                        {child.title}
-                                                    </Link>
-                                                    ))}
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-
-                                        ) : (
-
-                                            // Simple link without children
-                                            <Link
-                                                href={item.href}
-                                                className={cn(
-                                                    'hover:bg-[#9B000A] rounded-sm',
-                                                    'bg-primary text-primary-foreground h-9 cursor-pointer px-3 gap-2.5 flex items-center',
-                                                    isSameUrl(page.url, item.href) && 'text-primary-foreground-2 underline underline-offset-4 bg-[]',
-                                                )}
-                                            >
-                                                {item.title}
-                                            </Link>
-                                        )}
-                                    </NavigationMenuItem>
-                                ))}
-                            </NavigationMenuList>
-                        </NavigationMenu>
-                    </div>
+        <header className="w-full flex flex-col">
+            {/* TOP NAVBAR*/}
+            <div className="bg-primary h-20 flex items-center shadow-md">
+                <div className="mx-auto flex w-full items-center justify-between px-6 md:max-w-[1440px]">
                     
-
-                    {/* NAV - Secondary tabs */}
-                    <div className=" flex items-center space-x-2">
-                        <div className="relative flex items-center space-x-1">
-                            {/* <Button
-                                variant="ghost"
-                                size="icon"
-                                className="group h-9 w-9 cursor-pointer"
-                            >
-                                <Search className="!size-5 opacity-80 group-hover:opacity-100" />
-                            </Button> */}
-                            <div className="hidden lg:flex">
-                                {rightNavItems.map((item) => (
-                                    <TooltipProvider
-                                        key={item.title}
-                                        delayDuration={0}
-                                    >
-                                        <Tooltip>
-                                            <TooltipTrigger>
-                                                <a
-                                                    href={resolveUrl(item.href)}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="group ml-1 inline-flex h-9 w-9 items-center justify-center rounded-md bg-transparent p-0 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-[#9B000A] hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
-                                                >
-                                                    <span className="sr-only">
-                                                        {item.title}
-                                                    </span>
-                                                    <Icon
-                                                        iconNode={Search}
-                                                        className="size-5 opacity-80 group-hover:opacity-100"
-                                                    />
-                                                </a>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p>{item.title}</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
-                                ))}
-                            </div>
+                    {/* 1. LEFT: Fully Static Logo and Branding */}
+                    <div className="flex items-center gap-4 cursor-default select-none">
+                        
+                        {/* STATIC LOGO */}
+                        <AppLogoIcon 
+                            variant={isDarkMode ? "light" : "dark"} 
+                            className="h-13 w-13 drop-shadow-md" 
+                        />
+                        
+                        {/* STATIC TEXT SECTION */}
+                        <div className="flex flex-col">
+                            <h1 className="text-primary-foreground-2 text-xl font-bold leading-none tracking-tight">
+                                Thesis Management System
+                            </h1>
+                            {/* Visual Separator Line */}
+                            <div className="h-[1.2px] bg-background/30 w-full my-1.5" />
+                            <p className="text-background text-xs font-medium uppercase tracking-widest opacity-90 font-dm">
+                                Department of Computer Engineering
+                            </p>
                         </div>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    className="size-10 rounded-full p-1"
-                                >
-                                    <Avatar className="size-8 overflow-hidden rounded-full">
-                                        <AvatarImage
-                                            src={auth.user.avatar}
-                                            alt={auth.user.name}
-                                        />
-                                        <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
-                                            {getInitials(auth.user.name)}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-56" align="end">
-                                <UserMenuContent user={auth.user} />
-                            </DropdownMenuContent>
-                        </DropdownMenu>
                     </div>
+
+                    {/* 2. CENTER: Navigation Links */}
+                    <nav className="hidden lg:flex items-center space-x-1">
+                        {navItems.map((item, index) => (
+                            variant === 'guest' ? (
+                                <Link
+                                    key={index}
+                                    href={item.href || '#'}
+                                    className={cn(
+                                        "px-4 py-2 text-white text-sm font-medium hover:text-[#FFBD00] cursor-pointer transition-colors font-['DM_Sans']",
+                                        isSameUrl(url, item.href) && "text-[#FFBD00]"
+                                    )}
+                                >
+                                    {item.title}
+                                </Link>
+                            ) : (
+                                <div key={index} className="px-4 py-2 text-white text-sm font-medium hover:text-[#FFBD00] cursor-pointer transition-colors">
+                                    {item.title}
+                                    {item.children && <ChevronDown className="inline ml-1 size-3 opacity-50" />}
+                                </div>
+                            )
+                        ))}
+                    </nav>
+
+                    {/* 3. RIGHT: Action Icons & Profile */}
+                    {variant === 'guest' ? (
+                        <div className="flex items-center gap-4">
+                            <Link
+                                href="/login"
+                                className="flex items-center justify-center size-9 rounded-full hover:bg-white/20 transition-colors"
+                                title="Login"
+                            >
+                                <Icon name="profileDefault" size={36} />
+                            </Link>
+                            <button
+                                className="flex items-center justify-center size-9 rounded-full hover:bg-white/20 transition-colors"
+                                title="Help"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="size-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <circle cx="12" cy="12" r="10" stroke="white" />
+                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" stroke="white" />
+                                    <circle cx="12" cy="17" r="0.5" fill="white" />
+                                </svg>
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-4 text-white">
+                            <div className="flex items-center gap-3 border-r border-white/20 pr-4">
+                                <div className="size-5 bg-white/10 rounded-full" title="Profile" />
+                                <div className="relative size-5 bg-white/10 rounded-full" title="Notifications">
+                                    {/* Yellow Dot Indicator */}
+                                    <div className="absolute -top-0.5 -right-0.5 size-2 bg-[#FFBD00] rounded-full border border-[#730000]" />
+                                </div>
+                                <div className="size-5 bg-white/10 rounded-full" title="Help" />
+                                <div className="size-5 bg-white/10 rounded-full" title="Settings" />
+                            </div>
+                            {/* Avatar Placeholder */}
+                            <div className="size-9 bg-[#FFBD00] rounded-full border-2 border-white/10" />
+                        </div>
+                    )}
                 </div>
             </div>
-            
+
+            {/* BREADCRUMB BAR*/}
             {breadcrumbs.length > 0 && (
-                <div className="flex w-full bg-breadcrumb border-b border-sidebar-border/70">
-                    <div className="mx-auto flex h-12 w-full items-center justify-start px-4 bg-breadcrumb text-neutral-500 md:max-w-[1440px]">
-                        <Breadcrumbs breadcrumbs={breadcrumbs} />
+                <div className="bg-breadcrumb h-10 border-b border-foreground/5 flex items-center">
+                    <div className="mx-auto flex w-full items-center px-6 md:max-w-[1440px]">
+                        <div className="flex items-center gap-2 text-xs font-medium text-primary/70">
+                             {/* Breadcrumb Placeholder */}
+                            <span>Home</span>
+                            <ChevronRight className="size-3" />
+                            <span className="font-bold text-primary">Current Page</span>
+                        </div>
                     </div>
                 </div>
             )}
-        </>
+        </header>
     );
 }

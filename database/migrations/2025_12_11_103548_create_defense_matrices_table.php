@@ -11,26 +11,24 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('defense_matrices', function (Blueprint $table) {
+        Schema::create('tbl_defense_matrices', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('thesis_id')
-                  ->constrained('theses')
+            $table->foreignId('endorsement_id')
+                  ->constrained('tbl_endorsements')
                   ->cascadeOnDelete();
-
-            $table->string('title');
 
             $table->enum('course', ['MOR', 'DP1', 'DP2'])->comment('MOR, DP1, DP2');
 
             // Derived (Review this later)
-            $table->string('academic_year')->nullable();
+            // $table->string('academic_year')->nullable();
 
             $table->dateTime('defense_schedule');
 
-            $table->string('defense_room');
+            $table->integer('defense_room');
 
             // Derived (Review this later)
-            $table->boolean('is_defended')->default(false);
+            // $table->boolean('is_defended')->default(false);
 
             $table->timestamps();
         });
@@ -41,6 +39,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('defense_matrices');
+        Schema::dropIfExists('tbl_defense_matrices');
     }
 };

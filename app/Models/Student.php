@@ -2,17 +2,22 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Student extends Model
 {
+    use HasFactory;
+
+    protected $table = 'tbl_students';
+    
     protected $fillable = [
         'user_id',
         'group_id',
-        'email',
         'last_name',
         'first_name',
         'middle_name',
+        'suffix',
         'section',
         'spec_id',
         'is_leader',
@@ -23,6 +28,11 @@ class Student extends Model
     ];
     
 
+    /*
+    ==================================================================================
+    RELATIONSHIPS
+    ==================================================================================
+    */
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -30,6 +40,11 @@ class Student extends Model
 
     public function specialization()
     {
-        return $this->belongsTo(Specialization::class, 'spec_id');
+        return $this->belongsTo(Specialization::class);
+    }
+
+    public function group()
+    {
+        return $this->belongsTo(ThesisGroup::class);
     }
 }

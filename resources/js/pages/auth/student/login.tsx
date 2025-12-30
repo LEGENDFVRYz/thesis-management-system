@@ -1,5 +1,7 @@
+import RoleToggle from '@/components/role-toggle';
+import { login as facultyLogin } from '@/routes/faculty';
 import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
+import { TextLink } from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -10,6 +12,7 @@ import { register } from '@/routes';
 import { store } from '@/routes/student';
 import { request } from '@/routes/password';
 import { Form, Head } from '@inertiajs/react';
+import { useState } from 'react';
 
 interface LoginProps {
     status?: string;
@@ -22,6 +25,33 @@ export default function Login({
     canResetPassword,
     canRegister,
 }: LoginProps) {
+    const [validationErrors, setValidationErrors] = useState<{
+        identity_no?: string;
+        password?: string;
+    }>({});
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        const identity = (e.currentTarget.querySelector('#identity_no') as HTMLInputElement)?.value || '';
+        const password = (e.currentTarget.querySelector('#password') as HTMLInputElement)?.value || '';
+
+        const errors: { identity_no?: string; password?: string } = {};
+
+        if (!identity.trim()) {
+            errors.identity_no = '* This is a required field';
+        }
+        if (!password.trim()) {
+            errors.password = '* This is a required field';
+        }
+
+        if (Object.keys(errors).length > 0) {
+            e.preventDefault();
+            setValidationErrors(errors);
+            return false;
+        }
+
+        setValidationErrors({});
+    };
+
     return (
         <AuthLayout
             title="Sign In"
@@ -32,76 +62,93 @@ export default function Login({
             <Form
                 {...store.form()}
                 resetOnSuccess={['password']}
-                className="flex flex-col gap-6"
+                className="flex flex-col gap-[16px]"
+                onSubmit={handleSubmit}
             >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="login_id">Student Number</Label>
+                        {/* Add Role Toggle */}
+                        <RoleToggle
+                            currentRole="student"
+                            studentRoute={store()}
+                            facultyRoute={facultyLogin()}
+                        />
+
+                        <div className="flex flex-col items-center gap-[17px] self-stretch">
+                            {errors.identity_no && errors.identity_no.includes('credentials') && (
+                                <div className="w-full sm:w-[384px] text-center">
+                                    <InputError message={errors.identity_no} />
+                                </div>
+                            )}
+                            <div className="flex flex-col gap-[8px] w-full sm:w-[384px]">
+                                <Label htmlFor="identity_no">Student No.</Label>
                                 <Input
+                                    className="auth-input"
                                     id="identity_no"
                                     type="text"
                                     name="identity_no"
-                                    required
-                                    autoFocus
                                     tabIndex={1}
-                                    autoComplete="email"
+                                    autoComplete="off"
                                     placeholder="20XX-XXXXX-MN-X"
+                                    style={validationErrors.identity_no ? {
+                                        borderColor: '#730000'
+                                    } as React.CSSProperties : undefined}
                                 />
-                                <InputError message={errors.identity_no} />
+                                {validationErrors.identity_no && <InputError message={validationErrors.identity_no} />}
+                                {!validationErrors.identity_no && errors.identity_no && !errors.identity_no.includes('credentials') && <InputError message={errors.identity_no} />}
                             </div>
 
-                            <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
-                                </div>
+                            <div className="flex flex-col gap-[8px] w-full sm:w-[384px]">
+                                <Label htmlFor="password">Password</Label>
                                 <Input
+                                    className="auth-input"
                                     id="password"
                                     type="password"
                                     name="password"
-                                    required
                                     tabIndex={2}
                                     autoComplete="current-password"
-                                    placeholder="Password"
+                                    placeholder="Enter your password"
+                                    style={validationErrors.password ? {
+                                        borderColor: '#730000'
+                                    } as React.CSSProperties : undefined}
                                 />
-                                <InputError message={errors.password} />
+                                {validationErrors.password && <InputError message={validationErrors.password} />}
+                                {!validationErrors.password && errors.password && <InputError message={errors.password} />}
                             </div>
-                            
-                            {/* TEMPORARY COMMENTED OUT */}
-                            {/* <div className="flex items-center space-x-3">
-                                <Checkbox
-                                    id="remember"
-                                    name="remember"
-                                    tabIndex={3}
-                                />
-                                <Label htmlFor="remember">Remember me</Label>
-                            </div> */}
-
                             <Button
                                 type="submit"
-                                className="mt-4 w-full"
+                                variant="negative"
+                                className="w-full sm:w-[384px] h-[36px] font-['DM_Sans'] font-medium text-[13.33px] text-justify rounded-[8px]"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
                             >
                                 {processing && <Spinner />}
-                                Log in
+                                Sign In
                             </Button>
                         </div>
-
-                        {canResetPassword && (
-                            <TextLink
-                                href={request()}
-                                className="m-auto text-sm text-center"
-                                tabIndex={5}
-                            >
-                                Forgot password?
-                            </TextLink>
-                        )}
                     </>
                 )}
             </Form>
+            
+            {canResetPassword && (
+                <TextLink
+                    href={request()}
+                    className="block text-sm text-center text-[#730000] hover:underline"
+                    tabIndex={5}
+                >
+                    Forgot password?
+                </TextLink>
+            )}
+
+            {canRegister && (
+                <div className="text-center text-sm text-muted-foreground mt-4">
+                    Don't have an account?{' '}
+                    <TextLink href={register()} className="text-[#730000] hover:underline" tabIndex={6}>
+                        Sign up
+                    </TextLink>
+                </div>
+            )}
 
             {status && (
                 <div className="mb-4 text-center text-sm font-medium text-green-600">

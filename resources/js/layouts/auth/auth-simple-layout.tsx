@@ -1,4 +1,4 @@
-import AppLogoIcon from '@/components/app-logo-icon';
+import Logo from '@/components/icons/logo';
 import { home } from '@/routes';
 import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
@@ -21,11 +21,9 @@ export default function AuthSimpleLayout({
                 {/* Top PART */}
                 <div className="space-y-5">
                     <div className="flex h-12 w-12">
-                        {/* please change it to finalized logo */}
-                        <img
-                            src="https://placehold.co/48/FFBD00/730000/png?text=Logo" 
-                            alt="Thesis Management System Logo"
-                            className="h-12 w-12 object-contain rounded-full"
+                        <Logo
+                            className="h-12 w-12"
+                            variant="light"
                         />
                     </div>
                     

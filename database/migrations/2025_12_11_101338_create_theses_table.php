@@ -11,26 +11,24 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('theses', function (Blueprint $table) {
+        Schema::create('tbl_theses', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('proposal_id')
-                  ->constrained('proposals')
-                  ->cascadeOnDelete();
-
-            $table->foreignId('group_id')
-                  ->constrained('thesis_groups')
+                  ->constrained('tbl_proposals')
                   ->cascadeOnDelete();
 
             // Derived (Review this later)
-            $table->integer('group_code')->nullable();
+            // $table->foreignId('group_id')
+            //       ->constrained('tbl_thesis_groups')
+            //       ->cascadeOnDelete();
 
             $table->string('title');
 
             $table->text('manuscript_filepath')->nullable();
 
             // Derived (Review this later)
-            $table->string('thesis_status')->nullable();
+            // $table->string('thesis_status')->nullable();
 
             $table->timestamps();
         });
@@ -41,6 +39,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('theses');
+        Schema::dropIfExists('tbl_theses');
     }
 };
