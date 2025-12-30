@@ -18,6 +18,7 @@ use App\Http\Controllers\Faculty\Coordinator\DefenseManagement\Matrix;
 use App\Http\Controllers\Faculty\Coordinator\DefenseManagement\PanelAssign;
 use App\Http\Controllers\Faculty\Coordinator\ThesisMonitoring\ThesisRegistry;
 use App\Http\Controllers\Faculty\Joint1\DefenseManagement;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\FileImportController;
 use App\Http\Controllers\Shared\ThesisArchive;
 use Illuminate\Support\Facades\Route;
@@ -242,9 +243,13 @@ Note: Temporary Routes only for frontend, but soon will have own controller depe
 ==================================================================================
 */
 Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('Admin/dashboard');
-    })->name('admin.dashboard');
+    
+    // Old Dashboard Route
+    // Route::get('/', function () {
+    //     return Inertia::render('Admin/dashboard');
+    // })->name('admin.dashboard');
+
+    Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
 
     // Management Routes
     Route::prefix('management')->group(function () {

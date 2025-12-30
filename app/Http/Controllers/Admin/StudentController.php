@@ -23,6 +23,16 @@ class StudentController extends Controller
      */
     public function index()
     {
+
+        // Get the year (e.g., 2025) from the active semester
+        $activeYear = DB::table('tbl_school_years')
+            ->join('tbl_semesters', 'tbl_school_years.id', '=', 'tbl_semesters.school_year_id')
+            ->where('tbl_semesters.is_active', true)
+            ->value('year');
+
+        // Fallback if no active year is set (optional safety)
+        $activeYear = $activeYear ?? 2025;
+
         $students = DB::table('tbl_students')
             // 1. Join Users (For Student Number & Email)
             ->leftJoin('users', 'tbl_students.user_id', '=', 'users.id')
@@ -64,11 +74,13 @@ class StudentController extends Controller
                 // ELSE: Section + Padded Group Number (09)
                 DB::raw("
                     CONCAT(
-                        3 - (tbl_school_years.year - 2025), 
-                        tbl_section_advisers.section,
+                        (3 + ($activeYear - tbl_school_years.year)), 
+                        tbl_section_advisers.section, 
                         LPAD(tbl_thesis_groups.group_number, 2, '0')
-                    )  AS group_code
+                    ) AS group_code
                 "),
+
+                DB::raw("(3 + ($activeYear - tbl_school_years.year)) as year_level"),
             )
             ->orderBy('tbl_students.id', 'asc')
             ->get(); // Use ->paginate(10) if you want pagination
