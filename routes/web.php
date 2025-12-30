@@ -102,6 +102,10 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Student/dashboard'); // Your Student Dashboard Component
     })->name('dashboard');
+
+    Route::get('notification', function () {
+        return Inertia::render('Shared/notification');
+    })->name('student.notification');
 });
 
 
@@ -227,6 +231,10 @@ Route::prefix('faculty')->group(function () {
             return Inertia::render('Shared/resources');
         })->name('faculty.resources');
 
+        Route::get('notification', function () {
+            return Inertia::render('Shared/notification');
+        })->name('faculty.notification');
+
         // Route::get('repository', function () {
         //     return Inertia::render('Shared/repository/thesis');
         // })->name('faculty.repository');
@@ -295,6 +303,10 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
     Route::get('resources', function () {
         return Inertia::render('Shared/resources');
     })->name('admin.resources');
+
+    Route::get('notification', function () {
+        return Inertia::render('Shared/notification');
+    })->name('admin.notification');
 });
 
 
