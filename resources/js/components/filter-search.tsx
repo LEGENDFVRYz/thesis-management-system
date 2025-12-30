@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { YearRangePicker } from "@/components/acad-year-range-picker";
 import { Search, X, Calendar, Plus } from 'lucide-react';
-import { SecondarySort } from './icons/secondary-sort';
+import { SecondarySort } from './Icons/secondary-sort';
 
 
 /* =======================
@@ -469,7 +469,7 @@ export function RepoFilter({ onClose, onApply }: { onClose?: () => void; onApply
       </div>
 
       {/* Bottom Action Buttons */}
-      <div className="flex items-center justify-between pt-4 border-t">
+      <div className="flex items-center justify-end gap-3 pt-4 border-t">
         <button
           onClick={() => {
             setSortState('clicked');
@@ -482,28 +482,26 @@ export function RepoFilter({ onClose, onApply }: { onClose?: () => void; onApply
         >
           <SecondarySort state={sortState} />
         </button>
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            onClick={handleReset}
-          >
-            Reset
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={onClose}
-            className="font-['DM_Sans']"
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="negative"
-            onClick={handleApplyClick}
-            className="font-['DM_Sans']"
-          >
-            Apply All Filters
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          onClick={handleReset}
+        >
+          Reset
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={onClose}
+          className="font-['DM_Sans']"
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="negative"
+          onClick={handleApplyClick}
+          className="font-['DM_Sans']"
+        >
+          Apply All Filters
+        </Button>
       </div>
     </div>
   );
