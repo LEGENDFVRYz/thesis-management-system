@@ -82,7 +82,7 @@ const CustomLegend = () => (
       gap: "16px",
       marginTop: "16px",
       fontSize: "13px",
-      color: "#374151",
+      color: "#000000",
       alignItems: "center",
     }}
   >
@@ -134,9 +134,10 @@ export function SubmissionStatusChart({
     <div className={className} style={{ width: "100%", fontFamily: '"DM Sans", sans-serif' }}>
       <div
         style={{
-          backgroundColor: "#ffffff",
+          backgroundColor: "#FDFCF6",
           borderRadius: "8px",
-          boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
+          border: "1px solid #73000042",
+          boxShadow: "0px 4px 12px #00000040",
           padding: "24px",
         }}
       >
