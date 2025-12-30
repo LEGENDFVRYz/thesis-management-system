@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Faculty;
 use App\Models\FacultyAssignment;
 use App\Models\FacultyRole;
+use App\Models\SchoolYear;
 use App\Models\Semester;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -19,69 +20,72 @@ class FacultySeeder extends Seeder
     {
         $faker = Faker::create();
 
-        // 1. FIND ACTIVE SCHOOL YEAR ID via Active Semester
+        // 1. GET ACTIVE SY (Keep this for mandatory active roles)
         $activeSemester = Semester::where('is_active', true)->first();
-
         if (!$activeSemester) {
-            $this->command->error("No active semester found. Run SchoolYearSeeder first.");
+            $this->command->error("No active semester found.");
             return;
         }
-        
-        // EXTRACT THE SY ID HERE to pass it cleanly later
         $activeSyId = $activeSemester->school_year_id;
 
-        // 2. Fetch Key Roles
+        // 2. GET ALL SY IDs (For random history/past assignments)
+        // This will likely give you [1, 2] based on your seeder
+        $allSyIds = SchoolYear::pluck('id'); 
+
+        // 3. Fetch Roles
         $panelRole     = FacultyRole::where('role_name', 'Panelist')->first();
         $adviserRole   = FacultyRole::where('role_name', 'Adviser')->first();
         $committeeRole = FacultyRole::where('role_name', 'Committee')->first();
-        
-        $otherRoles = FacultyRole::whereIn('role_name', ['Admin', 'Coordinator', 'Co-adviser'])->get();
+        $otherRoles    = FacultyRole::whereIn('role_name', ['Admin', 'Coordinator', 'Co-adviser'])->get();
 
-        if (!$panelRole || !$adviserRole || !$committeeRole) {
-            $this->command->error("Required roles are missing. Seed roles first.");
-            return;
-        }
+        if (!$panelRole || !$adviserRole || !$committeeRole) return;
 
-        // 3. Create New Dummy Faculties
+        // 4. Create/Get Faculties
         Faculty::factory(10)->create();
-
-        // 4. SCAN EVERY FACULTY IN THE DATABASE
         $allFaculties = Faculty::all();
 
         foreach ($allFaculties as $faculty) {
             
-            // A. MANDATORY: Everyone becomes a Panelist
-            // Pass the SY ID, not the Semester ID
+            // =========================================================
+            // A. MANDATORY: Panelist (ALWAYS ACTIVE SY)
+            // We keep this on 2025 so they can function in the current app
+            // =========================================================
             $this->assignRole($faculty->id, $panelRole->id, $activeSyId);
 
-            // B. EXTRA ROLES LOGIC
+            // =========================================================
+            // B. EXTRA ROLES (RANDOM SY)
+            // This creates variety (2024 vs 2025)
+            // =========================================================
             if (rand(1, 100) <= 70) {
                 
+                // Pick a random year (2024 or 2025)
+                $randomSyId = $allSyIds->random(); 
+
                 $isAdviser = rand(1, 100) <= 60;
 
                 if ($isAdviser) {
-                    $this->assignRole($faculty->id, $adviserRole->id, $activeSyId);
-                    $this->assignRole($faculty->id, $committeeRole->id, $activeSyId);
+                    // Assign Adviser to a RANDOM year
+                    $this->assignRole($faculty->id, $adviserRole->id, $randomSyId);
+                    
+                    // Committee must match the same random year
+                    $this->assignRole($faculty->id, $committeeRole->id, $randomSyId);
                     
                 } elseif ($otherRoles->isNotEmpty()) {
                     $randomRole = $otherRoles->random();
-                    $this->assignRole($faculty->id, $randomRole->id, $activeSyId);
+                    $this->assignRole($faculty->id, $randomRole->id, $randomSyId);
                 }
             }
         }
 
-        $this->command->info("Assigned roles to {$allFaculties->count()} faculty members for SY ID: {$activeSyId}.");
+        $this->command->info("Assigned roles to {$allFaculties->count()} faculties across multiple School Years.");
     }
 
-    /**
-     * Helper function to safely assign roles
-     */
     private function assignRole($facultyId, $roleId, $syId)
     {
         FacultyAssignment::firstOrCreate([
             'faculty_id'  => $facultyId,
             'role_id'     => $roleId,
-            'sy_id'       => $syId, // Now uses the variable passed to the function
+            'sy_id'       => $syId, 
         ], [
             'is_active'   => true,
         ]);

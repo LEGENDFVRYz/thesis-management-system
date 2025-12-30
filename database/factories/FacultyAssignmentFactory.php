@@ -24,7 +24,7 @@ class FacultyAssignmentFactory extends Factory
         return [
             'faculty_id' => Faculty::factory(),
             'role_id' => FacultyRole::inRandomOrder()->first()->id,
-            'sy_id' => SchoolYear::inRandomOrder()->first()->id ?? SchoolYear::factory(),
+            'sy_id' => SchoolYear::inRandomOrder()->value('id') ?? SchoolYear::factory(),
             'is_active' => fake()->boolean(90),
         ];
     }
