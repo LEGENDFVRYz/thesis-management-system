@@ -112,7 +112,7 @@ export function AppHeader({ breadcrumbs = [], variant = 'default' }: AppHeaderPr
         <header className="w-full flex flex-col">
             {/* TOP NAVBAR*/}
             <div className="bg-primary h-20 flex items-center shadow-md">
-                <div className="mx-auto flex w-full items-center justify-between px-6 md:max-w-[1440px]">
+                <div className="flex w-full items-center justify-between px-6">
                     
                     {/* 1. LEFT: Fully Static Logo and Branding */}
                     <div className="flex items-center gap-4 cursor-default select-none">

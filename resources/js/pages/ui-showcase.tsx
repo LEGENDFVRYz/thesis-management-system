@@ -154,6 +154,51 @@ export default function UIShowcase() {
             ] 
         }
     ];
+
+    const coordinatorManagementItems = [
+        { 
+            id: 'coordinator-root', 
+            title: 'Coordinator', 
+            children: [
+            { title: 'Compliance & Eligibility', href: '#', isHeader: true },
+            { title: 'Pre-Defense Compliance', href: '/coordinator/compliance' },
+            { title: 'Endorsement Management', href: '/coordinator/endorsement' },
+            { title: 'Thesis Monitoring', href: '#', isHeader: true },
+            { title: 'Thesis Registry', href: '/coordinator/registry' },
+            { title: 'Progress Reports', href: '/coordinator/progress' },
+            { title: 'Defense Management', href: '#', isHeader: true },
+            { title: 'Defense Schedule', href: '/coordinator/schedule' },
+            { title: 'Panel Assignment', href: '/coordinator/panel' },
+            { title: 'Matrix Management', href: '/coordinator/matrix' },
+            { title: 'Grading Management', href: '/coordinator/grading' }
+            ] 
+        }
+    ];
+
+    const studentManagementItems = [
+        { 
+            id: 'student-root', 
+            title: 'Student',
+            children: [
+                // Progress Tracking Section
+                { title: 'Progress Tracking', href: '/student/progress', isHeader: true },
+                { title: 'Overall Progress', href: '/student/progress/overall' },
+                { title: 'Consultations', href: '/student/progress/consultations' },
+                { title: 'Status Reports', href: '/student/progress/status-reports' },
+                
+                // Thesis Management Section
+                { title: 'Thesis Management', href: '/student/thesis' },
+                
+                // Defense Management
+                { title: 'Defense Management', href: '/student/defense' },
+                
+                // Compliance & IP Section
+                { title: 'Compliance & IP', href: '/student/compliance', isHeader: true },
+                { title: 'IP & Plagiarism', href: '/student/ip-plagiarism' },
+                { title: 'Public Presentation', href: '/student/public-presentation' }
+            ] 
+        }
+    ];
     
     return (
         <div className={`min-h-screen transition-colors duration-300 ${bgClass}`}>
@@ -930,8 +975,29 @@ export default function UIShowcase() {
                             variant="faculty" 
                             items={facultyManagementItems} 
                             />
+
+                            <GlobalNavDropdown 
+                            label="Management" 
+                            variant="coordinator" 
+                            items={coordinatorManagementItems} 
+                            />
                         </div>
                     </section>
+
+                    {/* Student List Dropdown Variants Section */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Student Management Dropdown</h2>
+                        <p className="text-sm text-gray-400">Hover over the tabs to see management routes for students</p>
+                        
+                        <div className="p-5 bg-background rounded-xl border border-border flex justify-start gap-10 items-start min-h-[50px]">
+                            <GlobalNavDropdown 
+                                label="Management" 
+                                variant="student" 
+                                items={studentManagementItems} 
+                            />
+                        </div>
+                    </section>
+
 
                     {/* Placeholder Pattern */}
                     <section className="space-y-4">
