@@ -1,3 +1,4 @@
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -43,7 +44,7 @@ const sampleAdvisees: Advisee[] = Array(20).fill({
 });
 
 export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
-    // Use sample data if no real data provided
+    // Using sample data
     const displayAdvisees = advisees.length > 0 ? advisees : sampleAdvisees;
 
     return (
@@ -70,6 +71,9 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                     <Button variant="primary">Clear Filter</Button>
                 </div>
             </div>
+            <Badge variant="default" className="mb-4">
+                Total Advisees (20)
+            </Badge>
 
             {/* Table Section */}
             <div className="overflow-x-auto rounded-lg border-1 border-[var(--primary)] bg-white shadow">
