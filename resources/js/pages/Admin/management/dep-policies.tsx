@@ -12,8 +12,7 @@ import StageSwitchToggle from '@/components/stage-toggle';
 import EditIcon from '@/components/Icons/ic_edit-Default.svg';
 import DeleteIcon from '@/components/Icons/ic_delete-Default.svg';
 import AddIcon from '@/components/Icons/ic_add-Default.svg';
-import DeptPolicyIcon from '@/components/Icons/ic_pen-settings-Default.svg';
-
+import ManagementIcon from '@/components/Icons/ic_pen-settings-Default.svg';
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -362,7 +361,7 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
             breadcrumbs={breadcrumbs}
             title={
                 <div className="flex items-center gap-2 text-[#FFBD00]">
-                    <img src={DeptPolicyIcon} className="w-6 h-6" />
+                    <img src={ManagementIcon} className="w-6 h-6" />
                     <span className="font-medium">Department Policies</span>
                 </div>
             }
