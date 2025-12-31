@@ -18,7 +18,7 @@ interface NavItem {
 interface Props {
     label?: string;
     items: NavItem[];
-    variant?: 'faculty' | 'admin';
+    variant?: 'faculty' | 'admin' | 'coordinator' | 'student';
 }
 
 export function GlobalNavDropdown({ 
@@ -30,6 +30,8 @@ export function GlobalNavDropdown({
     const [activeTab, setActiveTab] = useState<string | null>(null);
 
     const isAdmin = variant === 'admin';
+    const isCoordinator = variant === 'coordinator';
+    const isStudent = variant === 'student';
 
     return (
         <div 
@@ -44,7 +46,7 @@ export function GlobalNavDropdown({
             <Button
                 variant="primary"
                 className={cn(
-                    "w-fit h-10 px-4 transition-all rounded-md flex items-center justify-start gap-5 border-none shadow-md",
+                    "w-fit h-10 px-4 transition-all rounded-md flex items-center justify-start gap-5 border-none shadow-md", isStudent && "min-w-[160px]", "w-full justify-between",
                     /* Combined the hover states for clarity */
                     "bg-primary text-background hover:bg-destructive", 
                     /* Added underline and ensured text remains yellow on hover */
@@ -66,12 +68,12 @@ export function GlobalNavDropdown({
                     "w-full"
                 )}>
                     
-                    {isAdmin ? (
-                        /* --- ADMIN VARIANT --- */
+                    {isAdmin || isCoordinator || isStudent ? (
+                        /* --- ADMIN/COORDINATOR/STUDENT VARIANT --- */
                         <div className="w-full rounded-b-xl bg-primary borderbackdrop-blur-sm">
                             {items[0]?.children?.map((sub, idx) => {
                                 const isCategory = sub.isHeader || 
-                                    ["User Management", "System Configuration", "Defense Management", "Panel Endorsement"].includes(sub.title);
+                                    ["User Management", "System Configuration", "Defense Management", "Panel Endorsement", "Grading Management", "Thesis Management", "Defense Management"].includes(sub.title);
 
                                 return (
                                     <div key={idx} className={cn(
