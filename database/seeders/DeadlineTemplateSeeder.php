@@ -83,32 +83,58 @@ class DeadlineTemplateSeeder extends Seeder
             ['stage' => 3, 'sort_order' => 16, 'name' => 'Finalization', 'role' => 'Adviser', 'type' => 'review', 'days' => 3, 'desc' => 'Release Clearance'],
         ];
 
+        $milestone_desc = [
+            '1-1' => 'Initial submission and adviser review of the research proposal.',
+            '1-2' => 'Committee assessment of the proposal viability.',
+            '1-3' => 'Formal approval from adviser to proceed to defense.',
+            '1-4' => 'Final manuscript submission and defense scheduling.',
+            '1-5' => 'Oral presentation and defense of the research proposal.',
+            '1-6' => 'Revisions based on panel feedback and final grading.',
+
+            '2-7' => 'Development progress monitoring and consultation.',
+            '2-8' => 'Validation of DP1 manuscript for defense eligibility.',
+            '2-9' => 'Submission of DP1 deliverables and scheduling.',
+            '2-10' => 'Presentation of the design and initial prototype.',
+            '2-11' => 'Feasibility validation and revision compliance.',
+
+            '3-12' => 'Final development phase and progress updates.',
+            '3-13' => 'Validation of complete project manuscript for final defense.',
+            '3-14' => 'Final oral defense and project demonstration.',
+            '3-15' => 'Completion confirmation and awarding nomination.',
+            '3-16' => 'Clearance, binding, and final administrative requirements.',
+        ];
+
+
+        // Main logic: Insert all the data
         foreach ($template as $item) {
-            // 1. Create or Find the Parent Milestone
-            // We use 'stage' and 'sort_order' as the unique key
+            // Pulled the genral description per milestone
+            $key = $item['stage'] . '-' . $item['sort_order'];
+            $general_desc = $milestone_desc[$key] ?? null;
+
+            // Create or Find the Parent Milestone
             $milestoneId = DB::table('tbl_milestones')
                 ->where('stage', $item['stage'])
                 ->where('sort_order', $item['sort_order'])
-                ->value('id'); // Attempt to get ID if exists
+                ->value('id');
 
-            // If it doesn't exist, create it
             if (!$milestoneId) {
+                // If it doesn't exist, create it
                 $milestoneId = DB::table('tbl_milestones')->insertGetId([
                     'stage' => $item['stage'],
                     'sort_order' => $item['sort_order'],
                     'name' => $item['name'],
-                    'desc' => null, // Generic description, can be added later
+                    'desc' => $general_desc,    // Generic description of the milestone
                 ]);
             }
 
-            // 2. Insert the Child Template (Role specific)
+            // Insert (Role specific) rulings in the deadlines
             DB::table('tbl_deadline_rules')->insert([
                 'milestone_id' => $milestoneId,
                 'role' => $item['role'],
                 'type' => $item['type'],
-                'desc' => $item['desc'], // Map 'description' array key to 'desc' column
+                'desc' => $item['desc'], 
                 'days' => $item['days'],
-                'anchor' => null, // Set to null for now
+                'anchor' => null,           // Set to null temporarily
             ]);
         }
     }
