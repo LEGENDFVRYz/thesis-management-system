@@ -13,15 +13,18 @@ return new class extends Migration
     {
         Schema::create('tbl_deadline_templates', function (Blueprint $table) {
             $table->id();
-            $table->integer('stage');               // 1=MOR, 2=DP1, 3=DP2
-            $table->integer('sort_order');          // Step number (e.g., 1, 2, 3...)
+            
+            // $table->foreignId('id')
+            //       ->constrained('tbl_milestones')
+            //       ->cascadeOnDelete();
+
             $table->string('role');
 
-            $table->string('name');
-            $table->text('description')->nullable();
             $table->string('type');
-            $table->integer('days')->nullable();    // Default duration
-            $table->integer('anchor')->nullable();  // Code for dependency calculation
+            $table->text('desc')->nullable();        // Role-specific display description
+            $table->integer('days')->nullable();     // Default duration
+            $table->integer('anchor')->nullable()    // id for dependency calculation
+                  ->comment('linked to itself');    
         });
     }
 

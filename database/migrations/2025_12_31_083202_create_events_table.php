@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('tbl_events', function (Blueprint $table) {
             $table->id();
             
-            $table->foreignId('dl_template_id')
-                  ->constrained('tbl_deadline_templates')
-                  ->onDelete('cascade');
-            
+            $table->foreignId('milestone_id')
+                  ->constrained('tbl_milestones')
+                  ->cascadeOnDelete();
+                  
             $table->foreignId('semester_id')
                   ->constrained('tbl_semesters')
                   ->onDelete('cascade');
