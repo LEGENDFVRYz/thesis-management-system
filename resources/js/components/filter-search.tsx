@@ -5,7 +5,7 @@ import { CheckboxWithLabel } from "@/components/ui/checkbox-with-label";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { YearRangePicker } from "@/components/acad-year-range-picker";
+import YearRangePicker from "@/components/acad-year-range-picker";
 import { Search, X, Calendar, Plus } from 'lucide-react';
 import { SecondarySort } from './Icons/secondary-sort';
 import { cn } from "@/lib/utils";

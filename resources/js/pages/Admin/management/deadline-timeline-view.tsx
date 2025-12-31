@@ -1,6 +1,6 @@
 import { Calendar, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Timeline } from '@/components/timeline';
+import Timeline from '@/components/timeline';
 
 export function DeadlineTimelineView() {
     return (

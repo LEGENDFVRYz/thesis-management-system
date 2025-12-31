@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
-import { YearRangePicker } from '@/components/acad-year-range-picker';
+import YearRangePicker from '@/components/acad-year-range-picker';
 import { Button } from '@/components/ui/button';
 import FilterIcon from '@/components/icons/filter-icon';
 import { RepoFilter } from '@/components/filter-search';

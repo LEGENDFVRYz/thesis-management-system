@@ -35,7 +35,7 @@ import { HomeIcon, SettingsIcon, UsersIcon, Moon, Sun, Plus, Trash2, ArrowRight,
 import { SwitchButton } from '@/components/ui/switch-button';
 import { cn } from '@/lib/utils';
 import { Tabs, TabButton } from '@/components/ui/tabs';
-import { DatePicker } from '@/components/date-picker';
+import DatePicker from '@/components/date-picker';
 import { SubmissionStatusChart } from '@/components/submission-status-bar';
 import { PerformanceOverviewChart } from '@/components/performance-overview-ver-bar';
 import { ResearchAreaChart } from '@/components/research-area-distribution-pie';
@@ -50,7 +50,7 @@ import { NotificationList, NotificationListItem } from '@/components/ui/notifica
 import StageSwitchToggle from '@/components/stage-toggle';
 import { FileUpload } from '@/components/file-upload';
 import FilePreview from '@/components/document-preview';
-import { Timeline } from '@/components/timeline';
+import Timeline from '@/components/timeline';
 import { toast } from 'sonner';
 import { AppHeader } from '@/components/app-header';
 import { GlobalNavDropdown } from '@/components/app-header-management';
