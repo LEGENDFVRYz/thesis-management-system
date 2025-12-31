@@ -1,8 +1,11 @@
 import ManagementLayout from '@/pages/Admin/management/index';
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { deadline } from '@/routes/admin/management/index';
+import { DeadlineTimelineView } from './deadline-timeline-view';
+import { DeadlineSubmissionSchedule } from './deadline-submission-schedule';
+import { DeadlineDefenseSchedule } from './deadline-defense-schedule';
+import { DeadlineNotificationRules } from './deadline-notification-rules';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -13,14 +16,21 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function DeadlinePage() {
     return (
-        <ManagementLayout 
+        <ManagementLayout
             breadcrumbs={breadcrumbs}
-            title="Deadline Management" 
-            description="Set submission windows, defense periods, and grading deadlines "
+            title="Deadline Management"
+            description="Set submission windows, defense periods, and grading deadlines"
         >
-            
-            <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+            <div className="space-y-6">
+                {/* Timeline View - Full Width */}
+                <DeadlineTimelineView />
+
+                {/* Three Column Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <DeadlineSubmissionSchedule />
+                    <DeadlineDefenseSchedule />
+                    <DeadlineNotificationRules />
+                </div>
             </div>
         </ManagementLayout>
     );

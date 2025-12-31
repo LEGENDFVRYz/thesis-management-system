@@ -445,6 +445,7 @@ interface ArchiveCardProps {
   badges: string[]
   onViewAbstract?: () => void
   variant?: 'default' | 'with-link'
+  href?: string
   className?: string
 }
 
@@ -455,6 +456,7 @@ function ArchiveCard({
   badges,
   onViewAbstract,
   variant = 'default',
+  href = '/guest/preview',
   className
 }: ArchiveCardProps) {
   return (
@@ -499,7 +501,7 @@ function ArchiveCard({
         <div className="w-full sm:h-9 relative">
           {variant === 'with-link' ? (
             <Link
-              href="/guest/preview"
+              href={href}
               className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full sm:w-auto text-xs sm:text-sm"
             >
               View Abstract
