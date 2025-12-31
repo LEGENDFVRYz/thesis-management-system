@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import {
     Table,
@@ -13,6 +14,7 @@ import { my_advisees } from '@/routes/faculty/management/adviser/advisee_managem
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Users } from 'lucide-react';
+import { useState } from 'react';
 import AdviseeManagementLayout from '.';
 
 const breadcrumb: BreadcrumbItem[] = [
@@ -44,8 +46,11 @@ const sampleAdvisees: Advisee[] = Array(20).fill({
 });
 
 export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
-    // Using sample data
-    const displayAdvisees = advisees.length > 0 ? advisees : sampleAdvisees;
+    const displayAdvisees = advisees.length > 0 ? advisees : sampleAdvisees; // Using sample data
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const [selectedAdvisee, setSelectedAdvisee] = useState<Advisee | null>(
+        null,
+    );
 
     return (
         <AdviseeManagementLayout
@@ -56,7 +61,7 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
             <Head title="My Advisees" />
 
             {/* Filters & Search Section */}
-            <div className="border-border-primary-muted] mb-6 rounded-lg border-[1px] bg-white p-6 shadow">
+            <div className="border-border-primary-muted] mb-6 rounded-lg border-[1px] bg-primary-foreground p-6 shadow">
                 <div className="mb-4">
                     <p className="text-body-2 mb-2 text-primary">
                         Filters & Search
@@ -72,30 +77,30 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                 </div>
             </div>
             <Badge variant="default" className="mb-4">
-                Total Advisees (20)
+                Total Advisees ({displayAdvisees.length})
             </Badge>
 
             {/* Table Section */}
-            <div className="overflow-x-auto rounded-lg border-1 border-[var(--primary)] bg-white shadow">
+            <div className="overflow-x-auto rounded-lg border-1 border-[var(--primary)] bg-primary-foreground shadow">
                 <Table className="w-[1360px]">
                     <TableHeader>
-                        <TableRow className="bg-[#730000] hover:bg-[#730000]">
-                            <TableHead className="text-center text-white">
+                        <TableRow className="bg-primary hover:bg-primary">
+                            <TableHead className="text-center text-primary-foreground">
                                 Student ID
                             </TableHead>
-                            <TableHead className="text-center text-white">
+                            <TableHead className="text-center text-primary-foreground">
                                 Student Name
                             </TableHead>
-                            <TableHead className="text-center text-white">
+                            <TableHead className="text-center text-primary-foreground">
                                 PUP Webmail
                             </TableHead>
-                            <TableHead className="text-center text-white">
+                            <TableHead className="text-center text-primary-foreground">
                                 Group Code
                             </TableHead>
-                            <TableHead className="text-center text-white">
+                            <TableHead className="text-center text-primary-foreground">
                                 Block
                             </TableHead>
-                            <TableHead className="text-center text-white">
+                            <TableHead className="text-center text-primary-foreground">
                                 Action
                             </TableHead>
                         </TableRow>
@@ -120,7 +125,14 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                                         {advisee.block}
                                     </TableCell>
                                     <TableCell className="text-center">
-                                        <Button variant="tertiary" size="sm">
+                                        <Button
+                                            variant="tertiary"
+                                            size="sm"
+                                            onClick={() => {
+                                                setSelectedAdvisee(advisee);
+                                                setIsProfileOpen(true);
+                                            }}
+                                        >
                                             View
                                         </Button>
                                     </TableCell>
@@ -132,8 +144,8 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                                     colSpan={6}
                                     className="h-64 text-center"
                                 >
-                                    <div className="flex flex-col items-center justify-center text-gray-500">
-                                        <Users className="mb-4 h-12 w-12 text-gray-300" />
+                                    <div className="flex flex-col items-center justify-center text-alert-desc">
+                                        <Users className="mb-4 h-12 w-12 text-alert-desc" />
                                         <p className="text-lg font-medium">
                                             No advisees found
                                         </p>
@@ -147,7 +159,169 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                         )}
                     </TableBody>
                 </Table>
+                <div className="border-t border-gray-200 bg-primary-foreground px-6 py-4 text-center">
+                    <p className="text-sm text-alert-desc">
+                        {displayAdvisees.length} of {displayAdvisees.length}{' '}
+                        Student Accounts
+                    </p>
+                </div>
             </div>
+            <Dialog open={isProfileOpen} onOpenChange={setIsProfileOpen}>
+                <DialogContent
+                    className="p-0 [&_[data-slot=dialog-overlay]]:bg-foreground/20 [&_[data-slot=dialog-overlay]]:backdrop-blur-sm"
+                    style={{ maxWidth: '800px' }}
+                >
+                    {/* Header */}
+                    <div className="flex flex-col gap-1 rounded-t-lg bg-primary pt-6 pb-4 pl-6">
+                        <p className="text-lg text-primary-foreground">
+                            Student Profile
+                        </p>
+                        {selectedAdvisee && (
+                            <p className="font-bold text-primary-foreground-2">
+                                {selectedAdvisee.student_name} (
+                                {selectedAdvisee.student_id})
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-8">
+                        {/* Left Column - Student Information */}
+                        <div className="mb-6 grid grid-cols-2 gap-25">
+                            <div>
+                                <div className="mb-4">
+                                    <p className="text-body-1 mb-4 pb-0 font-bold text-primary">
+                                        STUDENT INFORMATION
+                                    </p>
+                                </div>
+                                <div className="space-y-4">
+                                    <div>
+                                        <p className="text-body-3 text-alert-desc">
+                                            Student ID
+                                        </p>
+                                        <p className="text-body-2 font-medium">
+                                            {selectedAdvisee?.student_id}
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <p className="text-body-3 text-alert-desc">
+                                            PUP Webmail
+                                        </p>
+                                        <p className="text-body-2 font-medium">
+                                            {selectedAdvisee?.pup_webmail}
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <p className="text-body-3 text-alert-desc">
+                                            Block
+                                        </p>
+                                        <p className="text-body-2 font-medium">
+                                            {selectedAdvisee?.block}
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <p className="text-body-3 text-alert-desc">
+                                            Group Code
+                                        </p>
+                                        <p className="text-body-2 font-medium">
+                                            {selectedAdvisee?.group_code}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            {/* Right Column - Thesis Information */}
+                            <div>
+                                <div className="flex items-start justify-between">
+                                    <p className="text-body-1 mb-2 pb-2 font-bold text-primary">
+                                        THESIS INFORMATION
+                                    </p>
+                                    <Button variant="primary" size="sm">
+                                        View
+                                    </Button>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div>
+                                        <p className="text-body-3 text-alert-desc">
+                                            Thesis Title
+                                        </p>
+                                        <p className="font-medium">
+                                            Machine Learning Applications in
+                                            Healthcare
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <p className="text-body-3 text-alert-desc">
+                                            Co-researchers
+                                        </p>
+                                        <div className="mt-2 flex gap-2">
+                                            <Badge
+                                                variant="outline"
+                                                className="rounded-full"
+                                            >
+                                                Jane Smith
+                                            </Badge>
+                                            <Badge
+                                                variant="outline"
+                                                className="rounded-full"
+                                            >
+                                                Jane Smith
+                                            </Badge>
+                                            <Badge
+                                                variant="outline"
+                                                className="rounded-full"
+                                            >
+                                                Jane Smith
+                                            </Badge>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <p className="text-body-3 text-alert-desc">
+                                            Thesis Stage
+                                        </p>
+                                        <p className="font-medium">
+                                            Manuscript Submission
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <p className="text-body-3 mb-2 text-alert-desc">
+                                            Progress
+                                        </p>
+                                        <div className="h-3 w-full overflow-hidden rounded-full bg-primary">
+                                            <div
+                                                className="h-full bg-primary-foreground-2"
+                                                style={{ width: '60%' }}
+                                            />
+                                        </div>
+                                        <p className="mt-1 text-sm font-medium">
+                                            60% Complete
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Footer Buttons */}
+                        <div className="flex justify-end gap-3">
+                            <Button
+                                variant="negative"
+                                onClick={() => setIsProfileOpen(false)}
+                            >
+                                Cancel
+                            </Button>
+                            <Button variant="primary">
+                                Send Message/Feedback
+                            </Button>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </AdviseeManagementLayout>
     );
 }
