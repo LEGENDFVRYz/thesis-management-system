@@ -40,6 +40,8 @@ import { SubmissionStatusChart } from '@/components/submission-status-bar';
 import { PerformanceOverviewChart } from '@/components/performance-overview-ver-bar';
 import { ResearchAreaChart } from '@/components/research-area-distribution-pie';
 import { ArchivedJournalsChart } from '@/components/archived-journals-line';
+import { SystemRepositoryStorage } from '@/components/system-repository-storage';
+import ManageArchiveModal from '@/components/modal/manage-archive-modal';
 import { Toast, ToastTitle, ToastDescription } from '@/components/ui/toast';
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell, TableCaption } from '@/components/ui/table';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
@@ -65,6 +67,7 @@ export default function UIShowcase() {
     const [isUploading, setIsUploading] = useState(false);
     const [contentProgress, setContentProgress] = useState(0);
     const [evalValue, setEvalValue] = useState(0);
+    const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
 
     // Auto-animate Content Loading and Eval Progress on mount
     useEffect(() => {
@@ -1023,6 +1026,26 @@ export default function UIShowcase() {
                             <h3 className="text-lg font-semibold mb-4 text-white">4. Archived Journals Trend (Line Chart)</h3>
                             <ArchivedJournalsChart />
                         </div>
+
+                        <div>
+                            <h3 className="text-lg font-semibold mb-4 text-white">System Repository Storage Bar</h3>
+                            <SystemRepositoryStorage />
+                        </div>
+                    </section>
+
+                    {/* Manage Archive Restrictions Modal */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Manage Archive Restrictions Modal</h2>
+                        <p className="text-sm text-gray-400">Modal for configuring archive access permissions by role</p>
+                        <div className="flex gap-3">
+                            <Button onClick={() => setIsArchiveModalOpen(true)}>
+                                Open Archive Modal
+                            </Button>
+                        </div>
+                        <ManageArchiveModal 
+                            isOpen={isArchiveModalOpen} 
+                            onClose={() => setIsArchiveModalOpen(false)} 
+                        />
                     </section>
 
                     {/* Toast */}
