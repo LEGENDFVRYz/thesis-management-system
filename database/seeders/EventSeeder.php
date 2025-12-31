@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\DeadlineTemplate;
 use App\Models\Event;
+use App\Models\Milestone;
 use App\Models\Semester;
 use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -43,7 +44,7 @@ class EventSeeder extends Seeder
         }
 
         // 3. Fetch ONLY templates for the allowed stages
-        $templates = DeadlineTemplate::whereIn('stage', $allowedStages)
+        $templates = Milestone::whereIn('stage', $allowedStages)    // change due to updated migrations
                         ->orderBy('stage')
                         ->orderBy('id')
                         ->get();
@@ -60,7 +61,7 @@ class EventSeeder extends Seeder
             $dueDate = $semStart->copy()->addDays($accumulatedDays);
 
             Event::firstOrCreate([
-                'dl_template_id' => $template->id,
+                'milestone_id' => $template->id,
                 'semester_id'    => $activeSemester->id,
             ], [
                 // 'title'    => $template->name, 

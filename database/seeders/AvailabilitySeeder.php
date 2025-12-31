@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Availability;
 use App\Models\Event;
 use App\Models\Faculty;
+use App\Models\Milestone;
 use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -18,8 +19,8 @@ class AvailabilitySeeder extends Seeder
     {
         // 1. Find the specific "Defense" events we just seeded
         // We look for events linked to templates with 'defense' in the anchor
-        $defenseEvents = Event::whereHas('deadlineTemplate', function($q) {
-            $q->whereIn('anchor', ['mor_defense', 'dp1_defense', 'dp2_defense']);
+        $defenseEvents = Event::whereHas('milestone', function($q) {
+            $q->whereIn('name', ['MOR Defense', 'DP1 Defense', 'DP2 Defense']);
         })->get();
 
         if ($defenseEvents->isEmpty()) {
@@ -53,7 +54,7 @@ class AvailabilitySeeder extends Seeder
         $this->command->info("Total Events Found: " . $totalEvents);
 
         // DEBUG: Check if we have the specific defense templates
-        $templates = \App\Models\DeadlineTemplate::whereIn('anchor', ['mor_defense', 'dp1_defense', 'dp2_defense'])->get();
+        $templates = Milestone::whereIn('name', ['MOR Defense', 'DP1 Defense', 'DP2 Defense'])->get();
         $this->command->info("Defense Templates Found: " . $templates->count());
 
         $this->command->info("Generated availability slots for {$defenseEvents->count()} defense events.");
