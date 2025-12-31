@@ -13,11 +13,15 @@ return new class extends Migration
     {
         Schema::create('tbl_deadline_templates', function (Blueprint $table) {
             $table->id();
-            $table->integer('stage'); // 1=MOR, 2=DP1, 3=DP2
-            $table->string('name')->unique();
+            $table->integer('stage');               // 1=MOR, 2=DP1, 3=DP2
+            $table->integer('sort_order');          // Step number (e.g., 1, 2, 3...)
+            $table->string('role');
+
+            $table->string('name');
             $table->text('description')->nullable();
-            $table->integer('duration'); // Number of days
-            $table->string('anchor')->nullable(); // Code for dependency calculation
+            $table->string('type');
+            $table->integer('days')->nullable();    // Default duration
+            $table->integer('anchor')->nullable();  // Code for dependency calculation
         });
     }
 
