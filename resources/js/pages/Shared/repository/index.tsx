@@ -20,7 +20,7 @@ export default function RepositoryLayout({ children, breadcrumbs }: RepositoryLa
     return (
         // WRAPPER FOR MANAGEMENT
         <AppLayout breadcrumbs={[...breadcrumb, ...(breadcrumbs ?? [])]}>
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 {children}
             </div>
         </AppLayout>

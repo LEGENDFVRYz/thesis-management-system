@@ -319,5 +319,19 @@ API ROUTES (temporary only)
 Route::post('file-import', [FileImportController::class, 'store'])->name('file.import');
 
 
+// TEMPORARY: view shared thesis page without affecting guest/admin routes
+Route::get('/test-thesis', function () {
+    return Inertia::render('Shared/repository/thesis');
+});
+
+Route::get('/test-thesis-preview', function () {
+    return Inertia::render('Shared/repository/document-preview', [
+        'document' => [
+            'title' => 'Sample Thesis',
+            'url' => '/storage/sample.pdf'
+        ]
+    ]);
+});
+
 
 require __DIR__.'/settings.php';
