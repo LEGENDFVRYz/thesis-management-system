@@ -61,7 +61,7 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
             <Head title="My Advisees" />
 
             {/* Filters & Search Section */}
-            <div className="border-border-primary-muted] mb-6 rounded-lg border-[1px] bg-primary-foreground p-6 shadow">
+            <div className="border-border-primary-muted mb-6 rounded-lg border-[1px] bg-primary-foreground p-6 shadow">
                 <div className="mb-4">
                     <p className="text-body-2 mb-2 text-primary">
                         Filters & Search
