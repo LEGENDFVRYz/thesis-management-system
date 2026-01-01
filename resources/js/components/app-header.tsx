@@ -43,6 +43,7 @@ import { facultyMainNav } from '@/pages/Faculty/_navigation';
 import { studentMainNav } from '@/pages/Student/_navigation';
 import { useMemo, useState } from 'react';
 import AppLogoIcon from '@/components/Icons/logo';
+import { GlobalNavDropdown } from './app-header-management';
 
 const isDarkMode = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
 
@@ -115,6 +116,9 @@ export function AppHeader({ breadcrumbs = [], variant = 'default' }: AppHeaderPr
             return studentDB.url();
         }
     };
+
+    // Inside AppHeader component
+    const userRole = url.startsWith('/admin') ? 'admin' : url.startsWith('/faculty') ? 'faculty' : 'student';
 
     return (
         <header className="w-full flex flex-col">
@@ -249,12 +253,8 @@ export function AppHeader({ breadcrumbs = [], variant = 'default' }: AppHeaderPr
             {breadcrumbs.length > 0 && (
                 <div className="bg-breadcrumb h-10 border-b border-foreground/5 flex items-center">
                     <div className="flex w-full items-center px-10">
-                        <div className="flex items-center gap-2 text-xs font-medium text-primary/70">
-                             {/* Breadcrumb Placeholder */}
-                            <span>Home</span>
-                            <ChevronRight className="size-3" />
-                            <span className="font-bold text-primary">Current Page</span>
-                        </div>
+                        {/* Pass the breadcrumbs array directly to your component */}
+                        <Breadcrumbs breadcrumbs={breadcrumbs} />
                     </div>
                 </div>
             )}
