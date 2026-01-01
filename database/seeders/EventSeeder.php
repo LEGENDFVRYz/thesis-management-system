@@ -65,7 +65,7 @@ class EventSeeder extends Seeder
                 'semester_id'    => $activeSemester->id,
             ], [
                 // 'title'    => $template->name, 
-                'due_date' => $dueDate,
+                'start_date' => null,       // temporary solution
             ]);
         }
         

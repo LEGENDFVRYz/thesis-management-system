@@ -50,7 +50,7 @@ class DeadlineTemplateSeeder extends Seeder
             ['stage' => 2, 'sort_order' => 8, 'name' => 'Endorsement', 'role' => 'Coordinator', 'type' => 'approval', 'days' => 3, 'desc' => 'Verify Endorsement'],
             
             ['stage' => 2, 'sort_order' => 9, 'name' => 'Pre-Defense (DP1)', 'role' => 'Student', 'type' => 'submission', 'days' => 3, 'desc' => 'Submit Final DP1 Manuscript & Documentation'],
-            ['stage' => 2, 'sort_order' => 9, 'name' => 'Pre-Defense (DP1)', 'role' => 'Adviser', 'type' => 'review', 'days' => 3, 'desc' => 'Review final manuscript quality.'],
+            ['stage' => 2, 'sort_order' => 9, 'name' => 'Pre-Defense (DP1)', 'role' => 'Adviser', 'type' => 'review', 'days' => 3, 'desc' => 'Review DP1 manuscript quality and project feasibility'],
             ['stage' => 2, 'sort_order' => 9, 'name' => 'Pre-Defense (DP1)', 'role' => 'Coordinator', 'type' => 'schedule', 'days' => 3, 'desc' => 'Defense Matrix (Schedule)'],
             
             ['stage' => 2, 'sort_order' => 10, 'name' => 'DP1 Defense', 'role' => 'Student', 'type' => 'submission', 'days' => 3, 'desc' => 'Present project to panel.'],
@@ -70,17 +70,21 @@ class DeadlineTemplateSeeder extends Seeder
             ['stage' => 3, 'sort_order' => 13, 'name' => 'Endorsement', 'role' => 'Adviser', 'type' => 'approval', 'days' => 3, 'desc' => 'Validate DP2 Manuscript and Compliance (100%)'],
             ['stage' => 3, 'sort_order' => 13, 'name' => 'Endorsement', 'role' => 'Coordinator', 'type' => 'approval', 'days' => 3, 'desc' => 'Verify Endorsement'],
             
-            ['stage' => 3, 'sort_order' => 14, 'name' => 'DP2 Defense', 'role' => 'Student', 'type' => 'submission', 'days' => 3, 'desc' => 'Present project to panel.'],
-            ['stage' => 3, 'sort_order' => 14, 'name' => 'DP2 Defense', 'role' => 'Panelist', 'type' => 'evaluation', 'days' => 3, 'desc' => 'Evaluate defense presentation.'],
-            ['stage' => 3, 'sort_order' => 14, 'name' => 'DP2 Defense', 'role' => 'Adviser', 'type' => 'evaluation', 'days' => 3, 'desc' => 'Sit in defense and grade student.'],
+            ['stage' => 3, 'sort_order' => 14, 'name' => 'Pre-Defense (DP2)', 'role' => 'Student', 'type' => 'submission', 'days' => 3, 'desc' => 'Submit Final DP2 Manuscript & Project Completion Documentation'],
+            ['stage' => 3, 'sort_order' => 14, 'name' => 'Pre-Defense (DP2)', 'role' => 'Adviser', 'type' => 'review', 'days' => 3, 'desc' => 'Review final manuscript quality and project'],
+            ['stage' => 3, 'sort_order' => 14, 'name' => 'Pre-Defense (DP2)', 'role' => 'Coordinator', 'type' => 'schedule', 'days' => 3, 'desc' => 'Defense Matrix (Schedule)'],
+
+            ['stage' => 3, 'sort_order' => 15, 'name' => 'DP2 Defense', 'role' => 'Student', 'type' => 'submission', 'days' => 3, 'desc' => 'Present project to panel.'],
+            ['stage' => 3, 'sort_order' => 15, 'name' => 'DP2 Defense', 'role' => 'Panelist', 'type' => 'evaluation', 'days' => 3, 'desc' => 'Evaluate defense presentation.'],
+            ['stage' => 3, 'sort_order' => 15, 'name' => 'DP2 Defense', 'role' => 'Adviser', 'type' => 'evaluation', 'days' => 3, 'desc' => 'Sit in defense and grade student.'],
             
-            ['stage' => 3, 'sort_order' => 15, 'name' => 'Post-Defense', 'role' => 'Student', 'type' => 'agreement', 'days' => 3, 'desc' => 'Submit revised manuscript based on feedback.'],
-            ['stage' => 3, 'sort_order' => 15, 'name' => 'Post-Defense', 'role' => 'Adviser', 'type' => 'grading', 'days' => 3, 'desc' => 'Confirm Completion'],
-            ['stage' => 3, 'sort_order' => 15, 'name' => 'Post-Defense', 'role' => 'Awardee', 'type' => 'evaluation', 'days' => 3, 'desc' => 'Best Thesis Project Nomination / Awarding'],
+            ['stage' => 3, 'sort_order' => 16, 'name' => 'Post-Defense', 'role' => 'Student', 'type' => 'agreement', 'days' => 3, 'desc' => 'Submit revised manuscript based on feedback.'],
+            ['stage' => 3, 'sort_order' => 16, 'name' => 'Post-Defense', 'role' => 'Adviser', 'type' => 'grading', 'days' => 3, 'desc' => 'Confirm Completion'],
+            ['stage' => 3, 'sort_order' => 16, 'name' => 'Post-Defense', 'role' => 'Awardee', 'type' => 'evaluation', 'days' => 3, 'desc' => 'Best Thesis Project Nomination / Awarding'],
             
-            ['stage' => 3, 'sort_order' => 16, 'name' => 'Finalization', 'role' => 'Student', 'type' => 'submission', 'days' => 3, 'desc' => 'Final Requirements'],
-            ['stage' => 3, 'sort_order' => 16, 'name' => 'Finalization', 'role' => 'Panelist', 'type' => 'approval', 'days' => 3, 'desc' => 'Signatory for approval sheet of completion'],
-            ['stage' => 3, 'sort_order' => 16, 'name' => 'Finalization', 'role' => 'Adviser', 'type' => 'review', 'days' => 3, 'desc' => 'Release Clearance'],
+            ['stage' => 3, 'sort_order' => 17, 'name' => 'Finalization', 'role' => 'Student', 'type' => 'submission', 'days' => 3, 'desc' => 'Final Requirements'],
+            ['stage' => 3, 'sort_order' => 17, 'name' => 'Finalization', 'role' => 'Panelist', 'type' => 'approval', 'days' => 3, 'desc' => 'Signatory for approval sheet of completion'],
+            ['stage' => 3, 'sort_order' => 17, 'name' => 'Finalization', 'role' => 'Adviser', 'type' => 'review', 'days' => 3, 'desc' => 'Release Clearance'],
         ];
 
         $milestone_desc = [

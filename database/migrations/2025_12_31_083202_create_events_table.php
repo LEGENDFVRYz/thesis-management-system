@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use phpDocumentor\Reflection\Types\Nullable;
 
 return new class extends Migration
 {
@@ -25,7 +26,7 @@ return new class extends Migration
             // Derived
             // $table->string('title'); // Copied from template for convenience
             
-            $table->date('due_date');
+            $table->date('start_date')->nullable();
         });
     }
 

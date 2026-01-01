@@ -17,8 +17,10 @@ return new class extends Migration
             $table->integer('stage')->comment('1=MOR, 2=DP1, 3=DP2');   // Thesis stages
             $table->integer('sort_order');              // Step number within the whole process
 
-            $table->string('name');             // Milestone name
-            $table->text('desc')->nullable();   // General display description
+            $table->string('name');            // Milestone name
+            $table->text('desc')->nullable();  // General display description
+            $table->integer('offset')
+                  ->default(0)->nullable();     // Offset days
 
             // --- TABLE CONSTRAINTS ---
             $table->unique(['stage', 'sort_order']);
