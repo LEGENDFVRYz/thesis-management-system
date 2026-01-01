@@ -14,7 +14,7 @@ interface YearRangePickerProps {
   inputSize?: "default" | "filter";
 }
 
-export function YearRangePicker({
+export default function YearRangePicker({
   value,
   onChange,
   placeholder = "Academic Year",

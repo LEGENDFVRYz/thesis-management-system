@@ -35,11 +35,13 @@ import { HomeIcon, SettingsIcon, UsersIcon, Moon, Sun, Plus, Trash2, ArrowRight,
 import { SwitchButton } from '@/components/ui/switch-button';
 import { cn } from '@/lib/utils';
 import { Tabs, TabButton } from '@/components/ui/tabs';
-import { DatePicker } from '@/components/date-picker';
+import DatePicker from '@/components/date-picker';
 import { SubmissionStatusChart } from '@/components/submission-status-bar';
 import { PerformanceOverviewChart } from '@/components/performance-overview-ver-bar';
 import { ResearchAreaChart } from '@/components/research-area-distribution-pie';
 import { ArchivedJournalsChart } from '@/components/archived-journals-line';
+import { SystemRepositoryStorage } from '@/components/system-repository-storage';
+import ManageArchiveModal from '@/components/modal/manage-archive-modal';
 import { Toast, ToastTitle, ToastDescription } from '@/components/ui/toast';
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell, TableCaption } from '@/components/ui/table';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
@@ -50,10 +52,11 @@ import { NotificationList, NotificationListItem } from '@/components/ui/notifica
 import StageSwitchToggle from '@/components/stage-toggle';
 import { FileUpload } from '@/components/file-upload';
 import FilePreview from '@/components/document-preview';
-import { Timeline } from '@/components/timeline';
+import Timeline from '@/components/timeline';
 import { toast } from 'sonner';
 import { AppHeader } from '@/components/app-header';
 import { GlobalNavDropdown } from '@/components/app-header-management';
+import FilterSearchSection from '@/components/filter-search-section';
 
 export default function UIShowcase() {
     const [isCollapsibleOpen, setIsCollapsibleOpen] = useState(false);
@@ -65,6 +68,7 @@ export default function UIShowcase() {
     const [isUploading, setIsUploading] = useState(false);
     const [contentProgress, setContentProgress] = useState(0);
     const [evalValue, setEvalValue] = useState(0);
+    const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
 
     // Auto-animate Content Loading and Eval Progress on mount
     useEffect(() => {
@@ -151,6 +155,51 @@ export default function UIShowcase() {
                 { title: 'Deadline', href: '/admin/deadline' },
                 { title: 'Department Policies', href: '/admin/policies' },
                 { title: 'Defense Management', href: '/admin/defense' }, // No header needed, it's a main item
+            ] 
+        }
+    ];
+
+    const coordinatorManagementItems = [
+        { 
+            id: 'coordinator-root', 
+            title: 'Coordinator', 
+            children: [
+            { title: 'Compliance & Eligibility', href: '#', isHeader: true },
+            { title: 'Pre-Defense Compliance', href: '/coordinator/compliance' },
+            { title: 'Endorsement Management', href: '/coordinator/endorsement' },
+            { title: 'Thesis Monitoring', href: '#', isHeader: true },
+            { title: 'Thesis Registry', href: '/coordinator/registry' },
+            { title: 'Progress Reports', href: '/coordinator/progress' },
+            { title: 'Defense Management', href: '#', isHeader: true },
+            { title: 'Defense Schedule', href: '/coordinator/schedule' },
+            { title: 'Panel Assignment', href: '/coordinator/panel' },
+            { title: 'Matrix Management', href: '/coordinator/matrix' },
+            { title: 'Grading Management', href: '/coordinator/grading' }
+            ] 
+        }
+    ];
+
+    const studentManagementItems = [
+        { 
+            id: 'student-root', 
+            title: 'Student',
+            children: [
+                // Progress Tracking Section
+                { title: 'Progress Tracking', href: '/student/progress', isHeader: true },
+                { title: 'Overall Progress', href: '/student/progress/overall' },
+                { title: 'Consultations', href: '/student/progress/consultations' },
+                { title: 'Status Reports', href: '/student/progress/status-reports' },
+                
+                // Thesis Management Section
+                { title: 'Thesis Management', href: '/student/thesis' },
+                
+                // Defense Management
+                { title: 'Defense Management', href: '/student/defense' },
+                
+                // Compliance & IP Section
+                { title: 'Compliance & IP', href: '/student/compliance', isHeader: true },
+                { title: 'IP & Plagiarism', href: '/student/ip-plagiarism' },
+                { title: 'Public Presentation', href: '/student/public-presentation' }
             ] 
         }
     ];
@@ -911,6 +960,16 @@ export default function UIShowcase() {
                         <AppHeader breadcrumbs={[{ title: 'Home', href: '#' }, { title: 'Showcase', href: '#' }]} />
                     </section>
 
+                    {/* Filter Search Section */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Filter Search Section</h2>
+                        <p className="text-sm text-gray-400">Reusable filter and search component</p>
+                        <FilterSearchSection variant="DefenseManagement" />
+                        <FilterSearchSection variant="StudentManagement" />
+                        <FilterSearchSection variant="ThesisArchive" />
+                        <FilterSearchSection variant="Notifications" />
+                    </section>
+
                     {/* Faculty List Dropdown Variants Section */}
                     <section className="space-y-4" onMouseLeave={() => {/* Option to close menu when leaving section */}}>
                         <h2 className="text-2xl font-semibold text-white">Faculty Management Dropdown</h2>
@@ -930,8 +989,29 @@ export default function UIShowcase() {
                             variant="faculty" 
                             items={facultyManagementItems} 
                             />
+
+                            <GlobalNavDropdown 
+                            label="Management" 
+                            variant="coordinator" 
+                            items={coordinatorManagementItems} 
+                            />
                         </div>
                     </section>
+
+                    {/* Student List Dropdown Variants Section */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Student Management Dropdown</h2>
+                        <p className="text-sm text-gray-400">Hover over the tabs to see management routes for students</p>
+                        
+                        <div className="p-5 bg-background rounded-xl border border-border flex justify-start gap-10 items-start min-h-[50px]">
+                            <GlobalNavDropdown 
+                                label="Management" 
+                                variant="student" 
+                                items={studentManagementItems} 
+                            />
+                        </div>
+                    </section>
+
 
                     {/* Placeholder Pattern */}
                     <section className="space-y-4">
@@ -1023,6 +1103,26 @@ export default function UIShowcase() {
                             <h3 className="text-lg font-semibold mb-4 text-white">4. Archived Journals Trend (Line Chart)</h3>
                             <ArchivedJournalsChart />
                         </div>
+
+                        <div>
+                            <h3 className="text-lg font-semibold mb-4 text-white">System Repository Storage Bar</h3>
+                            <SystemRepositoryStorage />
+                        </div>
+                    </section>
+
+                    {/* Manage Archive Restrictions Modal */}
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-semibold text-white">Manage Archive Restrictions Modal</h2>
+                        <p className="text-sm text-gray-400">Modal for configuring archive access permissions by role</p>
+                        <div className="flex gap-3">
+                            <Button onClick={() => setIsArchiveModalOpen(true)}>
+                                Open Archive Modal
+                            </Button>
+                        </div>
+                        <ManageArchiveModal 
+                            isOpen={isArchiveModalOpen} 
+                            onClose={() => setIsArchiveModalOpen(false)} 
+                        />
                     </section>
 
                     {/* Toast */}

@@ -132,7 +132,7 @@ const DEFAULT_EVENTS: TimelineEvent[] = [
   },
 ];
 
-export function Timeline({ events = DEFAULT_EVENTS, className = '' }: TimelineViewProps) {
+export default function Timeline({ events = DEFAULT_EVENTS, className = '' }: TimelineViewProps) {
   const [activeTab, setActiveTab] = useState<'Current' | 'Upcoming' | 'Past'>('Current');
 
   const filteredEvents = events.filter((event) => {
