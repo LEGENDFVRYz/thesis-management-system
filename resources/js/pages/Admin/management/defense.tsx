@@ -1,19 +1,13 @@
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import AppLayout from '@/layouts/app-layout';
-import { dashboard } from '@/routes';
-import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import * as React from 'react';
+import { useState } from 'react';
+import { Search, Filter, Users, Calendar, Table as TableIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import ManagementLayout from '.';
-import { defenses } from '@/routes/admin/management/index';
-import { useState, useEffect } from 'react';
-import { router } from '@inertiajs/react';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Defense',
-        href: defenses().url,
-    },
-];
+import { defenses as defensesRoute } from '@/routes/admin/management/index';
+import { cn } from '@/lib/utils';
+import FilterSearchSection from '@/components/filter-search-section';
 
 // Filter Object
 interface FilterParams {
@@ -37,224 +31,188 @@ interface DefenseProps {
 }
 
 export default function Defense({ defenses, adviserOptions, blockOptions, filters }: DefenseProps) {
-    
+    const [statusFilter, setStatusFilter] = useState('upcoming');
+    const [view, setView] = useState('table');
+
     // --- MODAL STATE ---
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedDefense, setSelectedDefense] = useState<any>(null);
 
-    // --- FILTER STATE ---
-    // Initialize with values from URL (filters prop) or defaults
-    const [values, setValues] = useState({
-        search: filters.search || '',
-        adviser: filters.adviser || '',
-        block: filters.block || '',
-    });
-
-    // Helper to trigger the backend search
-    const handleFilterChange = (key: string, value: string) => {
-        const newValues = { ...values, [key]: value };
-        setValues(newValues);
-
-        // This reloads the page with ?search=...&adviser=... 
-        // preserveState: true keeps your scroll position and modal state intact
-        router.get(window.location.pathname, newValues, {
-            preserveState: true,
-            preserveScroll: true,
-            replace: true, 
-        });
-    };
-    
-    // Reset function
-    const resetFilters = () => {
-        setValues({ search: '', adviser: '', block: '' });
-        router.get(window.location.pathname, {}, {
-            preserveScroll: true,
-        });
+    // --- MODAL HANDLERS ---
+    const openModal = (defense: any) => {
+        setSelectedDefense(defense);
+        setIsModalOpen(true); 
     };
 
-    const openModal = (defense: any) => { setSelectedDefense(defense); setIsModalOpen(true); };
-    const closeModal = () => { setIsModalOpen(false); setSelectedDefense(null); };
-    
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedDefense(null);
+    };
+
     return (
         <ManagementLayout 
-            breadcrumbs={breadcrumbs}
+            breadcrumbs={[{ title: 'Defense', href: defensesRoute().url }]}
             title="Defense Management" 
             description="Monitor all defense schedules and panel assignments"
-        >
-            
-            {/*
-            * =============================================================================
-            * NOTICE: TEMPORARY UI / PLACEHOLDER DESIGN
-            * =============================================================================
-            * The layout and styles in this file are temporary placeholders intended solely
-            * to demonstrate backend logics, data rendering, and verify CRUD functionality.
-            * =============================================================================
-            */}
+        >    
+            <div className="space-y-6">
+                
+                {/* 1. Filters & Search */}
+                <FilterSearchSection variant="DefenseManagement" />
 
-            <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                <div className="overflow-x-auto">
-
-                    {/* --- SEARCH & FILTER BAR --- */}
-                    <div className="flex flex-row md:flex-row gap-4 bg-white dark:bg-gray-900 p-4">
-                        
-                        {/* Search Input */}
-                        <div className="flex-1">
-                            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">
-                                Search Title
-                            </label>
-                            <input
-                                type="text"
-                                placeholder="Search thesis title..."
-                                value={values.search}
-                                onChange={(e) => handleFilterChange('search', e.target.value)}
-                                className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                            />
-                        </div>
-
-                        {/* Adviser Dropdown */}
-                        <div className="w-full md:w-64">
-                            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">
-                                Filter by Adviser
-                            </label>
-                            <select
-                                value={values.adviser}
-                                onChange={(e) => handleFilterChange('adviser', e.target.value)}
-                                className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                            >
-                                <option value="">All Advisers</option>
-                                {adviserOptions.map((adv: any) => (
-                                    <option key={adv.id} value={adv.id}>
-                                        {adv.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        {/* Block Dropdown */}
-                        <div className="w-full md:w-32">
-                            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">
-                                Filter by Block
-                            </label>
-                            <select
-                                value={values.block}
-                                onChange={(e) => handleFilterChange('block', e.target.value)}
-                                className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                            >
-                                <option value="">All</option>
-                                {blockOptions.map((block) => (
-                                    <option key={block} value={block}>
-                                        Block {block}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        {/* Reset Button */}
-                        <div className="flex items-end">
-                            <button
-                                onClick={resetFilters}
-                                className="h-10 px-4 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-md transition-colors"
-                            >
-                                Clear Filters
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* --- TABLE SECTION --- */}
-                    <table className="min-w-full text-left text-sm whitespace-nowrap">
-                        <thead className="uppercase tracking-wider border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                            <tr>
-                                <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Group Code</th>
-                                <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Thesis Title</th>
-                                <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Proponents</th>
-                                <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Adviser</th>
-                                <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Block</th>
-                                <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Schedule</th>
-                                <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Type</th>
-                                <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Action</th>
-                            </tr>
-                        </thead>
-                        
-                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                            {defenses && defenses.length > 0 ? (
-                                defenses.map((def, index) => (
-                                    <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                        
-                                        {/* Group Code Badge */}
-                                        <td className="px-6 py-4">
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-                                                {def.group_code}
-                                            </span>
-                                        </td>
-
-                                        {/* Title */}
-                                        <td className="px-6 py-4 text-gray-900 dark:text-gray-100 max-w-xs whitespace-normal truncate">
-                                            <div className="line-clamp-2" title={def.thesis_title}>
-                                                {def.thesis_title}
-                                            </div>
-                                        </td>
-                                        
-                                        {/* Proponents Count */}
-                                        <td className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-                                            {def.proponents_count}
-                                        </td>
-
-                                        {/* Adviser Name */}
-                                        <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
-                                            {def.adviser_name}
-                                        </td>
-
-                                        {/* Block */}
-                                        <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
-                                            BSCPE {def.year_level}-{def.block}  
-                                        </td>
-
-                                        {/* Defense Schedule */}
-                                        <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
-                                            <div className="font-medium text-gray-500 dark:text-gray-100">
-                                                {def.defense_date}
-                                            </div>
-                                            <div className="text-xs text-gray-500 text-center">
-                                                {def.defense_time}
-                                            </div>
-                                        </td>
-
-                                        {/* Defense Type Badge */}
-                                        <td className="px-6 py-4">
-                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                                ${def.defense_type.includes('MOR') 
-                                                    ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' 
-                                                    : 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300'
-                                                }`}>
-                                                {def.defense_type}
-                                            </span>
-                                        </td>
-                                        
-                                        {/* Action Button */}
-                                        <td className="px-6 py-4 text-right">
-                                            <button
-                                                type="button"
-                                                onClick={() => openModal(def)}
-                                                className="inline-flex items-center justify-center rounded-md text-sm text-gray-500 dark:text-gray-100 font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
-                                            >
-                                                View Details
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={7} className="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
-                                        No defense schedules found.
-                                    </td>
-                                </tr>
+                {/* 2. Toggle Groups Row (Pill Style) */}
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+    
+                    {/* Status Toggle - Fit to Content */}
+                    <ToggleGroup 
+                        type="single" 
+                        value={statusFilter} 
+                        onValueChange={(val) => val && setStatusFilter(val)}
+                        className="bg-[#FDF8E7] p-1 rounded-full border border-amber-100 w-fit" 
+                    >
+                        <ToggleGroupItem 
+                            value="upcoming" 
+                            className={cn(
+                                "h-10 px-6 rounded-full transition-all font-bold text-xs uppercase whitespace-nowrap",
+                                statusFilter === 'upcoming' 
+                                    ? "bg-[#700000] text-white shadow-md" 
+                                    : "text-[#700000] hover:bg-amber-100/50"
                             )}
-                        </tbody>
-                    </table>
+                        >
+                            Upcoming Defense
+                        </ToggleGroupItem>
+                        <ToggleGroupItem 
+                            value="completed" 
+                            className={cn(
+                                "h-10 px-6 rounded-full transition-all font-bold text-xs uppercase whitespace-nowrap",
+                                statusFilter === 'completed' 
+                                    ? "bg-[#700000] text-white shadow-md" 
+                                    : "text-[#700000] hover:bg-amber-100/50"
+                            )}
+                        >
+                            Completed Defenses
+                        </ToggleGroupItem>
+                    </ToggleGroup>
+
+                    {/* View Toggle - Fit to Content */}
+                    <ToggleGroup 
+                        type="single" 
+                        value={view} 
+                        onValueChange={(val) => val && setView(val)}
+                        className="bg-[#FDF8E7] p-1 rounded-full border border-amber-100 w-fit"
+                    >
+                        <ToggleGroupItem 
+                            value="table" 
+                            className={cn(
+                                "gap-2 h-10 px-6 rounded-full text-xs font-bold uppercase whitespace-nowrap transition-all",
+                                view === 'table' 
+                                    ? "bg-[#700000] text-white shadow-md" 
+                                    : "text-[#700000] hover:bg-amber-100/50"
+                            )}
+                        >
+                            <TableIcon className="w-4 h-4" /> Table View
+                        </ToggleGroupItem>
+                        <ToggleGroupItem 
+                            value="calendar" 
+                            className={cn(
+                                "gap-2 h-10 px-6 rounded-full text-xs font-bold uppercase whitespace-nowrap transition-all",
+                                view === 'calendar' 
+                                    ? "bg-[#700000] text-white shadow-md" 
+                                    : "text-[#700000] hover:bg-amber-100/50"
+                            )}
+                        >
+                            <Calendar className="w-4 h-4" /> Calendar View
+                        </ToggleGroupItem>
+                    </ToggleGroup>
+                </div>
+
+                {/* 3. Content Area */}
+                <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    {view === 'table' ? (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-sm">
+                                <thead className="bg-[#800000] text-white uppercase text-[11px] font-bold tracking-[0.1em]">
+                                    <tr>
+                                        <th className="px-6 py-4 border-r border-white/10">Defense ID</th>
+                                        <th className="px-6 py-4 border-r border-white/10">Title</th>
+                                        <th className="px-6 py-4 border-r border-white/10">Proponents</th>
+                                        <th className="px-6 py-4 border-r border-white/10">Adviser</th>
+                                        <th className="px-6 py-4 border-r border-white/10">Block</th>
+                                        <th className="px-6 py-4 border-r border-white/10">Date & Time</th>
+                                        <th className="px-6 py-4 border-r border-white/10">Type</th>
+                                        <th className="px-6 py-4 text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100">
+                                    {defenses && defenses.length > 0 ? (
+                                        defenses?.map((def, index) => (
+                                            <tr key={index} className="hover:bg-gray-50 transition-colors whitespace-nowrap">
+                                                
+                                                {/* Group Code */}
+                                                <td className="px-6 py-4 text-gray-500 font-medium text-xs">
+                                                    {def.group_code}
+                                                </td>
+                                                
+                                                {/* Title */}
+                                                <td className="px-6 py-4 font-medium text-gray-900 max-w-xs truncate">
+                                                    {def.thesis_title}
+                                                </td>
+
+                                                {/* Proponents Count */}
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-2 text-[#800000] font-bold">
+                                                        <Users className="w-4 h-4" />
+                                                        {def.proponents_count}
+                                                    </div>
+                                                </td>
+
+                                                {/* Adviser Name */}
+                                                <td className="px-6 py-4 text-gray-600">
+                                                    {def.adviser_name}
+                                                </td>
+
+                                                {/* Block */}
+                                                <td className="px-6 py-4 text-gray-600">
+                                                    BSCPE {def.year_level}-{def.block}
+                                                </td>
+
+                                                {/* Defense Schedule */}
+                                                <td className="px-6 py-4 text-gray-600 text-xs leading-tight">
+                                                    {def.defense_date} <br/> {def.defense_time}
+                                                </td>
+
+                                                {/* Defense Type Badge */}
+                                                <td className="px-6 py-4 text-gray-700 font-medium text-xs">
+                                                    {def.defense_type}
+                                                </td>
+                                                
+                                                {/* Action Button */}
+                                                <td className="px-6 py-4 text-center">
+                                                    <Button variant="outline" onClick={() => openModal(def)} className="rounded-md border-[#800000]/30 text-[#800000] hover:bg-red-50 h-8 px-4 text-[10px] font-bold uppercase shadow-sm">
+                                                        View Details
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan={8} className="px-6 py-12 text-center text-gray-400">
+                                                No defense schedules found.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <div className="p-20 text-center text-gray-400">
+                           {/* Calendar content */}
+                        </div>
+                    )}
                 </div>
             </div>
-
-            {/* SAMPLE MODAL */}
+        
+            {/* SAMPLE MODAL - REPLACE DESIGN/MODAL COMPONENT LATER */}
             {isModalOpen && selectedDefense && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
                     <div className="w-full max-w-2xl rounded-xl bg-white dark:bg-gray-900 shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden flex flex-col max-h-[90vh]">
@@ -395,5 +353,105 @@ export default function Defense({ defenses, adviserOptions, blockOptions, filter
                 </div>
             )}
         </ManagementLayout>
+
+        // * ===============================================================================================
+        // * NOTICE: THIS IS THE BACKEND LOGIC FOR SEARCH & FILTERING - KEEP FOR REFERENCE AND DO NOT DELETE
+        // * ===============================================================================================
+
+        // // --- FILTER STATE ---
+        // // Initialize with values from URL (filters prop) or defaults
+        // const [values, setValues] = useState({
+        //     search: filters.search || '',
+        //     adviser: filters.adviser || '',
+        //     block: filters.block || '',
+        // });
+
+        // // Helper to trigger the backend search
+        // const handleFilterChange = (key: string, value: string) => {
+        //     const newValues = { ...values, [key]: value };
+        //     setValues(newValues);
+
+        //     // This reloads the page with ?search=...&adviser=... 
+        //     // preserveState: true keeps your scroll position and modal state intact
+        //     router.get(window.location.pathname, newValues, {
+        //         preserveState: true,
+        //         preserveScroll: true,
+        //         replace: true, 
+        //     });
+        // };
+        
+        // // Reset function
+        // const resetFilters = () => {
+        //     setValues({ search: '', adviser: '', block: '' });
+        //     router.get(window.location.pathname, {}, {
+        //         preserveScroll: true,
+        //     });
+        // };
+
+        // // --- SEARCH & FILTER BAR ---
+        // <div className="flex flex-row md:flex-row gap-4 bg-white dark:bg-gray-900 p-4">
+            
+        //     {/* Search Input */}
+        //     <div className="flex-1">
+        //         <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">
+        //             Search Title
+        //         </label>
+        //         <input
+        //             type="text"
+        //             placeholder="Search thesis title..."
+        //             value={values.search}
+        //             onChange={(e) => handleFilterChange('search', e.target.value)}
+        //             className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+        //         />
+        //     </div>
+
+        //     {/* Adviser Dropdown */}
+        //     <div className="w-full md:w-64">
+        //         <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">
+        //             Filter by Adviser
+        //         </label>
+        //         <select
+        //             value={values.adviser}
+        //             onChange={(e) => handleFilterChange('adviser', e.target.value)}
+        //             className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+        //         >
+        //             <option value="">All Advisers</option>
+        //             {adviserOptions.map((adv: any) => (
+        //                 <option key={adv.id} value={adv.id}>
+        //                     {adv.name}
+        //                 </option>
+        //             ))}
+        //         </select>
+        //     </div>
+
+        //     {/* Block Dropdown */}
+        //     <div className="w-full md:w-32">
+        //         <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">
+        //             Filter by Block
+        //         </label>
+        //         <select
+        //             value={values.block}
+        //             onChange={(e) => handleFilterChange('block', e.target.value)}
+        //             className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+        //         >
+        //             <option value="">All</option>
+        //             {blockOptions.map((block) => (
+        //                 <option key={block} value={block}>
+        //                     Block {block}
+        //                 </option>
+        //             ))}
+        //         </select>
+        //     </div>
+
+        //     {/* Reset Button */}
+        //     <div className="flex items-end">
+        //         <button
+        //             onClick={resetFilters}
+        //             className="h-10 px-4 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-md transition-colors"
+        //         >
+        //             Clear Filters
+        //         </button>
+        //     </div>
+        // </div>
     );
 }

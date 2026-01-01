@@ -16,6 +16,7 @@ const buttonVariants = cva(
         negativelight: "bg-white border border-primary/15 text-destructive hover:bg-breadcrumb active:bg-primary/35",
         ghost: "text-foreground hover:bg-secondary-foreground-2 active:bg-background active:border border-secondary-foreground-2 active:text-secondary-foreground-2",
         link: "text-primary underline-offset-4 hover:underline underline-destructive hover:text-destructive active:text-secondary-foreground-2",
+        outline: "rounded-lg border-[0.8px] border-primary/15 text-[#1A1A1A] font-['DM_Sans'] text-[13.33px] font-medium leading-normal px-4 py-2 hover:bg-breadcrumb active:bg-primary/10",
       },
       size: {
         default: "h-9 px-4 py-2",

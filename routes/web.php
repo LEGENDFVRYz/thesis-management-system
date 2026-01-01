@@ -45,17 +45,44 @@ Route::get('/components-showcase', function () {
     return Inertia::render('components-showcase');
 })->name('components-showcase');
 
+Route::get('/badges-icons-showcase', function () {
+    return Inertia::render('badges-icons-showcase');
+})->name('badges-icons-showcase');
+
+// FAQ Page
+Route::get('/faq', function () {
+    return Inertia::render('faq');
+})->name('faq');
+
 // Route::middleware(['auth', 'verified'])->group(function () {
 //     // Acts as a gateway for each main role     (temporary, soon will have merge gateway controller)
 //     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 // });
 
 
-// PUBLIC ARCHIVE
-Route::prefix('repository')->group(function () {
-    Route::redirect('/', 'repository/thesis')->name('repository.index');
+// GUEST ROUTES
+Route::prefix('guest')->group(function () {
+    Route::get('/', function () {
+        return Inertia::render('Guest/landing');
+    })->name('guest.landing');
 
-    Route::get('thesis', [ThesisArchive::class, 'index'])->name('repository.theses');
+    Route::get('/repository', function () {
+        return Inertia::render('Guest/repository');
+    })->name('guest.repository');
+
+    Route::get('/search', function () {
+        return Inertia::render('Guest/filter-search');
+    })->name('guest.search');
+
+    Route::get('/preview', function () {
+        return Inertia::render('Guest/document-preview');
+    })->name('guest.preview');
+});
+
+// PUBLIC ARCHIVE (legacy routes - redirect to guest)
+Route::prefix('repository')->group(function () {
+    Route::redirect('/', '/guest/repository')->name('repository.index');
+    Route::redirect('thesis', '/guest/repository')->name('repository.theses');
 });
 
 
@@ -75,6 +102,10 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Student/dashboard'); // Your Student Dashboard Component
     })->name('dashboard');
+
+    Route::get('notification', function () {
+        return Inertia::render('Shared/notification');
+    })->name('student.notification');
 });
 
 
@@ -215,6 +246,10 @@ Route::prefix('faculty')->group(function () {
             return Inertia::render('Shared/resources');
         })->name('faculty.resources');
 
+        Route::get('notification', function () {
+            return Inertia::render('Shared/notification');
+        })->name('faculty.notification');
+
         // Route::get('repository', function () {
         //     return Inertia::render('Shared/repository/thesis');
         // })->name('faculty.repository');
@@ -256,7 +291,6 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
             return Inertia::render('Admin/management/deadline');
         })->name('admin.management.deadline');
 
-
         // FULL CRUD OPERATIONS EXAMPLES
         Route::get('dept-policies', [DepartmentPoliciesController::class, 'index'])->name('admin.management.dep-policies');
         // Route::get('dept-policies/grading-criteria/{id}/edit', [DepartmentPoliciesController::class, 'edit'])->name('admin.management.dep-policies.edit');
@@ -284,6 +318,10 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
     Route::get('resources', function () {
         return Inertia::render('Shared/resources');
     })->name('admin.resources');
+
+    Route::get('notification', function () {
+        return Inertia::render('Shared/notification');
+    })->name('admin.notification');
 });
 
 
@@ -295,6 +333,20 @@ API ROUTES (temporary only)
 */
 Route::post('file-import', [FileImportController::class, 'store'])->name('file.import');
 
+
+// TEMPORARY: view shared thesis page without affecting guest/admin routes
+Route::get('/test-thesis', function () {
+    return Inertia::render('Shared/repository/thesis');
+});
+
+Route::get('/test-thesis-preview', function () {
+    return Inertia::render('Shared/repository/document-preview', [
+        'document' => [
+            'title' => 'Sample Thesis',
+            'url' => '/storage/sample.pdf'
+        ]
+    ]);
+});
 
 
 require __DIR__.'/settings.php';

@@ -32,9 +32,9 @@ function SelectTrigger({
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
       className={cn(
-        // Container styling from Figma
-        "flex w-[376px] p-[10px] items-center gap-[70px]",
-        "rounded-[8px] bg-[#F3EFD0]",
+        // Container styling from Figma (default width, can be overridden)
+        "flex p-[10px] items-center gap-[70px]",
+        "rounded-[8px] bg-breadcrumb",
         // Remove border completely
         "border-none !border-0 !shadow-none",
         // Text styling
@@ -74,7 +74,7 @@ function SelectContent({
       <SelectPrimitive.Content
         data-slot="select-content"
         className={cn(
-          "flex flex-col items-start w-[376px] rounded-[8px] bg-[#F3EFD0] text-[#1A1A1A] !border-0",
+          "flex flex-col items-start rounded-[8px] bg-breadcrumb text-[#1A1A1A] !border-0",
           "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
           "relative z-50 max-h-96 overflow-hidden",
           position === "popper" &&
@@ -125,7 +125,7 @@ function SelectItem({
         // Default state: cream background with dark text
         "flex items-center gap-[10px] transition-colors cursor-pointer select-none outline-none relative",
         "w-full p-[10px]",
-        "bg-[#F3EFD0]",
+        "bg-breadcrumb",
         "text-[#1A1A1A] font-['DM_Sans'] text-[13.33px] font-medium leading-normal",
         // Hover/focus state: white background
         "hover:bg-white focus:bg-white data-[highlighted]:bg-white",
