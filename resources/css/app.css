@@ -217,7 +217,7 @@
     --title-3: 1.5rem;                            /* 24px */
     --body-1: 1.375rem;                           /* 22px */
     --body-2: 1rem;                               /* 16px */
-    --body-3: 0.9375rem;                          /* 15px */
+    --body-3: 0.83rem;                          /* 15px */
     --body-4: 0.75rem;                            /* 12px */
     --body-5: 0.5625rem;                          /* 9px */
 }
@@ -302,15 +302,6 @@
     --endorsed-bg: #0F1E3A;
     --endorsed-border: #2563EB;
     --endorsed-font-color: #C7D2FE;
-
-
-
-
-
-
-
-
-    
     
 
 }
@@ -809,6 +800,17 @@
             line-height: 1.5;
         }
     }
+}
+
+@layer utilities {
+  .text-body-1 { font-size: var(--body-1); }
+  .text-body-2 { font-size: var(--body-2); }
+  .text-body-3 { font-size: var(--body-3); }
+  .text-body-4 { font-size: var(--body-4); }
+
+  .text-title-1 { font-size: var(--title-1); }
+  .text-title-2 { font-size: var(--title-2); }
+  .text-title-3 { font-size: var(--title-3); }
 }
 
 html {
