@@ -1,9 +1,15 @@
-import { Filter, ArrowUpDown, Trash2, CheckCircle2, Calendar, ChevronDown } from 'lucide-react';
+import * as React from 'react';
+import { useState } from 'react';
+import { Filter, Trash2, CheckCircle2, Calendar, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button'; 
 import { cn } from '@/lib/utils';
 import { SearchBar } from '@/components/filter-search';
-import { useState } from 'react';
+import { RepoFilter } from '@/components/filter-search';
 import { Icon } from '@/components/icon-index';
+import {
+    Dialog,
+    DialogContent,
+} from "@/components/ui/dialog";
 
 type SectionVariant = 'StudentManagement' | 'DefenseManagement' | 'ThesisArchive' | 'Notifications';
 
@@ -13,6 +19,9 @@ interface FilterSearchSectionProps {
 
 export default function FilterSearchSection({ variant = 'DefenseManagement' }: FilterSearchSectionProps) {
     const [query, setQuery] = useState('');
+    
+    // State to manage the Advanced Filter Modal visibility
+    const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
     /**
      * Container Style Mapping
@@ -22,14 +31,20 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
         StudentManagement: "h-[134px] p-[24.8px_24.8px_0.8px_24.8px] gap-4 border-primary/20 shadow-sm",
         DefenseManagement: "h-[125.6px] p-[24.8px_24.8px_0.8px_24.8px] gap-4 border-primary/20 shadow-sm",
         ThesisArchive: "h-[120px] p-[25px_19px] gap-[25px] border-border",
-        Notifications: "h-[118px] p-6 gap-6 border-border shadow-none overflow-y-auto"
+        Notifications: "h-[118px] p-6 gap-6 border-border shadow-none"
+    };
+
+    // Callback when tags are applied in RepoFilter
+    const handleApplyFilters = (tags: string[]) => {
+        console.log("Applied Tags:", tags);
+        setIsFilterModalOpen(false);
     };
 
     return (
         <div className={cn(
             "flex flex-col items-start self-stretch w-full max-w-[1360px] bg-card rounded-[10px] flex-none",
             "border-[0.8px] box-border transition-all duration-200",
-            "font-dm", // Forces DM Sans for the entire container
+            "font-dm", 
             containerVariants[variant]
         )}>
             
@@ -116,7 +131,12 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                     )}
 
                     {variant !== 'Notifications' && (
-                        <Button variant="secondary" size="icon" className="rounded-lg border-none font-dm">
+                        <Button 
+                            variant="secondary" 
+                            size="icon" 
+                            className="rounded-lg border-none font-dm"
+                            onClick={() => setIsFilterModalOpen(true)} // Calls the modal
+                        >
                             <Filter className="w-4 h-4" />
                         </Button>
                     )}
@@ -136,6 +156,19 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                     </Button>
                 </div>
             </div>
+
+            {/* --- INTEGRATED REPO FILTER MODAL --- */}
+            <Dialog open={isFilterModalOpen} onOpenChange={setIsFilterModalOpen}>
+                {/* Technical Note: DialogContent has border/bg removed to let the 
+                    RepoFilter's internal shadow and bg-white container show through cleanly.
+                */}
+                <DialogContent className="max-w-md p-0 border-none bg-transparent shadow-none outline-none">
+                    <RepoFilter 
+                        onClose={() => setIsFilterModalOpen(false)} 
+                        onApply={handleApplyFilters}
+                    />
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
