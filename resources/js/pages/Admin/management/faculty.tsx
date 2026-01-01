@@ -1,10 +1,10 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
+
+//SHARED COMPONENTS 
 import { AppHeader } from '@/components/app-header';
 import { AppContent } from '@/components/app-content';
 import { NavFooter } from '@/components/nav-footer';
-
-//SHARED COMPONENTS 
 import { Button } from '@/components/ui/button';
 import { RadioGroup } from "@/components/ui/radio-group";
 import { RadioGroupItemWithLabel } from "@/components/ui/radio-group-with-label";
@@ -12,9 +12,6 @@ import { CheckboxWithLabel } from "@/components/ui/checkbox-with-label";
 import { Filter as FilterIcon } from 'lucide-react';
 import { Icon } from '@/components/icon-index';
 import { SearchBar } from '@/components/filter-search';
-
-//ICONS 
-
 
 interface Faculty {
   id: string;
@@ -179,7 +176,6 @@ interface FilterState {
   facultyType: string;
 }
 
-// Custom Dropdown Wrapper Component
 function Dropdown({ 
   isOpen, 
   onClose, 
@@ -224,7 +220,7 @@ function Dropdown({
   );
 }
 
-// Filter Component (Based on Filter1 from shared components)
+// Filter
 function FacultyFilterDropdown({ 
   onApply, 
   onClose 
@@ -316,7 +312,7 @@ function FacultyFilterDropdown({
   );
 }
 
-// Sort Component (Based on Sort1 from shared components)
+// Sort
 function FacultySortDropdown({ 
   onApply, 
   onClose 
@@ -438,7 +434,7 @@ export default function FacultyManagement({ faculties }: { faculties?: any[] }) 
     return (
         <>
             <Head title="Faculty Management" />
-            <AppHeader variant="admin" />
+            <AppHeader/>
 
             <AppContent
                 title={
@@ -540,9 +536,7 @@ export default function FacultyManagement({ faculties }: { faculties?: any[] }) 
 
                 {/* Add Faculty Button */}
                 <div className="flex justify-end mb-6">
-                    <Button>
-                        + Add Faculty
-                    </Button>
+                    <Button> + Add Faculty </Button>
                 </div>
 
                 {/* Results Info */}
@@ -558,7 +552,7 @@ export default function FacultyManagement({ faculties }: { faculties?: any[] }) 
                 <div className="overflow-x-auto">
                     <div className="min-w-[1360px]">
                         {/* Table Header */}
-                        <div className="grid grid-cols-7 h-10 rounded-t-lg bg-primary">
+                        <div className="grid grid-cols-7 h-10 rounded-t-lg bg-primary transition-colors duration-200 hover:bg-destructive-foreground">
                             <div className="flex items-center justify-center p-2.5">
                                 <span className="text-white text-center font-sans text-[13.33px] font-medium">
                                     Faculty ID
@@ -620,7 +614,7 @@ export default function FacultyManagement({ faculties }: { faculties?: any[] }) 
                                             />
                                         ) : (
                                             <div className="w-8 h-8 flex items-center justify-center rounded-full bg-[#ECECF0]">
-                                                <span className="text-[#0A0A0A] font-arimo text-sm">
+                                                <span className="text-black font-arimo text-sm">
                                                     {faculty.initials}
                                                 </span>
                                             </div>
@@ -670,7 +664,7 @@ export default function FacultyManagement({ faculties }: { faculties?: any[] }) 
 
                                     {/* Date Added */}
                                     <div className="flex items-center justify-center p-2.5">
-                                        <span className="text-[#0A0A0A] text-center text-[13.33px] font-medium">
+                                        <span className="text-black text-center text-[13.33px] font-medium">
                                             {faculty.dateAdded}
                                         </span>
                                     </div>
@@ -693,7 +687,6 @@ export default function FacultyManagement({ faculties }: { faculties?: any[] }) 
                     </div>
                 </div>
             </AppContent>
-
             <NavFooter />
         </>
     );

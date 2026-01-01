@@ -1,23 +1,21 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
-import { AppHeader } from '@/components/app-header';
-import { AppContent } from '@/components/app-content';
-import { NavFooter } from '@/components/nav-footer';
 
 //SHARED COMPONENTS 
 import { Button } from '@/components/ui/button';
-import { Filter as FilterIcon } from 'lucide-react';
-import { Icon } from '@/components/icon-index';
 import { SearchBar } from '@/components/filter-search';
 import { RadioGroup } from "@/components/ui/radio-group";
 import { RadioGroupItemWithLabel } from "@/components/ui/radio-group-with-label";
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { Table as TableIcon, LayoutGrid } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { AppHeader } from '@/components/app-header';
+import { AppContent } from '@/components/app-content';
+import { NavFooter } from '@/components/nav-footer';
+import { Icon } from '@/components/icon-index';
 import { GroupCard } from '@/components/ui/card';
 
-//ICONS 
-
+import { Table as TableIcon, LayoutGrid } from 'lucide-react';
+import { Filter as FilterIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface Student {
   studentNumber: string;
@@ -43,7 +41,7 @@ interface GroupData {
  //Sample Data
 const studentData: Student[] = [
   {
-    studentNumber: "20XX-XXXXX-MN-1",
+    studentNumber: "2022-00001-MN-0",
     name: "Rena Dela Cruz",
     email: "ronadelacruz@iskolarngbayan.pup.edu.ph",
     groupCode: "3I01",
@@ -52,7 +50,7 @@ const studentData: Student[] = [
     adviser: "Dr. Robert Dela Cruz",
   },
   {
-    studentNumber: "20XX-XXXXX-MN-2",
+    studentNumber: "2022-00002-MN-0",
     name: "John Santos",
     email: "johnsantos@iskolarngbayan.pup.edu.ph",
     groupCode: "3I01",
@@ -61,7 +59,7 @@ const studentData: Student[] = [
     adviser: "Dr. Robert Dela Cruz",
   },
   {
-    studentNumber: "20XX-XXXXX-MN-3",
+    studentNumber: "2022-00003-MN-0",
     name: "Maria Garcia",
     email: "mariagarcia@iskolarngbayan.pup.edu.ph",
     groupCode: "3I01",
@@ -70,7 +68,7 @@ const studentData: Student[] = [
     adviser: "Dr. Robert Dela Cruz",
   },
   {
-    studentNumber: "20XX-XXXXX-MN-4",
+    studentNumber: "2022-00004-MN-0",
     name: "Pedro Reyes",
     email: "pedroreyes@iskolarngbayan.pup.edu.ph",
     groupCode: "3I02",
@@ -80,7 +78,7 @@ const studentData: Student[] = [
     hasPhoto: true,
   },
   {
-    studentNumber: "20XX-XXXXX-MN-5",
+    studentNumber: "2022-00005-MN-0",
     name: "Ana Lopez",
     email: "analopez@iskolarngbayan.pup.edu.ph",
     groupCode: "3I02",
@@ -89,7 +87,7 @@ const studentData: Student[] = [
     adviser: "Engr. Robert Dela Cruz",
   },
   {
-    studentNumber: "20XX-XXXXX-MN-6",
+    studentNumber: "2022-00006-MN-0",
     name: "Carlos Mendoza",
     email: "carlosmendoza@iskolarngbayan.pup.edu.ph",
     groupCode: "3I02",
@@ -98,7 +96,7 @@ const studentData: Student[] = [
     adviser: "Engr. Robert Dela Cruz",
   },
   {
-    studentNumber: "20XX-XXXXX-MN-7",
+    studentNumber: "2022-00007-MN-0",
     name: "Sofia Torres",
     email: "sofiatorres@iskolarngbayan.pup.edu.ph",
     groupCode: "4I01",
@@ -107,7 +105,7 @@ const studentData: Student[] = [
     adviser: "Dr. Robert Dela Cruz",
   },
   {
-    studentNumber: "20XX-XXXXX-MN-8",
+    studentNumber: "2022-00008-MN-0",
     name: "Miguel Cruz",
     email: "miguelcruz@iskolarngbayan.pup.edu.ph",
     groupCode: "4I01",
@@ -117,7 +115,7 @@ const studentData: Student[] = [
     hasPhoto: true,
   },
   {
-    studentNumber: "20XX-XXXXX-MN-9",
+    studentNumber: "2022-00009-MN-0",
     name: "Isabella Ramos",
     email: "isabellaramos@iskolarngbayan.pup.edu.ph",
     groupCode: "4I01",
@@ -126,7 +124,7 @@ const studentData: Student[] = [
     adviser: "Dr. Robert Dela Cruz",
   },
   {
-    studentNumber: "20XX-XXXXX-MN-10",
+    studentNumber: "2022-00010-MN-0",
     name: "Luis Fernandez",
     email: "luisfernandez@iskolarngbayan.pup.edu.ph",
     groupCode: "4I02",
@@ -136,7 +134,7 @@ const studentData: Student[] = [
     hasPhoto: true,
   },
   {
-    studentNumber: "20XX-XXXXX-MN-11",
+    studentNumber: "2022-00011-MN-0",
     name: "Carmen Diaz",
     email: "carmendiaz@iskolarngbayan.pup.edu.ph",
     groupCode: "4I02",
@@ -145,7 +143,7 @@ const studentData: Student[] = [
     adviser: "Engr. Robert Dela Cruz",
   },
   {
-    studentNumber: "20XX-XXXXX-MN-12",
+    studentNumber: "2022-00012-MN-0",
     name: "Rafael Silva",
     email: "rafaelsilva@iskolarngbayan.pup.edu.ph",
     groupCode: "4I02",
@@ -154,7 +152,7 @@ const studentData: Student[] = [
     adviser: "Engr. Robert Dela Cruz",
   },
   {
-    studentNumber: "20XX-XXXXX-MN-13",
+    studentNumber: "2022-00013-MN-0",
     name: "Elena Martinez",
     email: "elenamartinez@iskolarngbayan.pup.edu.ph",
     groupCode: "4I03",
@@ -163,7 +161,7 @@ const studentData: Student[] = [
     adviser: "Dr. Robert Dela Cruz",
   },
   {
-    studentNumber: "20XX-XXXXX-MN-14",
+    studentNumber: "2022-00014-MN-0",
     name: "Diego Morales",
     email: "diegomorales@iskolarngbayan.pup.edu.ph",
     groupCode: "4I03",
@@ -173,7 +171,7 @@ const studentData: Student[] = [
     hasPhoto: true,
   },
   {
-    studentNumber: "20XX-XXXXX-MN-15",
+    studentNumber: "2022-00015-MN-0",
     name: "Lucia Herrera",
     email: "luciaherrera@iskolarngbayan.pup.edu.ph",
     groupCode: "4I03",
@@ -182,7 +180,7 @@ const studentData: Student[] = [
     adviser: "Dr. Robert Dela Cruz",
   },
   {
-    studentNumber: "20XX-XXXXX-MN-16",
+    studentNumber: "2022-00016-MN-0",
     name: "Antonio Vargas",
     email: "antoniovargas@iskolarngbayan.pup.edu.ph",
     groupCode: "4I04",
@@ -192,7 +190,7 @@ const studentData: Student[] = [
     hasPhoto: true,
   },
   {
-    studentNumber: "20XX-XXXXX-MN-17",
+    studentNumber: "2022-00017-MN-0",
     name: "Gabriela Ortiz",
     email: "gabrielaortiz@iskolarngbayan.pup.edu.ph",
     groupCode: "4I04",
@@ -201,7 +199,7 @@ const studentData: Student[] = [
     adviser: "Engr. Robert Dela Cruz",
   },
   {
-    studentNumber: "20XX-XXXXX-MN-18",
+    studentNumber: "2022-00018-MN-0",
     name: "Fernando Castro",
     email: "fernandocastro@iskolarngbayan.pup.edu.ph",
     groupCode: "4I04",
@@ -210,7 +208,7 @@ const studentData: Student[] = [
     adviser: "Engr. Robert Dela Cruz",
   },
   {
-    studentNumber: "20XX-XXXXX-MN-19",
+    studentNumber: "2022-00019-MN-0",
     name: "Valentina Ruiz",
     email: "valentinaruiz@iskolarngbayan.pup.edu.ph",
     groupCode: "3I03",
@@ -219,7 +217,7 @@ const studentData: Student[] = [
     adviser: "Dr. Robert Dela Cruz",
   },
   {
-    studentNumber: "20XX-XXXXX-MN-20",
+    studentNumber: "2022-00020-MN-0",
     name: "Sebastian Flores",
     email: "sebastianflores@iskolarngbayan.pup.edu.ph",
     groupCode: "3I03",
@@ -229,7 +227,7 @@ const studentData: Student[] = [
     hasPhoto: true,
   },
   {
-    studentNumber: "20XX-XXXXX-MN-21",
+    studentNumber: "2021-00021-MN-0",
     name: "Camila Jimenez",
     email: "camilajimenez@iskolarngbayan.pup.edu.ph",
     groupCode: "3I03",
@@ -238,7 +236,7 @@ const studentData: Student[] = [
     adviser: "Dr. Robert Dela Cruz",
   },
   {
-    studentNumber: "20XX-XXXXX-MN-22",
+    studentNumber: "2022-00022-MN-0",
     name: "Mateo Gonzalez",
     email: "mateogonzalez@iskolarngbayan.pup.edu.ph",
     groupCode: "3I04",
@@ -247,7 +245,7 @@ const studentData: Student[] = [
     adviser: "Engr. Robert Dela Cruz",
   },
   {
-    studentNumber: "20XX-XXXXX-MN-23",
+    studentNumber: "2022-00023-MN-0",
     name: "Natalia Romero",
     email: "nataliaromero@iskolarngbayan.pup.edu.ph",
     groupCode: "3I04",
@@ -257,7 +255,7 @@ const studentData: Student[] = [
     hasPhoto: true,
   },
   {
-    studentNumber: "20XX-XXXXX-MN-24",
+    studentNumber: "2022-00024-MN-0",
     name: "Alejandro Suarez",
     email: "alejandrosuarez@iskolarngbayan.pup.edu.ph",
     groupCode: "3I04",
@@ -266,7 +264,7 @@ const studentData: Student[] = [
     adviser: "Engr. Robert Dela Cruz",
   },
   {
-    studentNumber: "20XX-XXXXX-MN-25",
+    studentNumber: "2022-00025-MN-0",
     name: "Victoria Ramirez",
     email: "victoriaramirez@iskolarngbayan.pup.edu.ph",
     groupCode: "4I05",
@@ -276,7 +274,7 @@ const studentData: Student[] = [
     hasPhoto: true,
   },
   {
-    studentNumber: "20XX-XXXXX-MN-26",
+    studentNumber: "2022-00026-MN-0",
     name: "Daniel Medina",
     email: "danielmedina@iskolarngbayan.pup.edu.ph",
     groupCode: "4I05",
@@ -285,7 +283,7 @@ const studentData: Student[] = [
     adviser: "Dr. Robert Dela Cruz",
   },
   {
-    studentNumber: "20XX-XXXXX-MN-27",
+    studentNumber: "2022-00027-MN-0",
     name: "Andrea Guzman",
     email: "andreaguzman@iskolarngbayan.pup.edu.ph",
     groupCode: "4I05",
@@ -294,7 +292,7 @@ const studentData: Student[] = [
     adviser: "Dr. Robert Dela Cruz",
   },
   {
-    studentNumber: "20XX-XXXXX-MN-28",
+    studentNumber: "2022-00028-MN-0",
     name: "Pablo Rivera",
     email: "pablorivera@iskolarngbayan.pup.edu.ph",
     groupCode: "4I06",
@@ -303,7 +301,7 @@ const studentData: Student[] = [
     adviser: "Engr. Robert Dela Cruz",
   },
   {
-    studentNumber: "20XX-XXXXX-MN-29",
+    studentNumber: "2022-00029-MN-0",
     name: "Laura Nunez",
     email: "lauranunez@iskolarngbayan.pup.edu.ph",
     groupCode: "4I06",
@@ -313,7 +311,7 @@ const studentData: Student[] = [
     hasPhoto: true,
   },
   {
-    studentNumber: "20XX-XXXXX-MN-30",
+    studentNumber: "2022-00030-MN-0",
     name: "Javier Campos",
     email: "javiercampos@iskolarngbayan.pup.edu.ph",
     groupCode: "4I06",
@@ -328,7 +326,6 @@ interface FilterState {
   specializations: string[];
 }
 
-// Custom Dropdown Wrapper Component
 function Dropdown({ 
   isOpen, 
   onClose, 
@@ -374,7 +371,6 @@ function Dropdown({
 }
 
 //Sort and Filter
-
 function StudentFilterWrapper({ 
   onApply, 
   onClose 
@@ -518,7 +514,7 @@ function StudentSortWrapper({
   );
 }
 
-// Sort3 for Group Card View
+// Sorting for Group Card View
 function GroupSortWrapper({ 
   onApply, 
   onClose 
@@ -580,7 +576,7 @@ export default function StudentManagement({ students }: { students?: any[] }) {
     const sortButtonRef = useRef<HTMLButtonElement>(null);
     const filterButtonRef = useRef<HTMLButtonElement>(null);
 
-    // Group students by group code for card view
+    // Grouping students by group code for the group card view
     const groupedData = useMemo(() => {
         const groups: { [key: string]: GroupData } = {};
         
@@ -589,7 +585,7 @@ export default function StudentManagement({ students }: { students?: any[] }) {
                 groups[student.groupCode] = {
                     groupCode: student.groupCode,
                     thesisTitle: "Machine Learning Applications in Healthcare Diagnostics",
-                    thesisStage: "Title Defense",
+                    thesisStage: "Title Proposal",
                     members: [],
                     adviser: student.adviser,
                     specialization: student.specialization,
@@ -602,7 +598,7 @@ export default function StudentManagement({ students }: { students?: any[] }) {
         return Object.values(groups);
     }, []);
 
-    // Apply filtering and sorting for groups (card view)
+    // Apply filtering and sorting for groups (in group card view)
     const filteredAndSortedGroups = useMemo(() => {
         let result = [...groupedData];
 
@@ -689,7 +685,7 @@ export default function StudentManagement({ students }: { students?: any[] }) {
     return (
         <>
             <Head title="Student Management" />
-            <AppHeader variant="admin" />
+            <AppHeader/>
 
             <AppContent
                 title={
@@ -807,7 +803,7 @@ export default function StudentManagement({ students }: { students?: any[] }) {
                                 "gap-2",
                                 view === 'table' 
                                     ? "bg-primary text-white hover:bg-primary/90" 
-                                    : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                                    : "border-gray-300 hover:bg-gray-50"
                             )}
                             onClick={() => setView('table')}
                         >
@@ -820,7 +816,7 @@ export default function StudentManagement({ students }: { students?: any[] }) {
                                 "gap-2",
                                 view === 'card' 
                                     ? "bg-primary text-white hover:bg-primary/90" 
-                                    : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                                    : "border-gray-300 hover:bg-gray-50"
                             )}
                             onClick={() => setView('card')}
                         >
@@ -848,8 +844,8 @@ export default function StudentManagement({ students }: { students?: any[] }) {
                 <div className="overflow-x-auto">
                     <div className="min-w-[1360px]">
                         
-                        {/* Table Header - 8 Columns */}
-                        <div className="grid grid-cols-8 h-10 rounded-t-lg bg-primary">
+                        {/* Table Header*/}
+                        <div className="grid grid-cols-8 h-10 rounded-t-lg bg-primary transition-colors duration-200 hover:bg-destructive-foreground">
                             <div className="flex items-center justify-center p-2.5">
                                 <span className="text-white text-center font-sans text-[13.33px] font-medium">
                                     Student ID
@@ -908,14 +904,14 @@ export default function StudentManagement({ students }: { students?: any[] }) {
 
                                     {/* Student Name */}
                                     <div className="flex items-center justify-center p-2.5">
-                                        <span className="text-[#0A0A0A] text-center text-[13.33px] font-medium">
+                                        <span className="text-center text-[13.33px] font-medium">
                                             {student.name}
                                         </span>
                                     </div>
 
                                     {/* PUP Webmail */}
                                     <div className="flex items-center justify-center p-2.5">
-                                        <p className="text-[#0A0A0A] text-center text-[13.33px] font-medium break-all leading-tight">
+                                        <p className="text-center text-[13.33px] font-medium truncate leading-tight">
                                             {student.email}
                                         </p>
                                     </div>
@@ -936,14 +932,14 @@ export default function StudentManagement({ students }: { students?: any[] }) {
 
                                     {/* Specialization */}
                                     <div className="flex items-center justify-center p-2.5">
-                                        <span className="text-[#0A0A0A] text-center text-[13.33px] font-medium">
+                                        <span className="text-center text-[13.33px] font-medium">
                                             {student.specialization}
                                         </span>
                                     </div>
 
                                     {/* Thesis Adviser */}
                                     <div className="flex items-center justify-center p-2.5">
-                                        <span className="text-[#0A0A0A] text-center text-[13.33px] font-medium">
+                                        <span className="text-center text-[13.33px] font-medium">
                                             {student.adviser}
                                         </span>
                                     </div>
@@ -966,12 +962,12 @@ export default function StudentManagement({ students }: { students?: any[] }) {
                     </div>
                 </div>
                 ) : (
-                    <div className="grid grid-cols-6 gap-4">
-                        {groupedData.map((group, index) => (
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-6 gap-4">
+                        {filteredAndSortedGroups.map((group, index) => (
                             <GroupCard
                                 key={`${group.groupCode}-${index}`}
                                 groupCode={group.groupCode}
-                                groupDescription={`${group.block} - ${group.specialization}`}
+                                groupDescription={`${group.block} | ${group.specialization}`}
                                 thesisTitle={group.thesisTitle}
                                 thesisStage={group.thesisStage}
                                 members={group.members}
@@ -981,7 +977,6 @@ export default function StudentManagement({ students }: { students?: any[] }) {
                     </div>
                 )}
             </AppContent>
-
             <NavFooter />
         </>
     );
