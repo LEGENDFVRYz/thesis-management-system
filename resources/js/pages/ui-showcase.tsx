@@ -1023,7 +1023,6 @@ export default function UIShowcase() {
                     </section>
 
                     {/* Sidebar Primitive */}
-                    {/*  
                     <section className="space-y-4">
                         <h2 className="text-2xl font-semibold text-white">Sidebar Primitive</h2>
                         <p className="text-sm text-gray-400">Base sidebar component (used in app-sidebar)</p>
@@ -1060,7 +1059,7 @@ export default function UIShowcase() {
                                 </Sidebar>
                             </SidebarProvider>
                         </div>
-                    </section>*/}
+                    </section>
 
                     {/* Date Picker */}
                     <section className="space-y-4">
