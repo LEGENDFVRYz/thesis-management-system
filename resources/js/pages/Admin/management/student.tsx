@@ -1,155 +1,690 @@
-import { useState } from 'react';
-import axios from 'axios';
-import Papa from 'papaparse';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import { AppHeader } from '@/components/app-header';
 import { AppContent } from '@/components/app-content';
 import { NavFooter } from '@/components/nav-footer';
-import { store } from '@/routes/admin/management/student/index';
-import ImportReviewModal from '@/components/modal/ImportReviewModal'; 
 
-//SHARED COMPONENTS
+//SHARED COMPONENTS 
+import { Button } from '@/components/ui/button';
+import { Filter as FilterIcon } from 'lucide-react';
+import { Icon } from '@/components/icon-index';
+import { SearchBar } from '@/components/filter-search';
+import { RadioGroup } from "@/components/ui/radio-group";
+import { RadioGroupItemWithLabel } from "@/components/ui/radio-group-with-label";
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Table as TableIcon, LayoutGrid } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { GroupCard } from '@/components/ui/card';
 
-//ICONS
+//ICONS 
 
-// --- Types ---
-interface ImportStats {
-    to_create: number;
-    to_update: number;
-    to_skip: number;
-    errors: number;
+
+interface Student {
+  studentNumber: string;
+  name: string;
+  email: string;
+  groupCode: string;
+  block: string;
+  specialization: string;
+  adviser: string;
+  hasPhoto?: boolean;
 }
 
-const FIELDS = [
-    { key: 'student_id',     label: 'Student ID',   required: true },
-    { key: 'name',           label: 'Student Name', required: true },
-    { key: 'email',          label: 'PUP Webmail',  required: true },
-    { key: 'block',          label: 'Block',        required: true },
+interface GroupData {
+  groupCode: string;
+  thesisTitle: string;
+  thesisStage: string;
+  members: string[];
+  adviser: string;
+  specialization: string;
+  block: string;
+}
+
+const studentData: Student[] = [
+  {
+    studentNumber: "20XX-XXXXX-MN-1",
+    name: "Rena Dela Cruz",
+    email: "ronadelacruz@iskolarngbayan.pup.edu.ph",
+    groupCode: "3I01",
+    block: "BSCPE 3-1",
+    specialization: "Machine Learning",
+    adviser: "Dr. Robert Dela Cruz",
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-2",
+    name: "John Santos",
+    email: "johnsantos@iskolarngbayan.pup.edu.ph",
+    groupCode: "3I01",
+    block: "BSCPE 3-1",
+    specialization: "Machine Learning",
+    adviser: "Dr. Robert Dela Cruz",
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-3",
+    name: "Maria Garcia",
+    email: "mariagarcia@iskolarngbayan.pup.edu.ph",
+    groupCode: "3I01",
+    block: "BSCPE 3-1",
+    specialization: "Machine Learning",
+    adviser: "Dr. Robert Dela Cruz",
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-4",
+    name: "Pedro Reyes",
+    email: "pedroreyes@iskolarngbayan.pup.edu.ph",
+    groupCode: "3I02",
+    block: "BSCPE 3-3",
+    specialization: "Big Data Analytics",
+    adviser: "Engr. Robert Dela Cruz",
+    hasPhoto: true,
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-5",
+    name: "Ana Lopez",
+    email: "analopez@iskolarngbayan.pup.edu.ph",
+    groupCode: "3I02",
+    block: "BSCPE 3-3",
+    specialization: "Big Data Analytics",
+    adviser: "Engr. Robert Dela Cruz",
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-6",
+    name: "Carlos Mendoza",
+    email: "carlosmendoza@iskolarngbayan.pup.edu.ph",
+    groupCode: "3I02",
+    block: "BSCPE 3-3",
+    specialization: "Big Data Analytics",
+    adviser: "Engr. Robert Dela Cruz",
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-7",
+    name: "Sofia Torres",
+    email: "sofiatorres@iskolarngbayan.pup.edu.ph",
+    groupCode: "4I01",
+    block: "BSCPE 4-3",
+    specialization: "Big Data Analytics",
+    adviser: "Dr. Robert Dela Cruz",
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-8",
+    name: "Miguel Cruz",
+    email: "miguelcruz@iskolarngbayan.pup.edu.ph",
+    groupCode: "4I01",
+    block: "BSCPE 4-3",
+    specialization: "Big Data Analytics",
+    adviser: "Dr. Robert Dela Cruz",
+    hasPhoto: true,
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-9",
+    name: "Isabella Ramos",
+    email: "isabellaramos@iskolarngbayan.pup.edu.ph",
+    groupCode: "4I01",
+    block: "BSCPE 4-3",
+    specialization: "Big Data Analytics",
+    adviser: "Dr. Robert Dela Cruz",
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-10",
+    name: "Luis Fernandez",
+    email: "luisfernandez@iskolarngbayan.pup.edu.ph",
+    groupCode: "4I02",
+    block: "BSCPE 4-2",
+    specialization: "Big Data Analytics",
+    adviser: "Engr. Robert Dela Cruz",
+    hasPhoto: true,
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-11",
+    name: "Carmen Diaz",
+    email: "carmendiaz@iskolarngbayan.pup.edu.ph",
+    groupCode: "4I02",
+    block: "BSCPE 4-2",
+    specialization: "Big Data Analytics",
+    adviser: "Engr. Robert Dela Cruz",
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-12",
+    name: "Rafael Silva",
+    email: "rafaelsilva@iskolarngbayan.pup.edu.ph",
+    groupCode: "4I02",
+    block: "BSCPE 4-2",
+    specialization: "Big Data Analytics",
+    adviser: "Engr. Robert Dela Cruz",
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-13",
+    name: "Elena Martinez",
+    email: "elenamartinez@iskolarngbayan.pup.edu.ph",
+    groupCode: "4I03",
+    block: "BSCPE 4-1",
+    specialization: "Machine Learning",
+    adviser: "Dr. Robert Dela Cruz",
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-14",
+    name: "Diego Morales",
+    email: "diegomorales@iskolarngbayan.pup.edu.ph",
+    groupCode: "4I03",
+    block: "BSCPE 4-1",
+    specialization: "Machine Learning",
+    adviser: "Dr. Robert Dela Cruz",
+    hasPhoto: true,
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-15",
+    name: "Lucia Herrera",
+    email: "luciaherrera@iskolarngbayan.pup.edu.ph",
+    groupCode: "4I03",
+    block: "BSCPE 4-1",
+    specialization: "Machine Learning",
+    adviser: "Dr. Robert Dela Cruz",
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-16",
+    name: "Antonio Vargas",
+    email: "antoniovargas@iskolarngbayan.pup.edu.ph",
+    groupCode: "4I04",
+    block: "BSCPE 4-6",
+    specialization: "System Development",
+    adviser: "Engr. Robert Dela Cruz",
+    hasPhoto: true,
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-17",
+    name: "Gabriela Ortiz",
+    email: "gabrielaortiz@iskolarngbayan.pup.edu.ph",
+    groupCode: "4I04",
+    block: "BSCPE 4-6",
+    specialization: "System Development",
+    adviser: "Engr. Robert Dela Cruz",
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-18",
+    name: "Fernando Castro",
+    email: "fernandocastro@iskolarngbayan.pup.edu.ph",
+    groupCode: "4I04",
+    block: "BSCPE 4-6",
+    specialization: "System Development",
+    adviser: "Engr. Robert Dela Cruz",
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-19",
+    name: "Valentina Ruiz",
+    email: "valentinaruiz@iskolarngbayan.pup.edu.ph",
+    groupCode: "3I03",
+    block: "BSCPE 3-3",
+    specialization: "Big Data Analytics",
+    adviser: "Dr. Robert Dela Cruz",
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-20",
+    name: "Sebastian Flores",
+    email: "sebastianflores@iskolarngbayan.pup.edu.ph",
+    groupCode: "3I03",
+    block: "BSCPE 3-3",
+    specialization: "Big Data Analytics",
+    adviser: "Dr. Robert Dela Cruz",
+    hasPhoto: true,
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-21",
+    name: "Camila Jimenez",
+    email: "camilajimenez@iskolarngbayan.pup.edu.ph",
+    groupCode: "3I03",
+    block: "BSCPE 3-3",
+    specialization: "Big Data Analytics",
+    adviser: "Dr. Robert Dela Cruz",
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-22",
+    name: "Mateo Gonzalez",
+    email: "mateogonzalez@iskolarngbayan.pup.edu.ph",
+    groupCode: "3I04",
+    block: "BSCPE 3-4",
+    specialization: "Big Data Analytics",
+    adviser: "Engr. Robert Dela Cruz",
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-23",
+    name: "Natalia Romero",
+    email: "nataliaromero@iskolarngbayan.pup.edu.ph",
+    groupCode: "3I04",
+    block: "BSCPE 3-4",
+    specialization: "Big Data Analytics",
+    adviser: "Engr. Robert Dela Cruz",
+    hasPhoto: true,
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-24",
+    name: "Alejandro Suarez",
+    email: "alejandrosuarez@iskolarngbayan.pup.edu.ph",
+    groupCode: "3I04",
+    block: "BSCPE 3-4",
+    specialization: "Big Data Analytics",
+    adviser: "Engr. Robert Dela Cruz",
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-25",
+    name: "Victoria Ramirez",
+    email: "victoriaramirez@iskolarngbayan.pup.edu.ph",
+    groupCode: "4I05",
+    block: "BSCPE 4-3",
+    specialization: "Big Data Analytics",
+    adviser: "Dr. Robert Dela Cruz",
+    hasPhoto: true,
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-26",
+    name: "Daniel Medina",
+    email: "danielmedina@iskolarngbayan.pup.edu.ph",
+    groupCode: "4I05",
+    block: "BSCPE 4-3",
+    specialization: "Big Data Analytics",
+    adviser: "Dr. Robert Dela Cruz",
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-27",
+    name: "Andrea Guzman",
+    email: "andreaguzman@iskolarngbayan.pup.edu.ph",
+    groupCode: "4I05",
+    block: "BSCPE 4-3",
+    specialization: "Big Data Analytics",
+    adviser: "Dr. Robert Dela Cruz",
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-28",
+    name: "Pablo Rivera",
+    email: "pablorivera@iskolarngbayan.pup.edu.ph",
+    groupCode: "4I06",
+    block: "BSCPE 4-5",
+    specialization: "Computer Networks",
+    adviser: "Engr. Robert Dela Cruz",
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-29",
+    name: "Laura Nunez",
+    email: "lauranunez@iskolarngbayan.pup.edu.ph",
+    groupCode: "4I06",
+    block: "BSCPE 4-5",
+    specialization: "Computer Networks",
+    adviser: "Engr. Robert Dela Cruz",
+    hasPhoto: true,
+  },
+  {
+    studentNumber: "20XX-XXXXX-MN-30",
+    name: "Javier Campos",
+    email: "javiercampos@iskolarngbayan.pup.edu.ph",
+    groupCode: "4I06",
+    block: "BSCPE 4-5",
+    specialization: "Computer Networks",
+    adviser: "Engr. Robert Dela Cruz",
+  },
 ];
 
-export default function StudentManagement({ students }: { students: any[] }) {
-    const [file, setFile] = useState<File | null>(null);
-    const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
-    const [sampleData, setSampleData] = useState<any[]>([]);
-    const [columnMapping, setColumnMapping] = useState<Record<string, string>>({});
-    const [action, setAction] = useState<'update' | 'skip'>('skip');
+interface FilterState {
+  blocks: string[];
+  specializations: string[];
+}
+
+// Custom Dropdown Wrapper Component
+function Dropdown({ 
+  isOpen, 
+  onClose, 
+  children, 
+  triggerRef 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  children: React.ReactNode;
+  triggerRef: React.RefObject<HTMLButtonElement>;
+}) {
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current && 
+        !dropdownRef.current.contains(event.target as Node) &&
+        triggerRef.current &&
+        !triggerRef.current.contains(event.target as Node)
+      ) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen, onClose, triggerRef]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div 
+      ref={dropdownRef}
+      className="absolute right-0 top-full mt-2 z-50"
+      style={{ minWidth: '400px' }}
+    >
+      {children}
+    </div>
+  );
+}
+
+// Sort Component (Sort2 for Students) - Using imported component with wrapper
+// Wrapper components that match the exact UI/layout of Filter2 and Sort2 from shared components
+// but with proper callback integration
+
+function StudentFilterWrapper({ 
+  onApply, 
+  onClose 
+}: { 
+  onApply: (filters: FilterState) => void; 
+  onClose: () => void;
+}) {
+  const [adviser, setAdviser] = useState("");
+  const [block, setBlock] = useState("");
+  const [specialization, setSpecialization] = useState("");
+
+  const handleClear = () => {
+    setAdviser("");
+    setBlock("");
+    setSpecialization("");
+  };
+
+  const handleApply = () => {
+    // Convert the filter selections to the FilterState format
+    onApply({ 
+      blocks: block ? [block] : [], 
+      specializations: specialization ? [specialization] : [] 
+    });
+    onClose();
+  };
+
+  const selects = [
+    {
+      label: "Adviser",
+      value: adviser,
+      setter: setAdviser,
+      options: ["Dr. Cherry Casuat", "Engr. Rolito Mahaguay", "Dr. Robert Dela Cruz", "Engr. Robert Dela Cruz"],
+    },
+    {
+      label: "Block",
+      value: block,
+      setter: setBlock,
+      options: ["BSCPE 3-1", "BSCPE 3-3", "BSCPE 3-4", "BSCPE 4-1", "BSCPE 4-2", "BSCPE 4-3", "BSCPE 4-5", "BSCPE 4-6"],
+    },
+    {
+      label: "Specialization",
+      value: specialization,
+      setter: setSpecialization,
+      options: ["Big Data Analytics", "Machine Learning", "System Development", "Computer Networks"],
+    },
+  ];
+
+  return (
+    <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+      <h2 className="text-2xl font-bold mb-3 text-primary">
+        Apply Filter
+      </h2>
+      <div className="border-t my-4" />
+
+      {selects.map(({ label, value, setter, options }) => (
+        <div key={label} className="mb-4">
+          <label className="font-medium">{label}</label>
+          <select
+            value={value}
+            onChange={(e) => setter(e.target.value)}
+            className="w-full mt-1 p-2 bg-yellow-50 rounded"
+          >
+            <option value="">Select {label}</option>
+            {options.map((o) => (
+              <option key={o} value={o}>
+                {o}
+              </option>
+            ))}
+          </select>
+        </div>
+      ))}
+
+      <div className="flex justify-between mt-6">
+        <Button variant="tertiary" className="flex items-center justify-center" onClick={handleClear}>
+          Reset
+        </Button>
+        <Button variant="negative" className="flex items-center justify-center" onClick={handleApply}>
+          Apply
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function StudentSortWrapper({ 
+  onApply, 
+  onClose 
+}: { 
+  onApply: (sortOption: string) => void; 
+  onClose: () => void;
+}) {
+  const [selectedSort, setSelectedSort] = useState("");
+
+  const handleReset = () => setSelectedSort("");
+  
+  const handleApply = () => {
+    onApply(selectedSort);
+    onClose();
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+      <h2 className="text-2xl font-bold mb-3 text-primary">
+        Sort By
+      </h2>
+      <div className="border-t my-4" />
+
+      {/* Student ID */}
+      <div className="mb-4">
+        <label className="block text-gray-900 mb-2 font-medium">Student ID</label>
+        <RadioGroup value={selectedSort} onValueChange={setSelectedSort} className="flex flex-col gap-3">
+          <RadioGroupItemWithLabel id="student-id-asc" value="student-id-asc" label="Ascending" />
+          <RadioGroupItemWithLabel id="student-id-desc" value="student-id-desc" label="Descending" />
+        </RadioGroup>
+      </div>
+
+      {/* Student Name */}
+      <div className="mb-4">
+        <label className="block text-gray-900 mb-2 font-medium">Student Name</label>
+        <RadioGroup value={selectedSort} onValueChange={setSelectedSort} className="flex flex-col gap-3">
+          <RadioGroupItemWithLabel id="student-name-a-z" value="student-name-a-z" label="First Name (A-Z)" />
+          <RadioGroupItemWithLabel id="student-name-z-a" value="student-name-z-a" label="First Name (Z-A)" />
+        </RadioGroup>
+      </div>
+
+      {/* Group Code */}
+      <div className="mb-4">
+        <label className="block text-gray-900 mb-2 font-medium">Group Code</label>
+        <RadioGroup value={selectedSort} onValueChange={setSelectedSort} className="flex flex-col gap-3">
+          <RadioGroupItemWithLabel id="group-code-asc-s2" value="group-code-asc" label="Ascending" />
+          <RadioGroupItemWithLabel id="group-code-desc-s2" value="group-code-desc" label="Descending" />
+        </RadioGroup>
+      </div>
+
+      <div className="flex items-center justify-end gap-2 mt-6">
+        <Button variant="tertiary" onClick={handleReset}>Reset</Button>
+        <Button variant="secondary" onClick={onClose}>Cancel</Button>
+        <Button variant="negative" onClick={handleApply}>Apply</Button>
+      </div>
+    </div>
+  );
+}
+
+// Sort3 for Group Card View
+function GroupSortWrapper({ 
+  onApply, 
+  onClose 
+}: { 
+  onApply: (sortOption: string) => void; 
+  onClose: () => void;
+}) {
+  const [selectedSort, setSelectedSort] = useState("");
+
+  const handleReset = () => setSelectedSort("");
+  
+  const handleApply = () => {
+    onApply(selectedSort);
+    onClose();
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+      <h2 className="text-2xl font-bold mb-3 text-primary">
+        Sort By
+      </h2>
+      <div className="border-t my-4" />
+
+      {/* Group Code */}
+      <div className="mb-4">
+        <label className="block text-gray-900 mb-2 font-medium">Group Code</label>
+        <RadioGroup value={selectedSort} onValueChange={setSelectedSort} className="flex flex-col gap-3">
+          <RadioGroupItemWithLabel id="group-code-asc-s3" value="group-code-asc" label="Ascending" />
+          <RadioGroupItemWithLabel id="group-code-desc-s3" value="group-code-desc" label="Descending" />
+        </RadioGroup>
+      </div>
+
+      {/* Thesis Title */}
+      <div className="mb-4">
+        <label className="block text-gray-900 mb-2 font-medium">Thesis Title</label>
+        <RadioGroup value={selectedSort} onValueChange={setSelectedSort} className="flex flex-col gap-3">
+          <RadioGroupItemWithLabel id="thesis-title-a-z" value="thesis-title-a-z" label="A-Z" />
+          <RadioGroupItemWithLabel id="thesis-title-z-a" value="thesis-title-z-a" label="Z-A" />
+        </RadioGroup>
+      </div>
+
+      <div className="flex items-center justify-end gap-2 mt-6">
+        <Button variant="tertiary" onClick={handleReset}>Reset</Button>
+        <Button variant="secondary" onClick={onClose}>Cancel</Button>
+        <Button variant="negative" onClick={handleApply}>Apply</Button>
+      </div>
+    </div>
+  );
+}
+
+export default function StudentManagement({ students }: { students?: any[] }) {
+    const [searchQuery, setSearchQuery] = useState("");
+    const [filters, setFilters] = useState<FilterState>({ blocks: [], specializations: [] });
+    const [sortOption, setSortOption] = useState("");
+    const [filterOpen, setFilterOpen] = useState(false);
+    const [sortOpen, setSortOpen] = useState(false);
+    const [view, setView] = useState("table");
     
-    // Status States
-    const [message, setMessage] = useState('');
-    const [loading, setLoading] = useState(false);
-    
-    // Modal & Data States
-    const [showModal, setShowModal] = useState(false);
-    const [stats, setStats] = useState<ImportStats | null>(null);
-    const [errorData, setErrorData] = useState<any[]>([]); // To store error rows
+    const sortButtonRef = useRef<HTMLButtonElement>(null);
+    const filterButtonRef = useRef<HTMLButtonElement>(null);
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const selectedFile = e.target.files[0];
-            setFile(selectedFile);
-            setMessage(''); 
-            
-            // Preview: 0 (reads whole file) or set a number for performance
-            Papa.parse(selectedFile, {
-                header: true,
-                skipEmptyLines: true,
-                preview: 50, 
-                complete: (results) => {
-                    const headers = results.meta.fields || [];
-                    setCsvHeaders(headers);
-                    setSampleData(results.data);
-                    
-                    // Auto-map logic
-                    const initialMapping: Record<string, string> = {};
-                    FIELDS.forEach(field => {
-                        const match = headers.find(h => 
-                            h.toLowerCase().replace(/_/g, '').trim() === field.label.toLowerCase().replace(/ /g, '').trim() ||
-                            h.toLowerCase() === field.key.toLowerCase()
-                        );
-                        if (match) initialMapping[field.key] = match;
-                    });
-                    setColumnMapping(initialMapping);
-                },
-                error: (error) => setMessage(`Error parsing CSV: ${error.message}`)
-            });
-        }
-    };
+    // Group students by group code for card view
+    const groupedData = useMemo(() => {
+        const groups: { [key: string]: GroupData } = {};
+        
+        studentData.forEach(student => {
+            if (!groups[student.groupCode]) {
+                groups[student.groupCode] = {
+                    groupCode: student.groupCode,
+                    thesisTitle: "Machine Learning Applications in Healthcare Diagnostics",
+                    thesisStage: "Title Defense",
+                    members: [],
+                    adviser: student.adviser,
+                    specialization: student.specialization,
+                    block: student.block
+                };
+            }
+            groups[student.groupCode].members.push(student.name);
+        });
+        
+        return Object.values(groups);
+    }, []);
 
-    const handleMappingChange = (systemKey: string, csvHeader: string) => {
-        setColumnMapping(prev => ({ ...prev, [systemKey]: csvHeader }));
-    };
+    // Apply filtering and sorting for groups (card view)
+    const filteredAndSortedGroups = useMemo(() => {
+        let result = [...groupedData];
 
-    // --- Step 1: Validate & Dry Run ---
-    const handleInitiateImport = async () => {
-        if (!file) {
-            setMessage('Please select a file first.');
-            return;
+        // Apply block filter
+        if (filters.blocks.length > 0) {
+            result = result.filter(group =>
+                filters.blocks.includes(group.block)
+            );
         }
 
-        const missingFields = FIELDS.filter(f => f.required && !columnMapping[f.key]);
-        if (missingFields.length > 0) {
-            setMessage(`Please map: ${missingFields.map(f => f.label).join(', ')}`);
-            return;
+        // Apply specialization filter
+        if (filters.specializations.length > 0) {
+            result = result.filter(group => 
+                filters.specializations.includes(group.specialization)
+            );
         }
 
-        setLoading(true);
-        setMessage('');
-
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('mapping', JSON.stringify(columnMapping));
-        formData.append('action', action);
-        formData.append('dry_run', '1');
-
-        try {
-            const response = await axios.post(store().url, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
-            
-            // Backend return format: { dry_run: true, stats: {...}, error_rows: [...] }
-            setStats(response.data.stats);
-            
-            // If backend sends specific rows that failed, set them here. 
-            // Otherwise, default to empty array (modal will still show error count from stats)
-            setErrorData(response.data.error_rows || []); 
-            
-            setShowModal(true); 
-        } catch (error: any) {
-            console.error(error);
-            setMessage(error.response?.data?.message || 'Validation failed.');
-        } finally {
-            setLoading(false);
+        // Apply sorting for groups
+        if (sortOption === "group-code-asc") {
+            result.sort((a, b) => a.groupCode.localeCompare(b.groupCode));
+        } else if (sortOption === "group-code-desc") {
+            result.sort((a, b) => b.groupCode.localeCompare(a.groupCode));
+        } else if (sortOption === "thesis-title-a-z") {
+            result.sort((a, b) => a.thesisTitle.localeCompare(b.thesisTitle));
+        } else if (sortOption === "thesis-title-z-a") {
+            result.sort((a, b) => b.thesisTitle.localeCompare(a.thesisTitle));
         }
-    };
 
-    // --- Step 2: Actual Import ---
-    const handleConfirmImport = async () => {
-        if (!file) return;
+        return result;
+    }, [groupedData, filters, sortOption]);
 
-        setShowModal(false); 
-        setLoading(true);    
+    // Apply filtering and sorting
+    const filteredAndSortedData = useMemo(() => {
+        let result = [...studentData];
 
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('mapping', JSON.stringify(columnMapping));
-        formData.append('action', action);
-        formData.append('dry_run', '0'); 
-
-        try {
-            const response = await axios.post(store().url, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
-            setMessage(response.data.message || 'Import successful!');
-            
-            // Optional cleanup
-            // setFile(null);
-            // setCsvHeaders([]);
-        } catch (error: any) {
-            console.error(error);
-            setMessage(error.response?.data?.message || 'Import failed.');
-        } finally {
-            setLoading(false);
+        // Apply search
+        if (searchQuery) {
+            result = result.filter(student =>
+                student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                student.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                student.studentNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                student.groupCode.toLowerCase().includes(searchQuery.toLowerCase())
+            );
         }
+
+        // Apply block filter
+        if (filters.blocks.length > 0) {
+            result = result.filter(student =>
+                filters.blocks.includes(student.block)
+            );
+        }
+
+        // Apply specialization filter
+        if (filters.specializations.length > 0) {
+            result = result.filter(student => 
+                filters.specializations.includes(student.specialization)
+            );
+        }
+
+        // Apply sorting
+        if (sortOption === "student-id-asc") {
+            result.sort((a, b) => a.studentNumber.localeCompare(b.studentNumber));
+        } else if (sortOption === "student-id-desc") {
+            result.sort((a, b) => b.studentNumber.localeCompare(a.studentNumber));
+        } else if (sortOption === "student-name-a-z") {
+            result.sort((a, b) => a.name.localeCompare(b.name));
+        } else if (sortOption === "student-name-z-a") {
+            result.sort((a, b) => b.name.localeCompare(a.name));
+        } else if (sortOption === "group-code-asc") {
+            result.sort((a, b) => a.groupCode.localeCompare(b.groupCode));
+        } else if (sortOption === "group-code-desc") {
+            result.sort((a, b) => b.groupCode.localeCompare(a.groupCode));
+        }
+
+        return result;
+    }, [searchQuery, filters, sortOption]);
+
+    const handleClearFilters = () => {
+        setSearchQuery("");
+        setFilters({ blocks: [], specializations: [] });
+        setSortOption("");
     };
 
     return (
@@ -158,196 +693,293 @@ export default function StudentManagement({ students }: { students: any[] }) {
             <AppHeader variant="admin" />
 
             <AppContent
-                title="Student Management"
+                title={
+                    <div className="flex items-center gap-2 text-[#FFBD00]">
+                        <span className="font-medium">Student Management</span>
+                    </div>
+                }
                 subtitle="View and Manage Student Accounts and Thesis Group Assignments"
             >
-                {/* TEMPORARY SLOT FOR IMPORT  --- rushed ehh */}
-                <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-sidebar-border shadow-sm relative mb-6">
-                    
-                    {/* File Upload Section */}
-                    <div className="mb-8">
-                        <label className="block text-sm font-medium mb-2">Upload CSV File</label>
-                        <div className="flex gap-4 items-center">
-                            <input 
-                                type="file" 
-                                accept=".csv"
-                                onChange={handleFileChange} 
-                                className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0
-                                file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground
-                                hover:file:text-primary-foreground-2"
-                            />
+                {/* Filter & Search Section */}
+                <div className="mb-4">
+                    <div className="flex flex-col items-start self-stretch w-full max-w-[1360px] bg-card rounded-[10px] border-[0.8px] border-primary/20 shadow-sm h-[134px] p-[24.8px] gap-4 font-dm">
+                        {/* Header */}
+                        <div className="flex flex-row items-center gap-2 self-stretch w-full h-6">
+                            <FilterIcon className="w-5 h-5 text-primary" />
+                            <h2 className="font-dm font-normal text-base leading-6 text-primary">
+                                Search, Sort, & Filter
+                            </h2>
+                        </div>
+
+                        {/* Controls Row */}
+                        <div className="flex flex-row items-center gap-[10px] self-stretch w-full">
+                            {/* Search Bar */}
+                            <div className="flex-1">
+                                <SearchBar 
+                                    variant="filter-section" 
+                                    placeholder="Search by name, email, student number, or group code..." 
+                                    value={searchQuery} 
+                                    onChange={setSearchQuery} 
+                                />
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex flex-row items-center gap-[10px]">
+                                {/* Sort Button with Dropdown */}
+                                <div className="relative">
+                                    <Button 
+                                        ref={sortButtonRef}
+                                        variant="secondary" 
+                                        size="icon" 
+                                        className="rounded-lg border-none"
+                                        onClick={() => {
+                                            setSortOpen(!sortOpen);
+                                            setFilterOpen(false);
+                                        }}
+                                    >
+                                        <Icon name="sortDefault" size={16} />
+                                    </Button>
+                                    <Dropdown 
+                                        isOpen={sortOpen} 
+                                        onClose={() => setSortOpen(false)}
+                                        triggerRef={sortButtonRef}
+                                    >
+                                        {view === 'table' ? (
+                                            <StudentSortWrapper 
+                                                onApply={setSortOption}
+                                                onClose={() => setSortOpen(false)}
+                                            />
+                                        ) : (
+                                            <GroupSortWrapper 
+                                                onApply={setSortOption}
+                                                onClose={() => setSortOpen(false)}
+                                            />
+                                        )}
+                                    </Dropdown>
+                                </div>
+
+                                {/* Filter Button with Dropdown */}
+                                <div className="relative">
+                                    <Button 
+                                        ref={filterButtonRef}
+                                        variant="secondary" 
+                                        size="icon" 
+                                        className="rounded-lg border-none"
+                                        onClick={() => {
+                                            setFilterOpen(!filterOpen);
+                                            setSortOpen(false);
+                                        }}
+                                    >
+                                        <FilterIcon className="w-4 h-4" />
+                                    </Button>
+                                    <Dropdown 
+                                        isOpen={filterOpen} 
+                                        onClose={() => setFilterOpen(false)}
+                                        triggerRef={filterButtonRef}
+                                    >
+                                        <StudentFilterWrapper 
+                                            onApply={setFilters}
+                                            onClose={() => setFilterOpen(false)}
+                                        />
+                                    </Dropdown>
+                                </div>
+
+                                {/* Clear Filter Button */}
+                                <Button 
+                                    variant="negative" 
+                                    className="px-4 py-2 gap-2 h-9 rounded-lg min-w-[101px]"
+                                    onClick={handleClearFilters}
+                                >
+                                    <span className="text-[13.33px] font-medium">Clear Filter</span>
+                                </Button>
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    {/* Mapping Interface */}
-                    {file && csvHeaders.length > 0 && (
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            
-                            <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-6 text-sm" role="alert">
-                                <p className="font-bold">Map Columns</p>
-                                <p>Columns are automatically mapped if there are matching header names. Otherwise, select manually.</p>
+                {/* View Toggle and Import Button */}
+                <div className="flex justify-between items-center mb-6">
+                    {/* View Toggle Buttons */}
+                    <div className="flex gap-2">
+                        <Button
+                            variant={view === 'table' ? 'default' : 'outline'}
+                            size="sm"
+                            className={cn(
+                                "gap-2",
+                                view === 'table' 
+                                    ? "bg-primary text-white hover:bg-primary/90" 
+                                    : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                            )}
+                            onClick={() => setView('table')}
+                        >
+                            <TableIcon className="w-4 h-4" /> Table View
+                        </Button>
+                        <Button
+                            variant={view === 'card' ? 'default' : 'outline'}
+                            size="sm"
+                            className={cn(
+                                "gap-2",
+                                view === 'card' 
+                                    ? "bg-primary text-white hover:bg-primary/90" 
+                                    : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                            )}
+                            onClick={() => setView('card')}
+                        >
+                            <LayoutGrid className="w-4 h-4" /> Group Card View
+                        </Button>
+                    </div>
+
+                    {/* Import Button */}
+                    <Button>
+                        Import
+                    </Button>
+                </div>
+
+                {/* Results Info */}
+                {(searchQuery || filters.blocks.length > 0 || filters.specializations.length > 0) && (
+                    <div className="mb-4">
+                        <p className="text-sm text-gray-600 font-['DM_Sans']">
+                            Found {filteredAndSortedData.length} student{filteredAndSortedData.length !== 1 ? 's' : ''} matching your filters
+                        </p>
+                    </div>
+                )}
+
+                {/* Data Table */}
+                {view === 'table' ? (
+                <div className="overflow-x-auto">
+                    <div className="min-w-[1360px]">
+                        {/* Table Header - 8 Columns */}
+                        <div className="grid grid-cols-8 h-10 rounded-t-lg bg-primary">
+                            <div className="flex items-center justify-center p-2.5">
+                                <span className="text-white text-center font-sans text-[13.33px] font-medium">
+                                    Student ID
+                                </span>
                             </div>
-
-                            <div className="overflow-hidden rounded-lg border border-gray-200 mb-8">
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-[#800000] text-white">
-                                        <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-medium uppercase w-1/4">System Field</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium uppercase w-1/4">Source Header</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium uppercase w-2/4">Sample Data</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200 dark:bg-zinc-800 dark:divide-zinc-700">
-                                        {FIELDS.map((field) => (
-                                            <tr key={field.key}>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">{field.label} {field.required && <span className="text-red-500">*</span>}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    <select 
-                                                        className={`block w-full rounded-md border-0 py-1.5 pl-3 pr-10 ring-1 ring-inset focus:ring-2 sm:text-sm sm:leading-6 
-                                                            ${columnMapping[field.key] ? 'bg-amber-50 text-gray-900 ring-amber-300' : 'bg-gray-50 text-gray-400 ring-gray-300'}`}
-                                                        value={columnMapping[field.key] || ''}
-                                                        onChange={(e) => handleMappingChange(field.key, e.target.value)}
-                                                    >
-                                                        <option value="">Select...</option>
-                                                        {csvHeaders.map(h => <option key={h} value={h}>{h}</option>)}
-                                                    </select>
-                                                </td>
-                                                <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                    {columnMapping[field.key] 
-                                                        ? <span className="text-gray-700 dark:text-gray-300">{sampleData[0]?.[columnMapping[field.key]]}</span>
-                                                        : <span className="italic text-gray-400">-- --</span>
-                                                    }
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                            <div className="flex items-center justify-center p-2.5">
+                                <span className="text-white text-center font-sans text-[13.33px] font-medium">
+                                    Student Name
+                                </span>
                             </div>
+                            <div className="flex items-center justify-center p-2.5">
+                                <span className="text-white text-center font-sans text-[13.33px] font-medium">
+                                    PUP Webmail
+                                </span>
+                            </div>
+                            <div className="flex items-center justify-center p-2.5">
+                                <span className="text-white text-center font-sans text-[13.33px] font-medium">
+                                    Group Code
+                                </span>
+                            </div>
+                            <div className="flex items-center justify-center p-2.5">
+                                <span className="text-white text-center font-sans text-[13.33px] font-medium">
+                                    Block
+                                </span>
+                            </div>
+                            <div className="flex items-center justify-center p-2.5">
+                                <span className="text-white text-center font-sans text-[13.33px] font-medium">
+                                    Specialization
+                                </span>
+                            </div>
+                            <div className="flex items-center justify-center p-2.5">
+                                <span className="text-white text-center font-sans text-[13.33px] font-medium">
+                                    Thesis Adviser
+                                </span>
+                            </div>
+                            <div className="flex items-center justify-center p-2.5">
+                                <span className="text-white text-center font-sans text-[13.33px] font-medium">
+                                    Action
+                                </span>
+                            </div>
+                        </div>
 
-                            {/* Actions Section */}
-                            <div className="mb-6">
-                                <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-2">Actions</h3>
-                                <div className="space-y-4">
-                                    <div className="flex items-center">
-                                        <input
-                                            id="update"
-                                            name="import-action"
-                                            type="radio"
-                                            value="update"
-                                            checked={action === 'update'}
-                                            onChange={() => setAction('update')}
-                                            className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                                        />
-                                        <label htmlFor="update" className="ml-3 block text-sm font-medium leading-6 text-gray-900 dark:text-gray-300">
-                                            Update Existing Records
-                                        </label>
+                        {/* Table Rows */}
+                        {filteredAndSortedData.length > 0 ? (
+                            filteredAndSortedData.map((student, index) => (
+                                <div
+                                    key={`${student.studentNumber}-${index}`}
+                                    className="grid grid-cols-8 min-h-10 bg-white border-b border-gray-100 hover:bg-breadcrumb transition-colors"
+                                >
+                                    {/* Student ID */}
+                                    <div className="flex items-center justify-center p-2.5">
+                                        <span className="text-black text-center text-[13.33px] font-medium">
+                                            {student.studentNumber}
+                                        </span>
                                     </div>
-                                    <div className="flex items-center">
-                                        <input
-                                            id="skip"
-                                            name="import-action"
-                                            type="radio"
-                                            value="skip"
-                                            checked={action === 'skip'}
-                                            onChange={() => setAction('skip')}
-                                            className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                                        />
-                                        <label htmlFor="skip" className="ml-3 block text-sm font-medium leading-6 text-gray-900 dark:text-gray-300">
-                                            Skip (Do not overwrite)
-                                        </label>
+
+                                    {/* Student Name */}
+                                    <div className="flex items-center justify-center p-2.5">
+                                        <span className="text-[#0A0A0A] text-center text-[13.33px] font-medium">
+                                            {student.name}
+                                        </span>
+                                    </div>
+
+                                    {/* PUP Webmail */}
+                                    <div className="flex items-center justify-center p-2.5">
+                                        <p className="text-[#0A0A0A] text-center text-[13.33px] font-medium break-all leading-tight">
+                                            {student.email}
+                                        </p>
+                                    </div>
+
+                                    {/* Group Code */}
+                                    <div className="flex items-center justify-center p-2.5">
+                                        <span className="text-sm">
+                                            {student.groupCode}
+                                        </span>
+                                    </div>
+
+                                    {/* Block */}
+                                    <div className="flex items-center justify-center p-2.5">
+                                        <span className="text-black text-center font-sans text-[13.33px] font-medium">
+                                            {student.block}
+                                        </span>
+                                    </div>
+
+                                    {/* Specialization */}
+                                    <div className="flex items-center justify-center p-2.5">
+                                        <span className="text-[#0A0A0A] text-center text-[13.33px] font-medium">
+                                            {student.specialization}
+                                        </span>
+                                    </div>
+
+                                    {/* Thesis Adviser */}
+                                    <div className="flex items-center justify-center p-2.5">
+                                        <span className="text-[#0A0A0A] text-center text-[13.33px] font-medium">
+                                            {student.adviser}
+                                        </span>
+                                    </div>
+
+                                    {/* Action */}
+                                    <div className="flex items-center justify-center p-2.5">
+                                        <Button variant="outline" className='border-primary text-primary'>
+                                            View
+                                        </Button>
                                     </div>
                                 </div>
+                            ))
+                        ) : (
+                            <div className="col-span-full text-center py-12 bg-white">
+                                <p className="text-gray-500 font-['DM_Sans']">
+                                    No students found matching your search.
+                                </p>
                             </div>
-
-                            {/* Initiate Button */}
-                            <div className="flex items-center gap-4">
-                                <button 
-                                    onClick={handleInitiateImport} 
-                                    disabled={loading}
-                                    className={`text-white w-40 p-2 rounded-lg transition-colors
-                                        ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#800000] hover:bg-red-800'}`}
-                                >
-                                    {loading ? 'Processing...' : 'Review Import'}
-                                </button>
-                                {message && <p className={`text-sm ${message.includes('failed') || message.includes('error') ? 'text-red-600' : 'text-green-600'}`}>{message}</p>}
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-
-                {/* TABLE */}
-                <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full text-left text-sm whitespace-nowrap">
-                            <thead className="uppercase tracking-wider border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                                <tr>
-                                    <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Student No.</th>
-                                    <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Name</th>
-                                    <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Email</th>
-                                    <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Group Code</th>
-                                    <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Block</th>
-                                    <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Specialization</th>
-                                    <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Adviser</th>
-                                </tr>
-                            </thead>
-                            
-                            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                {students && students.length > 0 ? (
-                                    students.map((stud, index) => (
-                                        <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                            <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">
-                                                {stud.student_number}
-                                            </td>
-                                            <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
-                                                {stud.student_name}
-                                            </td>
-                                            <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
-                                                {stud.email}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                {stud.group_code ? (
-                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-                                                        {stud.group_code}
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-gray-400 italic">No Group</span>
-                                                )}
-                                            </td>
-                                            <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
-                                                BSCPE {stud.year_level} - {stud.block}
-                                            </td>
-                                            <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
-                                                {stud.specialization || <span className="text-gray-400 italic">N/A</span>}
-                                            </td>
-                                            <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
-                                                {stud.thesis_adviser || <span className="text-gray-400 italic">Unassigned</span>}
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan={7} className="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
-                                            No students found.
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
+                        )}
                     </div>
                 </div>
-
-                
-                {/* --- Import Review Modal (Replaces old simple modal) --- */}
-                <ImportReviewModal 
-                    isOpen={showModal}
-                    onClose={() => setShowModal(false)}
-                    onConfirm={handleConfirmImport}
-                    onBack={() => setShowModal(false)}
-                    stats={stats || { to_create: 0, to_update: 0, to_skip: 0, errors: 0 }}
-                    previewData={sampleData} 
-                    errorData={errorData} 
-                />
+                ) : (
+                    <div className="grid grid-cols-6 gap-4">
+                        {groupedData.map((group, index) => (
+                            <GroupCard
+                                key={`${group.groupCode}-${index}`}
+                                groupCode={group.groupCode}
+                                groupDescription={`${group.block} - ${group.specialization}`}
+                                thesisTitle={group.thesisTitle}
+                                thesisStage={group.thesisStage}
+                                members={group.members}
+                                adviserName={group.adviser}
+                            />
+                        ))}
+                    </div>
+                )}
             </AppContent>
 
             <NavFooter />
