@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AcademicSettingController;
+use App\Http\Controllers\Admin\DeadlineController;
 use App\Http\Controllers\Admin\DefenseController;
 use App\Http\Controllers\Admin\DepartmentPoliciesController;
 use App\Http\Controllers\Admin\FacultyController;
@@ -264,9 +265,7 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
         Route::get('academic-settings', [AcademicSettingController::class, 'index'])->name('admin.management.academic');
         Route::put('academic-settings', [AcademicSettingController::class, 'update'])->name('admin.management.academic.update');
 
-        Route::get('deadline', function () {
-            return Inertia::render('Admin/management/deadline');
-        })->name('admin.management.deadline');
+        Route::get('deadline', [DeadlineController::class, 'index'])->name('admin.management.deadline');
 
 
         // FULL CRUD OPERATIONS EXAMPLES

@@ -15,7 +15,8 @@ class Event extends Model
     protected $fillable = [
         'milestone_id',
         'semester_id',
-        'due_date',
+        'start_date',
+        'offset'
     ];
 
     protected $casts = [
