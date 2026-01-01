@@ -436,16 +436,6 @@ export default function UIShowcase() {
                         <h2 className="text-2xl font-semibold text-white border-l-4 border-[#FFBD00] pl-4"> Cards </h2>
                         <div className="max-w-md">
 
-                            {/* ===== Header Card (per page) ===== */}
-                            <h2 className="text-lg font-semibold text-white mb-4"> -- Header Card </h2>
-
-                           {/* Without icon yet */}
-                           {/* icon={} -> for adding an icon */} 
-                            <HeaderCard
-                            title="Card Title Here"
-                            description="Card Description"
-                            />
-
                             {/* Metric Cards */}
                             <h2 className="text-lg font-semibold text-white py-4 mb-4"> Metric Cards </h2>
                         
