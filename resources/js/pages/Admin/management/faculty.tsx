@@ -14,7 +14,7 @@ import { Icon } from '@/components/icon-index';
 import { SearchBar } from '@/components/filter-search';
 
 //ICONS 
-import { UsersIcon } from 'lucide-react';
+
 
 interface Faculty {
   id: string;
