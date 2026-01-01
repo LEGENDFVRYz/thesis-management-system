@@ -5,10 +5,10 @@ import { CheckboxWithLabel } from "@/components/ui/checkbox-with-label";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { YearRangePicker } from "@/components/acad-year-range-picker";
+import YearRangePicker from "@/components/acad-year-range-picker";
 import { Search, X, Calendar, Plus } from 'lucide-react';
-import { SecondarySort } from './icons/secondary-sort';
-
+import { SecondarySort } from './Icons/secondary-sort';
+import { cn } from "@/lib/utils";
 
 /* =======================
    FILTER 1
@@ -301,25 +301,77 @@ export function Sort3() {
 
 
 
+/* =======================
+   SEARCH BAR VARIANTS
+======================= */
+interface SearchBarProps {
+  placeholder?: string;
+  value?: string;
+  onChange?: (val: string) => void;
+  variant?: 'default' | 'filter-section';
+}
 
-export function SearchBar() {
-  const [query, setQuery] = useState("");
+export function SearchBar({ 
+  placeholder = "Search...", 
+  value, 
+  onChange, 
+  variant = 'default' 
+}: SearchBarProps) {
+  const [internalQuery, setInternalQuery] = useState("");
 
+  const query = value !== undefined ? value : internalQuery;
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (onChange) onChange(val);
+    else setInternalQuery(val);
+  };
+
+  // Variant: Filter Section (Figma: 36px height, bg-breadcrumb [#F3EFD0])
+  if (variant === 'filter-section') {
+    return (
+      <div 
+        className={cn(
+          "flex flex-row items-center",
+          "h-9 w-full max-w-[1153.4px]", // Height: 36px
+          "bg-breadcrumb border-[0.8px] border-primary/30 rounded-lg", // bg: #F3EFD0, border: rgba(115, 0, 0, 0.3)
+          "hover:bg-breadcrumb/50 focus-within:border-primary", // hover & focus effects
+          "pl-5 pr-3 py-1", 
+          "flex-1 order-0 grow",
+          "transition-colors duration-200"
+        )}
+        data-name="Search Bar - No Icon Variant"
+      >
+        <input
+          type="text"
+          value={query}
+          onChange={handleChange}
+          placeholder={placeholder}
+          className={cn(
+            "h-7 w-full bg-transparent border-none outline-none focus:ring-0",
+            "text-[13.33px] font-medium leading-[17px] text-alert-desc placeholder:text-alert-desc", // font: DM Sans, size: 13.33px
+            "font-dm"
+          )}
+        />
+      </div>
+    );
+  }
+
+  // Default Variant (44px height design)
   return (
-    <div className="flex items-center w-full relative" data-name="Search bar">
-      {/* Search input field */}
+    <div className="flex items-center w-full relative" data-name="Search bar - Default">
       <input
         type="text"
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search..."
-        className="flex-grow h-[44px] bg-white rounded-l-md border border-gray-400 px-3 text-gray-500 text-[16px] font-medium focus:outline-none"
-        style={{ fontFamily: "var(--font-dm, 'DM Sans')", fontVariationSettings: "'opsz' 14" }}
+        onChange={handleChange}
+        placeholder={placeholder}
+        className={cn(
+          "flex-grow h-[44px] bg-white rounded-l-md border border-input px-3 text-foreground text-base font-medium focus:outline-none",
+          "font-dm"
+        )}
       />
-
-      {/* Search button */}
-      <div className="flex items-center justify-center h-[44px] w-[46px] bg-primary rounded-r-md cursor-pointer">
-        <Search className="w-6 h-6 text-white" />
+      <div className="flex items-center justify-center h-[44px] w-[46px] bg-primary rounded-r-md cursor-pointer hover:bg-sidebar-gradient-mid transition-colors">
+        <Search className="w-6 h-6 text-primary-foreground" />
       </div>
     </div>
   );
@@ -469,7 +521,7 @@ export function RepoFilter({ onClose, onApply }: { onClose?: () => void; onApply
       </div>
 
       {/* Bottom Action Buttons */}
-      <div className="flex items-center justify-between pt-4 border-t">
+      <div className="flex items-center justify-end gap-3 pt-4 border-t">
         <button
           onClick={() => {
             setSortState('clicked');
@@ -482,28 +534,26 @@ export function RepoFilter({ onClose, onApply }: { onClose?: () => void; onApply
         >
           <SecondarySort state={sortState} />
         </button>
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            onClick={handleReset}
-          >
-            Reset
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={onClose}
-            className="font-['DM_Sans']"
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="negative"
-            onClick={handleApplyClick}
-            className="font-['DM_Sans']"
-          >
-            Apply All Filters
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          onClick={handleReset}
+        >
+          Reset
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={onClose}
+          className="font-['DM_Sans']"
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="negative"
+          onClick={handleApplyClick}
+          className="font-['DM_Sans']"
+        >
+          Apply All Filters
+        </Button>
       </div>
     </div>
   );

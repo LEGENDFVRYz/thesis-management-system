@@ -81,6 +81,16 @@ export function AppHeader({ breadcrumbs = [], variant = 'default' }: AppHeaderPr
     
     const url = page.url;
 
+    const [hoveredIcon, setHoveredIcon] = useState<string | null>(null);
+    const [clickedIcon, setClickedIcon] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState(0);
+
+    const getIconName = (iconType: string) => {
+        if (clickedIcon === iconType) return `${iconType}Clicked`;
+        if (hoveredIcon === iconType) return `${iconType}Hover`;
+        return `${iconType}Default`;
+    };
+
     const navItems = useMemo<NavItem[]>(() => {
         if (variant === 'guest') {
             return guestNavItems;
@@ -106,13 +116,11 @@ export function AppHeader({ breadcrumbs = [], variant = 'default' }: AppHeaderPr
         }
     };
 
-    const [activeTab, setActiveTab] = useState(0);
-
     return (
         <header className="w-full flex flex-col">
             {/* TOP NAVBAR*/}
             <div className="bg-primary h-20 flex items-center shadow-md">
-                <div className="mx-auto flex w-full items-center justify-between px-6 md:max-w-[1440px]">
+                <div className="flex w-full items-center justify-between px-6">
                     
                     {/* 1. LEFT: Fully Static Logo and Branding */}
                     <div className="flex items-center gap-4 cursor-default select-none">
@@ -182,17 +190,56 @@ export function AppHeader({ breadcrumbs = [], variant = 'default' }: AppHeaderPr
                         </div>
                     ) : (
                         <div className="flex items-center gap-4 text-white">
-                            <div className="flex items-center gap-3 border-r border-white/20 pr-4">
-                                <div className="size-5 bg-white/10 rounded-full" title="Profile" />
-                                <div className="relative size-5 bg-white/10 rounded-full" title="Notifications">
-                                    {/* Yellow Dot Indicator */}
-                                    <div className="absolute -top-0.5 -right-0.5 size-2 bg-[#FFBD00] rounded-full border border-[#730000]" />
-                                </div>
-                                <div className="size-5 bg-white/10 rounded-full" title="Help" />
-                                <div className="size-5 bg-white/10 rounded-full" title="Settings" />
+                            {/* Profile Icon */}
+                            <div 
+                                className="flex items-center justify-center cursor-pointer transition-transform hover:scale-110" 
+                                title="Profile"
+                                onMouseEnter={() => setHoveredIcon('profile')}
+                                onMouseLeave={() => setHoveredIcon(null)}
+                                onClick={() => setClickedIcon(clickedIcon === 'profile' ? null : 'profile')}
+                            >
+                                <Icon 
+                                    name={getIconName('profile') as any} 
+                                    size={20} 
+                                />
                             </div>
-                            {/* Avatar Placeholder */}
-                            <div className="size-9 bg-[#FFBD00] rounded-full border-2 border-white/10" />
+                            
+                            {/* Notifications Icon*/}
+                            <div 
+                                className="relative flex items-center justify-center cursor-pointer transition-transform hover:scale-110" 
+                                title="Notifications"
+                                onMouseEnter={() => setHoveredIcon('notification')}
+                                onMouseLeave={() => setHoveredIcon(null)}
+                                onClick={() => setClickedIcon(clickedIcon === 'notification' ? null : 'notification')}
+                            >
+                                <Icon 
+                                    name={getIconName('notification') as any} 
+                                    size={20} 
+                                />
+                            </div>
+                            
+                            {/* FAQ Icon */}
+                            <div 
+                                className="flex items-center justify-center cursor-pointer transition-transform hover:scale-110" 
+                                title="FAQs"
+                                onMouseEnter={() => setHoveredIcon('faq')}
+                                onMouseLeave={() => setHoveredIcon(null)}
+                                onClick={() => setClickedIcon(clickedIcon === 'faq' ? null : 'faq')}
+                            >
+                                <Icon 
+                                    name={getIconName('faq') as any} 
+                                    size={20} 
+                                />
+                            </div>
+                            {/* Avatar with Logout Dropdown */}
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button className="size-9 bg-[#FFBD00] rounded-full border-2 border-white/10 hover:border-white/30 transition-all cursor-pointer" />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <UserMenuContent user={auth.user} />
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                     )}
                 </div>
@@ -201,7 +248,7 @@ export function AppHeader({ breadcrumbs = [], variant = 'default' }: AppHeaderPr
             {/* BREADCRUMB BAR*/}
             {breadcrumbs.length > 0 && (
                 <div className="bg-breadcrumb h-10 border-b border-foreground/5 flex items-center">
-                    <div className="mx-auto flex w-full items-center px-6 md:max-w-[1440px]">
+                    <div className="flex w-full items-center px-10">
                         <div className="flex items-center gap-2 text-xs font-medium text-primary/70">
                              {/* Breadcrumb Placeholder */}
                             <span>Home</span>

@@ -446,6 +446,7 @@ interface ArchiveCardProps {
   badges: string[]
   onViewAbstract?: () => void
   variant?: 'default' | 'with-link'
+  href?: string
   className?: string
 }
 
@@ -457,6 +458,7 @@ function ArchiveCard({
   badges,
   onViewAbstract,
   variant = 'default',
+  href = '/guest/preview',
   className
 }: ArchiveCardProps) {
   return (
