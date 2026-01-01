@@ -113,11 +113,14 @@ class Endorsement extends Controller
             
             ->orderBy('e.updated_at', 'desc')
             ->get();
+            
         dd(vars: $validEndorsements);
         return Inertia::render('Faculty/management/adviser/endorsements', [
             'endorsements' => $validEndorsements
         ]);
     }
+    
+
 
     /**
      * Show the form for creating a new resource.
@@ -158,9 +161,15 @@ class Endorsement extends Controller
     {
         // TASK 2.2: Arnel      --part 2/2
 
-        // Toggle the boolean marker for "is_adviser_approved" when approve 
-
-        // SAved to DB
+        // Toggle the boolean marker for "is_adviser_approved" when approve
+        DB::table('tbl_endorsements')
+            ->where('id', $id)
+            ->update([
+                'is_adviser_approved' => true,
+                'updated_at' => now()
+            ]);
+        // SAved to DB  
+        return back()->with('success', 'Endorsement approved successfully.');
     }
 
     /**
