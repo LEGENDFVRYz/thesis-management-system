@@ -31,11 +31,11 @@ import { login as facultyLogin } from '@/routes/faculty';
 import { HomeIcon, SettingsIcon, BellIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Calendar } from "@/components/calendar";
-import { DatePicker } from "@/components/date-picker";
+import DatePicker from "@/components/date-picker";
 import { MonthPicker } from "@/components/month-picker";
 import { YearDropdownPicker } from "@/components/year-dropdown-picker";
 import { YearPicker } from "@/components/year-picker";
-import { YearRangePicker } from "@/components/acad-year-range-picker";
+import YearRangePicker from "@/components/acad-year-range-picker";
 import { DefenseCalendarWeekly } from "@/components/defense-calendar-weekly";
 import { DefenseCalendar } from "@/components/defense-calendar-monthly";
 import { ResearchAreaChart } from "@/components/research-area-distribution-pie";
@@ -43,7 +43,7 @@ import { SubmissionStatusChart } from "@/components/submission-status-bar";
 import { ArchivedJournalsChart } from "@/components/archived-journals-line";
 import { PerformanceOverviewChart } from "@/components/performance-overview-ver-bar";
 import { SubmissionStatusNonAdminChart } from "@/components/submission-status-bar-nonadmin";
-import { Timeline } from '@/components/timeline';
+import Timeline from '@/components/timeline';
 import { Filter1, Filter2, Sort1, Sort2, Sort3, SearchBar, RepoFilter } from '@/components/filter-search';
 
 

@@ -1,97 +1,143 @@
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import AppLayout from '@/layouts/app-layout';
-import { dashboard } from '@/routes';
-import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import * as React from 'react';
+import { useState } from 'react';
+import { Search, Filter, Users, Calendar, Table as TableIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import ManagementLayout from '.';
-import { defenses } from '@/routes/admin/management/index';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Defense',
-        href: defenses().url,
-    },
-];
+import { defenses as defensesRoute } from '@/routes/admin/management/index';
+import { cn } from '@/lib/utils';
+import FilterSearchSection from '@/components/filter-search-section';
 
 export default function Dashboard({ defenses }: { defenses: any[] }) {
+    const [statusFilter, setStatusFilter] = useState('upcoming');
+    const [view, setView] = useState('table');
+
     return (
         <ManagementLayout 
-            breadcrumbs={breadcrumbs}
+            breadcrumbs={[{ title: 'Defense', href: defensesRoute().url }]}
             title="Defense Management" 
             description="Monitor all defense schedules and panel assignments"
-        >
-            
-            <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                <div className="overflow-x-auto">
-                    <table className="min-w-full text-left text-sm whitespace-nowrap">
-                        <thead className="uppercase tracking-wider border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                            <tr>
-                                <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Group Code</th>
-                                <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Thesis Title</th>
-                                <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Proponents</th>
-                                <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Adviser</th>
-                                <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Block</th>
-                                <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Schedule</th>
-                                <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Type</th>
-                            </tr>
-                        </thead>
-                        
-                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                            {defenses && defenses.length > 0 ? (
-                                defenses.map((def, index) => (
-                                    <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                        
-                                        {/* Group Code Badge */}
-                                        <td className="px-6 py-4">
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-                                                {def.group_code}
-                                            </span>
-                                        </td>
+        >    
+            <div className="space-y-6">
+                
+                {/* 1. Filters & Search */}
+                <FilterSearchSection variant="DefenseManagement" />
 
-                                        {/* Title: Allowed to wrap if long, limited width */}
-                                        <td className="px-6 py-4 text-gray-900 dark:text-gray-100 max-w-xs whitespace-normal truncate">
-                                            <div className="line-clamp-2" title={def.thesis_title}>
-                                                {def.thesis_title}
-                                            </div>
-                                        </td>
-
-                                        <td className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-                                            {def.proponents}
-                                        </td>
-
-                                        <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
-                                            {def.adviser_name}
-                                        </td>
-
-                                        <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
-                                            BSCPE 3-{def.block}
-                                        </td>
-
-                                        <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
-                                            {def.defense_date_time}
-                                        </td>
-
-                                        {/* Defense Type Badge */}
-                                        <td className="px-6 py-4">
-                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                                ${def.defense_type.includes('MOR') 
-                                                    ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' 
-                                                    : 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300'
-                                                }`}>
-                                                {def.defense_type}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={7} className="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
-                                        No defense schedules found.
-                                    </td>
-                                </tr>
+                {/* 2. Toggle Groups Row (Pill Style) */}
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+    
+                    {/* Status Toggle - Fit to Content */}
+                    <ToggleGroup 
+                        type="single" 
+                        value={statusFilter} 
+                        onValueChange={(val) => val && setStatusFilter(val)}
+                        className="bg-[#FDF8E7] p-1 rounded-full border border-amber-100 w-fit" 
+                    >
+                        <ToggleGroupItem 
+                            value="upcoming" 
+                            className={cn(
+                                "h-10 px-6 rounded-full transition-all font-bold text-xs uppercase whitespace-nowrap",
+                                statusFilter === 'upcoming' 
+                                    ? "bg-[#700000] text-white shadow-md" 
+                                    : "text-[#700000] hover:bg-amber-100/50"
                             )}
-                        </tbody>
-                    </table>
+                        >
+                            Upcoming Defense
+                        </ToggleGroupItem>
+                        <ToggleGroupItem 
+                            value="completed" 
+                            className={cn(
+                                "h-10 px-6 rounded-full transition-all font-bold text-xs uppercase whitespace-nowrap",
+                                statusFilter === 'completed' 
+                                    ? "bg-[#700000] text-white shadow-md" 
+                                    : "text-[#700000] hover:bg-amber-100/50"
+                            )}
+                        >
+                            Completed Defenses
+                        </ToggleGroupItem>
+                    </ToggleGroup>
+
+                    {/* View Toggle - Fit to Content */}
+                    <ToggleGroup 
+                        type="single" 
+                        value={view} 
+                        onValueChange={(val) => val && setView(val)}
+                        className="bg-[#FDF8E7] p-1 rounded-full border border-amber-100 w-fit"
+                    >
+                        <ToggleGroupItem 
+                            value="table" 
+                            className={cn(
+                                "gap-2 h-10 px-6 rounded-full text-xs font-bold uppercase whitespace-nowrap transition-all",
+                                view === 'table' 
+                                    ? "bg-[#700000] text-white shadow-md" 
+                                    : "text-[#700000] hover:bg-amber-100/50"
+                            )}
+                        >
+                            <TableIcon className="w-4 h-4" /> Table View
+                        </ToggleGroupItem>
+                        <ToggleGroupItem 
+                            value="calendar" 
+                            className={cn(
+                                "gap-2 h-10 px-6 rounded-full text-xs font-bold uppercase whitespace-nowrap transition-all",
+                                view === 'calendar' 
+                                    ? "bg-[#700000] text-white shadow-md" 
+                                    : "text-[#700000] hover:bg-amber-100/50"
+                            )}
+                        >
+                            <Calendar className="w-4 h-4" /> Calendar View
+                        </ToggleGroupItem>
+                    </ToggleGroup>
+                </div>
+
+                {/* 3. Content Area */}
+                <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    {view === 'table' ? (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-sm">
+                                <thead className="bg-[#800000] text-white uppercase text-[11px] font-bold tracking-[0.1em]">
+                                    <tr>
+                                        <th className="px-6 py-4 border-r border-white/10">Defense ID</th>
+                                        <th className="px-6 py-4 border-r border-white/10">Title</th>
+                                        <th className="px-6 py-4 border-r border-white/10">Proponents</th>
+                                        <th className="px-6 py-4 border-r border-white/10">Adviser</th>
+                                        <th className="px-6 py-4 border-r border-white/10">Block</th>
+                                        <th className="px-6 py-4 border-r border-white/10">Date & Time</th>
+                                        <th className="px-6 py-4 border-r border-white/10">Type</th>
+                                        <th className="px-6 py-4 text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100">
+                                    {defenses?.map((def, index) => (
+                                        <tr key={index} className="hover:bg-gray-50 transition-colors whitespace-nowrap">
+                                            <td className="px-6 py-4 text-gray-500 font-medium text-xs">3306</td>
+                                            <td className="px-6 py-4 font-medium text-gray-900 max-w-xs truncate">Machine Learning Something with...</td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-2 text-[#800000] font-bold">
+                                                    <Users className="w-4 h-4" /> 4
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-gray-600">Dr. Cherry D. Casuat</td>
+                                            <td className="px-6 py-4 text-gray-600">BSCPE 3-3</td>
+                                            <td className="px-6 py-4 text-gray-600 text-xs leading-tight">
+                                                November 28, 2025<br/>09:00 AM
+                                            </td>
+                                            <td className="px-6 py-4 text-gray-700 font-medium text-xs">Title Defense</td>
+                                            <td className="px-6 py-4 text-center">
+                                                <Button variant="outline" className="rounded-md border-[#800000]/30 text-[#800000] hover:bg-red-50 h-8 px-4 text-[10px] font-bold uppercase shadow-sm">
+                                                    View Details
+                                                </Button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <div className="p-20 text-center text-gray-400">
+                           {/* Calendar content */}
+                        </div>
+                    )}
                 </div>
             </div>
         </ManagementLayout>

@@ -18,6 +18,7 @@ use App\Http\Controllers\Faculty\Coordinator\DefenseManagement\Matrix;
 use App\Http\Controllers\Faculty\Coordinator\DefenseManagement\PanelAssign;
 use App\Http\Controllers\Faculty\Coordinator\ThesisMonitoring\ThesisRegistry;
 use App\Http\Controllers\Faculty\Joint1\DefenseManagement;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\FileImportController;
 use App\Http\Controllers\Shared\ThesisArchive;
 use Illuminate\Support\Facades\Route;
@@ -101,6 +102,10 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Student/dashboard'); // Your Student Dashboard Component
     })->name('dashboard');
+
+    Route::get('notification', function () {
+        return Inertia::render('Shared/notification');
+    })->name('student.notification');
 });
 
 
@@ -226,6 +231,10 @@ Route::prefix('faculty')->group(function () {
             return Inertia::render('Shared/resources');
         })->name('faculty.resources');
 
+        Route::get('notification', function () {
+            return Inertia::render('Shared/notification');
+        })->name('faculty.notification');
+
         // Route::get('repository', function () {
         //     return Inertia::render('Shared/repository/thesis');
         // })->name('faculty.repository');
@@ -242,9 +251,13 @@ Note: Temporary Routes only for frontend, but soon will have own controller depe
 ==================================================================================
 */
 Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('Admin/dashboard');
-    })->name('admin.dashboard');
+    
+    // Old Dashboard Route
+    // Route::get('/', function () {
+    //     return Inertia::render('Admin/dashboard');
+    // })->name('admin.dashboard');
+
+    Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
 
     // Management Routes
     Route::prefix('management')->group(function () {
@@ -262,7 +275,6 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
         Route::get('deadline', function () {
             return Inertia::render('Admin/management/deadline');
         })->name('admin.management.deadline');
-
 
         // FULL CRUD OPERATIONS EXAMPLES
         Route::get('dept-policies', [DepartmentPoliciesController::class, 'index'])->name('admin.management.dep-policies');
@@ -291,6 +303,10 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
     Route::get('resources', function () {
         return Inertia::render('Shared/resources');
     })->name('admin.resources');
+
+    Route::get('notification', function () {
+        return Inertia::render('Shared/notification');
+    })->name('admin.notification');
 });
 
 
@@ -302,6 +318,20 @@ API ROUTES (temporary only)
 */
 Route::post('file-import', [FileImportController::class, 'store'])->name('file.import');
 
+
+// TEMPORARY: view shared thesis page without affecting guest/admin routes
+Route::get('/test-thesis', function () {
+    return Inertia::render('Shared/repository/thesis');
+});
+
+Route::get('/test-thesis-preview', function () {
+    return Inertia::render('Shared/repository/document-preview', [
+        'document' => [
+            'title' => 'Sample Thesis',
+            'url' => '/storage/sample.pdf'
+        ]
+    ]);
+});
 
 
 require __DIR__.'/settings.php';

@@ -10,7 +10,7 @@ interface DatePickerProps {
   displayFormat?: "short" | "full"; // "Dec. 2024" vs "12-03-25"
 }
 
-export function DatePicker({
+export default function DatePicker({
   value,
   onChange,
   placeholder = "Edit Date",

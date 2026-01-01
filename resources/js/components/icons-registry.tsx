@@ -1,4 +1,6 @@
-﻿import ArchiveClickedIcon from "./Icons/ic_archive-Clicked.svg?react";
+import AboutIcon from "./Icons/ic_about.svg?react";
+
+import ArchiveClickedIcon from "./Icons/ic_archive-Clicked.svg?react";
 import ArchiveDefaultIcon from "./Icons/ic_archive-Default.svg?react";
 import ArchiveHoverIcon from "./Icons/ic_archive-Hover.svg?react";
 import BackClickedIcon from "./Icons/ic_back-Clicked.svg?react";
@@ -94,6 +96,15 @@ import ProfileHoverIcon from "./Icons/ic_profile-Hover.svg?react";
 import ProponentsClickedIcon from "./Icons/ic_proponents-Clicked.svg?react";
 import ProponentsDefaultIcon from "./Icons/ic_proponents-Default.svg?react";
 import ProponentsHoverIcon from "./Icons/ic_proponents-Hover.svg?react";
+
+import QuicklinkCalendarIcon from "./Icons/ic_quicklink-calendar.svg?react";
+import QuicklinkCalendarHoverIcon from "./Icons/ic_quicklink-calendar-Hover.svg?react";
+import QuicklinkManagementIcon from "./Icons/ic_quicklink-management.svg?react";
+import QuicklinkManagementHoverIcon from "./Icons/ic_quicklink-management-Hover.svg?react";
+import QuicklinkPeopleIcon from "./Icons/ic_quicklink-people.svg?react";
+import QuicklinkPeopleHoverIcon from "./Icons/ic_quicklink-people-Hover.svg?react";
+import QuicklinkRepositoryIcon from "./Icons/ic_quicklink-repository.svg?react";
+import QuicklinkRepositoryHoverIcon from "./Icons/ic_quicklink-repository-Hover.svg?react";
 import RepoClickedIcon from "./Icons/ic_repo-Clicked.svg?react";
 import RepoDefaultIcon from "./Icons/ic_repo-Default.svg?react";
 import RepoHoverIcon from "./Icons/ic_repo-Hover.svg?react";
@@ -120,6 +131,7 @@ import UploadDefaultIcon from "./Icons/ic_upload-Default.svg?react";
 import UploadHoverIcon from "./Icons/ic_upload-Hover.svg?react";
 
 export const iconRegistry = {
+  about: AboutIcon,
   archiveClicked: ArchiveClickedIcon,
   archiveDefault: ArchiveDefaultIcon,
   archiveHover: ArchiveHoverIcon,
@@ -216,6 +228,16 @@ export const iconRegistry = {
   proponentsClicked: ProponentsClickedIcon,
   proponentsDefault: ProponentsDefaultIcon,
   proponentsHover: ProponentsHoverIcon,
+
+  quicklinkCalendar: QuicklinkCalendarIcon,
+  quicklinkCalendarHover: QuicklinkCalendarHoverIcon,
+  quicklinkManagement: QuicklinkManagementIcon,
+  quicklinkManagementHover: QuicklinkManagementHoverIcon,
+  quicklinkPeople: QuicklinkPeopleIcon,
+  quicklinkPeopleHover: QuicklinkPeopleHoverIcon,
+  quicklinkRepository: QuicklinkRepositoryIcon,
+  quicklinkRepositoryHover: QuicklinkRepositoryHoverIcon,
+
   repoClicked: RepoClickedIcon,
   repoDefault: RepoDefaultIcon,
   repoHover: RepoHoverIcon,

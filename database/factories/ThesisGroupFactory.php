@@ -18,10 +18,8 @@ class ThesisGroupFactory extends Factory
     public function definition(): array
     {
         return [
-            'section_adviser_id' => SectionAdviser::inRandomOrder()->first()->id,
-                // ?? SectionAdviser::factory(),
-
-            'group_number' => $this->faker->numberBetween(1, 11),
+            'section_adviser_id' => SectionAdviser::inRandomOrder()->value('id') ?? SectionAdviser::factory(),
+            'group_number'       => $this->faker->numberBetween(1, 11),
         ];
     }
 }

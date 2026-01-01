@@ -314,7 +314,7 @@ export default function DeadlinePage({ students }: { students: any[] }) {
                                             )}
                                         </td>
                                         <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
-                                            BSCPE 3 - {stud.block}
+                                            BSCPE {stud.year_level} - {stud.block}
                                         </td>
                                         <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
                                             {stud.specialization || <span className="text-gray-400 italic">N/A</span>}

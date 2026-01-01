@@ -182,7 +182,7 @@ export default function GuestRepository({ search = '' }: RepositoryProps) {
     return (
         <>
             <Head title="Repository" />
-            <AppHeader />
+            <AppHeader variant="guest" />
 
             <AppContent
                 title="Thesis Repository"
