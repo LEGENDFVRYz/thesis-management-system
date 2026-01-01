@@ -40,6 +40,7 @@ interface GroupData {
   block: string;
 }
 
+ //Sample Data
 const studentData: Student[] = [
   {
     studentNumber: "20XX-XXXXX-MN-1",
@@ -372,9 +373,7 @@ function Dropdown({
   );
 }
 
-// Sort Component (Sort2 for Students) - Using imported component with wrapper
-// Wrapper components that match the exact UI/layout of Filter2 and Sort2 from shared components
-// but with proper callback integration
+//Sort and Filter
 
 function StudentFilterWrapper({ 
   onApply, 
@@ -848,6 +847,7 @@ export default function StudentManagement({ students }: { students?: any[] }) {
                 {view === 'table' ? (
                 <div className="overflow-x-auto">
                     <div className="min-w-[1360px]">
+                        
                         {/* Table Header - 8 Columns */}
                         <div className="grid grid-cols-8 h-10 rounded-t-lg bg-primary">
                             <div className="flex items-center justify-center p-2.5">
