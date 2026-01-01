@@ -3,13 +3,14 @@ import { useState } from 'react';
 import { Filter, Trash2, CheckCircle2, Calendar, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button'; 
 import { cn } from '@/lib/utils';
-import { SearchBar } from '@/components/filter-search';
+import { SearchBar, Sort3 } from '@/components/filter-search';
 import { RepoFilter } from '@/components/filter-search';
 import { Icon } from '@/components/icon-index';
 import {
     Dialog,
     DialogContent,
 } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type SectionVariant = 'StudentManagement' | 'DefenseManagement' | 'ThesisArchive' | 'Notifications';
 
@@ -22,6 +23,9 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
     
     // State to manage the Advanced Filter Modal visibility
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+    
+    // State to manage the Sort Modal visibility
+    const [isSort3ModalOpen, setIsSort3ModalOpen] = useState(false);
 
     /**
      * Container Style Mapping
@@ -38,6 +42,12 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
     const handleApplyFilters = (tags: string[]) => {
         console.log("Applied Tags:", tags);
         setIsFilterModalOpen(false);
+    };
+
+    // Callback when sort options are applied in Sort3
+    const handleApplySort = (sortBy: string) => {
+        console.log("Applied Sort By:", sortBy);
+        setIsSort3ModalOpen(false);
     };
 
     return (
@@ -104,17 +114,30 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                     <>
                         <div className="flex flex-col gap-2 w-[320px] font-dm">
                             <label className="text-sm font-medium text-alert-desc font-dm">Notification Type</label>
-                            <div className="flex items-center justify-between px-3 h-9 bg-breadcrumb rounded-lg cursor-pointer font-dm">
-                                <span className="text-alert-desc text-[13.33px] font-medium font-dm">Filter by Type</span>
-                                <ChevronDown className="w-4 h-4 text-alert-desc/50" />
-                            </div>
+                            <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Filter by Type" />
+                                </SelectTrigger>
+                                <SelectContent className='w-[var(--radix-select-trigger-width)]'>
+                                    <SelectItem value="Defense Management">Defense Management</SelectItem>
+                                    <SelectItem value="Panel Assignment">Panel Assignment</SelectItem>
+                                    <SelectItem value="Reminder">Reminder</SelectItem>
+                                    <SelectItem value="System Update">System Update</SelectItem>
+                                    <SelectItem value="Alert">Alert</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                         <div className="flex flex-col gap-2 w-[320px] font-dm">
                             <label className="text-sm font-medium text-alert-desc font-dm">Status</label>
-                            <div className="flex items-center justify-between px-3 h-9 bg-breadcrumb rounded-lg cursor-pointer font-dm">
-                                <span className="text-alert-desc text-[13.33px] font-medium font-dm">Filter by Status</span>
-                                <ChevronDown className="w-4 h-4 text-alert-desc/50" />
-                            </div>
+                            <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Filter by Status" />
+                                </SelectTrigger>
+                                <SelectContent className='w-[var(--radix-select-trigger-width)]'>
+                                    <SelectItem value="Read">Read Only</SelectItem>
+                                    <SelectItem value="Unread">Unread Only</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                     </>
                 )}
@@ -125,7 +148,7 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                     (variant === 'ThesisArchive' || variant === 'Notifications') ? "mt-auto h-9" : ""
                 )}>
                     {(variant === 'StudentManagement' || variant === 'Notifications') && (
-                        <Button variant="secondary" size="icon" className="rounded-lg border-none font-dm">
+                        <Button variant="secondary" size="icon" className="rounded-lg border-none font-dm" onClick={() => setIsSort3ModalOpen(true)}>
                             <Icon name="sortDefault" size={16} />
                         </Button>
                     )}
@@ -169,6 +192,15 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                     />
                 </DialogContent>
             </Dialog>
+
+            {/* --- INTEGRATED SORT MODAL --- */}
+            <Dialog open={isSort3ModalOpen} onOpenChange={setIsSort3ModalOpen}>
+                <DialogContent className="max-w-md p-0 border-none bg-transparent shadow-none outline-none">
+                    {/* The call to Sort3 */}
+                    <Sort3/>
+                </DialogContent>
+            </Dialog>
+
         </div>
     );
 }

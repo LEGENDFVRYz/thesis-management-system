@@ -158,7 +158,7 @@ export default function DefenseTable({ defenses }: { defenses: any[] }) {
     return (
         <>
             <Head title="Defense Management" />
-            <AppLayout breadcrumbs={[{ title: 'Defense Management', href: defensesRoute().url }]}>
+            <AppLayout breadcrumbs={[{ title: 'Management', href: '/admin/management' }, { title: 'Defense', href: defensesRoute().url }]}>
                 <AppContent
                     title="Defense Management"
                     subtitle="Monitor all defense schedules and panel assignments"
