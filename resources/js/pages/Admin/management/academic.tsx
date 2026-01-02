@@ -119,7 +119,7 @@ export default function AcademicSettings() {
                     style={{ backgroundColor: '#730000' }}
                   />
 
-                  <CardContent className="py-1.5 px-3 pl-4">
+                  <CardContent className="py-1.5 px-3 pl-0">
                     <p className="font-semibold text-base leading-tight" style={{ color: '#730000' }}>
                       {event.title}
                     </p>
