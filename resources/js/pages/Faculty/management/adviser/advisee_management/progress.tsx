@@ -42,11 +42,8 @@ interface ProgressProps {
     groups: Groups[];
 }
 
-// sample data
-// Replace your sample data section with this:
-
-// Sample data with VARIED statuses and thesis stages
-const sampleGroups: Groups[] = Array(10)
+// Sample data with statuses and thesis stages
+const sampleGroups: Groups[] = Array(9)
     .fill(null)
     .map((_, index) => ({
         group_code: `330${index + 1}`,
@@ -60,7 +57,6 @@ const sampleGroups: Groups[] = Array(10)
             'Cybersecurity Framework for SMEs',
             'Renewable Energy Monitoring System',
             'E-commerce Platform with Analytics',
-            'Augmented Reality Educational Tool',
         ][index],
         proponents: '4',
         student_name: 'Rona Dela Cruz',
@@ -516,7 +512,10 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
             <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
                 <DialogContent
                     className="p-0 [&_[data-slot=dialog-overlay]]:bg-foreground/20 [&_[data-slot=dialog-overlay]]:backdrop-blur-sm"
-                    style={{ maxWidth: '400px' }}
+                    style={{
+                        maxWidth: '400px',
+                        overflow: 'visible',
+                    }}
                 >
                     <BlockAndTagsFilter
                         block={selectedBlock}
