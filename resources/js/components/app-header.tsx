@@ -186,12 +186,11 @@ export function AppHeader({ breadcrumbs = [], variant }: AppHeaderProps) {
                         {activeRole === 'committee' && (
                             <>
                                 <Button variant="primary" asChild className="mx-1 border-none shadow-none">
-                                    <Link href="/committee/dashboard" className='hover:text-primary-foreground-2'>Home</Link>
-                                </Button>
-                                <Button variant="primary" asChild className="mx-1 border-none shadow-none">
                                     <Link href="/committee/proposals" className='hover:text-primary-foreground-2'>Proposal Review</Link>
                                 </Button>
-                                <SharedLinks />
+                                <Button variant="primary" asChild className="mx-1 border-none shadow-none">
+                                    <Link href="/repository" className='hover:text-primary-foreground-2'>Repository</Link>
+                                </Button>
                             </>
                         )}
 

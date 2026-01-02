@@ -345,5 +345,8 @@ Route::get('/test-thesis-preview', function () {
     ]);
 });
 
+Route::get('/committee/proposal-review', function () {
+    return Inertia::render('Committee/proposal-review');
+});
 
 require __DIR__.'/settings.php';
