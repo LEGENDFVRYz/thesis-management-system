@@ -61,6 +61,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Grade Input', href: '#' },
 ];
 
+
 const rubricSections = [
     {
         id: 1,
@@ -72,7 +73,49 @@ const rubricSections = [
             { name: "Data Collection and Analysis", desc1: "Collects and analyzes data with limited accuracy. Fails to use appropriate tools or techniques.", desc2: "Collects and analyzes data with some accuracy but with lack of consistency. Uses appropriate tools and techniques.", desc3: "Collects and analyzes data accurately. Uses appropriate tools and techniques effectively.", desc4: "Collects and analyzes data thoroughly, ensuring accuracy. Display exceptional use of advanced tools and techniques." },
         ]
     },
+    {
+        id: 2,
+        title: "Rubric No. 2 (20%)",
+        description: "Function effectively as an individual, and as a member or leader in diverse teams and in multidisciplinary settings.",
+        indicators: [
+            { name: "Individual Contribution", desc1: "Minimal contributions to team activities. Lacks initiative to fulfill responsibility.", desc2: "Some contributions to team activities. Shows limited initiative, need occasional guidance.", desc3: "Significant contributions to team activities. Takes initiative and fulfills individual responsibilities.", desc4: "Exceptional contributions to team activities. Display leadership, initiative and consistencies, fulfill individual responsibilities." },
+        ]
+    },
+    {
+        id: 3,
+        title: "Rubric No. 3 (20%)",
+        description: "Identify, formulate, research literature and analyze complex engineering problems reaching substantiated conclusions using first principles of mathematics, natural sciences and engineering sciences",
+        indicators: [
+            { name: "Problem Identification", desc1: "Struggles to identify or define problems. Lacks understanding of problem background.", desc2: "Partially identifies problems but lacks clarity or precision. Shows limited understanding of problem background.", desc3: "Clearly identifies and defines problems. Demonstrates a good understanding of problem background.", desc4: "Skillfully identifies and defines problems. Shows exceptional understanding of problem background." },
+            { name: "Problem Formulation", desc1: "Formulates problems with limited specificity or lacks focus. Does not consider relevant variables or constraints.", desc2: "Formulates problems with some specificity but lacks precision or may overlook certain variables or constraints.", desc3: "Formulates problems with clarity and specificity. Considers relevant variables and constraints appropriately.", desc4: "Formulates problems precisely and comprehensively. Identifies and incorporates all relevant variables and constraints." },
+            { name: "Research Literature", desc1: "Shows limited ability to research and gather relevant literature.", desc2: "Display some ability to research and gather literature with inconsistency.", desc3: "Research and gather relevant literature effectively. Shows good strength of references.", desc4: "Research and gather comprehensive literature from credible sources. Displays exceptional strength of references." },
+        ]
+    },
+    {
+        id: 4,
+        title: "Rubric No. 4 (20%)",
+        description: "Communicate effectively on complex engineering activities with the engineering community and with society at large, such as being able to comprehend and write effective reports and design documentation, make effective presentations, and give and receive clear instructions.",
+        indicators: [
+            { name: "Technical Content Comprehension", desc1: "Display limited understanding of activities. Struggles to comprehend content or terminology.", desc2: "Shows some understanding of activities but require clarification or explanation of content or terminology.", desc3: "Displays a good understanding of activities. Comprehend content and terminology.", desc4: "Displays exceptional understanding of activities. Comprehend content and terminology with ease and fluency." },
+            { name: "Oral Presentation", desc1: "Delivers oral presentation with limited clarity, coherence or effective use of visual aids.", desc2: "Delivers oral presentation with some clarity and coherence. Uses visual aids to some extent.", desc3: "Delivers oral presentation with clarity, coherence and effectiveness. Uses visual aids effectively. Display confidence in public speaking.", desc4: "Delivers presentation with exceptional clarity, coherence, and effectiveness. Uses visual aids creatively and strategically. Display exceptional confidence in speaking engagement." },
+            { name: "Documentation", desc1: "Produces written documentation with limited clarity and organization. Lack of effective use of technical term and formatting.", desc2: "Produces written documentation with some clarity and organization. Uses technical term and appropriate formatting to a certain extent.", desc3: "Produces written documentation with clarity, organization and coherence. Uses technical language and appropriate formatting effectively.", desc4: "Produces written documentation with exceptional clarity, organization and coherence. Uses technical term and appropriate formatting with precision." },
+        ]
+    },
+    {
+        id: 5,
+        title: "Rubric No. 5 (20%)",
+        description: "Identify, formulate, research literature and analyze complex engineering problems reaching substantiated conclusions using first principles of mathematics, natural sciences and engineering sciences",
+        indicators: [
+            { name: "Technological Change Awareness", desc1: "Display limited awareness of implication of technological change. Needs understanding of emerging technologies.", desc2: "Shows some awareness of technological change but not consistently keep up.", desc3: "Displays a good awareness of technological change and keeps up with emerging technologies.", desc4: "Demonstrates a broad understanding of the problem. Identifies all significant factors and demonstrates exceptional awareness of background." },
+            { name: "Independent Learning Preparation", desc1: "Needs preparation and planning for independent learning. May strive to identify learning needs.", desc2: "Displays some preparation and planning for independent learning but not consistently identify learning needs.", desc3: "Displays effective preparation and planning for independent learning. Identifies learning needs and relevant learning goals.", desc4: "Design analysis with highly focused purpose, broad consideration of variables and controls. Display exceptional attention to details." },
+            { name: "Learning Strategies", desc1: "Needs awareness of effective learning strategies. Does not utilize strategies to enhance learning or address challenges.", desc2: "Displays some awareness of learning strategies but not consistently use them effectively or adapt to different learning contexts.", desc3: "Applies effective learning strategies to enhance learning and address challenges. Displays flexibility in adapting strategies to different learning contexts.", desc4: "Applies a wide range of effective learning strategies with consistency and adaptability. Displays exceptional self-aware skills in selecting and adjusting strategies based on learning objectives and contexts." },
+            { name: "Resource Utilization", desc1: "Does not effectively utilize available resources for learning. Needs awareness of relevant resources.", desc2: "Utilizes some resources for learning but not fully maximize their potential. Obtain relevant resources.", desc3: "Effectively identifies and utilizes available resources for learning. Shows good creativity and seeks out additional resources.", desc4: "Displays exceptional ability to identify and utilize a wide range of resources effectively. Shows creativity in seeking out and critically evaluating new resources." },
+            { name: "Continuous Improvement", desc1: "Shows resistance to feedback and limited willingness to make improvements. Does not take proactive steps to enhance skills or knowledge.", desc2: "Displays some openness to feedback and makes occasional upgrades. Takes limited initiative in enhancing skills or knowledge.", desc3: "Shows openness to feedback and actively seeks opportunities for improvement. Takes initiative in enhancing skills or knowledge based on feedback and self-reflection.", desc4: "Embraces feedback with enthusiasm and actively seeks continuous improvement opportunities. Takes proactive and deliberate measures to enhance skills, knowledge, and professional development." },
+        ]
+    }
 ];
+
+
 
 const DefenseDetailsModal = ({ group, onClose, onEdit }: { group: any, onClose: () => void, onEdit: () => void }) => {
     return (
@@ -187,6 +230,40 @@ const DefenseDetailsModal = ({ group, onClose, onEdit }: { group: any, onClose: 
     );
 };
 
+const ActionConfirmationModal = ({ isOpen, onClose, onConfirm }: { isOpen: boolean; onClose: () => void; onConfirm: () => void }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 text-center animate-in zoom-in-95 duration-200">
+                <div className="mx-auto w-16 h-16 bg-[#900000] rounded-full flex items-center justify-center mb-6 shadow-md">
+                    <span className="text-white text-4xl font-bold font-sans">!</span>
+                </div>
+                <h2 className="text-lg font-bold text-gray-900 mb-2 tracking-tight">
+                    Are you sure you want to save changes?
+                </h2>
+                <p className="text-gray-900 font-medium text-sm mb-8">
+                    This action cannot be undone.
+                </p>
+                <div className="flex items-center justify-center gap-4">
+                    <button
+                        onClick={onClose}
+                        className="px-10 py-2.5 rounded-full border border-gray-800 text-gray-900 font-bold hover:bg-gray-50 transition-colors min-w-[120px]"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        className="px-10 py-2.5 rounded-full bg-[#900000] text-white font-bold hover:bg-[#700000] transition-colors shadow-sm min-w-[120px]"
+                    >
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const RubricsManagementView = ({ onBack }: { onBack: () => void }) => {
     const [search, setSearch] = useState('');
     const [activeTab, setActiveTab] = useState('MOR');
@@ -194,10 +271,7 @@ const RubricsManagementView = ({ onBack }: { onBack: () => void }) => {
     return (
         <FacultyManagementLayout breadcrumbs={[...breadcrumbs, { title: 'Rubrics and Guidelines', href: '#' }]} title="" description="">
             <Head title="Rubrics and Guidelines" />
-            <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
-                .dm-sans { font-family: "DM Sans", sans-serif; }
-            `}</style>
+
             
             <div className="dm-sans w-full max-w-[1600px] mx-auto pb-12">
                 
@@ -356,19 +430,36 @@ const RubricsManagementView = ({ onBack }: { onBack: () => void }) => {
 const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void }) => {
     const [activeTab, setActiveTab] = useState<'review' | 'evaluation'>('review');
     const [ratings, setRatings] = useState<Record<string, number>>({});
+    
+    const [modalConfig, setModalConfig] = useState<{isOpen: boolean, type: 'save' | 'submit' | null}>({
+        isOpen: false, 
+        type: null
+    });
 
     const handleRatingChange = (sectionId: number, indicatorIndex: number, value: number) => {
         setRatings(prev => ({ ...prev, [`${sectionId}-${indicatorIndex}`]: value }));
+    };
+
+    const handleConfirmAction = () => {
+        if (modalConfig.type === 'save') {
+            console.log("Saving Draft...");
+        } else if (modalConfig.type === 'submit') {
+            console.log("Submitting Grades...");
+        }
+        setModalConfig({ isOpen: false, type: null });
     };
 
     return (
         <FacultyManagementLayout breadcrumbs={[...breadcrumbs, { title: 'Document Review', href: '#' }]} title="" description="">
             <Head title="Document Review" />
             
-            <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
-                .dm-sans { font-family: "DM Sans", sans-serif; }
-            `}</style>
+            <ActionConfirmationModal 
+                isOpen={modalConfig.isOpen} 
+                onClose={() => setModalConfig({isOpen: false, type: null})} 
+                onConfirm={handleConfirmAction} 
+            />
+            
+
 
             <div className="dm-sans">
                 <div className="mb-6">
@@ -383,7 +474,7 @@ const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void 
                     <div className="flex flex-col space-y-0">
                         <div className="flex justify-between items-end mb-[-1px] z-20 px-1">
                             <h2 className="text-[#900000] text-lg font-bold">
-                                {activeTab === 'review' ? 'Document Review' : 'Evaluation Form'}
+                                
                             </h2>
                             <div className="flex gap-0">
                                 <button 
@@ -402,8 +493,11 @@ const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void 
                         </div>
 
                         <div className="bg-[#FFFDF5] border border-stone-200 rounded-b-xl rounded-tl-xl p-8 shadow-sm relative z-10">
-                            
+                            <h2 className="text-[#900000] text-lg font-bold mb-6">
+                                {activeTab === 'review' ? 'Document Review' : 'Evaluation Form'}
+                            </h2>
                             <div className="bg-[#FDFCF6] border border-stone-200 rounded-xl p-6 shadow-sm mb-6">
+
                                 <div className="flex justify-between items-start">
                                     <div>
                                         <h2 className="text-[#900000] font-bold text-lg">Defense Details</h2>
@@ -506,7 +600,6 @@ const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void 
                                                 </div>
                                             </div>
                                             
-                                            {/* --- SIDEBAR COMMENTS WIDGET --- */}
                                             <div className="bg-white border border-stone-200 rounded-xl p-6 shadow-sm h-[320px] flex flex-col">
                                                 <div className="flex justify-between items-center mb-4">
                                                     <h3 className="text-[#900000] text-xs font-bold">Comments</h3>
@@ -540,7 +633,10 @@ const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void 
                                             placeholder="Enter your comments and recommendations here..."
                                         ></textarea>
                                         <div className="flex justify-end mt-4">
-                                            <button className="bg-[#700000] text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-[#900000] transition-colors">
+                                            <button 
+                                                onClick={() => setModalConfig({isOpen: true, type: 'submit'})}
+                                                className="bg-[#700000] text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-[#900000] transition-colors"
+                                            >
                                                 Submit Comment
                                             </button>
                                         </div>
@@ -557,7 +653,6 @@ const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void 
                                             { id: 3, role: "P3", name: "Engr. John Johnson", score: 2.2, decision: "Rejected", comments: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation." }
                                         ].map((panelist) => (
                                             <div key={panelist.id} className="bg-[#FDFCF6] border border-stone-200 rounded-xl p-6 shadow-sm">
-                                                {/* Header */}
                                                 <div className="flex items-center gap-3 mb-6 pb-4 border-b border-stone-100">
                                                     <div className="w-8 h-8 rounded-full bg-[#BC8585] text-white font-bold text-xs flex items-center justify-center shadow-sm">
                                                         {panelist.role}
@@ -565,7 +660,6 @@ const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void 
                                                     <span className="font-bold text-gray-800 text-sm">{panelist.name}</span>
                                                 </div>
 
-                                                {/* Scores */}
                                                 <div className="flex justify-between items-start mb-6">
                                                     <div>
                                                         <h4 className="text-[#900000] text-xs font-bold mb-1">Total Score</h4>
@@ -579,7 +673,6 @@ const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void 
                                                     </div>
                                                 </div>
 
-                                                {/* Comments */}
                                                 <div>
                                                     <h4 className="text-[#900000] text-xs font-bold mb-2">Comments/Recommendations</h4>
                                                     <p className="text-xs text-gray-600 leading-relaxed">
@@ -590,13 +683,11 @@ const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void 
                                         ))}
                                     </div>
 
-                                    {/* --- RUBRICS SINGLE CARD CONTAINER --- */}
                                     <div className="bg-[#FDFCF6] border border-stone-200 rounded-xl p-8 shadow-sm mt-10">
-                                            
+                                                
                                         {rubricSections.map((rubric, idx) => (
                                             <div key={rubric.id} className="space-y-4">
                                                 
-                                                {/* --- CONDITIONAL BLACK SEPARATOR LINE --- */}
                                                 {idx > 0 && (
                                                     <div className="w-full h-px bg-black my-10" />
                                                 )}
@@ -606,7 +697,6 @@ const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void 
                                                     <p className="text-xs text-gray-700 max-w-4xl leading-relaxed">{rubric.description}</p>
                                                 </div>
 
-                                                {/* RUBRIC TABLE */}
                                                 <div className="border border-[#D4A3A3] rounded-xl overflow-hidden shadow-sm">
                                                     <table className="w-full text-left border-collapse">
                                                         <thead>
@@ -691,8 +781,18 @@ const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void 
                                         <textarea className="w-full h-32 p-4 rounded-lg border border-gray-200 bg-[#FAFAFA] text-sm focus:outline-none focus:ring-1 focus:ring-[#900000] resize-none" placeholder="Enter your comments and recommendations here..."></textarea>
                                     </div>
                                     <div className="flex justify-end gap-3 pt-4">
-                                        <button className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#730000] text-white text-sm font-bold hover:bg-[#850000] shadow-sm transition-all"><Save className="w-4 h-4" /> Save as Draft</button>
-                                        <button className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#520000] text-white text-sm font-bold hover:bg-[#3d0000] shadow-sm transition-all"><Send className="w-4 h-4" /> Submit Grades</button>
+                                        <button 
+                                            onClick={() => setModalConfig({isOpen: true, type: 'save'})}
+                                            className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#730000] text-white text-sm font-bold hover:bg-[#850000] shadow-sm transition-all"
+                                        >
+                                            <Save className="w-4 h-4" /> Save as Draft
+                                        </button>
+                                        <button 
+                                            onClick={() => setModalConfig({isOpen: true, type: 'submit'})}
+                                            className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#520000] text-white text-sm font-bold hover:bg-[#3d0000] shadow-sm transition-all"
+                                        >
+                                            <Send className="w-4 h-4" /> Submit Grades
+                                        </button>
                                     </div>
                                 </div>
                             )}
@@ -732,10 +832,7 @@ export default function Dashboard() {
         >
             <Head title="Grade Input" />
             
-            <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
-                .dm-sans { font-family: "DM Sans", sans-serif; }
-            `}</style>
+
 
             {viewDetailsGroup && (
                 <DefenseDetailsModal 
@@ -760,7 +857,6 @@ export default function Dashboard() {
                     />
                 </div>
 
-                {/* --- Filters Bar --- */}
                 <div className="flex flex-col md:flex-row gap-4 items-end justify-between p-1">
                     <div className="flex-1 w-full md:w-auto grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1">
@@ -794,7 +890,6 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* --- Main Table --- */}
                 <div className="border border-[#D4A3A3] rounded-xl overflow-hidden shadow-sm bg-white">
                     <table className="w-full text-left text-sm">
                         <thead className="bg-[#700000] text-white">
