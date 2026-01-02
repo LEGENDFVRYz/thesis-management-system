@@ -2,6 +2,7 @@ import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { resources } from '@/routes/admin/index';
 import { toggle, remove, store } from '@/routes/admin/resources/index';
+import { download } from '@/routes/resources/index';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { useRef, useState } from 'react';
@@ -54,8 +55,10 @@ export default function Resources({ resources }: Props) {
         });
     };
 
+    // download the recorded resource
     const handleDownload = (filePath: string) => {
-        window.open(`/storage/${filePath}`, '_blank');
+        // window.open(download(filePath).url, '_blank');
+        window.location.href = download(filePath).url
     };
 
     // Upload the file in the resources
@@ -125,7 +128,7 @@ export default function Resources({ resources }: Props) {
                                                 {res.is_active ? 'Active' : 'Inactive'}
                                             </button>
                                         </td>
-
+                                        
                                         {/* ACTION BUTTONS */}
                                         <td className="px-6 py-4 flex gap-2 font-medium text-gray-900 dark:text-gray-100 justify-center">
                                             <button

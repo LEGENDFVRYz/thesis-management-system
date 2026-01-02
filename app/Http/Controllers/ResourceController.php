@@ -37,7 +37,7 @@ class ResourceController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|max:10240|pdf,doc,docx,xls,xlsx,png,jpg,jpeg',
+            'file' => 'required|file|max:10240|mimes:pdf,doc,docx,xls,xlsx,png,jpg,jpeg',
         ]);
 
         $file = $request->file('file');
@@ -46,17 +46,17 @@ class ResourceController extends Controller
         $extension = $file->getClientOriginalExtension();
 
         // simple randomizer of filename for security
-        $randomFileName = Str::random(16) . '_' . Str::random(16) . '.' . $extension;
+        $randomFileName = Str::random(16) . '_' . Str::random(16);
 
         // upload to public storage
-        $path = $file->storeAs('resources', $randomFileName, 'public');
+        $file->storeAs('resources', $randomFileName . '.' . $extension, 'public');
 
         // Overwrite record if the filename is exist
         Resource::updateOrCreate(
             ['file_name' => $filename],
             [
                 'file_type'   => strtoupper($extension),
-                'file_path'   => $path, 
+                'file_path'   => $randomFileName, 
                 'file_size'   => round($file->getSize() / 1024 / 1024, 2),
                 'uploaded_by' => auth()->user()->name,
                 'is_active'   => true,
@@ -66,6 +66,28 @@ class ResourceController extends Controller
 
         return back()->with('success', "{$filename} uploaded successfully!");
     }
+
+
+    public function download(string $filename)
+    {
+        $resource = Resource::where('file_path', $filename)->firstOrFail();
+        $filename = $resource->file_path;
+        $file_ext = strtolower($resource->file_type);
+        $fullPath = storage_path('app/public/resources/' . $filename . '.' . $file_ext);
+
+        // dd($fullPath);
+        abort_if(!file_exists($fullPath), 404);
+
+        return response()->download(
+            $fullPath,
+            $resource->file_name . '.' . strtolower($resource->file_type),
+            [
+                'Content-Type' => mime_content_type($fullPath),
+            ]
+        );
+    }
+
+
 
     /**
      * Display the specified resource.

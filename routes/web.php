@@ -296,8 +296,9 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
 
     Route::get('resources', [ResourceController::class, 'index'])->name('admin.resources');
     Route::post('resources', [ResourceController::class, 'store'])->name('admin.resources.store');
-    Route::patch('resources/toggle/{resource}', [ResourceController::class, 'toggle'])->name('admin.resources.toggle');
     Route::delete('resources/{resource}', [ResourceController::class, 'destroy'])->name('admin.resources.remove');
+    Route::patch('resources/{resource}/toggle', [ResourceController::class, 'toggle'])->name('admin.resources.toggle');
+    // Note: Download routes for resources is in public
 });
 
 
@@ -308,7 +309,7 @@ API ROUTES (temporary only)
 ==================================================================================
 */
 Route::post('file-import', [FileImportController::class, 'store'])->name('file.import');
-
+Route::get('/resources/{filekey}/download', [ResourceController::class, 'download'])->name('resources.download');
 
 
 require __DIR__.'/settings.php';
