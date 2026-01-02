@@ -8,18 +8,18 @@ import { AppContent } from '@/components/app-content';
 import { NavFooter } from '@/components/nav-footer';
 
 // 
-import { FilterSection } from './student-management-page/student_filter_section';
-import { StudentTableView } from './student-management-page/student_table_view';
-import { GroupCardView } from './student-management-page/student_groupcard_view';
-import { ViewToggle } from './student-management-page/student_view_toggle';
-import { StudentProfileModal } from './student-management-page/student_viewprofile_modal';
-import { GroupProfileModal } from './student-management-page/student_viewgroup_modal';
+import { FilterSection } from './student_management/student_filter_section';
+import { StudentTableView } from './student_management/student_table_view';
+import { GroupCardView } from './student_management/student_groupcard_view';
+import { ViewToggle } from './student_management/student_view_toggle';
+import { StudentProfileModal } from './student_management/student_viewprofile_modal';
+import { GroupProfileModal } from './student_management/student_viewgroup_modal';
 
 // TYPES AND SAMPLE DATA
-import { Student, GroupData, FilterState } from './student-management-page/student_interface';
-import { studentData, thesisTitles } from './student-management-page/student_sampleData';
+import { Student, GroupData, FilterState } from './student_management/student_interface';
+import { studentData, thesisTitles } from './student_management/student_sampleData';
 
-import { filterAndSortStudents, filterAndSortGroups, groupStudentsByCode } from './student-management-page/student_data_utilities';
+import { filterAndSortStudents, filterAndSortGroups, groupStudentsByCode } from './student_management/student_data_utilities';
 
 export default function StudentManagement({ students }: { students?: any[] }) {
   const [searchQuery, setSearchQuery] = useState("");
