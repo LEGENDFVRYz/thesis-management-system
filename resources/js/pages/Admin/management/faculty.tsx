@@ -190,7 +190,7 @@ function Dropdown({
   isOpen: boolean; 
   onClose: () => void; 
   children: React.ReactNode;
-  triggerRef: React.RefObject<HTMLButtonElement>;
+  triggerRef: React.RefObject<HTMLButtonElement | null>;
 }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -1144,14 +1144,9 @@ export default function FacultyManagement({ faculties }: { faculties?: any[] }) 
         <>
             <Head title="Faculty Management" />
             <AppHeader/>
-            <AppContent
-                title={
-                    <div className="flex items-center gap-2 text-primary-foreground-2">
-                        <span className="font-medium">Faculty Management</span>
-                    </div>
-                }
-                subtitle="Manage Faculty Accounts and Assign Roles"
-            >
+            <AppContent title="Faculty Management" className='text-primary-foreground-2'
+            subtitle='Manage Faculty Accounts and Assign Roles'>
+                
                 {/* Filter & Search Section */}
                 <div className="mb-4">
                     <div className="flex flex-col items-start self-stretch w-full max-w-[1360px] bg-card rounded-[10px] border-[0.8px] border-primary/20 shadow-sm h-[134px] p-[24.8px] gap-4 font-dm">
