@@ -235,6 +235,10 @@ Route::prefix('faculty')->group(function () {
             return Inertia::render('Shared/notification');
         })->name('faculty.notification');
 
+        Route::get('profilemanagement', function () {
+            return Inertia::render('Shared/profilemanagement'); 
+        })->name('faculty.profilemanagement');
+
         // Route::get('repository', function () {
         //     return Inertia::render('Shared/repository/thesis');
         // })->name('faculty.repository');
@@ -307,6 +311,10 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
     Route::get('notification', function () {
         return Inertia::render('Shared/notification');
     })->name('admin.notification');
+
+    Route::get('profilemanagement', function () {
+        return Inertia::render('Shared/profilemanagement'); 
+    })->name('admin.profilemanagement');
 });
 
 
