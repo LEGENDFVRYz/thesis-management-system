@@ -34,6 +34,9 @@ class Endorsement extends Controller
             // Join to Section Advisers
             ->join('tbl_section_advisers as sa', 'g.section_adviser_id', '=', 'sa.id')
 
+            // Join to Students (to get student names)
+            ->leftJoin('tbl_students as s', 'g.id', '=', 's.group_id')
+
             // Join to get Adviser's Faculty Assignment
             ->join('tbl_faculty_assignments as adviser_fa', 'sa.faculty_assign_id', '=', 'adviser_fa.id')
 
@@ -84,6 +87,15 @@ class Endorsement extends Controller
                         adviser_faculty.middle_name,
                         adviser_faculty.last_name
                     ) AS adviser_name
+                "),
+
+                // Student Names (concatenated for all group members)
+                DB::raw("
+                    GROUP_CONCAT(
+                        DISTINCT CONCAT_WS(' ', s.first_name, s.middle_name, s.last_name)
+                        ORDER BY s.last_name
+                        SEPARATOR ', '
+                    ) AS student_names
                 ")
             )
 
@@ -111,7 +123,7 @@ class Endorsement extends Controller
             ->orderBy('e.is_adviser_approved', 'asc')
             ->get();
             
-       // dd(vars: $validEndorsements);
+       dd(vars: $validEndorsements);
         return Inertia::render('Faculty/management/adviser/endorsements', [
             'endorsements' => $validEndorsements
         ]);
