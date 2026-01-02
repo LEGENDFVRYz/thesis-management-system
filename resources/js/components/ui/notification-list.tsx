@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Calendar, Users, Bell, Info } from 'lucide-react';
+import { Calendar, Users, Bell, Info, Check, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // --- Types ---
@@ -59,9 +59,9 @@ const NotificationListItem = React.forwardRef<HTMLDivElement, NotificationItemPr
             <div
                 ref={ref}
                 className={cn(
-                    'relative flex gap-4 px-6 py-5 border-b border-gray-50',
+                    'relative flex gap-4 px-6 py-5 border-border border rounded-xl mb-2',
                     'hover:bg-gray-50 transition-colors cursor-pointer',
-                    isUnread && 'bg-blue-50/30',
+                    isUnread && 'bg-blue-50/30 border-border',
                     className
                 )}
                 {...props}
@@ -82,16 +82,29 @@ const NotificationListItem = React.forwardRef<HTMLDivElement, NotificationItemPr
                 </div>
 
                 {/* Content */}
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 flex-1"> {/* added flex-1 to push actions right */}
                     <h3 className="text-sm font-semibold text-gray-900 leading-tight">
                         {title}
                     </h3>
                     <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">
                         {description}
                     </p>
-                    <span className="text-xs text-gray-400 mt-1">
-                        {timestamp}
-                    </span>
+                    <div className="flex items-center justify-between mt-2">
+                         <span className="text-xs text-gray-400">
+                            {timestamp}
+                        </span>
+                        
+                        {/* Action Buttons Container */}
+                        <div className="flex items-center gap-4">
+                            <button className="flex items-center gap-1 text-xs font-medium text-gray-600 hover:text-gray-900">
+                                <Check className="w-3.5 h-3.5" />
+                                Mark Read
+                            </button>
+                            <button className="p-1.5 bg-red-800 text-white rounded-md hover:bg-red-900">
+                                <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         );
