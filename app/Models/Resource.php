@@ -13,16 +13,18 @@ class Resource extends Model
     protected $table = 'tbl_resources';
 
     protected $fillable = [
-        'title',
-        'description',
-        'file_path',
-        'file_type',
-        'file_size',
-        // 'uploaded_by',
-        'is_active',
+        'file_name',      
+        'file_type',      
+        'file_path',      
+        'file_size',      
+        'uploaded_by',    
+        'uploaded_at',    
+        'status',         
+        'is_active',      
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'uploaded_at' => 'date',
     ];
 }

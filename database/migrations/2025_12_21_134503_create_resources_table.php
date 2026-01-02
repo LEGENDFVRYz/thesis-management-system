@@ -14,20 +14,17 @@ return new class extends Migration
         Schema::create('tbl_resources', function (Blueprint $table) {
             $table->id();
             
-            $table->string('title');
-            $table->text('description')->nullable();
-            
-            $table->text('file_path');
-            $table->string('file_type');
-            $table->decimal('file_size', 10, 2);
-            
-            // Stores the name of the uploader directly (as a snapshot)
-            // rather than a foreign key, ensuring the name remains even if the user is deleted.
-            // Derived
-            // $table->string('uploaded_by'); 
+            // File info
+            $table->string('file_name'); // e.g., Project Plan.pdf
+            $table->string('file_type'); // e.g., PDF, Image, Excel
+            $table->string('file_path'); // Path in /storage/app/public/resources or public URL
+            $table->decimal('file_size', 10, 2); // Size in MB
+
+            // Uploader info
+            $table->string('uploaded_by'); 
+            $table->timestamp('uploaded_at')->useCurrent();
             
             $table->boolean('is_active')->default(true);
-            
             $table->timestamps();
             $table->softDeletes();
         });
