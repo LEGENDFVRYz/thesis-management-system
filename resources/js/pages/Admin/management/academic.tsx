@@ -3,18 +3,12 @@ import ManagementLayout from '@/pages/Admin/management/index';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { academic } from '@/routes/admin/management/index';
-
-// UI
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardHeader, CardTitle, CardContent,} from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
-// Date
 import AcademicYearRangePicker from '@/components/acad-year-range-picker';
 import DatePicker from '@/components/date-picker';
-
-// Icons
 import AcademicYearIcon from '@/components/Icons/academic-year-management.svg';
 import SemesterIcon from '@/components/Icons/semester-config.svg';
 import TimelineIcon from '@/components/Icons/system-timeline.svg';
@@ -25,7 +19,7 @@ import TimerIcon from '@/components/Icons/timer.svg';
 import ManagementIcon from '@/components/Icons/ic_pen-settings-Default.svg';
 
 const breadcrumbs: BreadcrumbItem[] = [
-  { title: 'Deadlines', href: academic().url },
+  { title: 'Academic Settings Configuration', href: academic().url },
 ];
 
 // Deadline events sample data
@@ -123,7 +117,7 @@ export default function AcademicSettings() {
                     style={{ backgroundColor: '#730000' }}
                   />
 
-                  <CardContent className="py-1.5 px-3 pl-4">
+                  <CardContent className="py-1.5 px-3 pl-0">
                     <p className="font-semibold text-base leading-tight" style={{ color: '#730000' }}>
                       {event.title}
                     </p>

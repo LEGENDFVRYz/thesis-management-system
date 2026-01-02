@@ -106,6 +106,10 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('notification', function () {
         return Inertia::render('Shared/notification');
     })->name('student.notification');
+
+    Route::get('student/thesis-management', function () {
+        return Inertia::render('Student/repository/thesis');
+    })->name('student.repository.thesis-management');
 });
 
 
@@ -167,9 +171,9 @@ Route::prefix('faculty')->group(function () {
                     return Inertia::render('Faculty/management/panel/thesis_review');
                 })->name('faculty.management.panel.thesis_review');
 
-                Route::get('thesis-review-0', function () {
-                    return Inertia::render('Faculty/management/panel/thesis-review-0/thesis-review');
-                })->name('faculty.management.panel.thesis_review_0');
+                Route::get('thesis-review-0/thesis_review', function () {
+                    return Inertia::render('Faculty/management/panel/thesis-review-0/thesis_review');
+                })->name('faculty.management.panel.thesis_review_0.thesis_review');
 
                 Route::get('thesis-review-0/docu_n_eval', function () {
                     return Inertia::render('Faculty/management/panel/thesis-review-0/docu_n_eval');

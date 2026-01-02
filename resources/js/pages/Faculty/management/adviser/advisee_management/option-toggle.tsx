@@ -5,6 +5,8 @@ interface OptionToggleProps {
   onStatusChange: (status: 'pending' | 'approved') => void;
   pendingCount?: number;
   approvedCount?: number;
+  pendingLabel?: string;
+  approvedLabel?: string;
   className?: string;
 }
 
@@ -13,6 +15,8 @@ export default function OptionToggle({
   onStatusChange,
   pendingCount = 0,
   approvedCount = 0,
+  pendingLabel = 'Pending',
+  approvedLabel = 'Approved',
   className = '',
 }: OptionToggleProps) {
   return (
@@ -36,7 +40,7 @@ export default function OptionToggle({
             : 'bg-[#F3EFD0] text-[#730000]'
         )}
       >
-        Pending Groups ({pendingCount})
+        {pendingLabel} ({pendingCount})
       </button>
 
       {/* Secondary / Approved */}
@@ -52,7 +56,7 @@ export default function OptionToggle({
             : 'bg-[#F3EFD0] text-[#730000]'
         )}
       >
-        Approved Groups ({approvedCount})
+        {approvedLabel} ({approvedCount})
       </button>
     </div>
   );
