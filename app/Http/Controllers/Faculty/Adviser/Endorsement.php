@@ -90,7 +90,7 @@ class Endorsement extends Controller
         
             // KEY VERIFICATION: Only endorsements under THIS adviser's section 
             //remove this comment to enable filtering by logged-in adviser
-         //->where('adviser_faculty.user_id', $userId)
+            ->where('adviser_faculty.user_id', $userId)
 
             
             ->groupBy(
