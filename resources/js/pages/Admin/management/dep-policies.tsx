@@ -15,13 +15,6 @@ import AddIcon from '@/components/Icons/ic_add-Default.svg';
 import ManagementIcon from '@/components/Icons/ic_pen-settings-Default.svg';
 
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Deadlines',
-        href: depPolicies().url,
-    },
-];
-
 const POLICY_TABS = [
     { key: 'system', label: 'System Rules' },
     { key: 'workflow', label: 'Workflow Approval' },
@@ -110,6 +103,22 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
     const [editingWorkflowId, setEditingWorkflowId] = useState<number | null>(null);
     const [workflows, setWorkflows] = useState<Record<Stage, WorkflowStepType[]>>(WORKFLOWS);
     const [stage, setStage] = useState<'mor' | 'dp1' | 'dp2'>('mor');
+
+    // Tab Label
+    const getTabLabel = (tabKey: string) => {
+        return POLICY_TABS.find(tab => tab.key === tabKey)?.label || 'Department Policies';
+    };
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Department Policies',
+            href: depPolicies().url,
+        },
+        {
+            title: getTabLabel(activeTab),
+            href: depPolicies().url,
+        },
+    ];
 
     const openConfirm = (message: string, onConfirm: () => void) => {
         setConfirmDialog({ message, onConfirm });
