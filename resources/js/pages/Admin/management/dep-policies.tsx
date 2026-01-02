@@ -7,6 +7,8 @@ import { Tabs, TabButton } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Alert } from '@/components/ui/alert';
 import StageSwitchToggle from '@/components/stage-toggle';
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
+import DefensePoliciesRubrics from '@/pages/Admin/management/dep-policies-rubrics';
 
 // ICONS
 import EditIcon from '@/components/Icons/ic_edit-Default.svg';
@@ -110,9 +112,26 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
     const [editingWorkflowId, setEditingWorkflowId] = useState<number | null>(null);
     const [workflows, setWorkflows] = useState<Record<Stage, WorkflowStepType[]>>(WORKFLOWS);
     const [stage, setStage] = useState<'mor' | 'dp1' | 'dp2'>('mor');
+    const [rubricModalOpen, setRubricModalOpen] = useState(false);
+    const [selectedRubricCategory, setSelectedRubricCategory] = useState<string>('');
+    const [rubrics, setRubrics] = useState([
+        { category: 'Research & Investigation Skills', weight: '20%', minimum: 15 },
+        { category: 'Teamwork & Leadership', weight: '20%', minimum: 15 },
+        { category: 'Engineering Problem Analysis', weight: '20%', minimum: 15 },
+        { category: 'Engineering Communication', weight: '20%', minimum: 15 },
+        { category: 'Independent & Lifelong Learning', weight: '20%', minimum: 15 },
+    ]);
 
     const openConfirm = (message: string, onConfirm: () => void) => {
         setConfirmDialog({ message, onConfirm });
+    };
+
+    const handleRubricUpdate = (oldCategory: string, newCategory: string, newWeight: string) => {
+        setRubrics(prev => prev.map(rubric =>
+            rubric.category === oldCategory
+                ? { ...rubric, category: newCategory, weight: newWeight }
+                : rubric
+        ));
     };
 
     // System Rule CRUD Operations (TO BE REVISED)
@@ -598,67 +617,87 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
 
                     {/* GRADING */}
                     {activeTab === 'grading' && (
-                        <div className="relative min-h-[100vh] p-8 flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                            <div className="flex items-center justify-between pb-4">
-                                <h1 className='font-bold pb-5'>Grade Policies</h1>
-                                <button
-                                    className="py-2 px-4 bg-primary text-sm text-primary-foreground hover:text-primary-foreground-2 cursor-pointer rounded-sm"
-                                    onClick={openCreate}
-                                    disabled={processing}
-                                >
-                                    Create
-                                </button>
+                        <div className="space-y-8">
+                            {/* DEFENSE RUBRICS TABLE */}
+                            <div>
+                                <h2 className="font-medium text-[#730000] mb-4" style={{ fontSize: '24px' }}>
+                                    Defense Rubrics
+                                </h2>
+                                <div className="bg-white rounded-xl border overflow-hidden">
+                                    <Table>
+                                        <TableHeader className="bg-[#730000] text-white">
+                                            <TableRow className="hover:bg-[#730000] border-none">
+                                                <TableHead className="px-6 py-3 text-center text-base text-white">Category</TableHead>
+                                                <TableHead className="px-6 py-3 text-center text-base text-white">Weight</TableHead>
+                                                <TableHead className="px-6 py-3 text-center text-base text-white">Minimum Score</TableHead>
+                                                <TableHead className="px-6 py-3 text-center text-base text-white">Action</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {rubrics.map((rubric, i) => (
+                                                <TableRow key={i}>
+                                                    <TableCell className="px-6 py-4 text-center">{rubric.category}</TableCell>
+                                                    <TableCell className="px-6 py-4 text-center">{rubric.weight}</TableCell>
+                                                    <TableCell className="px-6 py-4 text-center">{rubric.minimum}</TableCell>
+                                                    <TableCell className="px-6 py-4">
+                                                        <div className="flex justify-center">
+                                                            <img
+                                                                src={EditIcon}
+                                                                className="w-5 h-5 cursor-pointer"
+                                                                onClick={() => {
+                                                                    setSelectedRubricCategory(rubric.category);
+                                                                    setRubricModalOpen(true);
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </div>
                             </div>
 
-                            <table className="min-w-full text-left text-sm whitespace-nowrap">
-                                <thead className="uppercase tracking-wider border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                                    <tr>
-                                        <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100 text-center">Category</th>
-                                        <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100 text-center">Weight</th>
-                                        <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100 text-center">Minimum Score</th>
-                                        <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100 text-center">Action</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                    {grading && grading.length > 0 ? (
-                                        grading.map((criteria) => (
-                                            <tr key={criteria.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                                <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100 text-center">
-                                                    {criteria.category}
-                                                </td>
-                                                <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100 text-center">
-                                                    {criteria.weight}
-                                                </td>
-                                                <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100 text-center">
-                                                    {criteria.minimum}
-                                                </td>
-                                                <td className="px-6 py-4 flex gap-2 font-medium text-gray-900 dark:text-gray-100 justify-center">
-                                                    <button
-                                                        className="py-1 px-4 bg-primary text-primary-foreground hover:text-primary-foreground-2 cursor-pointer rounded-sm"
-                                                        onClick={() => openEdit(criteria)}
-                                                    >
-                                                        Edit
-                                                    </button>
-                                                    <button
-                                                        className="py-1 px-4 bg-primary text-primary-foreground hover:text-primary-foreground-2 cursor-pointer rounded-sm"
-                                                        onClick={() => handleDelete(criteria.id)}
-                                                        disabled={processing}
-                                                    >
-                                                        Delete
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan={4} className="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
-                                                No Grading Criteria has been created yet!
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                            {/* GRADING SCALE TABLE */}
+                            <div>
+                                <h2 className="font-medium text-[#730000] mb-4" style={{ fontSize: '24px' }}>
+                                    Grading Scale
+                                </h2>
+                                <div className="bg-white rounded-xl border overflow-hidden">
+                                    <Table>
+                                        <TableHeader className="bg-[#730000] text-white">
+                                            <TableRow className="hover:bg-[#730000] border-none">
+                                                <TableHead className="px-6 py-3 text-center text-base text-white">Grade</TableHead>
+                                                <TableHead className="px-6 py-3 text-center text-base text-white">Percentage / Equivalent</TableHead>
+                                                <TableHead className="px-6 py-3 text-center text-base text-white">Description</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {[
+                                                { grade: '1.0', percentage: '97 - 100', description: 'Excellent' },
+                                                { grade: '1.25', percentage: '94 - 96', description: 'Excellent' },
+                                                { grade: '1.5', percentage: '91 - 93', description: 'Very Good' },
+                                                { grade: '1.75', percentage: '88 - 90', description: 'Very Good' },
+                                                { grade: '2.0', percentage: '85 - 87', description: 'Good' },
+                                                { grade: '2.25', percentage: '82 - 84', description: 'Good' },
+                                                { grade: '2.50', percentage: '79 - 81', description: 'Satisfactory' },
+                                                { grade: '2.75', percentage: '76 - 78', description: 'Satisfactory' },
+                                                { grade: '3.0', percentage: '75', description: 'Passing' },
+                                                { grade: '5.0', percentage: '65 - 74', description: 'Failure' },
+                                                { grade: 'INC', percentage: '-', description: 'Incomplete' },
+                                                { grade: 'W', percentage: '-', description: 'Withdrawn' },
+                                                { grade: 'D', percentage: '-', description: 'Dropped' },
+                                            ].map((scale, i) => (
+                                                <TableRow key={i}>
+                                                    <TableCell className="px-6 py-4 text-center">{scale.grade}</TableCell>
+                                                    <TableCell className="px-6 py-4 text-center">{scale.percentage}</TableCell>
+                                                    <TableCell className="px-6 py-4 text-center">{scale.description}</TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </div>
+                            </div>
                         </div>
                     )}
 
@@ -906,6 +945,15 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Rubric Edit Modal */}
+            {rubricModalOpen && (
+                <DefensePoliciesRubrics
+                    category={selectedRubricCategory}
+                    onClose={() => setRubricModalOpen(false)}
+                    onUpdate={handleRubricUpdate}
+                />
             )}
 
         </ManagementLayout>

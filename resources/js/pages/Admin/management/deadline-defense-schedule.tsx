@@ -1,5 +1,7 @@
 import { Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import DefensePeriodModal from './defense-period-modal';
 
 interface ScheduleItem {
     id: number;
@@ -7,9 +9,13 @@ interface ScheduleItem {
     dateRange: string;
     labelTop: number;
     inputTop: number;
+    periodStart?: Date;
+    periodEnd?: Date;
+    panelDeadline?: Date;
+    resultDeadline?: Date;
 }
 
-const scheduleItems: ScheduleItem[] = [
+const INITIAL_SCHEDULE_ITEMS: ScheduleItem[] = [
     {
         id: 1,
         label: 'Methods of Research Defense Period',
@@ -59,7 +65,39 @@ const EditIcon = () => (
 );
 
 export function DeadlineDefenseSchedule() {
+    const [scheduleItems, setScheduleItems] = useState<ScheduleItem[]>(INITIAL_SCHEDULE_ITEMS);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedPeriod, setSelectedPeriod] = useState<ScheduleItem | null>(null);
+
+    const handleEditClick = (item: ScheduleItem) => {
+        setSelectedPeriod(item);
+        setModalOpen(true);
+    };
+
+    const formatDateRange = (start?: Date, end?: Date) => {
+        if (!start || !end) return 'Not set';
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"];
+        return `${monthNames[start.getMonth()]} ${start.getDate()} - ${monthNames[end.getMonth()]} ${end.getDate()}`;
+    };
+
+    const handleSave = (updatedPeriod: any) => {
+        setScheduleItems(prev => prev.map(item =>
+            item.id === updatedPeriod.id
+                ? {
+                    ...item,
+                    periodStart: updatedPeriod.periodStart,
+                    periodEnd: updatedPeriod.periodEnd,
+                    panelDeadline: updatedPeriod.panelDeadline,
+                    resultDeadline: updatedPeriod.resultDeadline,
+                    dateRange: formatDateRange(updatedPeriod.periodStart, updatedPeriod.periodEnd)
+                }
+                : item
+        ));
+    };
+
     return (
+        <>
         <div
             className="relative rounded-lg border border-[#730000]/26 bg-[#FDFCF6]"
             style={{
@@ -143,6 +181,7 @@ export function DeadlineDefenseSchedule() {
                         <button
                             className="text-[#730000] hover:text-[#730000]/70 transition-colors flex items-center justify-center"
                             style={{ width: '22px', height: '22px' }}
+                            onClick={() => handleEditClick(item)}
                         >
                             <EditIcon />
                         </button>
@@ -171,5 +210,15 @@ export function DeadlineDefenseSchedule() {
                 </Button>
             </div>
         </div>
+
+        {/* Defense Period Modal */}
+        {modalOpen && selectedPeriod && (
+            <DefensePeriodModal
+                period={selectedPeriod}
+                onClose={() => setModalOpen(false)}
+                onSave={handleSave}
+            />
+        )}
+        </>
     );
 }
