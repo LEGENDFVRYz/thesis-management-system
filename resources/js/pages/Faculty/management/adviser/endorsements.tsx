@@ -4,12 +4,9 @@ import { endorsement } from '@/routes/faculty/management/adviser';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
-// Added X, AlertCircle, Send for the new modal
 import { Eye, CheckCircle, Layers, X, AlertCircle, Send } from 'lucide-react';
 import { useState } from 'react';
 import DocumentPreview from '@/components/document-preview';
-
-// --- Types & Mock Data ---
 
 interface PanelMember {
     id: string;
@@ -39,7 +36,7 @@ const mockProposals: Proposal[] = Array(6).fill({
     adviser: 'Prof. James Lee',
     approvalDate: '12/5/2025',
     status: 'Endorsed',
-    manuscriptUrl: 'https://www.w3.org/WAI/WCAG21/Techniques/pdf/pdf1.pdf', // Example PDF URL
+    manuscriptUrl: 'https://www.w3.org/WAI/WCAG21/Techniques/pdf/pdf1.pdf',
     panelMembers: [
         { id: 'p1', role: 'P1', name: 'Dr. Robert Chen' },
         { id: 'p2', role: 'P2', name: 'Dr. Sofia Smith' },
@@ -47,15 +44,12 @@ const mockProposals: Proposal[] = Array(6).fill({
     ],
 }).map((item, index) => ({ ...item, id: index.toString() }));
 
-// --- Sub-Component: The Card ---
-
 const EndorsementCard = ({ data }: { data: Proposal }) => {
     const [showPreview, setShowPreview] = useState(false);
     const [showEndorseModal, setShowEndorseModal] = useState(false);
     const [remarks, setRemarks] = useState('');
 
     const handleEndorseSubmit = () => {
-        // Handle the submission logic here
         console.log("Endorsing:", data.id, "Remarks:", remarks);
         setShowEndorseModal(false);
     };
@@ -64,7 +58,6 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
         <>
             <div className="bg-white dark:bg-sidebar dark:border-sidebar-border rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col h-full hover:shadow-md transition-shadow">
             
-                {/* Header */}
                 <div className="flex justify-between items-start mb-2">
                     <div className="flex-1 pr-2">
                         <h3 className="font-bold text-gray-800 dark:text-gray-100 text-sm leading-tight mb-1">
@@ -81,7 +74,6 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                     </span>
                 </div>
 
-                {/* Proponents */}
                 <div className="mb-4">
                     <p className="text-[10px] text-gray-500 mb-0.5">Proponents</p>
                     <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -89,7 +81,6 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                     </p>
                 </div>
 
-                {/* Info Grid */}
                 <div className="grid grid-cols-3 gap-2 mb-4">
                     <div>
                         <p className="text-[10px] text-gray-500">Block</p>
@@ -105,7 +96,6 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                     </div>
                 </div>
 
-                {/* Panel Members */}
                 <div className="mb-6 flex-1">
                     <p className="text-[10px] text-gray-500 mb-2">Panel Members</p>
                     <div className="space-y-2">
@@ -125,7 +115,6 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                     </div>
                 </div>
 
-                {/* Buttons */}
                 <div className="flex gap-3 mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
                     <button 
                         onClick={() => setShowPreview(true)}
@@ -142,7 +131,6 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                 </div>
             </div>
 
-            {/* Document Preview Modal - LEFT UNTOUCHED */}
             {showPreview && (
                 <div 
                     className="fixed inset-0 flex items-center justify-center z-50 p-4"
@@ -169,12 +157,10 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                 </div>
             )}
 
-            {/* NEW: Endorsement Confirmation Modal */}
             {showEndorseModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm font-sans">
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                         
-                        {/* Modal Header - Maroon Background */}
                         <div className="bg-[#7e1416] text-white px-6 py-4 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <Send className="w-5 h-5 -rotate-45" />
@@ -189,7 +175,6 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                         </div>
 
                         <div className="p-6">
-                            {/* Proposal Info */}
                             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4 leading-snug">
                                 {data.title}
                             </h3>
@@ -213,7 +198,6 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                                 </div>
                             </div>
 
-                            {/* Assigned Panel Members */}
                             <div className="mb-6">
                                 <h4 className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Assigned Panel Members</h4>
                                 <div className="flex flex-wrap gap-2">
@@ -225,7 +209,6 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                                 </div>
                             </div>
 
-                            {/* Warning Box */}
                             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 flex gap-3">
                                 <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                                 <div>
@@ -241,7 +224,6 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                                 </div>
                             </div>
 
-                            {/* Remarks Input */}
                             <div className="mb-2">
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Remarks / Justification
@@ -255,7 +237,6 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                             </div>
                         </div>
 
-                        {/* Footer */}
                         <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3">
                             <button
                                 onClick={() => setShowEndorseModal(false)}
@@ -278,8 +259,6 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
     );
 };
 
-// --- Main Page Component ---
-
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Endorsements',
@@ -295,11 +274,9 @@ export default function Dashboard() {
             description="Endorse approved proposals/theses of your advisory class for formal review"
         >
             <Head title="Endorsements" />
-            {/* Line */}
             <div className="border-t-2 border-[#7e1416] my-4"></div>
 
             <div className="p-4 font-dm">
-                {/* Grid Container */}
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {mockProposals.map((proposal) => (
                         <EndorsementCard key={proposal.id} data={proposal} />
