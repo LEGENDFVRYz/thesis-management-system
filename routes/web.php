@@ -106,6 +106,10 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('notification', function () {
         return Inertia::render('Shared/notification');
     })->name('student.notification');
+
+    Route::get('student/thesis-management', function () {
+        return Inertia::render('Student/repository/thesis');
+    })->name('student.repository.thesis-management');
 });
 
 

@@ -7,12 +7,11 @@ import { Tabs, TabButton } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Alert } from '@/components/ui/alert';
 import StageSwitchToggle from '@/components/stage-toggle';
-
-// ICONS
 import EditIcon from '@/components/Icons/ic_edit-Default.svg';
 import DeleteIcon from '@/components/Icons/ic_delete-Default.svg';
 import AddIcon from '@/components/Icons/ic_add-Default.svg';
 import ManagementIcon from '@/components/Icons/ic_pen-settings-Default.svg';
+import { PoliciesHeader, PoliciesRow } from './policies-tables';
 
 
 const POLICY_TABS = [
@@ -432,14 +431,7 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
 
                             <div className="bg-white rounded-xl border overflow-hidden">
                                 <table className="w-full text-sm">
-                                    <thead className="bg-[#9B000A] text-white">
-                                        <tr>
-                                            <th className="px-6 py-3 text-center text-base">Rule Name</th>
-                                            <th className="px-6 py-3 text-center text-base">Value</th>
-                                            <th className="px-6 py-3 text-center text-base">Status</th>
-                                            <th className="px-6 py-3 text-center text-base">Action</th>
-                                        </tr>
-                                    </thead>
+                                    <PoliciesHeader columns={['Rule Name', 'Value', 'Status', 'Action']} />
                                     <tbody>
                                         {[
                                             { name: 'Title Proposal Submission', value: '2 weeks', status: 'Active' },
@@ -449,35 +441,12 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
                                             { name: 'Title Proposal Submission', value: '4 weeks', status: 'Active' },
                                             { name: 'Title Proposal Submission', value: '1 week', status: 'Active' },
                                         ].map((doc, i) => (
-                                            <tr key={i} className="border-t">
-                                                <td className="px-6 py-4 text-center text-sm-2">{doc.name}</td>
-                                                <td className="px-6 py-4 text-center text-sm-2">{doc.value}</td>
-                                                <td className="px-6 py-4 text-center text-sm-2">
-                                                    <span
-                                                        className="px-4 py-1 rounded-full text-xs font-semibold text-white"
-                                                        style={{
-                                                            backgroundColor:
-                                                                doc.status === 'Active'
-                                                                    ? '#0D542B'
-                                                                    : '#717182',
-                                                        }}
-                                                    >
-                                                        {doc.status}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 flex justify-center gap-3">
-                                                    <img
-                                                        src={EditIcon}
-                                                        className="w-6 h-6 cursor-pointer"
-                                                        onClick={() => openEditSystemRule(doc)}
-                                                    />
-                                                    <img
-                                                        src={DeleteIcon}
-                                                        className="w-6 h-6 cursor-pointer"
-                                                        onClick={() => deleteSystemRule(doc.id)}
-                                                    />
-                                                </td>
-                                            </tr>
+                                            <PoliciesRow
+                                                key={i}
+                                                data={doc}
+                                                onEdit={() => openEditSystemRule(doc)}
+                                                onDelete={() => deleteSystemRule(doc.id)}
+                                            />
                                         ))}
                                     </tbody>
                                 </table>
@@ -557,47 +526,19 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
 
                             <div className="bg-white rounded-xl border overflow-hidden">
                                 <table className="w-full text-sm">
-                                    <thead className="bg-[#9B000A] text-white">
-                                        <tr>
-                                            <th className="px-6 py-3 text-center text-base">Rule Name</th>
-                                            <th className="px-6 py-3 text-center text-base">Format</th>
-                                            <th className="px-6 py-3 text-center text-base">Status</th>
-                                            <th className="px-6 py-3 text-center text-base">Action</th>
-                                        </tr>
-                                    </thead>
+                                    <PoliciesHeader columns={['Rule Name', 'Format', 'Status', 'Action']} />
                                     <tbody>
                                         {[
                                             { name: 'Proposal Document', format: 'PDF', status: 'Mandatory' },
                                             { name: 'Ethics Clearance', format: 'PDF', status: 'Mandatory' },
                                             { name: 'Adviser Consent Form', format: 'PDF', status: 'Optional' },
                                         ].map((doc, i) => (
-                                            <tr key={i} className="border-t">
-                                                <td className="px-6 py-4 text-center text-sm-2">{doc.name}</td>
-                                                <td className="px-6 py-4 text-center text-sm-2">{doc.format}</td>
-                                                <td className="px-6 py-4 text-center text-sm-2">
-                                                    <span
-                                                        className="px-4 py-1 rounded-full text-xs font-semibold text-white"
-                                                        style={{
-                                                            backgroundColor:
-                                                                doc.status === 'Mandatory'
-                                                                    ? '#730000'
-                                                                    : '#717182',
-                                                        }}
-                                                    >
-                                                        {doc.status}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 flex justify-center gap-3">
-                                                    <img
-                                                        src={EditIcon}
-                                                        className="w-6 h-6 cursor-pointer"
-                                                    />
-                                                    <img
-                                                        src={DeleteIcon}
-                                                        className="w-6 h-6 cursor-pointer"
-                                                    />
-                                                </td>
-                                            </tr>
+                                            <PoliciesRow
+                                                key={i}
+                                                data={doc}
+                                                onEdit={() => {}}
+                                                onDelete={() => {}}
+                                            />
                                         ))}
                                     </tbody>
                                 </table>

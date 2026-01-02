@@ -9,8 +9,6 @@ import { Card, CardHeader, CardTitle, CardContent,} from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AcademicYearRangePicker from '@/components/acad-year-range-picker';
 import DatePicker from '@/components/date-picker';
-
-// Icons
 import AcademicYearIcon from '@/components/Icons/academic-year-management.svg';
 import SemesterIcon from '@/components/Icons/semester-config.svg';
 import TimelineIcon from '@/components/Icons/system-timeline.svg';
