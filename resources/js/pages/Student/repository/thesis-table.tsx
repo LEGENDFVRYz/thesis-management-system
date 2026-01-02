@@ -3,8 +3,40 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import DocumentPreview from '@/pages/Student/repository/thesis-preview';
 import { useState } from "react";
+import ApprovedBadge from '@/components/badges/verdict_badges-Approved.svg'
+import RejectedBadge from '@/components/badges/verdict_badges-Rejected.svg'
+import RevisionBadge from '@/components/badges/verdict_badges-For_Revision.svg'
 
 const primaryBg = '#730000';
+
+// Function to get the appropriate verdict badge based on status
+const getVerdictBadge = (status: string) => {
+  const s = status.toLowerCase();
+
+  if (s.includes('approved')) {
+    return {
+      src: ApprovedBadge,
+      alt: 'Approved',
+    };
+  }
+
+  if (s.includes('revision')) {
+    return {
+      src: RevisionBadge,
+      alt: 'For Revision',
+    };
+  }
+
+  if (s.includes('rejected')) {
+    return {
+      src: RejectedBadge,
+      alt: 'Rejected',
+    };
+  }
+
+  return null;
+};
+
 
 // Custom Header for Thesis Management Documents Table
 export function ThesisDocumentsHeader() {
@@ -52,14 +84,22 @@ export function ThesisDocumentRow({
         <td className="px-4 py-3 text-center text-[#0A0A0A]">{type}</td>
         <td className="px-4 py-3 text-center text-[#0A0A0A]">{version}</td>
         <td className="px-4 py-3 text-center text-[#0A0A0A]">{date}</td>
-        <td className="px-4 py-3">
-          <div className="flex justify-center">
-            <Badge className="inline-flex items-center justify-center gap-1 bg-[#FEF9C2] text-primary border-transparent">
-              <AlertCircle className="h-4 w-4" />
-              <span className="text-sm">{status}</span>
-            </Badge>
-          </div>
-        </td>
+        <td className="px-4 py-3 align-middle">
+            <div className="flex justify-center">
+                {(() => {
+                const badge = getVerdictBadge(status);
+                if (!badge) return null;
+
+                return (
+                    <img
+                    src={badge.src}
+                    alt={badge.alt}
+                    className="h-6 w-auto"
+                    />
+                );
+                })()}
+            </div>
+            </td>
         <td className="px-4 py-3">
           <div className="flex justify-center gap-2">
             <Button variant="tertiary" size="sm" onClick={() => setIsPreviewOpen(true)}>

@@ -38,7 +38,7 @@ const DOCUMENTS = [
     type: 'Thesis Proposal',
     version: 'v1',
     date: 'December 19, 2025',
-    status: 'For Revision',
+    status: 'Rejected',
   },
   {
     id: 1,
@@ -47,7 +47,7 @@ const DOCUMENTS = [
     type: 'Thesis Proposal',
     version: 'v1',
     date: 'December 19, 2025',
-    status: 'For Revision',
+    status: 'Approved',
   },
 
 ]
