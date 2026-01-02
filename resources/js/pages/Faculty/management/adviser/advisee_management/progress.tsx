@@ -1,9 +1,9 @@
 import { badgesRegistry, type BadgeName } from '@/components/badges-registry';
 import { SearchBar } from '@/components/filter-search';
 import { iconRegistry } from '@/components/icons-registry';
-import { type TimelineEvent } from '@/components/timeline';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import {
     Table,
     TableBody,
@@ -19,6 +19,7 @@ import { Head } from '@inertiajs/react';
 import { Filter, Users } from 'lucide-react';
 import { useState } from 'react';
 import AdviseeManagementLayout from '.';
+import { BlockAndTagsFilter } from './progress-filter-search';
 
 const breadcrumb: BreadcrumbItem[] = [
     {
@@ -42,37 +43,80 @@ interface ProgressProps {
 }
 
 // sample data
-const sampleGroups: Groups[] = Array(10).fill({
-    group_code: '3301',
-    title: 'Machine Learning Applications in Healthcare',
-    proponents: '4',
-    student_name: 'Juan Dela Cruz',
-    block: 'BSCPE 3-3',
-    thesis_stage: 'Manuscript Submission',
-    status: 2,
-});
+// Replace your sample data section with this:
 
-const groupTimeline: TimelineEvent[] = [
-    {
-        id: '1',
-        title: 'DP1 Manuscript',
-        dateRange: 'Oct 10 – Oct 20',
-        description: 'Draft manuscript submission',
-        status: 'current',
-        isCurrent: true,
-    },
-];
+// Sample data with VARIED statuses and thesis stages
+const sampleGroups: Groups[] = Array(10)
+    .fill(null)
+    .map((_, index) => ({
+        group_code: `330${index + 1}`,
+        title: [
+            'Machine Learning Applications in Healthcare',
+            'IoT-Based Smart Home System',
+            'Blockchain for Supply Chain Management',
+            'AI-Powered Student Performance Predictor',
+            'Mobile App for Mental Health Support',
+            'Web-Based Inventory Management System',
+            'Cybersecurity Framework for SMEs',
+            'Renewable Energy Monitoring System',
+            'E-commerce Platform with Analytics',
+            'Augmented Reality Educational Tool',
+        ][index],
+        proponents: '4',
+        student_name: 'Rona Dela Cruz',
+        block: ['BSCPE 3-3', 'BSCPE 4-3'][index % 2],
+        thesis_stage: [
+            'Title Proposal',
+            'Manuscript Submission',
+            'DP1 Manuscript Revision',
+        ][index % 3],
+        status: [0, 1, 2][index % 3], // 0=Pending, 1=Approved, 2=Denied
+    }));
 
 const DocuIcon = iconRegistry.docuDefault;
 const BackIcon = iconRegistry.backDefault;
 const PeopleIcon = iconRegistry.peopleLinear;
 
 export default function Dashboard({ groups = [] }: ProgressProps) {
-    const [searchQuery, setSearchQuery] = useState('');
     const [selectedGroup, setSelectedGroup] = useState<Groups | null>(null);
     const displayGroups = groups.length > 0 ? groups : sampleGroups;
 
-    // Helper function to get the correct status badge component
+    // Filters
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedBlock, setSelectedBlock] = useState('');
+    const [selectedTags, setSelectedTags] = useState<string[]>([
+        'Title Proposal',
+        'Manuscript Submission',
+        'DP1 Manuscript Revision',
+    ]);
+    const [statusTags, setStatusTags] = useState<number[]>([0, 1, 2]);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+    // Filter logic
+    const filteredGroups = displayGroups.filter((group) => {
+        const matchesSearch =
+            searchTerm === '' ||
+            group.student_name
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase()) ||
+            group.group_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            group.title.toLowerCase().includes(searchTerm.toLowerCase());
+
+        const matchesBlock = selectedBlock
+            ? group.block === selectedBlock
+            : true;
+
+        const matchesTag = selectedTags.length
+            ? selectedTags.includes(group.thesis_stage)
+            : true;
+
+        const matchesStatus =
+            statusTags.length === 0 ? true : statusTags.includes(group.status);
+
+        return matchesSearch && matchesBlock && matchesTag && matchesStatus;
+    });
+
+    // Helper to get badge
     const getStatusBadgeComponent = (status: number) => {
         const statusMap: Record<number, BadgeName> = {
             0: 'statusBadgePendingReview',
@@ -84,26 +128,10 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
         return <BadgeComponent />;
     };
 
-    const filteredGroups = displayGroups.filter(
-        (group) =>
-            group.student_name
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase()) ||
-            group.group_code
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase()) ||
-            group.title.toLowerCase().includes(searchQuery.toLowerCase()),
-    );
+    const handleViewClick = (group: Groups) => setSelectedGroup(group);
+    const handleBackToList = () => setSelectedGroup(null);
 
-    const handleViewClick = (group: Groups) => {
-        setSelectedGroup(group);
-    };
-
-    const handleBackToList = () => {
-        setSelectedGroup(null);
-    };
-
-    // If a group is selected, show detail view
+    // Detail view - COMPLETE VERSION FROM DOCUMENT 3
     if (selectedGroup) {
         return (
             <AdviseeManagementLayout
@@ -143,6 +171,7 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
                         </p>
                     </div>
                 </div>
+
                 <div className="rounded-lg border-1 border-primary/20 shadow">
                     {/* Group Members Card */}
                     <div className="rounded-lg bg-white p-8">
@@ -317,6 +346,7 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
                         </div>
                     </div>
                 </div>
+
                 {/* Action Buttons */}
                 <div className="mt-6 flex items-center justify-end gap-3">
                     <Button variant="secondary" onClick={handleBackToList}>
@@ -329,7 +359,7 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
         );
     }
 
-    // Default: Show list view
+    // List view with search & filters
     return (
         <AdviseeManagementLayout
             breadcrumbs={breadcrumb}
@@ -338,45 +368,49 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
         >
             <Head title="Progress Monitoring" />
 
-            <div className="mb-6 box-border flex h-[125.6px] w-full max-w-[1360px] flex-col items-start gap-4 self-stretch rounded-[10px] border-[0.8px] border-primary/20 bg-card p-[24.8px_24.8px_0.8px_24.8px] font-dm shadow-sm transition-all duration-200">
-                {/* Header Section */}
-                <div className="flex h-6 w-full flex-row items-center gap-2 self-stretch rounded-none font-dm">
+            {/* Search & Filter Controls */}
+            <div className="mb-6 flex h-[125.6px] w-full max-w-[1360px] flex-col gap-4 rounded-[10px] border-[0.8px] border-primary/20 bg-card p-[24.8px_24.8px_0.8px_24.8px] font-dm shadow-sm">
+                <div className="flex h-6 w-full items-center gap-2">
                     <Filter className="h-5 w-5 text-primary" />
-                    <h2 className="font-dm text-base leading-6 font-normal text-primary">
+                    <h2 className="text-base font-normal text-primary">
                         Filters & Search
                     </h2>
                 </div>
 
-                {/* Controls Row */}
-                <div className="flex w-full flex-row items-center justify-center gap-[10px] self-stretch font-dm">
-                    {/* Search Box */}
-                    <div className="flex-1 font-dm">
+                <div className="flex w-full items-center gap-[10px]">
+                    <div className="flex-1">
                         <SearchBar
                             variant="filter-section"
                             placeholder="Search student, group code, or thesis title..."
-                            value={searchQuery}
-                            onChange={setSearchQuery}
+                            value={searchTerm}
+                            onChange={setSearchTerm}
                         />
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex flex-row items-center gap-[10px] font-dm">
+                    <div className="flex items-center gap-[10px]">
                         <Button
                             variant="secondary"
                             size="icon"
-                            className="rounded-lg border-none font-dm"
+                            onClick={() => setIsFilterOpen(true)}
                         >
                             <Filter className="h-4 w-4" />
                         </Button>
 
                         <Button
                             variant="negative"
-                            className="h-9 min-w-[101px] gap-2 rounded-lg px-4 py-2 font-dm"
-                            onClick={() => setSearchQuery('')}
+                            className="h-9 min-w-[101px] gap-2 px-4 py-2"
+                            onClick={() => {
+                                setSearchTerm('');
+                                setSelectedBlock('');
+                                setSelectedTags([
+                                    'Title Proposal',
+                                    'Manuscript Submission',
+                                    'DP1 Manuscript Revision',
+                                ]);
+                                setStatusTags([0, 1, 2]);
+                            }}
                         >
-                            <span className="font-dm text-[13.33px] font-medium">
-                                Clear Filter
-                            </span>
+                            Clear Filter
                         </Button>
                     </div>
                 </div>
@@ -386,8 +420,8 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
                 Total Groups ({filteredGroups.length})
             </Badge>
 
-            {/* Table */}
-            <div className="w-full overflow-hidden rounded-lg border-1 border-[var(--primary)] bg-primary-foreground shadow">
+            {/* Groups Table */}
+            <div className="w-full overflow-hidden rounded-lg border border-primary bg-primary-foreground shadow">
                 <Table className="w-full table-fixed">
                     <TableHeader>
                         <TableRow className="bg-primary hover:bg-primary">
@@ -414,7 +448,6 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
                             </TableHead>
                         </TableRow>
                     </TableHeader>
-
                     <TableBody>
                         {filteredGroups.length > 0 ? (
                             filteredGroups.map((group, index) => (
@@ -434,8 +467,8 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
                                     <TableCell className="text-center">
                                         {group.thesis_stage}
                                     </TableCell>
-                                    <TableCell className="align-middle">
-                                        <div className="flex items-center justify-center">
+                                    <TableCell className="text-center align-middle">
+                                        <div className="flex h-full items-center justify-center">
                                             {getStatusBadgeComponent(
                                                 group.status,
                                             )}
@@ -463,7 +496,7 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
                                             No records found
                                         </p>
                                         <p className="text-sm">
-                                            {searchQuery
+                                            {searchTerm
                                                 ? 'Try adjusting your search'
                                                 : 'Groups will appear once available'}
                                         </p>
@@ -478,6 +511,36 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
                     {filteredGroups.length} of {displayGroups.length} Groups
                 </div>
             </div>
+
+            {/* Filters Modal */}
+            <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+                <DialogContent
+                    className="p-0 [&_[data-slot=dialog-overlay]]:bg-foreground/20 [&_[data-slot=dialog-overlay]]:backdrop-blur-sm"
+                    style={{ maxWidth: '400px' }}
+                >
+                    <BlockAndTagsFilter
+                        block={selectedBlock}
+                        onBlockChange={setSelectedBlock}
+                        tags={selectedTags}
+                        onTagsChange={setSelectedTags}
+                        statusTags={statusTags}
+                        onStatusTagsChange={setStatusTags}
+                        searchTerm={searchTerm}
+                        onSearchTermChange={setSearchTerm}
+                        onApply={() => setIsFilterOpen(false)}
+                        onReset={() => {
+                            setSelectedBlock('');
+                            setSelectedTags([
+                                'Title Proposal',
+                                'Manuscript Submission',
+                                'DP1 Manuscript Revision',
+                            ]);
+                            setStatusTags([0, 1, 2]);
+                            setSearchTerm('');
+                        }}
+                    />
+                </DialogContent>
+            </Dialog>
         </AdviseeManagementLayout>
     );
 }
