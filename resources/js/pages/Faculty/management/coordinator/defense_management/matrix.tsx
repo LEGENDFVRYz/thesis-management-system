@@ -199,33 +199,36 @@ function DefenseTableHeader() {
     );
 }
 
-function DefenseTableRow({ data }: { data: typeof DEFENSES[0] }) {
+function DefenseTableRow({ data }: { data: any }) {
     const getStatusStyle = (status: string) => {
         switch(status) {
+            case 'SCHEDULED': return 'bg-[#8EC5FF] border border-[#193CB8] text-[#193CB8] hover:bg-[#7bb9ff]';
             case 'Completed': return 'bg-green-600 border-transparent text-white';
             case 'Cancelled': return 'bg-red-500 border-transparent text-white';
             default: return 'bg-[#8EC5FF] border border-[#193CB8] text-[#193CB8] hover:bg-[#7bb9ff]';
         }
     };
 
+    const defenseDateTime = new Date(`${data.defense_date}T${data.defense_time}`);
+
     return (
         <div className={`${GRID_LAYOUT} bg-white border-b border-gray-100 hover:bg-gray-50 transition-colors`}>
-            <span className="text-sm text-gray-800 font-medium truncate" title={data.title}>
-                {data.title}
+            <span className="text-sm text-gray-800 font-medium truncate" title={data.project_title}>
+                {data.project_title}
             </span>
             <span className="text-sm text-gray-800 text-center">
-                {data.block}
+                {data.section}
             </span>
             <span className="text-sm text-gray-800 text-center">
-                {data.room}
+                {data.defense_room}
             </span>
-            <span className="text-sm text-gray-800 truncate text-center" title={data.panel}>
-                {data.panel}
+            <span className="text-sm text-gray-800 truncate text-center" title={data.confirmed_panels || 'TBA'}>
+                {data.confirmed_panels || 'TBA'}
             </span>
             <div className="flex flex-col items-center text-sm text-gray-800">
-                <span>{data.date.toLocaleDateString()}</span>
+                <span>{defenseDateTime.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
                 <span className="text-xs text-gray-500">
-                    {data.date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                    {defenseDateTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
                 </span>
             </div>
             <div className="flex justify-center">
@@ -253,7 +256,7 @@ const breadcrumb: BreadcrumbItem[] = [
     },
 ];
 
-export default function MatrixManagement() {
+export default function MatrixManagement({ defenseMatrices }: { defenseMatrices: any[] }) {
     const [viewMode, setViewMode] = useState<'table' | 'calendar'>('calendar');
     const [currentDate, setCurrentDate] = useState(new Date('2025-11-28')); 
 
@@ -334,12 +337,12 @@ export default function MatrixManagement() {
                             <div className="rounded-xl border border-gray-200 overflow-hidden shadow-sm dark:border-sidebar-border">
                                 <DefenseTableHeader />
                                 <div>
-                                    {DEFENSES.map((defense) => (
+                                    {defenseMatrices.map(defense => (
                                         <DefenseTableRow key={defense.id} data={defense} />
                                     ))}
                                 </div>
                                 <div className="bg-gray-50 px-5 py-3 text-xs text-center text-gray-500 border-t border-gray-200">
-                                    {DEFENSES.length} of {DEFENSES.length} Upcoming Defenses
+                                    {defenseMatrices.length} of {defenseMatrices.length} Upcoming Defenses
                                 </div>
                             </div>
                         )}
@@ -349,4 +352,6 @@ export default function MatrixManagement() {
             </AppContent>
         </AppLayout>
     );
+
+
 }
