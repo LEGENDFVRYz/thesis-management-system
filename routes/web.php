@@ -22,6 +22,7 @@ use App\Http\Controllers\Faculty\Coordinator\ThesisMonitoring\ThesisRegistry;
 use App\Http\Controllers\Faculty\Joint1\DefenseManagement;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\FileImportController;
+use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\Shared\ThesisArchive;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -225,9 +226,7 @@ Route::prefix('faculty')->group(function () {
         });
 
 
-        Route::get('resources', function () {
-            return Inertia::render('Shared/resources');
-        })->name('faculty.resources');
+        Route::get('resources', [ResourceController::class, 'index'])->name('faculty.resources');
 
         // Route::get('repository', function () {
         //     return Inertia::render('Shared/repository/thesis');
@@ -295,9 +294,10 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
         })->name('admin.repository.system');
     });
 
-    Route::get('resources', function () {
-        return Inertia::render('Shared/resources');
-    })->name('admin.resources');
+    Route::get('resources', [ResourceController::class, 'index'])->name('admin.resources');
+    Route::post('resources', [ResourceController::class, 'store'])->name('admin.resources.store');
+    Route::patch('resources/toggle/{resource}', [ResourceController::class, 'toggle'])->name('admin.resources.toggle');
+    Route::delete('resources/{resource}', [ResourceController::class, 'destroy'])->name('admin.resources.remove');
 });
 
 
