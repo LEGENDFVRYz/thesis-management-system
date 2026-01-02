@@ -1,8 +1,9 @@
 import ManagementLayout from '@/pages/Admin/management/index';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import { deadline } from '@/routes/admin/management/index';
+import { update } from '@/routes/admin/management/deadline/index';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
@@ -17,7 +18,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 // Page Props
 interface WorkflowStep {
-    id: number;
+    event_id: number;   // main key
     stage: number;
     sort_order: number;
     name: string;
@@ -37,9 +38,13 @@ const STAGE_LABELS: Record<number, string> = {
     3: 'DP2 (Design Project 2)',
 };
 
+
 export default function DeadlinePage({ allowed_stages, workflow }: DeadlineProps) {
-    // Default to the first allowed stage (e.g., if Sem 1, start at Stage 1)
     const [activeStage, setActiveStage] = useState<number>(allowed_stages[0] || 1);
+
+    // Controls
+    const [modalOpen, setModalOpen] = useState(false);
+    const [activeStep, setActiveStep] = useState<WorkflowStep | null>(null);
 
     // Filter items based on the active tab
     const currentSteps = workflow.filter((step) => step.stage === activeStage);
@@ -72,7 +77,7 @@ export default function DeadlinePage({ allowed_stages, workflow }: DeadlineProps
                     ))}
                 </div>
 
-                {/* --- WORKFLOW GRID SECTION --- */}
+                {/* --- WORKFLOW SECTION --- */}
                 <div className="relative min-h-[50vh] flex-1 rounded-xl">
                     
                     {currentSteps.length === 0 ? (
@@ -82,20 +87,43 @@ export default function DeadlinePage({ allowed_stages, workflow }: DeadlineProps
                     ) : (
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                             {currentSteps.map((step) => (
-                                <WorkflowCard key={step.id} step={step} />
+                                <WorkflowCard 
+                                    key={step.event_id} 
+                                    step={step} 
+                                    onClick={() => {
+                                        setActiveStep(step);
+                                        setModalOpen(true);
+                                    }}
+                                />
                             ))}
                         </div>
                     )}
 
                 </div>
             </div>
+
+            {/* --- TESTING MODAL --- */}
+            {activeStep && (
+                <DeadlineDateModal
+                    key={activeStep.event_id}
+                    open={modalOpen}
+                    onClose={() => setModalOpen(false)}
+                    step={activeStep}
+                />
+            )}
         </ManagementLayout>
     );
 }
 
 
-// --- SUB-COMPONENT: INDIVIDUAL CARD ---
-function WorkflowCard({ step }: { step: WorkflowStep }) {
+// --- TESTING CARD ---
+function WorkflowCard({
+    step,
+    onClick,
+}: {
+    step: WorkflowStep;
+    onClick: () => void;
+}) {
     return (
         <div className="group relative flex flex-col justify-between rounded-lg border border-sidebar-border/70 bg-sidebar-background p-5 shadow-sm transition-all hover:border-primary/50 hover:shadow-md">
             
@@ -143,9 +171,79 @@ function WorkflowCard({ step }: { step: WorkflowStep }) {
             {/* Make the whole card clickable */}
             <button 
                 className="absolute inset-0 z-10 focus:outline-none" 
-                onClick={() => console.log(`Open modal for step ${step.id}`)}
+                onClick={onClick}
                 aria-label={`Manage ${step.name}`}
             />
+        </div>
+    );
+}
+
+
+// --- Testing modal ---
+function DeadlineDateModal({
+    open,
+    onClose,
+    step,
+}: {
+    open: boolean;
+    onClose: () => void;
+    step: WorkflowStep;
+}) {
+    const { data, setData, put, processing, errors } = useForm({
+        event_id: step.event_id,
+        start_date: step.start_date ?? '',
+    });
+
+    if (!open) return null;
+
+    const submit = () => {
+        put(update(step.event_id).url, {
+            onSuccess: () => onClose(),
+        });
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div className="w-full max-w-sm rounded-lg bg-background p-6 shadow-lg">
+                <h2 className="mb-4 text-lg font-semibold">
+                    Update Start Date
+                </h2>
+
+                {errors._error && (
+                    <div className="text-sm text-red-600 text-center">
+                        {errors._error}
+                    </div>
+                )}
+
+                <input
+                    type="date"
+                    value={data.start_date ?? undefined}
+                    onChange={(e) => setData('start_date', e.target.value)}
+                    className="w-full rounded border px-3 py-2 text-sm"
+                />
+                {errors.start_date && (
+                    <div className="w-full text-sm text-primary text-center">
+                        {errors.start_date}
+                    </div>
+                )}
+
+                <div className="mt-5 flex justify-end gap-2">
+                    <button
+                        onClick={onClose}
+                        className="text-sm text-muted-foreground"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        disabled={processing}
+                        onClick={submit}
+                        className="rounded bg-primary px-4 py-2 text-sm text-white"
+                    >
+                        Save
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }

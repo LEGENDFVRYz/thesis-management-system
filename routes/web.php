@@ -266,6 +266,7 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
         Route::put('academic-settings', [AcademicSettingController::class, 'update'])->name('admin.management.academic.update');
 
         Route::get('deadline', [DeadlineController::class, 'index'])->name('admin.management.deadline');
+        Route::put('deadline/{id}', [DeadlineController::class, 'update'])->name('admin.management.deadline.update');
 
 
         // FULL CRUD OPERATIONS EXAMPLES
