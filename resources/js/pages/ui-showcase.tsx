@@ -947,7 +947,11 @@ export default function UIShowcase() {
                         <h2 className="text-2xl font-semibold text-white">Navigation Menu</h2>
                         <p className="text-sm text-gray-400">Main application header with branding, top navigation, and utility actions.</p>
 
-                        <AppHeader breadcrumbs={[{ title: 'Home', href: '#' }, { title: 'Showcase', href: '#' }]} />
+                        <AppHeader breadcrumbs={[{ title: 'Home', href: '#' }, { title: 'Admin', href: '#' }]} variant='admin'/>
+                        <AppHeader breadcrumbs={[{ title: 'Home', href: '#' }, { title: 'Faculty', href: '#' }]} variant='faculty'/>
+                        <AppHeader breadcrumbs={[{ title: 'Home', href: '#' }, { title: 'Committee', href: '#' }]} variant='committee'/>
+                        <AppHeader breadcrumbs={[{ title: 'Home', href: '#' }, { title: 'Coordinator', href: '#' }]} variant='coordinator'/>
+                        <AppHeader breadcrumbs={[{ title: 'Home', href: '#' }, { title: 'Student', href: '#' }]} variant='student'/>
                     </section>
 
                     {/* Filter Search Section */}

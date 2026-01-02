@@ -1,13 +1,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog';
+import {Dialog,DialogContent,DialogHeader,DialogTitle,DialogDescription,DialogFooter,} from '@/components/ui/dialog';
+
+import InputError from '@/components/input-error';
 
 interface Member {
   id: number;
@@ -39,17 +34,81 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
   const [studentId, setStudentId] = useState('');
   const [email, setEmail] = useState('');
   const [reason, setReason] = useState('');
+  const [errors, setErrors] = useState<{
+    selectedMember?: string;
+    newMemberName?: string;
+    studentId?: string;
+    email?: string;
+    reason?: string;
+  }>({});
+
+  const validateForm = () => {
+    const newErrors: {
+      selectedMember?: string;
+      newMemberName?: string;
+      studentId?: string;
+      email?: string;
+      reason?: string;
+    } = {};
+
+    if (selectedAction === 'add') {
+      if (!newMemberName.trim()) {
+        newErrors.newMemberName = 'Name is required';
+      }
+      if (!studentId.trim()) {
+        newErrors.studentId = 'Student ID is required';
+      }
+      if (!email.trim()) {
+        newErrors.email = 'Email is required';
+      } else if (!email.includes('@')) {
+        newErrors.email = 'Please enter a valid email';
+      }
+      if (!reason.trim()) {
+        newErrors.reason = 'Reason is required';
+      }
+    } else if (selectedAction === 'remove') {
+      if (!selectedMember) {
+        newErrors.selectedMember = 'Please select a member';
+      }
+      if (!reason.trim()) {
+        newErrors.reason = 'Reason is required';
+      }
+    } else if (selectedAction === 'replace') {
+      if (!selectedMember) {
+        newErrors.selectedMember = 'Please select a member';
+      }
+      if (!newMemberName.trim()) {
+        newErrors.newMemberName = 'Name is required';
+      }
+      if (!studentId.trim()) {
+        newErrors.studentId = 'Student ID is required';
+      }
+      if (!email.trim()) {
+        newErrors.email = 'Email is required';
+      } else if (!email.includes('@')) {
+        newErrors.email = 'Please enter a valid email';
+      }
+      if (!reason.trim()) {
+        newErrors.reason = 'Reason is required';
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleUpdate = () => {
-    console.log('Updating group:', {
-      action: selectedAction,
-      selectedMember,
-      newMemberName,
-      studentId,
-      email,
-      reason,
-    });
-    onClose();
+    if (validateForm()) {
+      console.log('Updating group:', {
+        action: selectedAction,
+        selectedMember,
+        newMemberName,
+        studentId,
+        email,
+        reason,
+      });
+      onClose();
+    }
   };
 
   const handleCancel = () => {
@@ -59,6 +118,7 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
     setEmail('');
     setReason('');
     setSelectedAction('add');
+    setErrors({});
     onClose();
   };
 
@@ -102,7 +162,10 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
             <h3 className="font-semibold text-sm text-[#730000] mb-3">Change Member/s</h3>
             <div className="flex gap-3">
               <Button
-                onClick={() => setSelectedAction('add')}
+                onClick={() => {
+                  setSelectedAction('add');
+                  setErrors({});
+                }}
                 style={{
                   fontFamily: 'DM Sans, sans-serif',
                   fontSize: '13.33px',
@@ -117,7 +180,10 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                 Add Member
               </Button>
               <Button
-                onClick={() => setSelectedAction('remove')}
+                onClick={() => {
+                  setSelectedAction('remove');
+                  setErrors({});
+                }}
                 style={{
                   fontFamily: 'DM Sans, sans-serif',
                   fontSize: '13.33px',
@@ -132,7 +198,10 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                 Remove Member
               </Button>
               <Button
-                onClick={() => setSelectedAction('replace')}
+                onClick={() => {
+                  setSelectedAction('replace');
+                  setErrors({});
+                }}
                 style={{
                   fontFamily: 'DM Sans, sans-serif',
                   fontSize: '13.33px',
@@ -162,9 +231,15 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                     type="text"
                     placeholder="Full Name"
                     value={newMemberName}
-                    onChange={(e) => setNewMemberName(e.target.value)}
+                    onChange={(e) => {
+                      setNewMemberName(e.target.value);
+                      if (errors.newMemberName) {
+                        setErrors({ ...errors, newMemberName: undefined });
+                      }
+                    }}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
                   />
+                  <InputError message={errors.newMemberName} className="mt-1" />
                 </div>
 
                 <div>
@@ -175,9 +250,15 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                     type="text"
                     placeholder="2022-09786-MN-0"
                     value={studentId}
-                    onChange={(e) => setStudentId(e.target.value)}
+                    onChange={(e) => {
+                      setStudentId(e.target.value);
+                      if (errors.studentId) {
+                        setErrors({ ...errors, studentId: undefined });
+                      }
+                    }}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
                   />
+                  <InputError message={errors.studentId} className="mt-1" />
                 </div>
 
                 <div>
@@ -188,9 +269,15 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                     type="email"
                     placeholder="jdc@iskolarngbayan.pup.edu.ph"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (errors.email) {
+                        setErrors({ ...errors, email: undefined });
+                      }
+                    }}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
                   />
+                  <InputError message={errors.email} className="mt-1" />
                 </div>
 
                 <div>
@@ -200,10 +287,16 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                   <textarea
                     placeholder="Explain the reason for this membership change.."
                     value={reason}
-                    onChange={(e) => setReason(e.target.value)}
+                    onChange={(e) => {
+                      setReason(e.target.value);
+                      if (errors.reason) {
+                        setErrors({ ...errors, reason: undefined });
+                      }
+                    }}
                     rows={4}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000] resize-none"
                   />
+                  <InputError message={errors.reason} className="mt-1" />
                 </div>
               </>
             )}
@@ -217,7 +310,12 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                   </label>
                   <select
                     value={selectedMember}
-                    onChange={(e) => setSelectedMember(e.target.value)}
+                    onChange={(e) => {
+                      setSelectedMember(e.target.value);
+                      if (errors.selectedMember) {
+                        setErrors({ ...errors, selectedMember: undefined });
+                      }
+                    }}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#730000]"
                   >
                     <option value="">Select Member</option>
@@ -227,6 +325,7 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                       </option>
                     ))}
                   </select>
+                  <InputError message={errors.selectedMember} className="mt-1" />
                 </div>
 
                 <div>
@@ -236,10 +335,16 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                   <textarea
                     placeholder="Explain the reason for this membership change.."
                     value={reason}
-                    onChange={(e) => setReason(e.target.value)}
+                    onChange={(e) => {
+                      setReason(e.target.value);
+                      if (errors.reason) {
+                        setErrors({ ...errors, reason: undefined });
+                      }
+                    }}
                     rows={4}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000] resize-none"
                   />
+                  <InputError message={errors.reason} className="mt-1" />
                 </div>
               </>
             )}
@@ -253,7 +358,12 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                   </label>
                   <select
                     value={selectedMember}
-                    onChange={(e) => setSelectedMember(e.target.value)}
+                    onChange={(e) => {
+                      setSelectedMember(e.target.value);
+                      if (errors.selectedMember) {
+                        setErrors({ ...errors, selectedMember: undefined });
+                      }
+                    }}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#730000]"
                   >
                     <option value="">Select Member</option>
@@ -263,6 +373,7 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                       </option>
                     ))}
                   </select>
+                  <InputError message={errors.selectedMember} className="mt-1" />
                 </div>
 
                 <div>
@@ -273,9 +384,15 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                     type="text"
                     placeholder="Full Name"
                     value={newMemberName}
-                    onChange={(e) => setNewMemberName(e.target.value)}
+                    onChange={(e) => {
+                      setNewMemberName(e.target.value);
+                      if (errors.newMemberName) {
+                        setErrors({ ...errors, newMemberName: undefined });
+                      }
+                    }}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
                   />
+                  <InputError message={errors.newMemberName} className="mt-1" />
                 </div>
 
                 <div>
@@ -286,9 +403,15 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                     type="text"
                     placeholder="2022-09786-MN-0"
                     value={studentId}
-                    onChange={(e) => setStudentId(e.target.value)}
+                    onChange={(e) => {
+                      setStudentId(e.target.value);
+                      if (errors.studentId) {
+                        setErrors({ ...errors, studentId: undefined });
+                      }
+                    }}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
                   />
+                  <InputError message={errors.studentId} className="mt-1" />
                 </div>
 
                 <div>
@@ -299,9 +422,15 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                     type="email"
                     placeholder="jdc@iskolarngbayan.pup.edu.ph"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (errors.email) {
+                        setErrors({ ...errors, email: undefined });
+                      }
+                    }}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
                   />
+                  <InputError message={errors.email} className="mt-1" />
                 </div>
 
                 <div>
@@ -311,10 +440,16 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                   <textarea
                     placeholder="Explain the reason for this membership change.."
                     value={reason}
-                    onChange={(e) => setReason(e.target.value)}
+                    onChange={(e) => {
+                      setReason(e.target.value);
+                      if (errors.reason) {
+                        setErrors({ ...errors, reason: undefined });
+                      }
+                    }}
                     rows={4}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000] resize-none"
                   />
+                  <InputError message={errors.reason} className="mt-1" />
                 </div>
               </>
             )}

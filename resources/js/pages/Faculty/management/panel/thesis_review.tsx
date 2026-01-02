@@ -6,6 +6,7 @@ import { Head } from '@inertiajs/react';
 import ManagementLayout from '@/pages/Faculty/management/index';
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
 
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Thesis Review',

@@ -106,6 +106,10 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('notification', function () {
         return Inertia::render('Shared/notification');
     })->name('student.notification');
+
+    Route::get('student/thesis-management', function () {
+        return Inertia::render('Student/repository/thesis');
+    })->name('student.repository.thesis-management');
 });
 
 
@@ -345,5 +349,8 @@ Route::get('/test-thesis-preview', function () {
     ]);
 });
 
+Route::get('/committee/proposal-review', function () {
+    return Inertia::render('Committee/proposal-review');
+});
 
 require __DIR__.'/settings.php';
