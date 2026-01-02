@@ -11,13 +11,13 @@ import { Icon } from '@/components/icon-index';
 import { SearchBar } from '@/components/filter-search';
 
 // 
-import { Dropdown } from './dropdown-faculty';
-import { FacultyFilterDropdown } from './faculty_filter_dropdown';
-import { FacultySortDropdown } from './faculty_sort_dropdown';
-import { AddFacultyModal } from './add_faculty_modal';
-import { ViewEditFacultyModal } from './Viewedit-faculty-modal';
-import { FacultyTable } from './faculty-table';
-import { Faculty, FilterState } from './faculty-types';
+import { Dropdown } from './faculty-management-page/faculty_dropdown';
+import { FacultyFilterDropdown } from './faculty-management-page/faculty_filter_dropdown';
+import { FacultySortDropdown } from './faculty-management-page/faculty_sort_dropdown';
+import { AddFacultyModal } from './faculty-management-page/faculty_add_modal';
+import { ViewEditFacultyModal } from './faculty-management-page/faculty_viewandedit_modal';
+import { FacultyTable } from './faculty-management-page/faculty_table';
+import { Faculty, FilterState } from './faculty-management-page/faculty_types';
 
 //SAMPLE DATA
 const facultyData: Faculty[] = [
