@@ -306,6 +306,10 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
         Route::get('resources', function () {
             return Inertia::render('Admin/repository/system');
         })->name('admin.repository.system');
+
+        Route::get('system-expanded', function () {
+            return Inertia::render('Admin/repository/system-expanded');
+        })->name('admin.repository.system-expanded');
     });
 
     Route::get('resources', function () {
