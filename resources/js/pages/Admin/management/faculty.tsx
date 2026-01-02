@@ -1,4 +1,3 @@
-//IMPORTS
 import { useState, useMemo, useRef } from 'react';
 import { Head } from '@inertiajs/react';
 
@@ -11,7 +10,7 @@ import { Filter as FilterIcon } from 'lucide-react';
 import { Icon } from '@/components/icon-index';
 import { SearchBar } from '@/components/filter-search';
 
-// LOCAL COMPONENTS
+// 
 import { Dropdown } from './dropdown-faculty';
 import { FacultyFilterDropdown } from './faculty_filter_dropdown';
 import { FacultySortDropdown } from './faculty_sort_dropdown';
