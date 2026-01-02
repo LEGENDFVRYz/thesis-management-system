@@ -20,13 +20,18 @@ import {
     X,
     Clock,
     MapPin,
-    GraduationCap
+    GraduationCap,
+    Upload,
+    NotebookPen,
+    Filter,
+    Pencil,
+    File 
 } from 'lucide-react';
 
-// --- Types ---
+
 type Stage = 'mor' | 'dp1' | 'dp2';
 
-// --- Mock Data ---
+
 const mockGroups = [
     { code: '3301', title: 'Machine Learning Applications in Healthcare Diagnostics', proponents: 4, status: 'Complete', count: '3/3', id: 1 },
     { code: '3302', title: 'Machine Learning Something with...', proponents: 4, status: 'In Progress', count: '2/3', id: 2 },
@@ -40,12 +45,22 @@ const mockGroups = [
     { code: '3310', title: 'Machine Learning Something with...', proponents: 4, status: 'Complete', count: '3/3', id: 10 },
 ];
 
+const rubricFiles = [
+    { id: 1, name: 'MOR_Rubrics_AY2526', year: '2025-2026', date: 'November 28, 2025', time: '09:00 AM' },
+    { id: 2, name: 'MOR_Rubrics_AY2426', year: '2024-2025', date: 'November 28, 2025', time: '09:00 AM' },
+    { id: 3, name: 'MOR_Rubrics_AY2526', year: '2025-2026', date: 'November 28, 2025', time: '09:00 AM' },
+    { id: 4, name: 'MOR_Rubrics_AY2426', year: '2024-2025', date: 'November 28, 2025', time: '09:00 AM' },
+    { id: 5, name: 'MOR_Rubrics_AY2526', year: '2025-2026', date: 'November 28, 2025', time: '09:00 AM' },
+    { id: 6, name: 'MOR_Rubrics_AY2426', year: '2024-2025', date: 'November 28, 2025', time: '09:00 AM' },
+    { id: 7, name: 'MOR_Rubrics_AY2526', year: '2025-2026', date: 'November 28, 2025', time: '09:00 AM' },
+    { id: 8, name: 'MOR_Rubrics_AY2426', year: '2024-2025', date: 'November 28, 2025', time: '09:00 AM' },
+];
+
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Evaluation and Grading', href: eval_n_grading().url },
     { title: 'Grade Input', href: '#' },
 ];
 
-// --- Rubric Data (Full Set) ---
 const rubricSections = [
     {
         id: 1,
@@ -57,54 +72,13 @@ const rubricSections = [
             { name: "Data Collection and Analysis", desc1: "Collects and analyzes data with limited accuracy. Fails to use appropriate tools or techniques.", desc2: "Collects and analyzes data with some accuracy but with lack of consistency. Uses appropriate tools and techniques.", desc3: "Collects and analyzes data accurately. Uses appropriate tools and techniques effectively.", desc4: "Collects and analyzes data thoroughly, ensuring accuracy. Display exceptional use of advanced tools and techniques." },
         ]
     },
-    {
-        id: 2,
-        title: "Rubric No. 2 (20%)",
-        description: "Function effectively as an individual, and as a member or leader in diverse teams and in multidisciplinary settings.",
-        indicators: [
-            { name: "Individual Contribution", desc1: "Minimal contributions to team activities. Lacks initiative to fulfill responsibility.", desc2: "Some contributions to team activities. Shows limited initiative, need occasional guidance.", desc3: "Significant contributions to team activities. Takes initiative and fulfills individual responsibilities.", desc4: "Exceptional contributions to team activities. Display leadership, initiative and consistencies, fulfill individual responsibilities." },
-        ]
-    },
-    {
-        id: 3,
-        title: "Rubric No. 3 (20%)",
-        description: "Identify, formulate, research literature and analyze complex engineering problems reaching substantiated conclusions using first principles of mathematics, natural sciences and engineering sciences",
-        indicators: [
-            { name: "Problem Identification", desc1: "Struggles to identify or define problems. Lacks understanding of problem background.", desc2: "Partially identifies problems but lacks clarity or precision. Shows limited understanding of problem background.", desc3: "Clearly identifies and defines problems. Demonstrates a good understanding of problem background.", desc4: "Skillfully identifies and defines problems. Shows exceptional understanding of problem background." },
-            { name: "Problem Formulation", desc1: "Formulates problems with limited specificity or lacks focus. Does not consider relevant variables or constraints.", desc2: "Formulates problems with some specificity but lacks precision or may overlook certain variables or constraints.", desc3: "Formulates problems with clarity and specificity. Considers relevant variables and constraints appropriately.", desc4: "Formulates problems precisely and comprehensively. Identifies and incorporates all relevant variables and constraints." },
-            { name: "Research Literature", desc1: "Shows limited ability to research and gather relevant literature.", desc2: "Display some ability to research and gather literature with inconsistency.", desc3: "Research and gather relevant literature effectively. Shows good strength of references.", desc4: "Research and gather comprehensive literature from credible sources. Displays exceptional strength of references." },
-        ]
-    },
-    {
-        id: 4,
-        title: "Rubric No. 4 (20%)",
-        description: "Communicate effectively on complex engineering activities with the engineering community and with society at large, such as being able to comprehend and write effective reports and design documentation, make effective presentations, and give and receive clear instructions.",
-        indicators: [
-            { name: "Technical Content Comprehension", desc1: "Display limited understanding of activities. Struggles to comprehend content or terminology.", desc2: "Shows some understanding of activities but require clarification or explanation of content or terminology.", desc3: "Displays a good understanding of activities. Comprehend content and terminology.", desc4: "Displays exceptional understanding of activities. Comprehend content and terminology with ease and fluency." },
-            { name: "Oral Presentation", desc1: "Delivers oral presentation with limited clarity, coherence or effective use of visual aids.", desc2: "Delivers oral presentation with some clarity and coherence. Uses visual aids to some extent.", desc3: "Delivers oral presentation with clarity, coherence and effectiveness. Uses visual aids effectively. Display confidence in public speaking.", desc4: "Delivers presentation with exceptional clarity, coherence, and effectiveness. Uses visual aids creatively and strategically. Display exceptional confidence in speaking engagement." },
-            { name: "Documentation", desc1: "Produces written documentation with limited clarity and organization. Lack of effective use of technical term and formatting.", desc2: "Produces written documentation with some clarity and organization. Uses technical term and appropriate formatting to a certain extent.", desc3: "Produces written documentation with clarity, organization and coherence. Uses technical language and appropriate formatting effectively.", desc4: "Produces written documentation with exceptional clarity, organization and coherence. Uses technical term and appropriate formatting with precision." },
-        ]
-    },
-    {
-        id: 5,
-        title: "Rubric No. 5 (20%)",
-        description: "Identify, formulate, research literature and analyze complex engineering problems reaching substantiated conclusions using first principles of mathematics, natural sciences and engineering sciences",
-        indicators: [
-            { name: "Technological Change Awareness", desc1: "Display limited awareness of implication of technological change. Needs understanding of emerging technologies.", desc2: "Shows some awareness of technological change but not consistently keep up.", desc3: "Displays a good awareness of technological change and keeps up with emerging technologies.", desc4: "Demonstrates a broad understanding of the problem. Identifies all significant factors and demonstrates exceptional awareness of background." },
-            { name: "Independent Learning Preparation", desc1: "Needs preparation and planning for independent learning. May strive to identify learning needs.", desc2: "Displays some preparation and planning for independent learning but not consistently identify learning needs.", desc3: "Displays effective preparation and planning for independent learning. Identifies learning needs and relevant learning goals.", desc4: "Design analysis with highly focused purpose, broad consideration of variables and controls. Display exceptional attention to details." },
-            { name: "Learning Strategies", desc1: "Needs awareness of effective learning strategies. Does not utilize strategies to enhance learning or address challenges.", desc2: "Displays some awareness of learning strategies but not consistently use them effectively or adapt to different learning contexts.", desc3: "Applies effective learning strategies to enhance learning and address challenges. Displays flexibility in adapting strategies to different learning contexts.", desc4: "Applies a wide range of effective learning strategies with consistency and adaptability. Displays exceptional self-aware skills in selecting and adjusting strategies based on learning objectives and contexts." },
-            { name: "Resource Utilization", desc1: "Does not effectively utilize available resources for learning. Needs awareness of relevant resources.", desc2: "Utilizes some resources for learning but not fully maximize their potential. Obtain relevant resources.", desc3: "Effectively identifies and utilizes available resources for learning. Shows good creativity and seeks out additional resources.", desc4: "Displays exceptional ability to identify and utilize a wide range of resources effectively. Shows creativity in seeking out and critically evaluating new resources." },
-            { name: "Continuous Improvement", desc1: "Shows resistance to feedback and limited willingness to make improvements. Does not take proactive steps to enhance skills or knowledge.", desc2: "Displays some openness to feedback and makes occasional upgrades. Takes limited initiative in enhancing skills or knowledge.", desc3: "Shows openness to feedback and actively seeks opportunities for improvement. Takes initiative in enhancing skills or knowledge based on feedback and self-reflection.", desc4: "Embraces feedback with enthusiasm and actively seeks continuous improvement opportunities. Takes proactive and deliberate measures to enhance skills, knowledge, and professional development." },
-        ]
-    }
 ];
 
-// --- Sub-Component: Defense Details Modal ---
 const DefenseDetailsModal = ({ group, onClose, onEdit }: { group: any, onClose: () => void, onEdit: () => void }) => {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden relative animate-in zoom-in-95 duration-200">
-                {/* Header Section */}
+
                 <div className="flex justify-between items-start p-8 pb-4">
                     <div>
                         <h2 className="text-2xl font-bold text-gray-900">Defense Details</h2>
@@ -127,7 +101,6 @@ const DefenseDetailsModal = ({ group, onClose, onEdit }: { group: any, onClose: 
                 <div className="w-full h-px bg-gray-100 mb-6" />
 
                 <div className="px-8 pb-8 space-y-6">
-                    {/* ID & Status */}
                     <div className="flex justify-between items-center">
                         <div>
                             <h3 className="text-[#900000] text-sm font-bold mb-1">Defense ID</h3>
@@ -140,13 +113,11 @@ const DefenseDetailsModal = ({ group, onClose, onEdit }: { group: any, onClose: 
                         )}
                     </div>
 
-                    {/* Title */}
                     <div>
                         <h3 className="text-[#900000] text-sm font-bold mb-1">Thesis Title</h3>
                         <p className="text-gray-900 font-bold text-lg leading-snug">{group.title}</p>
                     </div>
 
-                    {/* Info Grid */}
                     <div className="grid grid-cols-3 gap-y-6 gap-x-4">
                         <div>
                             <h3 className="text-[#900000] text-sm font-bold mb-1">Date of Defense</h3>
@@ -181,7 +152,6 @@ const DefenseDetailsModal = ({ group, onClose, onEdit }: { group: any, onClose: 
                         </div>
                     </div>
 
-                    {/* Proponents */}
                     <div>
                         <h3 className="text-[#900000] text-sm font-bold mb-3">Proponents</h3>
                         <div className="flex flex-wrap gap-2">
@@ -194,7 +164,6 @@ const DefenseDetailsModal = ({ group, onClose, onEdit }: { group: any, onClose: 
                         </div>
                     </div>
 
-                    {/* Panel */}
                     <div>
                         <h3 className="text-[#900000] text-sm font-bold mb-3">Defense Panel</h3>
                         <div className="space-y-2">
@@ -218,7 +187,172 @@ const DefenseDetailsModal = ({ group, onClose, onEdit }: { group: any, onClose: 
     );
 };
 
-// --- Sub-Component: Document Review View ---
+const RubricsManagementView = ({ onBack }: { onBack: () => void }) => {
+    const [search, setSearch] = useState('');
+    const [activeTab, setActiveTab] = useState('MOR');
+
+    return (
+        <FacultyManagementLayout breadcrumbs={[...breadcrumbs, { title: 'Rubrics and Guidelines', href: '#' }]} title="" description="">
+            <Head title="Rubrics and Guidelines" />
+            <style>{`
+                @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+                .dm-sans { font-family: "DM Sans", sans-serif; }
+            `}</style>
+            
+            <div className="dm-sans w-full max-w-[1600px] mx-auto pb-12">
+                
+                <div className="flex flex-col space-y-6">
+                    <div className="flex justify-between items-start mb-2">
+                        <div className="flex items-start gap-4">
+                            <NotebookPen className="w-8 h-8 text-amber-500 mt-1" />
+                            <div>
+                                <h1 className="text-2xl font-bold text-amber-500">Rubrics and Guidelines</h1>
+                                <p className="text-[#900000] font-medium">Upload and manage scoring rubrics and grading criteria</p>
+                            </div>
+                        </div>
+
+                        <div className="bg-[#F5ECD5] rounded-full p-1 inline-flex items-center shadow-sm border border-[#E0D0A0]">
+                            {['MOR', 'DP1', 'DP2'].map((tab) => (
+                                <button
+                                    key={tab}
+                                    onClick={() => setActiveTab(tab)}
+                                    className={`px-6 py-1.5 rounded-full text-xs font-bold transition-all ${
+                                        activeTab === tab 
+                                        ? 'bg-[#700000] text-white shadow-sm' 
+                                        : 'text-[#700000] hover:bg-[#700000]/10'
+                                    }`}
+                                >
+                                    {tab}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="w-full h-px bg-[#900000]/30" />
+
+                    <div className="flex flex-col lg:flex-row gap-4 items-end">
+                        <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="flex flex-col gap-1">
+                                <label className="text-xs font-bold text-gray-700 ml-1">Search</label>
+                                <div className="relative">
+                                    <input 
+                                        type="text" 
+                                        placeholder="Keywords, Terms..." 
+                                        className="w-full px-4 py-2.5 rounded-lg border border-[#E0D0A0] bg-[#F5ECD5] text-sm focus:outline-none focus:ring-1 focus:ring-[#700000] text-gray-700 placeholder:text-gray-400"
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <label className="text-xs font-bold text-gray-700 ml-1">Academic Year</label>
+                                <div className="relative">
+                                    <select className="w-full px-4 py-2.5 rounded-lg border border-[#E0D0A0] bg-[#F5ECD5] text-sm focus:outline-none text-[#900000] font-bold cursor-pointer appearance-none">
+                                        <option>2024 - 2025</option>
+                                        <option>2025 - 2026</option>
+                                    </select>
+                                    <Calendar className="w-4 h-4 text-[#900000] absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <label className="text-xs font-bold text-gray-700 ml-1">Sort By</label>
+                                <div className="relative">
+                                    <select className="w-full px-4 py-2.5 rounded-lg border border-[#E0D0A0] bg-[#F5ECD5] text-sm focus:outline-none text-gray-600 cursor-pointer appearance-none">
+                                        <option>Sort by Date Added</option>
+                                        <option>Sort by Name</option>
+                                    </select>
+                                    <Filter className="w-4 h-4 text-[#900000] absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                </div>
+                            </div>
+                        </div>
+                        <button className="h-[42px] px-6 rounded-lg bg-[#900000] text-white hover:bg-[#700000] flex items-center gap-2 text-xs font-bold whitespace-nowrap shadow-sm transition-colors mb-[1px]">
+                            <Trash2 className="h-4 w-4" />
+                            Clear Filter
+                        </button>
+                    </div>
+                    
+                    <div className="flex justify-end">
+                        <button className="bg-[#700000] text-white px-6 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-[#900000] shadow-sm transition-colors">
+                            <Upload className="w-4 h-4" />
+                            Upload Document
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        
+                        <div className="lg:col-span-2 border border-[#900000]/20 rounded-xl overflow-hidden shadow-sm bg-white">
+                            <table className="w-full text-left text-sm">
+                                <thead className="bg-[#700000] text-white">
+                                    <tr>
+                                        <th className="px-6 py-3 font-medium text-xs">Name</th>
+                                        <th className="px-4 py-3 font-medium text-xs text-center">Academic Year</th>
+                                        <th className="px-4 py-3 font-medium text-xs text-center">Date Added</th>
+                                        <th className="px-4 py-3 font-medium text-xs text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100">
+                                    {rubricFiles.map((file, idx) => (
+                                        <tr key={file.id} className={`hover:bg-[#F5ECD5]/50 transition-colors ${idx === 0 ? 'bg-[#F5ECD5]/50' : ''}`}>
+                                            <td className="px-6 py-3">
+                                                <div className="flex items-center gap-3">
+                                                    <FileText className="w-4 h-4 text-[#900000]" />
+                                                    <span className="font-bold text-gray-800 text-xs">{file.name}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-3 text-center text-xs font-medium text-gray-600">{file.year}</td>
+                                            <td className="px-4 py-3 text-center">
+                                                <div className="flex flex-col text-[10px] leading-tight text-gray-600 font-medium">
+                                                    <span>{file.date}</span>
+                                                    <span>{file.time}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <div className="flex items-center justify-center gap-2">
+                                                    <button className="p-1.5 hover:bg-gray-100 rounded text-gray-600 border border-slate-200"><Download className="w-4 h-4" /></button>
+                                                    <button className="p-1.5 hover:bg-gray-100 rounded text-gray-600 border border-slate-200"><Pencil className="w-4 h-4" /></button>
+                                                    <button className="p-1.5 hover:bg-gray-100 rounded text-gray-600 border border-slate-200"><Trash2 className="w-4 h-4" /></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div className="bg-[#FFFDF9] border border-stone-200 rounded-xl p-6 shadow-sm flex flex-col h-[600px]">
+                            <div className="flex justify-between items-center mb-6 pb-2 border-b border-stone-100">
+                                <h3 className="text-[#900000] text-sm font-bold">Document Preview</h3>
+                                <button className="text-gray-400 hover:text-gray-600"><X className="w-4 h-4" /></button>
+                            </div>
+                            
+                            <div className="flex justify-end gap-2 mb-4">
+                                <button className="p-1.5 hover:bg-gray-100 rounded text-gray-600 border border-slate-200"><Download className="w-4 h-4" /></button>
+                                <button className="p-1.5 hover:bg-gray-100 rounded text-gray-600 border border-slate-200"><Pencil className="w-4 h-4" /></button>
+                                <button className="p-1.5 hover:bg-gray-100 rounded text-gray-600 border border-slate-200"><Trash2 className="w-4 h-4" /></button>
+                            </div>
+
+                            <div className="flex-1 bg-gray-50/50 rounded-xl border border-gray-200 border-dashed flex flex-col items-center justify-center text-gray-400">
+                                <File className="w-12 h-12 mb-3 text-gray-300" />
+                                <span className="text-xs font-bold text-gray-400">Document Preview Area</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            
+            <div className="fixed bottom-6 left-6">
+                 <button onClick={onBack} className="flex items-center text-[#900000] font-bold hover:underline gap-1 transition-all bg-white px-4 py-2 rounded-full shadow-md border border-gray-100">
+                    <ChevronLeft className="w-4 h-4" />
+                    Back to Grading
+                </button>
+            </div>
+            
+        </FacultyManagementLayout>
+    );
+};
+
+
 const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void }) => {
     const [activeTab, setActiveTab] = useState<'review' | 'evaluation'>('review');
     const [ratings, setRatings] = useState<Record<string, number>>({});
@@ -237,7 +371,6 @@ const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void 
             `}</style>
 
             <div className="dm-sans">
-                {/* Back Button */}
                 <div className="mb-6">
                     <button onClick={onBack} className="flex items-center text-[#900000] font-bold hover:underline gap-1 transition-all">
                         <ChevronLeft className="w-4 h-4" />
@@ -247,7 +380,6 @@ const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void 
 
                 <div className="space-y-6 w-full max-w-[1600px] mx-auto pb-12">
 
-                    {/* --- TABS SECTION --- */}
                     <div className="flex flex-col space-y-0">
                         <div className="flex justify-between items-end mb-[-1px] z-20 px-1">
                             <h2 className="text-[#900000] text-lg font-bold">
@@ -269,10 +401,8 @@ const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void 
                             </div>
                         </div>
 
-                        {/* --- CONTENT CONTAINER --- */}
                         <div className="bg-[#FFFDF5] border border-stone-200 rounded-b-xl rounded-tl-xl p-8 shadow-sm relative z-10">
                             
-                            {/* --- DEFENSE DETAILS CARD (Updated Color) --- */}
                             <div className="bg-[#FDFCF6] border border-stone-200 rounded-xl p-6 shadow-sm mb-6">
                                 <div className="flex justify-between items-start">
                                     <div>
@@ -293,9 +423,8 @@ const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void 
                                     <p className="font-bold text-gray-800 text-sm">{group.title}</p>
                                 </div>
 
-                                {/* Header Grid Layout */}
                                 <div className="mt-6 grid grid-cols-1 md:grid-cols-12 gap-6">
-                                    {/* Left Side Group */}
+
                                     <div className="md:col-span-7 grid grid-cols-3 gap-y-6 gap-x-4">
                                         <div className="col-span-1">
                                             <h3 className="text-[#900000] text-xs font-bold">Block</h3>
@@ -319,7 +448,6 @@ const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void 
                                         </div>
                                     </div>
 
-                                    {/* Proponents Column */}
                                     <div className="md:col-span-2">
                                         <h3 className="text-[#900000] text-xs font-bold">Proponents</h3>
                                         <div className="flex flex-col gap-2 mt-1">
@@ -330,7 +458,6 @@ const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void 
                                         </div>
                                     </div>
 
-                                    {/* Defense Panel Column */}
                                     <div className="md:col-span-3">
                                         <h3 className="text-[#900000] text-xs font-bold">Defense Panel</h3>
                                         <div className="flex flex-col gap-3 mt-2">
@@ -351,7 +478,6 @@ const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void 
                                 </div>
                             </div>
 
-                            {/* --- TAB CONTENT --- */}
                             {activeTab === 'review' ? (
                                 <div className="space-y-6">
                                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -407,7 +533,6 @@ const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void 
                                         </div>
                                     </div>
                                     
-                                    {/* --- FULL WIDTH COMMENTS/RECOMMENDATIONS SECTION (ADDED) --- */}
                                     <div className="bg-white border border-stone-200 rounded-xl p-6 shadow-sm">
                                         <h3 className="text-[#900000] font-bold text-sm mb-3">Comments/Recommendations</h3>
                                         <textarea 
@@ -425,7 +550,6 @@ const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void 
                             ) : (
                                 <div className="space-y-12 animate-in fade-in duration-300">
                                     
-                                    {/* --- PANEL EVALUATIONS SUMMARY CARDS (Updated Color) --- */}
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-2">
                                         {[
                                             { id: 1, role: "P1", name: "Dr. Robert Chen", score: 3.8, decision: "Accepted", comments: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation." },
@@ -466,14 +590,13 @@ const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void 
                                         ))}
                                     </div>
 
-                                    {/* --- RUBRICS SINGLE CARD CONTAINER (Updated Color) --- */}
+                                    {/* --- RUBRICS SINGLE CARD CONTAINER --- */}
                                     <div className="bg-[#FDFCF6] border border-stone-200 rounded-xl p-8 shadow-sm mt-10">
-                                        
+                                            
                                         {rubricSections.map((rubric, idx) => (
                                             <div key={rubric.id} className="space-y-4">
                                                 
-                                                {/* --- CONDITIONAL BLACK SEPARATOR LINE (INSIDE CARD) --- */}
-                                                {/* Only show line if index > 0 */}
+                                                {/* --- CONDITIONAL BLACK SEPARATOR LINE --- */}
                                                 {idx > 0 && (
                                                     <div className="w-full h-px bg-black my-10" />
                                                 )}
@@ -540,7 +663,6 @@ const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void 
 
                                     <div className="w-full h-px bg-gray-200 my-8" />
                                     
-                                    {/* SCORING & FOOTER (Updated Color) */}
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                         <div className="bg-[#FDFCF6] border border-[#D4A3A3] rounded-xl p-6 shadow-sm flex flex-col justify-center items-center">
                                             <span className="text-[#900000] font-bold text-sm mb-1">Total Score</span>
@@ -584,23 +706,24 @@ const DocumentReviewView = ({ group, onBack }: { group: any, onBack: () => void 
     );
 };
 
-// --- Main Dashboard Component ---
 export default function Dashboard() {
     const [activeStage, setActiveStage] = useState<Stage>('mor');
     const [searchQuery, setSearchQuery] = useState('');
     
-    // State for Full Page Grading View
     const [gradingGroup, setGradingGroup] = useState<any>(null);
     
-    // State for Defense Details Modal
     const [viewDetailsGroup, setViewDetailsGroup] = useState<any>(null);
 
-    // If gradingGroup is selected, render the Full Document Review View
+    const [showRubrics, setShowRubrics] = useState(false);
+
     if (gradingGroup) {
         return <DocumentReviewView group={gradingGroup} onBack={() => setGradingGroup(null)} />;
     }
 
-    // Otherwise, render the dashboard list
+    if (showRubrics) {
+        return <RubricsManagementView onBack={() => setShowRubrics(false)} />;
+    }
+
     return (
         <FacultyManagementLayout 
             breadcrumbs={breadcrumbs} 
@@ -614,13 +737,11 @@ export default function Dashboard() {
                 .dm-sans { font-family: "DM Sans", sans-serif; }
             `}</style>
 
-            {/* Defense Details Modal Overlay */}
             {viewDetailsGroup && (
                 <DefenseDetailsModal 
                     group={viewDetailsGroup} 
                     onClose={() => setViewDetailsGroup(null)} 
                     onEdit={() => {
-                        // Close modal and open grading view
                         setGradingGroup(viewDetailsGroup);
                         setViewDetailsGroup(null);
                     }}
@@ -628,11 +749,9 @@ export default function Dashboard() {
             )}
 
             <div className="flex flex-col w-full space-y-6 dm-sans"> 
-                
-                {/* --- Full Width Line --- */}
+        
                 <div className="w-screen relative h-px border-t-2 border-solid border-[#7e1416] my-8" style={{ left: 'calc(-50vw + 50%)' }} />
                 
-                {/* --- Stage Toggle Section --- */}
                 <div className="flex justify-end w-full pr-4">
                     <StageSwitchToggle 
                         value={activeStage} 
@@ -722,7 +841,13 @@ export default function Dashboard() {
                                     </td>
                                     <td className="px-4 py-4">
                                         <button 
-                                            onClick={() => setGradingGroup(group)}
+                                            onClick={() => {
+                                                if (group.code === '3310') {
+                                                    setShowRubrics(true);
+                                                } else {
+                                                    setGradingGroup(group);
+                                                }
+                                            }}
                                             className="flex items-center gap-2 text-[#700000] hover:text-[#900000] transition-colors font-bold underline underline-offset-4 decoration-gray-300 hover:decoration-[#900000]"
                                         >
                                             <FilePenLine className="h-4 w-4" />
