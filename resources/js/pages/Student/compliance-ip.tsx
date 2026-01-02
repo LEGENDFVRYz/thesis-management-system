@@ -1,18 +1,13 @@
 import React, { useState } from 'react';
 import { Head, useForm } from '@inertiajs/react';
 import { 
-    FileText, 
     Upload, 
     CheckCircle, 
-    AlertTriangle, 
-    BookOpen, 
+    XCircle, 
     Download, 
-    Lock,
     Loader2, 
-    XCircle,
-    ShieldCheck,
-    User,
-    Bell
+    ClipboardCheck, // Changed to match design icon
+    ArrowUp
 } from 'lucide-react';
 
 // --- GLOBAL COMPONENTS ---
@@ -90,105 +85,92 @@ export default function IpPlagiarism({ auth }: PageProps) {
 
             <NavBar user={auth.user} />
 
-            {/* SUB-HEADER STRIP */}
-            <div className="bg-[#FFF8DC] border-b border-[#e0d0b0] px-6 md:px-[5%] py-4 flex justify-between items-center">
-                <h2 className="text-[#800000] text-xl font-bold flex items-center gap-2">
-                    <ShieldCheck className="w-6 h-6" />
-                    <span className="hidden md:inline">IP & Compliance</span>
-                    <span className="md:hidden">Compliance</span>
-                </h2>
-                <span className="text-xs bg-[#800000] text-white px-3 py-1.5 rounded-full font-medium shadow-sm">
-                    Logged in as {auth.user.role_in_group}
-                </span>
+            {/* --- 1. HEADER STRIP (Updated to White BG per request) --- */}
+            <div className="bg-white border-b-2 border-[#800000]/60 px-6 md:px-[5%] py-6 flex items-start gap-4">
+                <div className="mt-1">
+                    <ClipboardCheck className="w-10 h-10 text-[#800000] stroke-[2.5]" />
+                </div>
+                <div>
+                    <h1 className="text-[#FFD700] text-3xl font-medium tracking-wide">IP & plagiarism</h1>
+                    <p className="text-[#800000] text-lg font-medium mt-1 leading-tight">
+                        Ensure IP compliance and submit plagiarism reports
+                    </p>
+                </div>
             </div>
 
-            <main className="max-w-[1440px] mx-auto w-full my-8 md:my-10 px-4 md:px-10 space-y-6">
+            <main className="max-w-7xl mx-auto w-full my-8 md:my-10 px-6 space-y-8">
 
-                {/* --- 1. STATUS BANNER --- */}
+                {/* --- 2. STATUS BANNER --- */}
                 <div className={`
-                    bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col md:flex-row justify-between items-center gap-4
-                    border-l-4 transition-all duration-300
-                    ${isVerified ? 'border-green-600' : 'border-[#ffc107]'}
+                    w-full border rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm transition-all duration-500
+                    ${isVerified ? "bg-green-50 border-green-600" : "bg-white border-[#800000]"}
                 `}>
-                    <div className="flex items-start gap-4">
-                        <div className={`mt-1 p-2 rounded-full ${isVerified ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                            {isVerified ? <CheckCircle className="w-6 h-6" /> : <AlertTriangle className="w-6 h-6" />}
-                        </div>
-                        <div>
-                            <h2 className="text-lg font-bold text-gray-800">
-                                {isVerified ? 'Compliance Verified' : 'Compliance Pending'}
-                            </h2>
-                            <p className="text-sm text-gray-600">
-                                {isVerified 
-                                    ? 'All requirements met. You may now download your certificate.' 
-                                    : 'Please upload a passing plagiarism report (<15%) to unlock compliance checks.'}
-                            </p>
-                        </div>
+                    <div className="text-left w-full">
+                        <h2 className={`text-3xl font-bold tracking-tight ${isVerified ? "text-green-800" : "text-[#800000]"}`}>
+                            {isVerified ? "Compliance Verified" : "Compliance Pending"}
+                        </h2>
+                        <p className={`text-sm md:text-base font-medium mt-1 ${isVerified ? "text-green-700" : "text-black"}`}>
+                            {isVerified 
+                                ? "All requirements met. You may now download your certificate." 
+                                : "Please upload your plagiarism report and confirm IP adherence to unlock the certificate."}
+                        </p>
                     </div>
 
                     <Button 
                         disabled={!isVerified}
                         className={`
-                            flex items-center gap-2 px-6 py-2.5 rounded font-semibold whitespace-nowrap transition-all shadow-lg
+                            whitespace-nowrap px-8 py-6 rounded-lg text-sm font-bold shadow-sm transition-all flex items-center gap-2
                             ${isVerified 
-                                ? 'bg-[#D4AF37] hover:bg-[#C5A028] text-white cursor-pointer hover:shadow-xl active:scale-95' 
-                                : 'bg-[#D4AF37] text-white opacity-50 cursor-not-allowed'}
+                                ? "bg-[#D4AF37] text-white hover:bg-[#C5A028] hover:scale-105" 
+                                : "bg-[#F3EAD3] text-[#800000] hover:bg-[#e8dec0]"}
                         `}
                     >
-                        {isVerified ? (
-                            <><Download className="w-4 h-4" /> <span className="hidden sm:inline">Download Certificate</span><span className="sm:hidden">Certificate</span></>
-                        ) : (
-                            <><Lock className="w-4 h-4" /> <span className="hidden sm:inline">Download Certificate</span><span className="sm:hidden">Certificate</span></>
-                        )}
+                        {isVerified && <Download className="w-4 h-4" />}
+                        Download Certificate
                     </Button>
                 </div>
 
-
-                {/* --- MAIN GRID CONTENT --- */}
-                <div className="grid gap-6 lg:grid-cols-2">
+                {/* --- 3. MAIN CONTENT GRID --- */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     
                     {/* --- LEFT COLUMN: SUBMISSION --- */}
-                    <div className="bg-white rounded-lg shadow-sm border-2 border-[#800000] overflow-hidden">
-                        <div className="bg-[#800000] text-[#FFD700] px-6 py-4 font-semibold tracking-wide">
+                    <div className="bg-white rounded-xl border border-[#800000] overflow-hidden flex flex-col h-full">
+                        {/* Header */}
+                        <div className="bg-[#800000] text-[#FFD700] px-6 py-4 font-medium text-lg tracking-wide">
                             Submission & Verification
                         </div>
                         
-                        <div className="p-6 space-y-6">
+                        <div className="p-6 flex flex-col gap-6 h-full">
                             
-                            {/* 1. File Upload Section */}
+                            {/* File Upload Section */}
                             <div>
-                                <label className="block text-sm font-semibold mb-3 text-gray-700">
+                                <label className="block text-base font-medium text-black mb-3">
                                     1. Plagiarism Check Report
                                 </label>
                                 
-                                {/* Upload Zone */}
+                                {/* Dashed Upload Zone */}
                                 <div 
                                     onClick={() => !isVerified && !isScanning && document.getElementById('file-upload')?.click()}
                                     className={`
-                                        group border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors relative
-                                        ${isScanning 
-                                            ? 'bg-gray-50 border-gray-300 cursor-wait pointer-events-none' 
-                                            : 'bg-gray-50 hover:bg-[#fffcf5] border-gray-300 hover:border-[#800000]'}
+                                        border-2 border-dashed border-[#800000]/60 rounded-lg p-10 text-center transition-colors group relative
+                                        ${isScanning ? 'bg-gray-50 cursor-wait' : 'hover:bg-gray-50 cursor-pointer'}
                                     `}
                                 >
-                                    {/* Loading Overlay */}
                                     {isScanning ? (
-                                        <div className="flex flex-col items-center gap-3">
-                                            <Loader2 className="w-10 h-10 text-[#800000] animate-spin" />
-                                            <p className="font-semibold text-[#800000]">Analyzing Document...</p>
-                                            <p className="text-xs text-gray-600">Checking similarity index against database</p>
+                                        <div className="flex flex-col items-center">
+                                            <Loader2 className="w-8 h-8 text-[#800000] animate-spin mb-2" />
+                                            <p className="text-[#800000] font-medium">Analyzing...</p>
                                         </div>
                                     ) : (
-                                        <div className="flex flex-col items-center gap-3 group-hover:scale-105 transition-transform">
-                                            <Upload className="w-10 h-10 text-gray-400 group-hover:text-[#800000]" />
-                                            <div>
-                                                <p className="font-bold text-gray-800">
-                                                    {data.plagiarism_report ? "Click to Replace File" : "Click to Upload PDF"}
-                                                </p>
-                                                <p className="text-xs text-gray-500 mt-1">(Turnitin or Grammarly Report)</p>
-                                                <p className="text-xs text-gray-400">Max size: 10 MB</p>
+                                        <>
+                                            <div className="border border-black rounded-lg w-10 h-10 flex items-center justify-center mx-auto mb-3">
+                                                <ArrowUp className="w-5 h-5 text-black" />
                                             </div>
-                                        </div>
+                                            <p className="text-gray-500 text-sm mb-1 group-hover:text-[#800000]">
+                                                {data.plagiarism_report ? "Click to replace file" : "Drag and drop files here, or click to select"}
+                                            </p>
+                                            <p className="text-gray-400 text-xs">Max size: 100 MB</p>
+                                        </>
                                     )}
                                     
                                     <input 
@@ -200,50 +182,39 @@ export default function IpPlagiarism({ auth }: PageProps) {
                                         disabled={!isLeader || isVerified || isScanning}
                                     />
                                 </div>
-
-                                {/* RESULTS DISPLAY LOGIC */}
-                                {data.plagiarism_report && !isScanning && scanResult && (
-                                    <div className={`
-                                        mt-4 border rounded-lg p-4 flex items-center justify-between
-                                        ${scanResult.status === 'pass' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}
-                                    `}>
-                                        <div className="flex items-center gap-3">
-                                            <div className={`p-2 rounded ${scanResult.status === 'pass' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                                                {scanResult.status === 'pass' ? <CheckCircle className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
-                                            </div>
-                                            <div>
-                                                <p className="text-sm font-bold text-gray-800">{data.plagiarism_report.name}</p>
-                                                <p className={`text-xs font-semibold ${scanResult.status === 'pass' ? 'text-green-700' : 'text-red-700'}`}>
-                                                    {scanResult.status === 'pass' ? 'Result: Passed Acceptable Threshold' : 'Result: Threshold Exceeded (>15%)'}
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Similarity</div>
-                                            <div className={`text-2xl font-bold ${scanResult.status === 'pass' ? 'text-green-600' : 'text-red-600'}`}>
-                                                {scanResult.score}%
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
                             </div>
 
-                            {/* 2. Checklist Section (Disabled until file passes) */}
-                            <div className={`transition-opacity ${!isReportValid ? 'opacity-50 pointer-events-none' : ''}`}>
-                                <label className="block text-sm font-semibold mb-3 text-gray-700 flex justify-between items-center">
-                                    <span>2. Declaration of Compliance</span>
-                                    {!isReportValid && <span className="text-xs text-red-500 font-normal italic">(Upload valid report to enable)</span>}
+                            {/* Scan Result Display */}
+                            {scanResult && !isScanning && (
+                                <div className={`border rounded-lg p-4 ${scanResult.status === 'pass' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                                    <div className="flex justify-between items-center">
+                                        <div>
+                                            <p className="text-sm font-bold text-gray-800">{data.plagiarism_report?.name}</p>
+                                            <p className={`text-xs ${scanResult.status === 'pass' ? 'text-green-700' : 'text-red-700'}`}>
+                                                {scanResult.status === 'pass' ? 'Pass: Within threshold' : 'Fail: Similarity too high'}
+                                            </p>
+                                        </div>
+                                        <div className={`text-2xl font-bold ${scanResult.status === 'pass' ? 'text-green-600' : 'text-red-600'}`}>
+                                            {scanResult.score}%
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Checkboxes */}
+                            <div className={`transition-opacity duration-300 ${!isReportValid ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+                                <label className="block text-base font-medium text-black mb-3">
+                                    2. Declaration of Compliance
                                 </label>
-                                <div className="space-y-3 bg-gray-50 p-4 rounded-lg border border-gray-100">
+                                <div className="space-y-3">
                                     <div className="flex items-start gap-3">
                                         <Checkbox 
                                             id="c1"
                                             checked={data.compliance_checked_1}
                                             onCheckedChange={(c) => setData('compliance_checked_1', !!c)}
                                             className="mt-1 data-[state=checked]:bg-[#800000] data-[state=checked]:border-[#800000]"
-                                            disabled={isVerified}
                                         />
-                                        <label htmlFor="c1" className="text-sm text-gray-700 leading-tight cursor-pointer">
+                                        <label htmlFor="c1" className="text-sm text-black leading-tight cursor-pointer">
                                             We certify that this manuscript is our original work and contains no plagiarized material.
                                         </label>
                                     </div>
@@ -253,9 +224,8 @@ export default function IpPlagiarism({ auth }: PageProps) {
                                             checked={data.compliance_checked_2}
                                             onCheckedChange={(c) => setData('compliance_checked_2', !!c)}
                                             className="mt-1 data-[state=checked]:bg-[#800000] data-[state=checked]:border-[#800000]"
-                                            disabled={isVerified}
                                         />
-                                        <label htmlFor="c2" className="text-sm text-gray-700 leading-tight cursor-pointer">
+                                        <label htmlFor="c2" className="text-sm text-black leading-tight cursor-pointer">
                                             We have read and understood the University IP Policy displayed on the right.
                                         </label>
                                     </div>
@@ -265,9 +235,8 @@ export default function IpPlagiarism({ auth }: PageProps) {
                                             checked={data.compliance_checked_3}
                                             onCheckedChange={(c) => setData('compliance_checked_3', !!c)}
                                             className="mt-1 data-[state=checked]:bg-[#800000] data-[state=checked]:border-[#800000]"
-                                            disabled={isVerified}
                                         />
-                                        <label htmlFor="c3" className="text-sm text-gray-700 leading-tight cursor-pointer">
+                                        <label htmlFor="c3" className="text-sm text-black leading-tight cursor-pointer">
                                             We grant the Department permission to archive this work in the library repository.
                                         </label>
                                     </div>
@@ -279,89 +248,57 @@ export default function IpPlagiarism({ auth }: PageProps) {
                                 onClick={handleSubmit}
                                 disabled={!allComplianceChecked || !isReportValid || isVerified || processing}
                                 className={`
-                                    w-full py-3 text-base font-bold rounded-md transition-all shadow-lg
+                                    w-full font-bold py-6 text-base rounded-lg mt-auto shadow-md transition-all
                                     ${isVerified 
-                                        ? 'bg-gray-100 text-gray-500 cursor-default hover:bg-gray-100' 
-                                        : !isReportValid
-                                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                            : 'bg-[#800000] hover:bg-[#600000] text-white active:scale-95'}
+                                        ? 'bg-gray-100 text-gray-500 cursor-default' 
+                                        : 'bg-[#800000] text-white hover:bg-[#660000]'}
                                 `}
                             >
-                                {isVerified ? "Submitted & Verified ✓" : "Confirm & Submit Compliance"}
+                                {isVerified ? "Submitted & Verified" : "Confirm & Submit Compliance"}
                             </Button>
-
                         </div>
                     </div>
 
-                    {/* --- RIGHT COLUMN: POLICY (COMPLETE FULL TEXT) --- */}
-                    <div className="bg-white rounded-lg shadow-sm border-2 border-[#800000] overflow-hidden flex flex-col" style={{maxHeight: '700px'}}>
-                        <div className="bg-[#800000] text-[#FFD700] px-6 py-4 font-semibold tracking-wide">
+                    {/* --- RIGHT COLUMN: POLICY TEXT --- */}
+                    <div className="bg-white rounded-xl border border-[#800000] overflow-hidden flex flex-col h-[700px]">
+                        <div className="bg-[#800000] text-[#FFD700] px-6 py-4 font-medium text-lg tracking-wide flex items-center gap-2">
                             IP Policy Guidelines
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-6 bg-gray-50 text-sm leading-relaxed text-gray-700" style={{scrollbarWidth: 'thin'}}>
-                            <div className="text-center border-b-2 border-gray-200 pb-4 mb-6">
-                                <h3 className="text-base font-bold text-gray-900 mb-1">Intellectual Property & Integrity Policy</h3>
-                                <p className="text-xs text-gray-500">Reference: Republic Act No. 8293 (IP Code of the Philippines)</p>
-                            </div>
-                            <div className="space-y-5">
-                                
-                                {/* ARTICLE I */}
-                                <section>
-                                    <h4 className="font-bold text-gray-900 border-b border-gray-200 pb-1 mb-2">Section 1. Student Ownership</h4>
-                                    <p>
-                                        In accordance with the Intellectual Property Code of the Philippines (RA 8293), the University recognizes that the student author(s) own the copyright of their thesis, dissertation, or capstone project, provided that the work was created as part of their regular academic requirements.
-                                    </p>
-                                </section>
+                        <div className="flex-1 overflow-y-auto p-8 bg-white text-black text-sm md:text-[15px] leading-relaxed custom-scrollbar">
+                            <h3 className="font-bold text-center text-lg mb-6">Intellectual Property & Integrity Policy</h3>
 
-                                {/* ARTICLE II */}
-                                <section>
-                                    <h4 className="font-bold text-gray-900 border-b border-gray-200 pb-1 mb-2">Section 2. Co-Ownership</h4>
-                                    <p>
-                                        In cases where the thesis resulted from a project funded by the University or involved substantial use of University resources (beyond standard library/laboratory access), the University shall retain joint ownership of the patent or copyright.
-                                    </p>
-                                </section>
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <p className="font-bold">Section 1. Student Ownership.</p>
+                                    <p>In accordance with the Intellectual Property Code of the Philippines (RA 8293), the University recognizes that the student author(s) own the copyright of their thesis, dissertation, or capstone project, provided that the work was created as part of their regular academic requirements.</p>
+                                </div>
 
-                                {/* ARTICLE III */}
-                                <section>
-                                    <h4 className="font-bold text-gray-900 border-b border-gray-200 pb-1 mb-2">Article II. Institutional Repository Rights</h4>
-                                    <p className="mb-2">
-                                        By submitting this manuscript, the author(s) grant the University a non-exclusive, royalty-free, and perpetual license to:
-                                    </p>
-                                    <ul className="list-disc list-inside space-y-1 ml-4 text-gray-600">
+                                <div className="space-y-2">
+                                    <p className="font-bold">Section 2. Co-Ownership.</p>
+                                    <p>In cases where the thesis resulted from a project funded by the University or involved substantial use of University resources (beyond standard library/laboratory access), the University shall retain joint ownership of the patent or copyright.</p>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <p className="font-bold">Article II. Institutional Repository Rights</p>
+                                    <p>By submitting this manuscript, the author(s) grant the University a non-exclusive, royalty-free, and perpetual license to:</p>
+                                    <ul className="list-disc pl-5 space-y-1 mt-1">
                                         <li>Archive the work in the University Library's digital and physical repository.</li>
-                                        <li>Make the work accessible to the public for research and educational purposes.</li>
+                                        <li>Make the work accessible to the academic community for research and educational purposes.</li>
                                         <li>Migrate the work to any medium or format for the purpose of preservation.</li>
                                     </ul>
-                                </section>
+                                </div>
 
-                                {/* ARTICLE IV */}
-                                <section>
-                                    <h4 className="font-bold text-gray-900 border-b border-gray-200 pb-1 mb-2">Article III. Originality and Plagiarism</h4>
-                                    <p className="mb-2">
-                                        <strong>Section 1. Zero Tolerance.</strong> The University maintains a strict policy against plagiarism. All submissions must be the original work of the authors.
-                                    </p>
-                                    <p>
-                                        <strong>Section 2. Similarity Index.</strong> All thesis manuscripts must undergo a plagiarism detection check. A similarity index of <span className="text-red-600 font-bold">above 15%</span> will be flagged for mandatory revision.
-                                    </p>
-                                </section>
-
-                                {/* ARTICLE V */}
-                                <section>
-                                    <h4 className="font-bold text-gray-900 border-b border-gray-200 pb-1 mb-2">Article IV. Third-Party Materials</h4>
-                                    <p>
-                                        It is the sole responsibility of the student author(s) to obtain written permission for any copyrighted third-party material (images, survey instruments, code, or extensive text) included in the thesis.
-                                    </p>
-                                </section>
-
-                                {/* ARTICLE VI */}
-                                <section>
-                                    <h4 className="font-bold text-gray-900 border-b border-gray-200 pb-1 mb-2">Article V. Penalties and Sanctions</h4>
-                                    <p>
-                                        Any student found to have deliberately plagiarized content or manipulated similarity reports will be subject to disciplinary action, which may include a failing grade for the thesis, suspension, or expulsion.
-                                    </p>
-                                </section>
-
+                                <div className="space-y-2">
+                                    <p className="font-bold">Article III. Originality and Plagiarism</p>
+                                    <p><strong>Section 1. Zero Tolerance.</strong> The University maintains a strict policy against plagiarism. All submissions must be the original work of the authors.</p>
+                                    <p><strong>Section 2. Similarity Index.</strong> All thesis manuscripts must undergo a plagiarism detection check. A similarity index of <span className="text-red-600 font-bold">above 15%</span> will be flagged for mandatory revision.</p>
+                                </div>
+                                
+                                <div className="space-y-2">
+                                    <p className="font-bold">Article IV. Third-Party Materials</p>
+                                    <p>It is the sole responsibility of the student author(s) to obtain written permission for any copyrighted third-party material (images, survey instruments, code, or extensive text) included in the thesis.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
