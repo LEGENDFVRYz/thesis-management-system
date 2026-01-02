@@ -24,48 +24,58 @@ class Endorsement extends Controller
         $validEndorsements = DB::table('tbl_endorsements as e')
             // Join to Theses
             ->join('tbl_theses as t', 'e.thesis_id', '=', 't.id')
-            
+
             // Join to Proposals
             ->join('tbl_proposals as p', 't.proposal_id', '=', 'p.id')
-            
+
             // Join to Thesis Groups
             ->join('tbl_thesis_groups as g', 'p.group_id', '=', 'g.id')
-            
+
             // Join to Section Advisers
             ->join('tbl_section_advisers as sa', 'g.section_adviser_id', '=', 'sa.id')
-            
+
             // Join to get Adviser's Faculty Assignment
             ->join('tbl_faculty_assignments as adviser_fa', 'sa.faculty_assign_id', '=', 'adviser_fa.id')
-            
+
             // Join to get Adviser's Faculty Info
             ->join('tbl_faculties as adviser_faculty', 'adviser_fa.faculty_id', '=', 'adviser_faculty.id')
-            
-            // Join to Defense Matrices (for panel connection)
+
+            // Join to Defense Matrices
             ->leftJoin('tbl_defense_matrices as dm', 'e.id', '=', 'dm.endorsement_id')
-            
-            // Join to Endorsed Panels
-            ->leftJoin('tbl_endorsed_panels as ep', 'dm.id', '=', 'ep.defense_matrix_id')
-            
-            // Join to Panel's Faculty Assignment
-            ->leftJoin('tbl_faculty_assignments as panel_fa', 'ep.panel_id', '=', 'panel_fa.id')
-            
-            // Join to Panel's Faculty Info
-            ->leftJoin('tbl_faculties as panel_faculty', 'panel_fa.faculty_id', '=', 'panel_faculty.id')
-            
+
             ->select(
+                // Endorsement ID
+                'e.id as endorsement_id',
+
                 // Thesis Title
                 't.title as thesis_title',
-                
-                // Group Code (section + group_number format)
-                DB::raw("CONCAT(sa.section, '-', g.group_number) AS group_code"),
-                
+
+                // Manuscript File Path for Document Preview
+                't.manuscript_filepath',
+
+                // Course
+                'dm.course',
+
+                // Group Code (course prefix + section + group_number format)
+                // MOR = 3, DP1/DP2 = 4
+                // group_number is padded to 2 digits (e.g., 1 -> 01)
+                DB::raw("CONCAT(
+                    CASE
+                        WHEN dm.course = 'MOR' THEN '3'
+                        WHEN dm.course IN ('DP1', 'DP2') THEN '4'
+                        ELSE ''
+                    END,
+                    sa.section,
+                    LPAD(g.group_number, 2, '0')
+                ) AS group_code"),
+
                 // Endorsement Status
                 'e.is_adviser_approved',
                 'e.updated_at as endorsement_updated_at',
-                
-                // Section
-                'sa.section',
-                
+
+                // Section (used as block)
+                'sa.section as block',
+
                 // Adviser Full Name (from section adviser path)
                 DB::raw("
                     CONCAT_WS(' ',
@@ -74,33 +84,20 @@ class Endorsement extends Controller
                         adviser_faculty.middle_name,
                         adviser_faculty.last_name
                     ) AS adviser_name
-                "),
-                
-                // Panel Members (concatenated)
-                DB::raw("
-                    GROUP_CONCAT(
-                        DISTINCT CONCAT_WS(' ',
-                            panel_faculty.name_prefix,
-                            panel_faculty.first_name,
-                            panel_faculty.middle_name,
-                            panel_faculty.last_name
-                        )
-                        SEPARATOR ', '
-                    ) AS panel_members
                 ")
             )
-            /* Remove this comment block to enable filtering (adviser specific and approved by adviser and coordinator)
 
-            // KEY VERIFICATION: Only endorsements under THIS adviser's section
-            ->where('adviser_faculty.user_id', $userId)
+        
+            // KEY VERIFICATION: Only endorsements under THIS adviser's section 
+            //remove this comment to enable filtering by logged-in adviser
+         //->where('adviser_faculty.user_id', $userId)
 
-            // Filter for valid endorsements (both adviser and coordinator approved)
-            ->where('e.is_adviser_approved', 1)
-            ->where('e.is_coordinator_approved', 1)
-            */
+            
             ->groupBy(
                 'e.id',
                 't.title',
+                't.manuscript_filepath', 
+                'dm.course',
                 'sa.section',
                 'g.group_number',
                 'e.is_adviser_approved',
@@ -111,10 +108,10 @@ class Endorsement extends Controller
                 'adviser_faculty.last_name'
             )
             
-            ->orderBy('e.updated_at', 'desc')
+            ->orderBy('e.is_adviser_approved', 'asc')
             ->get();
             
-        dd(vars: $validEndorsements);
+       // dd(vars: $validEndorsements);
         return Inertia::render('Faculty/management/adviser/endorsements', [
             'endorsements' => $validEndorsements
         ]);

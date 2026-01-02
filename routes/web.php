@@ -155,6 +155,7 @@ Route::prefix('faculty')->group(function () {
                 // CHECK THE SPECIAL ROUTES FOR THIS SCENARIO... 
 
                 Route::get('endorsement', [Endorsement::class, 'index'])->name('faculty.management.adviser.endorsement');
+                Route::put('endorsement/{id}', [Endorsement::class, 'update'])->name('faculty.management.adviser.endorsement.update');
 
                 Route::get('eval_n_grading', [EvaluationGrading::class, 'index'])->name('faculty.management.adviser.eval_n_grading');
             });
