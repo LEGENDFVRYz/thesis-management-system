@@ -166,6 +166,14 @@ Route::prefix('faculty')->group(function () {
                 Route::get('thesis_review', function () {
                     return Inertia::render('Faculty/management/panel/thesis_review');
                 })->name('faculty.management.panel.thesis_review');
+
+                Route::get('thesis-review-0', function () {
+                    return Inertia::render('Faculty/management/panel/thesis-review-0/thesis-review');
+                })->name('faculty.management.panel.thesis_review_0');
+
+                Route::get('thesis-review-0/docu_n_eval', function () {
+                    return Inertia::render('Faculty/management/panel/thesis-review-0/docu_n_eval');
+                })->name('faculty.management.panel.thesis_review_0.docu_n_eval');
                 
                 // DEFENSE MANAGEMENT OF PANEL HAS BEEN JOINED WITH ADVISER
                 // CHECK THE SPECIAL ROUTES FOR THIS SCENARIO... 

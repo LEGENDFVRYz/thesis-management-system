@@ -1,7 +1,8 @@
+import { SearchBar } from '@/components/filter-search';
+import { Icon } from '@/components/icon-index';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import {
     Table,
     TableBody,
@@ -13,7 +14,7 @@ import {
 import { my_advisees } from '@/routes/faculty/management/adviser/advisee_management';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import { Users } from 'lucide-react';
+import { Filter, Users } from 'lucide-react';
 import { useState } from 'react';
 import AdviseeManagementLayout from '.';
 
@@ -46,10 +47,29 @@ const sampleAdvisees: Advisee[] = Array(20).fill({
 });
 
 export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
-    const displayAdvisees = advisees.length > 0 ? advisees : sampleAdvisees; // Using sample data
+    const displayAdvisees = advisees.length > 0 ? advisees : sampleAdvisees;
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [selectedAdvisee, setSelectedAdvisee] = useState<Advisee | null>(
         null,
+    );
+    const [searchQuery, setSearchQuery] = useState('');
+
+    // Filter advisees based on search query
+    const filteredAdvisees = displayAdvisees.filter(
+        (advisee) =>
+            advisee.student_name
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase()) ||
+            advisee.student_id
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase()) ||
+            advisee.pup_webmail
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase()) ||
+            advisee.group_code
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase()) ||
+            advisee.block.toLowerCase().includes(searchQuery.toLowerCase()),
     );
 
     return (
@@ -60,25 +80,61 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
         >
             <Head title="My Advisees" />
 
-            {/* Filters & Search Section */}
-            <div className="border-border-primary-muted] mb-6 rounded-lg border-[1px] bg-primary-foreground p-6 shadow">
-                <div className="mb-4">
-                    <p className="text-body-2 mb-2 text-primary">
-                        Filters & Search
-                    </p>
+            {/* Filter & Search Section with Container Styling */}
+            <div className="box-border flex h-[134px] w-full max-w-[1360px] flex-col items-start gap-4 self-stretch rounded-[10px] border-[0.8px] border-primary/20 bg-card p-[24.8px_24.8px_0.8px_24.8px] font-dm shadow-sm transition-all duration-200">
+                {/* Header Section */}
+                <div className="flex h-6 w-full flex-row items-center gap-2 self-stretch rounded-none font-dm">
+                    <Filter className="h-5 w-5 text-primary" />
+                    <h2 className="font-dm text-base leading-6 font-normal text-primary">
+                        Search, Sort, & Filter
+                    </h2>
                 </div>
-                <div className="flex items-center gap-4">
-                    <Input
-                        type="text"
-                        placeholder="Search student name, student ID, or thesis title..."
-                        className="flex-1 border-[var(--border-primary-muted)] bg-[var(--breadcrumb)] p-4 text-[var(--text-primary)] placeholder:text-[var(--alert-desc)] focus:ring-0"
-                    />
-                    <Button variant="primary">Clear Filter</Button>
+
+                {/* Controls Row */}
+                <div className="flex w-full flex-row items-center justify-center gap-[10px] self-stretch font-dm">
+                    {/* Search Box */}
+                    <div className="flex-1 font-dm">
+                        <SearchBar
+                            variant="filter-section"
+                            placeholder="Search student name, student ID, or thesis title..."
+                            value={searchQuery}
+                            onChange={setSearchQuery}
+                        />
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-row items-center gap-[10px] font-dm">
+                        {/* Sort Button */}
+                        <Button
+                            variant="secondary"
+                            size="icon"
+                            className="rounded-lg border-none font-dm"
+                        >
+                            <Icon name="sortDefault" size={16} />
+                        </Button>
+
+                        {/* Filter Button */}
+                        <Button
+                            variant="secondary"
+                            size="icon"
+                            className="rounded-lg border-none font-dm"
+                        >
+                            <Filter className="h-4 w-4" />
+                        </Button>
+
+                        {/* Clear Filter Button */}
+                        <Button
+                            variant="negative"
+                            className="h-9 min-w-[101px] gap-2 rounded-lg px-4 py-2 font-dm"
+                            onClick={() => setSearchQuery('')}
+                        >
+                            <span className="font-dm text-[13.33px] font-medium">
+                                Clear Filter
+                            </span>
+                        </Button>
+                    </div>
                 </div>
             </div>
-            <Badge variant="default" className="mb-4">
-                Total Advisees ({displayAdvisees.length})
-            </Badge>
 
             {/* Table Section */}
             <div className="overflow-x-auto rounded-lg border-1 border-[var(--primary)] bg-primary-foreground shadow">
@@ -106,8 +162,8 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                         </TableRow>
                     </TableHeader>
                     <TableBody className="[&_tr]:border-b-0">
-                        {displayAdvisees.length > 0 ? (
-                            displayAdvisees.map((advisee, index) => (
+                        {filteredAdvisees.length > 0 ? (
+                            filteredAdvisees.map((advisee, index) => (
                                 <TableRow key={index}>
                                     <TableCell className="text-center font-medium">
                                         {advisee.student_id}
@@ -150,8 +206,9 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                                             No advisees found
                                         </p>
                                         <p className="text-sm">
-                                            Students will appear here once
-                                            assigned
+                                            {searchQuery
+                                                ? 'Try adjusting your search'
+                                                : 'Students will appear here once assigned'}
                                         </p>
                                     </div>
                                 </TableCell>
@@ -161,11 +218,12 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                 </Table>
                 <div className="border-t border-gray-200 bg-primary-foreground px-6 py-4 text-center">
                     <p className="text-sm text-alert-desc">
-                        {displayAdvisees.length} of {displayAdvisees.length}{' '}
+                        {filteredAdvisees.length} of {displayAdvisees.length}{' '}
                         Student Accounts
                     </p>
                 </div>
             </div>
+
             <Dialog open={isProfileOpen} onOpenChange={setIsProfileOpen}>
                 <DialogContent
                     className="p-0 [&_[data-slot=dialog-overlay]]:bg-foreground/20 [&_[data-slot=dialog-overlay]]:backdrop-blur-sm"
