@@ -1144,8 +1144,7 @@ export default function FacultyManagement({ faculties }: { faculties?: any[] }) 
         <>
             <Head title="Faculty Management" />
             <AppHeader/>
-            <AppContent title="Faculty Management" className='text-primary-foreground-2'
-            subtitle='Manage Faculty Accounts and Assign Roles'>
+            <AppContent title="Faculty Management" subtitle='Manage Faculty Accounts and Assign Roles'>
                 
                 {/* Filter & Search Section */}
                 <div className="mb-4">

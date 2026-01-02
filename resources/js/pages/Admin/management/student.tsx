@@ -1,3 +1,4 @@
+// IMPORTS
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 
@@ -13,9 +14,10 @@ import { NavFooter } from '@/components/nav-footer';
 import { Icon } from '@/components/icon-index';
 import { GroupCard } from '@/components/ui/card';
 
-import { Table as TableIcon, LayoutGrid } from 'lucide-react';
+import { Table as TableIcon, LayoutGrid, X } from 'lucide-react';
 import { Filter as FilterIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
 
 interface Student {
   studentNumber: string;
@@ -38,7 +40,7 @@ interface GroupData {
   block: string;
 }
 
- //Sample Data
+ //Sample Student Data
 const studentData: Student[] = [
   {
     studentNumber: "2022-00001-MN-0",
@@ -321,6 +323,20 @@ const studentData: Student[] = [
   },
 ];
 
+// Sample thesis titles for different groups
+const thesisTitles: { [key: string]: string } = {
+  "3I01": "AI-Powered Predictive Analytics for Student Performance",
+  "3I02": "Cloud-Based Data Visualization Dashboard for IoT Sensors",
+  "3I03": "Real-Time Traffic Monitoring Using Big Data Analytics",
+  "3I04": "Sentiment Analysis of Social Media Posts Using NLP",
+  "4I01": "Automated Image Classification for Medical Diagnostics",
+  "4I02": "Smart Recommendation System for E-Commerce Platforms",
+  "4I03": "Deep Learning for Facial Recognition Security Systems",
+  "4I04": "Web-Based Inventory Management System with QR Integration",
+  "4I05": "Predictive Maintenance System for Industrial Equipment",
+  "4I06": "Application of AI for Intrusion Detection"
+};
+
 interface FilterState {
   blocks: string[];
   specializations: string[];
@@ -335,7 +351,7 @@ function Dropdown({
   isOpen: boolean; 
   onClose: () => void; 
   children: React.ReactNode;
-  triggerRef: React.RefObject<HTMLButtonElement>;
+  triggerRef: React.RefObject<HTMLButtonElement | null>;
 }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -514,6 +530,239 @@ function StudentSortWrapper({
   );
 }
 
+
+// View Student Profile Modal (sa Table View)
+function StudentProfileModal({ 
+  isOpen, 
+  onClose, 
+  student 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  student: Student | null;
+}) {
+  if (!isOpen || !student) return null;
+
+  // Get co-researchers (other members of the same group)
+  const coResearchers = studentData
+    .filter(s => s.groupCode === student.groupCode && s.studentNumber !== student.studentNumber)
+    .map(s => s.name);
+
+  // Get thesis title of the group
+  const thesisTitle = thesisTitles[student.groupCode] || "Research Project in Computer Engineering";
+
+  return (
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white rounded-lg shadow-xl w-140 max-w-[900px] max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+         {/* View Student Profile Modal Component */}
+        {/* Header */}
+        <div className="bg-primary rounded-t-lg p-6 relative">
+          <h2 className="text-white text-3xl font-bold">Student Profile</h2>
+          <Button onClick={onClose} className="absolute top-6 right-6 text-white hover:text-gray-200 transition-colors">
+            <X> </X>
+          </Button>
+        </div>
+
+        {/* Content */}
+        <div className="p-8">
+          {/* Profile Section */}
+          <div className="flex items-start gap-6 mb-8">
+            {/* Name and Group */}
+            <div className="flex-1">
+              <h3 className="text-primary text-[40px] font-bold uppercase mb-2">
+                {student.name}
+              </h3>
+              <div className="inline-block bg-primary-foreground-2 text-primary px-4 py-1 rounded-full text-sm font-medium">
+                Group {student.groupCode}
+              </div>
+            </div>
+          </div>
+
+          {/* Student Information */}
+          <div className="mb-8">
+            <h4 className="text-primary text-xl font-bold mb-4">STUDENT INFORMATION</h4>
+            
+            <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+              {/* Student ID */}
+              <div>
+                <p className="text-gray-600 text-sm mb-1">Student ID</p>
+                <p className="text-gray-900 font-medium">{student.studentNumber}</p>
+              </div>
+
+              {/* PUP Webmail */}
+              <div>
+                <p className="text-gray-600 text-sm mb-1">PUP Webmail</p>
+                <p className="text-gray-900 font-medium break-all">{student.email}</p>
+              </div>
+
+              {/* Block */}
+              <div>
+                <p className="text-gray-600 text-sm mb-1">Block</p>
+                <p className="text-gray-900 font-medium">{student.block}</p>
+              </div>
+
+              {/* Specialization */}
+              <div>
+                <p className="text-gray-600 text-sm mb-1">Specialization</p>
+                <p className="text-gray-900 font-medium">{student.specialization}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Thesis Information */}
+          <div className="mb-8">
+            <h4 className="text-primary text-xl font-bold mb-4">THESIS INFORMATION</h4>
+            
+            {/* Thesis Title */}
+            <div className="mb-4">
+              <p className="text-gray-600 text-sm mb-1">Thesis Title</p>
+              <p className="text-gray-900 font-medium">
+                {thesisTitle}
+              </p>
+            </div>
+
+            {/* Co-researchers */}
+            <div className="mb-4">
+              <p className="text-gray-600 text-sm mb-2">Co-researchers</p>
+              <div className="flex flex-wrap gap-2">
+                {coResearchers.length > 0 ? (
+                  coResearchers.map((researcher, index) => (
+                    <span 
+                      key={index}
+                      className="inline-block border border-gray-300 rounded-full px-3 py-1 text-sm text-gray-700"
+                    >
+                      {researcher}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-sm text-gray-500">No co-researchers</span>
+                )}
+              </div>
+            </div>
+
+            {/* Thesis Adviser */}
+            <div>
+              <p className="text-gray-600 text-sm mb-1">Thesis Adviser</p>
+              <p className="text-gray-900 font-medium">{student.adviser}</p>
+            </div>
+          </div>
+
+          {/* Archive Button */}
+          <div className="flex justify-end">
+            <Button> Archive User </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// View Group Profile Modal (sa Group Card View)
+function GroupProfileModal({ 
+  isOpen, 
+  onClose, 
+  group 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  group: GroupData | null;
+}) {
+  if (!isOpen || !group) return null;
+
+  // Get full member details
+  const memberDetails = studentData.filter(s => s.groupCode === group.groupCode);
+
+  return (
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white rounded-lg shadow-xl w-150 max-w-[900px] max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="bg-primary rounded-t-lg p-6 relative">
+          <h2 className="text-white text-3xl font-bold">Group Profile</h2>
+          <Button 
+            onClick={onClose} 
+            className="absolute top-6 right-6 text-white hover:text-gray-200 hover:bg-primary-foreground/10 transition-colors"
+          >
+            <X className="w-6 h-6" />
+          </Button>
+        </div>
+
+        {/* Content */}
+        <div className="p-8">
+
+          {/* Group Header Section */}
+          <div className="flex items-center gap-3 mb-2">
+            <h3 className="text-primary text-[40px] font-bold">
+              Group {group.groupCode}
+            </h3>
+          </div>
+          
+          <p className="text-gray-600 text-base mb-6">
+            {group.block} | {group.specialization}
+          </p>
+
+          <div className="border-t border-gray-200 my-6" />
+
+          {/* Thesis Information */}
+          <div className="mb-8">
+            <h4 className="text-primary text-xl font-bold mb-4">THESIS INFORMATION</h4>
+            
+            {/* Thesis Title*/}
+            <div className="flex items-start gap-3 mb-4">
+              <div className="flex-1">
+                <p className="text-gray-600 text-sm mb-1">Thesis Title</p>
+                <p className="text-gray-900 font-medium">{group.thesisTitle}</p>
+              </div>
+            </div>
+
+            {/* Group Members*/}
+            <div className="flex items-start gap-3 mb-4">
+              <div className="flex-1">
+                <p className="text-gray-600 text-sm mb-1">Group Members</p>
+                <p className="text-gray-900 font-medium">{group.members.join(", ")}</p>
+              </div>
+            </div>
+
+            {/* Thesis Adviser with Icon */}
+            <div className="flex items-start gap-3">
+              <div className="flex-1">
+                <p className="text-gray-600 text-sm mb-1">Thesis Adviser</p>
+                <p className="text-gray-900 font-medium">{group.adviser}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Proponents Information */}
+          <div className="mb-8">
+            <h4 className="text-primary text-xl font-bold mb-4">PROPONENTS INFORMATION</h4>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {memberDetails.map((member, index) => (
+                <div key={member.studentNumber} className="space-y-2">
+                  <p className="text-gray-500 text-sm font-medium">Member {index + 1}:</p>
+                  <p className="text-gray-900 font-semibold">{member.name}</p>
+                  <p className="text-gray-700 text-sm">{member.studentNumber}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Sorting for Group Card View
 function GroupSortWrapper({ 
   onApply, 
@@ -572,9 +821,34 @@ export default function StudentManagement({ students }: { students?: any[] }) {
     const [filterOpen, setFilterOpen] = useState(false);
     const [sortOpen, setSortOpen] = useState(false);
     const [view, setView] = useState("table");
+    const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedGroup, setSelectedGroup] = useState<GroupData | null>(null);
+    const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
     
     const sortButtonRef = useRef<HTMLButtonElement>(null);
     const filterButtonRef = useRef<HTMLButtonElement>(null);
+
+    
+    const handleViewStudent = (student: Student) => {
+        setSelectedStudent(student);
+        setIsModalOpen(true);
+    };
+    
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedStudent(null);
+    };
+
+    const handleViewGroup = (group: GroupData) => {
+        setSelectedGroup(group);
+        setIsGroupModalOpen(true);
+    };
+    
+    const handleCloseGroupModal = () => {
+        setIsGroupModalOpen(false);
+        setSelectedGroup(null);
+    };
 
     // Grouping students by group code for the group card view
     const groupedData = useMemo(() => {
@@ -584,7 +858,7 @@ export default function StudentManagement({ students }: { students?: any[] }) {
             if (!groups[student.groupCode]) {
                 groups[student.groupCode] = {
                     groupCode: student.groupCode,
-                    thesisTitle: "Machine Learning Applications in Healthcare Diagnostics",
+                    thesisTitle: thesisTitles[student.groupCode] || "Research Project in Computer Engineering",
                     thesisStage: "Title Proposal",
                     members: [],
                     adviser: student.adviser,
@@ -682,19 +956,13 @@ export default function StudentManagement({ students }: { students?: any[] }) {
         setSortOption("");
     };
 
+// Main Content
     return (
         <>
             <Head title="Student Management" />
             <AppHeader/>
+            <AppContent title= "Student Management" subtitle="View and Manage Student Accounts and Thesis Group Assignments">
 
-            <AppContent
-                title={
-                    <div className="flex items-center gap-2 text-[#FFBD00]">
-                        <span className="font-medium">Student Management</span>
-                    </div>
-                }
-                subtitle="View and Manage Student Accounts and Thesis Group Assignments"
-            >
                 {/* Filter & Search Section */}
                 <div className="mb-4">
                     <div className="flex flex-col items-start self-stretch w-full max-w-[1360px] bg-card rounded-[10px] border-[0.8px] border-primary/20 shadow-sm h-[134px] p-[24.8px] gap-4 font-dm">
@@ -946,7 +1214,11 @@ export default function StudentManagement({ students }: { students?: any[] }) {
 
                                     {/* Action */}
                                     <div className="flex items-center justify-center p-2.5">
-                                        <Button variant="outline" className='border-primary text-primary'>
+                                        <Button 
+                                            variant="outline" 
+                                            className='border-primary text-primary'
+                                            onClick={() => handleViewStudent(student)}
+                                        >
                                             View
                                         </Button>
                                     </div>
@@ -972,12 +1244,26 @@ export default function StudentManagement({ students }: { students?: any[] }) {
                                 thesisStage={group.thesisStage}
                                 members={group.members}
                                 adviserName={group.adviser}
+                                onViewGroup={() => handleViewGroup(group)}
                             />
                         ))}
                     </div>
                 )}
             </AppContent>
             <NavFooter />
+            
+            {/* Student Profile Modal */}
+            <StudentProfileModal 
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                student={selectedStudent}
+            />
+            {/* Group Profile Modal */}
+            <GroupProfileModal 
+                isOpen={isGroupModalOpen}
+                onClose={handleCloseGroupModal}
+                group={selectedGroup}
+            />
         </>
     );
 }
