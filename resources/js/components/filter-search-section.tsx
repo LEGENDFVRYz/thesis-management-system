@@ -1,9 +1,16 @@
-import { Filter, ArrowUpDown, Trash2, CheckCircle2, Calendar, ChevronDown } from 'lucide-react';
+import * as React from 'react';
+import { useState } from 'react';
+import { Filter, Trash2, CheckCircle2, Calendar, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button'; 
 import { cn } from '@/lib/utils';
-import { SearchBar } from '@/components/filter-search';
-import { useState } from 'react';
+import { SearchBar, Sort3 } from '@/components/filter-search';
+import { RepoFilter } from '@/components/filter-search';
 import { Icon } from '@/components/icon-index';
+import {
+    Dialog,
+    DialogContent,
+} from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type SectionVariant = 'StudentManagement' | 'DefenseManagement' | 'ThesisArchive' | 'Notifications';
 
@@ -13,6 +20,12 @@ interface FilterSearchSectionProps {
 
 export default function FilterSearchSection({ variant = 'DefenseManagement' }: FilterSearchSectionProps) {
     const [query, setQuery] = useState('');
+    
+    // State to manage the Advanced Filter Modal visibility
+    const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+    
+    // State to manage the Sort Modal visibility
+    const [isSort3ModalOpen, setIsSort3ModalOpen] = useState(false);
 
     /**
      * Container Style Mapping
@@ -22,14 +35,26 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
         StudentManagement: "h-[134px] p-[24.8px_24.8px_0.8px_24.8px] gap-4 border-primary/20 shadow-sm",
         DefenseManagement: "h-[125.6px] p-[24.8px_24.8px_0.8px_24.8px] gap-4 border-primary/20 shadow-sm",
         ThesisArchive: "h-[120px] p-[25px_19px] gap-[25px] border-border",
-        Notifications: "h-[118px] p-6 gap-6 border-border shadow-none overflow-y-auto"
+        Notifications: "h-[118px] p-6 gap-6 border-border shadow-none"
+    };
+
+    // Callback when tags are applied in RepoFilter
+    const handleApplyFilters = (tags: string[]) => {
+        console.log("Applied Tags:", tags);
+        setIsFilterModalOpen(false);
+    };
+
+    // Callback when sort options are applied in Sort3
+    const handleApplySort = (sortBy: string) => {
+        console.log("Applied Sort By:", sortBy);
+        setIsSort3ModalOpen(false);
     };
 
     return (
         <div className={cn(
             "flex flex-col items-start self-stretch w-full max-w-[1360px] bg-card rounded-[10px] flex-none",
             "border-[0.8px] box-border transition-all duration-200",
-            "font-dm", // Forces DM Sans for the entire container
+            "font-dm", 
             containerVariants[variant]
         )}>
             
@@ -89,17 +114,30 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                     <>
                         <div className="flex flex-col gap-2 w-[320px] font-dm">
                             <label className="text-sm font-medium text-alert-desc font-dm">Notification Type</label>
-                            <div className="flex items-center justify-between px-3 h-9 bg-breadcrumb rounded-lg cursor-pointer font-dm">
-                                <span className="text-alert-desc text-[13.33px] font-medium font-dm">Filter by Type</span>
-                                <ChevronDown className="w-4 h-4 text-alert-desc/50" />
-                            </div>
+                            <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Filter by Type" />
+                                </SelectTrigger>
+                                <SelectContent className='w-[var(--radix-select-trigger-width)]'>
+                                    <SelectItem value="Defense Management">Defense Management</SelectItem>
+                                    <SelectItem value="Panel Assignment">Panel Assignment</SelectItem>
+                                    <SelectItem value="Reminder">Reminder</SelectItem>
+                                    <SelectItem value="System Update">System Update</SelectItem>
+                                    <SelectItem value="Alert">Alert</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                         <div className="flex flex-col gap-2 w-[320px] font-dm">
                             <label className="text-sm font-medium text-alert-desc font-dm">Status</label>
-                            <div className="flex items-center justify-between px-3 h-9 bg-breadcrumb rounded-lg cursor-pointer font-dm">
-                                <span className="text-alert-desc text-[13.33px] font-medium font-dm">Filter by Status</span>
-                                <ChevronDown className="w-4 h-4 text-alert-desc/50" />
-                            </div>
+                            <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Filter by Status" />
+                                </SelectTrigger>
+                                <SelectContent className='w-[var(--radix-select-trigger-width)]'>
+                                    <SelectItem value="Read">Read Only</SelectItem>
+                                    <SelectItem value="Unread">Unread Only</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                     </>
                 )}
@@ -110,13 +148,18 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                     (variant === 'ThesisArchive' || variant === 'Notifications') ? "mt-auto h-9" : ""
                 )}>
                     {(variant === 'StudentManagement' || variant === 'Notifications') && (
-                        <Button variant="secondary" size="icon" className="rounded-lg border-none font-dm">
+                        <Button variant="secondary" size="icon" className="rounded-lg border-none font-dm" onClick={() => setIsSort3ModalOpen(true)}>
                             <Icon name="sortDefault" size={16} />
                         </Button>
                     )}
 
                     {variant !== 'Notifications' && (
-                        <Button variant="secondary" size="icon" className="rounded-lg border-none font-dm">
+                        <Button 
+                            variant="secondary" 
+                            size="icon" 
+                            className="rounded-lg border-none font-dm"
+                            onClick={() => setIsFilterModalOpen(true)} // Calls the modal
+                        >
                             <Filter className="w-4 h-4" />
                         </Button>
                     )}
@@ -136,6 +179,28 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                     </Button>
                 </div>
             </div>
+
+            {/* --- INTEGRATED REPO FILTER MODAL --- */}
+            <Dialog open={isFilterModalOpen} onOpenChange={setIsFilterModalOpen}>
+                {/* Technical Note: DialogContent has border/bg removed to let the 
+                    RepoFilter's internal shadow and bg-white container show through cleanly.
+                */}
+                <DialogContent className="max-w-md p-0 border-none bg-transparent shadow-none outline-none">
+                    <RepoFilter 
+                        onClose={() => setIsFilterModalOpen(false)} 
+                        onApply={handleApplyFilters}
+                    />
+                </DialogContent>
+            </Dialog>
+
+            {/* --- INTEGRATED SORT MODAL --- */}
+            <Dialog open={isSort3ModalOpen} onOpenChange={setIsSort3ModalOpen}>
+                <DialogContent className="max-w-md p-0 border-none bg-transparent shadow-none outline-none">
+                    {/* The call to Sort3 */}
+                    <Sort3/>
+                </DialogContent>
+            </Dialog>
+
         </div>
     );
 }
