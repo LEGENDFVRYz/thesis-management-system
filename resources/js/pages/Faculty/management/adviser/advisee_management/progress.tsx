@@ -1,5 +1,7 @@
 import { badgesRegistry, type BadgeName } from '@/components/badges-registry';
 import { SearchBar } from '@/components/filter-search';
+import { iconRegistry } from '@/components/icons-registry';
+import { type TimelineEvent } from '@/components/timeline';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,10 +12,11 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { TimelineState } from '@/components/ui/wizard-timeline';
 import { group_comp } from '@/routes/faculty/management/adviser/advisee_management';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import { ArrowLeft, Filter, Users } from 'lucide-react';
+import { Filter, Users } from 'lucide-react';
 import { useState } from 'react';
 import AdviseeManagementLayout from '.';
 
@@ -48,6 +51,21 @@ const sampleGroups: Groups[] = Array(10).fill({
     thesis_stage: 'Manuscript Submission',
     status: 2,
 });
+
+const groupTimeline: TimelineEvent[] = [
+    {
+        id: '1',
+        title: 'DP1 Manuscript',
+        dateRange: 'Oct 10 – Oct 20',
+        description: 'Draft manuscript submission',
+        status: 'current',
+        isCurrent: true,
+    },
+];
+
+const DocuIcon = iconRegistry.docuDefault;
+const BackIcon = iconRegistry.backDefault;
+const PeopleIcon = iconRegistry.peopleLinear;
 
 export default function Dashboard({ groups = [] }: ProgressProps) {
     const [searchQuery, setSearchQuery] = useState('');
@@ -90,159 +108,222 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
         return (
             <AdviseeManagementLayout
                 breadcrumbs={breadcrumb}
-                title={`Group ${selectedGroup.group_code} Details`}
-                description="View detailed information about this thesis group"
+                title="Progress Monitoring"
+                description="Track milestone completion and submission history of all advisees"
             >
-                <Head title={`Group ${selectedGroup.group_code} Details`} />
+                <Head title="Progress Monitoring" />
 
-                {/* Back Button */}
-                <Button
-                    variant="ghost"
-                    className="mb-6 font-dm"
+                <div
+                    className="flex cursor-pointer items-center gap-2"
                     onClick={handleBackToList}
                 >
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Progress Monitoring
-                </Button>
+                    <BackIcon className="h-6 w-6 shrink-0 text-primary" />
+                    <p className="text-title-3 text-primary underline">
+                        Return
+                    </p>
+                </div>
 
                 {/* Group Information Card */}
-                <div className="h-30 rounded-lg bg-primary p-8 shadow">
-                    <p className="text-body-1 text-primary-foreground">
-                        Group Details
-                    </p>
-                    <p className="text-primary-foreground-2">
-                        {selectedGroup.title}
-                    </p>
-                    <p className="text-body-1 text-primary-foreground">
-                        {selectedGroup.group_code}
-                    </p>
-                </div>
-                <div className="mb-6 rounded-lg bg-white p-8 shadow">
-                    <h2 className="mb-6 font-dm text-2xl font-bold text-primary">
-                        Group Information
-                    </h2>
-
-                    <div className="grid grid-cols-2 gap-6">
-                        <div>
-                            <p className="mb-1 font-dm text-sm text-alert-desc">
-                                Group Code
-                            </p>
-                            <p className="font-dm font-medium">
-                                {selectedGroup.group_code}
-                            </p>
-                        </div>
-                        <div>
-                            <p className="mb-1 font-dm text-sm text-alert-desc">
-                                Block
-                            </p>
-                            <p className="font-dm font-medium">
-                                {selectedGroup.block}
-                            </p>
-                        </div>
-                        <div className="col-span-2">
-                            <p className="mb-1 font-dm text-sm text-alert-desc">
-                                Thesis Title
-                            </p>
-                            <p className="font-dm font-medium">
-                                {selectedGroup.title}
-                            </p>
-                        </div>
-                        <div>
-                            <p className="mb-1 font-dm text-sm text-alert-desc">
-                                Number of Proponents
-                            </p>
-                            <p className="font-dm font-medium">
-                                {selectedGroup.proponents}
-                            </p>
-                        </div>
-                        <div>
-                            <p className="mb-1 font-dm text-sm text-alert-desc">
-                                Student Name
-                            </p>
-                            <p className="font-dm font-medium">
-                                {selectedGroup.student_name}
-                            </p>
-                        </div>
-                        <div>
-                            <p className="mb-1 font-dm text-sm text-alert-desc">
-                                Current Stage
-                            </p>
-                            <p className="font-dm font-medium">
-                                {selectedGroup.thesis_stage}
-                            </p>
-                        </div>
-                        <div>
-                            <p className="mb-2 font-dm text-sm text-alert-desc">
-                                Status
-                            </p>
-                            {getStatusBadgeComponent(selectedGroup.status)}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Thesis Progress Card */}
-                <div className="mb-6 rounded-lg bg-white p-8 shadow">
-                    <h2 className="mb-6 font-dm text-2xl font-bold text-primary">
-                        Thesis Progress
-                    </h2>
-
-                    <div className="mb-6">
-                        <p className="mb-2 font-dm text-sm text-alert-desc">
-                            Overall Progress
+                <div className="flex flex-col gap-4 rounded-lg bg-primary p-8 shadow">
+                    {/* Card Header */}
+                    <div>
+                        <p className="text-body-1 font-semibold text-primary-foreground">
+                            Group Details
                         </p>
-                        <div className="h-3 w-full overflow-hidden rounded-full bg-gray-200">
-                            <div
-                                className="h-full bg-primary transition-all duration-300"
-                                style={{ width: '65%' }}
-                            />
-                        </div>
-                        <p className="mt-1 font-dm text-sm font-medium">
-                            65% Complete
+                    </div>
+
+                    {/* Card Content */}
+                    <div className="flex flex-col gap-1">
+                        <p className="text-primary-foreground-2">
+                            {selectedGroup.title}
+                        </p>
+
+                        <p className="text-body-1 text-primary-foreground">
+                            {selectedGroup.group_code}
                         </p>
                     </div>
                 </div>
+                <div className="rounded-lg border-1 border-primary/20 shadow">
+                    {/* Group Members Card */}
+                    <div className="rounded-lg bg-white p-8">
+                        <h2 className="mb-6 font-dm text-xl font-bold text-primary">
+                            Group Members
+                        </h2>
 
-                {/* Recent Milestones Card */}
-                <div className="rounded-lg bg-white p-8 shadow">
-                    <h2 className="mb-6 font-dm text-2xl font-bold text-primary">
-                        Recent Milestones
-                    </h2>
+                        <div className="space-y-3">
+                            {[
+                                { name: 'Rona Dela Cruz', isLeader: true },
+                                { name: 'Rona Dela Cruz', isLeader: false },
+                                { name: 'Rona Dela Cruz', isLeader: false },
+                                { name: 'Rona Dela Cruz', isLeader: false },
+                            ].map((member, index) => (
+                                <div
+                                    key={index}
+                                    className="flex items-center justify-between rounded-lg bg-breadcrumb p-4"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary font-dm font-semibold text-white">
+                                            RDC
+                                        </div>
+                                        <div>
+                                            <p className="font-dm font-medium text-primary">
+                                                {member.name}
+                                            </p>
+                                            <p className="font-dm text-sm text-alert-default">
+                                                2022-12345-MN-0
+                                            </p>
+                                            <p className="font-dm text-xs text-alert-default">
+                                                ronadelacruz@iskolarngbayan.pup.edu.ph
+                                            </p>
+                                        </div>
+                                    </div>
+                                    {member.isLeader && (
+                                        <Badge variant="default">Leader</Badge>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
 
-                    <div className="space-y-3">
-                        <div className="flex items-start gap-3 rounded-lg bg-gray-50 p-3">
-                            <div className="mt-2 h-2 w-2 rounded-full bg-primary" />
-                            <div>
-                                <p className="font-dm font-medium">
-                                    Title Defense
-                                </p>
-                                <p className="font-dm text-sm text-alert-desc">
-                                    Completed on Dec 15, 2024
-                                </p>
+                    {/* Milestone Progress Card */}
+                    <div className="-mt-8 rounded-lg bg-white p-8 shadow">
+                        <h2 className="mb-6 font-dm text-xl font-bold text-primary">
+                            Milestone Progress
+                        </h2>
+                        {/* Progress + Timeline Container */}
+                        <div className="rounded-lg bg-breadcrumb p-6">
+                            {/* Progress Bar */}
+                            <div className="mb-6">
+                                <div className="mb-2 flex items-center justify-between">
+                                    <p className="text-body-2 font-dm font-bold text-primary">
+                                        Progress
+                                    </p>
+                                    <p className="font-dm text-sm font-semibold text-primary">
+                                        60% Complete
+                                    </p>
+                                </div>
+                                <div className="h-3 w-full overflow-hidden rounded-full bg-gray-200">
+                                    <div className="h-full w-[60%] rounded-full bg-primary bg-gradient-to-r" />
+                                </div>
                             </div>
-                        </div>
-                        <div className="flex items-start gap-3 rounded-lg bg-gray-50 p-3">
-                            <div className="mt-2 h-2 w-2 rounded-full bg-primary" />
-                            <div>
-                                <p className="font-dm font-medium">
-                                    Proposal Submission
-                                </p>
-                                <p className="font-dm text-sm text-alert-desc">
-                                    Completed on Nov 20, 2024
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex items-start gap-3 rounded-lg bg-gray-50 p-3">
-                            <div className="mt-2 h-2 w-2 rounded-full bg-gray-300" />
-                            <div>
-                                <p className="font-dm font-medium">
-                                    Initial Consultation
-                                </p>
-                                <p className="font-dm text-sm text-alert-desc">
-                                    Completed on Oct 5, 2024
-                                </p>
+
+                            {/* Timeline with Milestones */}
+                            <div className="space-y-0">
+                                {[
+                                    {
+                                        title: 'DP1 Manuscript',
+                                        due: 'October 5, 2025',
+                                        submitted: 'October 1, 2025',
+                                        statusBadge:
+                                            'statusBadgeApproved' as BadgeName,
+                                    },
+                                    {
+                                        title: 'Title Proposal',
+                                        due: 'October 15, 2025',
+                                        submitted: 'October 10, 2025',
+                                        statusBadge:
+                                            'statusBadgeApproved' as BadgeName,
+                                    },
+                                    {
+                                        title: 'Chapter 1 Submission',
+                                        due: 'November 5, 2025',
+                                        submitted: null,
+                                        statusBadge:
+                                            'statusBadgePendingReview' as BadgeName,
+                                    },
+                                ].map((milestone, index, array) => {
+                                    const BadgeComponent =
+                                        badgesRegistry[milestone.statusBadge];
+
+                                    const state =
+                                        milestone.statusBadge ===
+                                        'statusBadgeApproved'
+                                            ? index === 0
+                                                ? 'past'
+                                                : 'current'
+                                            : 'upcoming';
+
+                                    return (
+                                        <div
+                                            key={index}
+                                            className="flex items-start gap-4"
+                                        >
+                                            {/* Timeline State Column */}
+                                            <div className="flex flex-col items-center pt-1">
+                                                <TimelineState
+                                                    state={state}
+                                                    className={
+                                                        index ===
+                                                        array.length - 1
+                                                            ? '[&_svg]:hidden'
+                                                            : ''
+                                                    }
+                                                />
+                                            </div>
+
+                                            {/* Content Card */}
+                                            <div className="mb-4 flex-1 rounded-lg border border-primary/20 bg-breadcrumb p-4 shadow-md">
+                                                <div className="flex items-start justify-between gap-3">
+                                                    <div className="flex-1">
+                                                        <p className="mb-1 font-dm font-semibold text-primary">
+                                                            {milestone.title}
+                                                        </p>
+                                                        <p className="font-dm text-sm text-primary">
+                                                            Due: {milestone.due}
+                                                        </p>
+                                                        {milestone.submitted && (
+                                                            <p className="font-dm text-sm text-alert-selected">
+                                                                Submitted:{' '}
+                                                                {
+                                                                    milestone.submitted
+                                                                }
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <BadgeComponent />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
                     </div>
+
+                    {/* Recent Submissions Card */}
+                    <div className="-mt-8 rounded-lg bg-primary-foreground p-8 shadow">
+                        <h2 className="mb-6 font-dm text-xl font-bold text-primary">
+                            Recent Submissions
+                        </h2>
+
+                        <div className="divide-y divide-border overflow-hidden rounded-lg border border-primary/20">
+                            {[
+                                'BSCPE_4-3_DP1_Manuscript.pdf',
+                                'BSCPE_4-3_Title Proposal.pdf',
+                            ].map((file, index) => (
+                                <div
+                                    key={index}
+                                    className="group flex cursor-pointer items-center gap-3 border-l-4 border-transparent bg-gray-50 p-4 transition-all duration-200 hover:border-primary hover:bg-primary/30"
+                                >
+                                    {/* Document Icon */}
+                                    <DocuIcon className="h-6 w-6 shrink-0 text-primary" />
+
+                                    {/* File Name */}
+                                    <p className="truncate font-dm font-medium text-primary">
+                                        {file}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+                {/* Action Buttons */}
+                <div className="mt-6 flex items-center justify-end gap-3">
+                    <Button variant="secondary" onClick={handleBackToList}>
+                        Cancel
+                    </Button>
+
+                    <Button variant="default">Send Message / Feedback</Button>
                 </div>
             </AdviseeManagementLayout>
         );
