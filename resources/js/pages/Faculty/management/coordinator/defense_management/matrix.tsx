@@ -217,7 +217,7 @@ function DefenseTableRow({ data }: { data: any }) {
                 {data.project_title}
             </span>
             <span className="text-sm text-gray-800 text-center">
-                {data.section}
+                BSCPE {data.year_level}-{data.section}
             </span>
             <span className="text-sm text-gray-800 text-center">
                 {data.defense_room}
@@ -246,6 +246,25 @@ function DefenseTableRow({ data }: { data: any }) {
 }
 
 // ----------------------------------------------------------------------
+// MOCK DATA ADD A SCHEDULE DEFENSE
+// ----------------------------------------------------------------------
+
+const dummyProjects = [
+    "Machine Learning Approach",
+    "IoT Based Monitoring System",
+    "Automated Attendance System",
+    "Network Security Analysis",
+    "FPGA Implementation"
+];
+
+const dummyGroupCodes = [
+    "BSCPE4-3A",
+    "BSCPE4-3B",
+    "BSCPE4-4A",
+    "BSCPE4-4B"
+];
+
+// ----------------------------------------------------------------------
 // MAIN DASHBOARD
 // ----------------------------------------------------------------------
 
@@ -258,7 +277,16 @@ const breadcrumb: BreadcrumbItem[] = [
 
 export default function MatrixManagement({ defenseMatrices }: { defenseMatrices: any[] }) {
     const [viewMode, setViewMode] = useState<'table' | 'calendar'>('calendar');
-    const [currentDate, setCurrentDate] = useState(new Date('2025-11-28')); 
+    const [currentDate, setCurrentDate] = useState(new Date('2025-11-28'));
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumb}>
@@ -294,7 +322,7 @@ export default function MatrixManagement({ defenseMatrices }: { defenseMatrices:
                         {/* 2. Standard Button Component */}
                         <Button 
                             variant="primary" 
-                            onClick={() => console.log("Open Schedule Modal")}
+                            onClick={openModal}
                         >
                             <Plus className="mr-2 h-4 w-4" /> 
                             Schedule a Defense
@@ -349,9 +377,72 @@ export default function MatrixManagement({ defenseMatrices }: { defenseMatrices:
                     </div>
 
                 </div>
+
             </AppContent>
+
+                {isModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                        <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-lg">
+                            <h2 className="text-xl font-bold mb-4">Schedule a Defense</h2>
+
+                            {/* Form fields */}
+                            <div className="space-y-4">
+                                {/* Project Title Dropdown */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Project Title</label>
+                                    <select className="w-full border border-gray-300 rounded px-3 py-2">
+                                        <option value="">Select Project</option>
+                                        {dummyProjects.map((proj, idx) => (
+                                            <option key={idx} value={proj}>{proj}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* Group Code Dropdown */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Group Code</label>
+                                    <select className="w-full border border-gray-300 rounded px-3 py-2">
+                                        <option value="">Select Group</option>
+                                        {dummyGroupCodes.map((code, idx) => (
+                                            <option key={idx} value={code}>{code}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* Room */}
+                                <input
+                                    type="text"
+                                    placeholder="Room"
+                                    className="w-full border border-gray-300 rounded px-3 py-2"
+                                />
+                                <input
+                                    type="date"
+                                    className="w-full border border-gray-300 rounded px-3 py-2"
+                                />
+                                <input
+                                    type="time"
+                                    className="w-full border border-gray-300 rounded px-3 py-2"
+                                />
+                            </div>
+
+
+                            {/* Action Buttons */}
+                            <div className="flex justify-end mt-6 gap-2">
+                                <Button variant="secondary" onClick={closeModal}>Cancel</Button>
+                                <Button variant="primary" onClick={() => { 
+                                    console.log("Save new defense"); 
+                                    closeModal();
+                                }}>Save</Button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
         </AppLayout>
+
     );
+
+
 
 
 }

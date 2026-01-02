@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class Matrix extends Controller
 {
@@ -19,6 +20,8 @@ class Matrix extends Controller
         // Main Query: Query all the valid schedule set by the coordinator      --note: date and timestamp
 
         // Render and Props
+
+        $userId = Auth::id(); // 1. Get Logged in User ID
 
         // Subquery for active school year
         $activeYearSub = DB::table('tbl_school_years as sy2')
@@ -65,6 +68,20 @@ class Matrix extends Controller
             ->join('tbl_faculty_assignments as fa_sy', 'sa.faculty_assign_id', '=', 'fa_sy.id')
             ->join('tbl_school_years as sy', 'fa_sy.sy_id', '=', 'sy.id')
             ->join('tbl_faculties as adv', 'fa_sy.faculty_id', '=', 'adv.id')
+
+            // --- 2. SECURITY FILTER STARTS HERE ---
+            // Join Assignments to check if the Logged-in User is a Coordinator for this specific 'sy.id'
+            ->join('tbl_faculty_assignments as my_coord_assign', function($join) {
+                $join->on('sy.id', '=', 'my_coord_assign.sy_id') // Match the Batch/SY
+                     ->where('my_coord_assign.role_id', 4);      // 4 = Coordinator Role ID
+            })
+            // Join Faculties to match the User ID
+            ->join('tbl_faculties as my_faculty', function($join) use ($userId) {
+                $join->on('my_coord_assign.faculty_id', '=', 'my_faculty.id')
+                     ->where('my_faculty.user_id', $userId);     // Filter by Logged-in User
+            })
+            // --- SECURITY FILTER ENDS HERE ---
+
             ->leftJoinSub($confirmedPanelsSub, 'cp', function($join) {
                 $join->on('cp.defense_matrix_id', '=', 'dm.id');
             })
@@ -72,7 +89,7 @@ class Matrix extends Controller
                 $join->on('st.group_id', '=', 'tg.id');
             })
             ->leftJoinSub($activeYearSub, 'ays', function($join) {
-                $join->on(DB::raw('1'), '=', DB::raw('1')); // cross join
+                $join->on(DB::raw('1'), '=', DB::raw('1'));
             })
             ->select(
                 'dm.id',
@@ -80,28 +97,20 @@ class Matrix extends Controller
                 DB::raw('TIME(dm.defense_schedule) AS defense_time'),
                 'dm.defense_room',
                 't.title AS project_title',
-
-                // group_code
-                DB::raw("CONCAT((3 + (ays.year - sy.year)), sa.section, LPAD(tg.group_number, 2, '0')) AS group_code"),
-
-                // year_level
+                DB::raw("CONCAT((3 + (ays.year - sy.year)), sa.section, LPAD(tg.group_number, 2, '0')) AS group_code"),                
                 DB::raw("LEFT(CONCAT((3 + (ays.year - sy.year)), sa.section, LPAD(tg.group_number, 2, '0')), 1) AS year_level"),
-
-                // section
                 DB::raw("SUBSTRING(CONCAT((3 + (ays.year - sy.year)), sa.section, LPAD(tg.group_number, 2, '0')), 2, LENGTH(CONCAT((3 + (ays.year - sy.year)), sa.section, LPAD(tg.group_number, 2, '0'))) - 3) AS section"),
-
-                // section adviser
                 DB::raw("CONCAT(COALESCE(adv.name_prefix,''), ' ', COALESCE(adv.first_name,''), ' ', COALESCE(adv.last_name,''), IF(adv.suffix IS NOT NULL AND adv.suffix <> '', CONCAT(' ', adv.suffix), '')) AS section_adviser"),
-
                 'cp.confirmed_panels',
                 'st.proponents',
-
                 DB::raw("CASE WHEN cp.panel_count = 3 THEN 'SCHEDULED' ELSE 'PENDING' END AS status")
             )
             ->get();
 
         return Inertia::render('Faculty/management/coordinator/defense_management/matrix', [
             'defenseMatrices' => $defenseMatrices,
+
+         
         ]);
 
     }
