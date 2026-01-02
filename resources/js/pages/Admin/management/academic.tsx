@@ -48,9 +48,6 @@ export default function AcademicSettings() {
                 </div>
             }
       description="Configure academic year, semester parameters, and system timeline">
-      
-      {/* SEPARATOR LINE */}
-      <div style={{ height: '1px', backgroundColor: '#9B000A', marginBottom: '0',}}/>
 
       {/* GRID */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 text-[#730000]">
