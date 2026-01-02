@@ -5,8 +5,8 @@ import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import AdviseeManagementLayout from '.';
 import { AdviseeGroupCard } from '@/components/ui/card';
-import FilterSearchSection from '@/components/filter-search-section';
-import { FileText, Calendar, ArrowLeft, Download, Eye, MessageSquare, User } from 'lucide-react';
+import { SearchBar } from '@/components/filter-search';
+import { FileText, Calendar, ArrowLeft, Download, Eye, MessageSquare, User, Filter } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,7 +23,7 @@ const breadcrumb: BreadcrumbItem[] = [
 const mockThesisGroups = [
   {
     groupCode: "4308",
-    badge: "1 Pending Review",
+    badge: "Pending Review",
     thesisTitle: "Machine Learning for Traffic Prediction",
     section: "BSCPE 4-3",
     numberofMembers: "4 Members",
@@ -32,7 +32,7 @@ const mockThesisGroups = [
   },
   {
     groupCode: "4309",
-    badge: "2 Approved",
+    badge: "Completed",
     thesisTitle: "Blockchain-Based Supply Chain Management System",
     section: "BSCPE 4-2",
     numberofMembers: "3 Members",
@@ -41,7 +41,7 @@ const mockThesisGroups = [
   },
   {
     groupCode: "4310",
-    badge: "1 Revisions Requested",
+    badge: "Pending Review",
     thesisTitle: "Mobile Application for Real-Time Traffic Monitoring",
     section: "BSCPE 4-1",
     numberofMembers: "4 Members",
@@ -50,6 +50,7 @@ const mockThesisGroups = [
   },
   {
     groupCode: "4311",
+    badge: "Completed",
     thesisTitle: "IoT-Based Smart Home Automation with AI Integration",
     section: "BSCPE 4-3",
     numberofMembers: "3 Members",
@@ -58,7 +59,7 @@ const mockThesisGroups = [
   },
   {
     groupCode: "4312",
-    badge: "3 Pending Review",
+    badge: "Pending Review",
     thesisTitle: "Natural Language Processing for Sentiment Analysis in Social Media",
     section: "BSCPE 4-2",
     numberofMembers: "4 Members",
@@ -67,6 +68,7 @@ const mockThesisGroups = [
   },
   {
     groupCode: "4313",
+    badge: "Completed",
     thesisTitle: "Computer Vision System for Automated Quality Control",
     section: "BSCPE 4-1",
     numberofMembers: "3 Members",
@@ -75,7 +77,7 @@ const mockThesisGroups = [
   },
   {
     groupCode: "4314",
-    badge: "1 Approved",
+    badge: "Completed",
     thesisTitle: "Augmented Reality Application for Educational Purposes",
     section: "BSCPE 4-2",
     numberofMembers: "4 Members",
@@ -84,7 +86,7 @@ const mockThesisGroups = [
   },
   {
     groupCode: "4315",
-    badge: "2 Pending Review",
+    badge: "Pending Review",
     thesisTitle: "Cybersecurity Framework for Small and Medium Enterprises",
     section: "BSCPE 4-3",
     numberofMembers: "3 Members",
@@ -93,6 +95,7 @@ const mockThesisGroups = [
   },
   {
     groupCode: "4316",
+    badge: "Completed",
     thesisTitle: "Cloud-Based Inventory Management System for Retail",
     section: "BSCPE 4-1",
     numberofMembers: "4 Members",
@@ -101,7 +104,7 @@ const mockThesisGroups = [
   },
   {
     groupCode: "4317",
-    badge: "2 Revisions Requested",
+    badge: "Pending Review",
     thesisTitle: "Recommendation System Using Collaborative Filtering",
     section: "BSCPE 4-2",
     numberofMembers: "3 Members",
@@ -110,7 +113,7 @@ const mockThesisGroups = [
   },
   {
     groupCode: "4318",
-    badge: "1 Pending Review",
+    badge: "Pending Review",
     thesisTitle: "Facial Recognition System for Attendance Monitoring",
     section: "BSCPE 4-3",
     numberofMembers: "4 Members",
@@ -119,7 +122,7 @@ const mockThesisGroups = [
   },
   {
     groupCode: "4319",
-    badge: "3 Approved",
+    badge: "Completed",
     thesisTitle: "E-Learning Platform with Adaptive Learning Technologies",
     section: "BSCPE 4-1",
     numberofMembers: "3 Members",
@@ -284,6 +287,15 @@ export default function ThesisReview() {
     const [selectedSubmission, setSelectedSubmission] = useState<any | null>(null);
     const [commentText, setCommentText] = useState('');
     const [pageNumber, setPageNumber] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
+
+    // Filter groups based on search query
+    const filteredGroups = mockThesisGroups.filter(
+        (group) =>
+            group.groupCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            group.thesisTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            group.section.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     const handleGroupClick = (group: typeof mockThesisGroups[0]) => {
         setSelectedGroup(group);
@@ -574,7 +586,7 @@ export default function ThesisReview() {
         );
     }
 
-    // Groups List View (Default)
+    // Groups List View 
     return (
         <AdviseeManagementLayout 
             breadcrumbs={breadcrumb}
@@ -582,10 +594,53 @@ export default function ThesisReview() {
             description="Review, comment on, and approve/request revisions for submitted thesis documents"
         >
             <div className="space-y-6">
-                <FilterSearchSection variant="DefenseManagement" />
+                {/* Filter & Search Section */}
+                <div className="mb-6 box-border flex h-[125.6px] w-full max-w-[1360px] flex-col items-start gap-4 self-stretch rounded-[10px] border-[0.8px] border-primary/20 bg-card p-[24.8px_24.8px_0.8px_24.8px] font-dm shadow-sm transition-all duration-200">
+                    {/* Header Section */}
+                    <div className="flex h-6 w-full flex-row items-center gap-2 self-stretch rounded-none font-dm">
+                        <Filter className="h-5 w-5 text-primary" />
+                        <h2 className="font-dm text-base leading-6 font-normal text-primary">
+                            Filters & Search
+                        </h2>
+                    </div>
+
+                    {/* Controls Row */}
+                    <div className="flex w-full flex-row items-center justify-center gap-[10px] self-stretch font-dm">
+                        {/* Search Box */}
+                        <div className="flex-1 font-dm">
+                            <SearchBar
+                                variant="filter-section"
+                                placeholder="Search group code, thesis title, or section..."
+                                value={searchQuery}
+                                onChange={setSearchQuery}
+                            />
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex flex-row items-center gap-[10px] font-dm">
+                            <Button
+                                variant="secondary"
+                                size="icon"
+                                className="rounded-lg border-none font-dm"
+                            >
+                                <Filter className="h-4 w-4" />
+                            </Button>
+
+                            <Button
+                                variant="negative"
+                                className="h-9 min-w-[101px] gap-2 rounded-lg px-4 py-2 font-dm"
+                                onClick={() => setSearchQuery('')}
+                            >
+                                <span className="font-dm text-[13.33px] font-medium">
+                                    Clear Filter
+                                </span>
+                            </Button>
+                        </div>
+                    </div>
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {mockThesisGroups.map((group, index) => (
+                    {filteredGroups.map((group, index) => (
                         <div 
                             key={index}
                             onClick={() => handleGroupClick(group)}

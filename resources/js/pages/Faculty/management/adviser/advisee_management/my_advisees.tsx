@@ -25,6 +25,11 @@ const breadcrumb: BreadcrumbItem[] = [
     },
 ];
 
+
+
+interface MyAdviseesProps {
+    advisees: Advisee[];
+}
 interface Advisee {
     student_id: string;
     student_name: string;
@@ -32,11 +37,6 @@ interface Advisee {
     group_code: string;
     block: string;
 }
-
-interface MyAdviseesProps {
-    advisees: Advisee[];
-}
-
 // Sample data - 1 student duplicated 20 times
 const sampleAdvisees: Advisee[] = Array(20).fill({
     student_id: '2022-12345-MN-0',
