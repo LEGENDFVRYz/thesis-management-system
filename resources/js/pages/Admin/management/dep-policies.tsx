@@ -374,14 +374,6 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
                     </Alert>
                 </div>
             )}
-            {/* SEPARATOR LINE */}
-            <div
-                style={{
-                    height: '1px',
-                    backgroundColor: '#9B000A',
-                    marginBottom: '0',
-                }}
-            />
 
             {/* TABS + CARD */}
             <div className="bg-white">
