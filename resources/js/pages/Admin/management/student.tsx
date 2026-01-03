@@ -164,7 +164,6 @@ export default function StudentManagement({ students }: { students?: any[] }) {
           }}
         />
       </ManagementLayout>
-          
       <NavFooter />
     </>
   );
