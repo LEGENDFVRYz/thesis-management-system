@@ -43,7 +43,7 @@ function ConfirmationPopup({
       <div className="bg-white rounded-lg p-8 max-w-sm w-full mx-4 shadow-xl">
         <div className="flex flex-col items-center text-center">
           {/* Warning Icon */}
-          <div className="w-16 h-16 flex items-center justify-center mb-4">
+          <div className="w-17 h-17 flex items-center justify-center mb-4">
             <AlertCircle size={60} className="text-primary" />
           </div>
           
