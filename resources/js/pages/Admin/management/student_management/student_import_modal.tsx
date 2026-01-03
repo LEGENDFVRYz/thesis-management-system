@@ -127,7 +127,7 @@ export function StudentImportModal({ isOpen, onClose, onImportComplete }: Import
     return true;
   };
 
-  //IMPORT MODAL
+  //IMPORT STUDENT MODAL
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
@@ -182,7 +182,7 @@ export function StudentImportModal({ isOpen, onClose, onImportComplete }: Import
                     <p className="text-xs text-gray-500">Supported formats: .csv, .xlsx, .xls</p>
                   </div>
 
-                  {/* Uploaded Files Display sa baba*/}
+                  {/* Successfully Uploaded File Display sa baba*/}
                   {uploadedFiles.length > 0 && uploadProgress === 100 && (
                     <div className="space-y-3">
                       <h3 className="text-sm font-semibold text-gray-700">Uploaded Files</h3>
@@ -267,7 +267,7 @@ export function StudentImportModal({ isOpen, onClose, onImportComplete }: Import
 
                   <div className="space-y-3">
                     <h3 className="font-medium text-[#7D1F1F]">Actions</h3>
-                    <p className="text-sm text-gray-600">Please specify the desired action for existing student accounts.</p>
+                    <p className="text-sm text-gray-600">Please specify the desired action for existing student records.</p>
                     
                     <RadioGroup value={updateAction} onValueChange={(value) => setUpdateAction(value as 'update' | 'skip')}>
                       <div className="flex items-center space-x-2">
@@ -303,88 +303,103 @@ export function StudentImportModal({ isOpen, onClose, onImportComplete }: Import
                       </div>
                     </div>
 
-                    {previewData.length > 0 && (
-                      <div className="border rounded-lg overflow-x-auto max-h-64 overflow-y-auto">
-                        <table className="w-full text-sm">
-                          <thead className="bg-gray-50 sticky top-0">
-                            <tr>
-                              {SYSTEM_FIELDS.map((field) => (
-                                <th key={field.field} className="p-2 text-left font-medium border-r last:border-r-0">
-                                  {field.field}
-                                </th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {previewData.map((row, i) => (
-                              <tr key={i} className="border-t hover:bg-gray-50">
+                    {/* Data Preview Container */}
+                    <div className="border rounded-lg overflow-hidden bg-gray-50 min-h-[200px]">
+                      {previewData.length > 0 ? (
+                        <div className="overflow-x-auto max-h-64 overflow-y-auto">
+                          <table className="w-full text-sm bg-white">
+                            <thead className="bg-gray-50 sticky top-0">
+                              <tr>
                                 {SYSTEM_FIELDS.map((field) => (
-                                  <td key={field.field} className="p-2 border-r last:border-r-0">
-                                    {row[field.field] || '—'}
-                                  </td>
+                                  <th key={field.field} className="p-2 text-left font-medium border-r last:border-r-0">
+                                    {field.field}
+                                  </th>
                                 ))}
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody>
+                              {previewData.map((row, i) => (
+                                <tr key={i} className="border-t hover:bg-gray-50">
+                                  {SYSTEM_FIELDS.map((field) => (
+                                    <td key={field.field} className="p-2 border-r last:border-r-0">
+                                      {row[field.field] || '—'}
+                                    </td>
+                                  ))}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center h-[200px]">
+                          <p className="text-sm text-gray-500">No preview data available</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Error Section Container */}
+                  <div className="border rounded-lg overflow-hidden bg-gray-50 min-h-[150px]">
+                    {importErrors.length > 0 ? (
+                      <div className="bg-red-50 border-red-200 p-4">
+                        <div className="flex gap-3 mb-3">
+                          
+                          <div>
+                            <h4 className="font-semibold text-red-800 mb-1">ERROR(S) FOUND: </h4>
+                            <p className="text-sm text-red-700">
+                              Records with errors are shown below and will not be imported.
+                            </p>
+                          </div>
+                        </div>
+
+                        <p className="text-sm font-medium text-red-800 mb-3">({importErrors.length}) Errors found</p>
+                        <ul className="text-sm text-red-700 space-y-1 mb-4">
+                          {importErrors.map((error, i) => (
+                            <li key={i}>• Row {error.row}: {error.errors.join(', ')}</li>
+                          ))}
+                        </ul>
+
+                        <div className="border rounded-lg overflow-x-auto mb-4 bg-white">
+                          <table className="w-full text-sm">
+                            <thead className="bg-gray-50">
+                              <tr>
+                                <th className="p-2 text-left font-medium border-r">#</th>
+                                {SYSTEM_FIELDS.map((field) => (
+                                  <th key={field.field} className="p-2 text-left font-medium border-r last:border-r-0">
+                                    {field.field}
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {importErrors.map((error) => (
+                                <tr key={error.row} className="border-t hover:bg-gray-50">
+                                  <td className="p-2 border-r">{error.row}</td>
+                                  <td className="p-2 border-r">{error.studentId}</td>
+                                  <td className="p-2 border-r">{error.studentName}</td>
+                                  <td className={`p-2 border-r ${
+                                    error.errors.some(e => e.includes('PUP Webmail')) ? "bg-red-100" : ""
+                                  }`}>{error.email}</td>
+                                  <td className="p-2 border-r">{error.groupCode}</td>
+                                  <td className="p-2 border-r">{error.block}</td>
+                                  <td className="p-2 border-r">{error.specialization}</td>
+                                  <td className={`p-2 ${
+                                    error.errors.some(e => e.includes('Thesis Adviser')) ? "bg-red-100" : ""
+                                  }`}>{error.thesisAdviser}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center bg-primary/15 justify-center h-[150px]">
+                        <div className="text-center">
+                          <p className="text-sm text-gray-600">No error/s found. </p>
+                        </div>
                       </div>
                     )}
                   </div>
-
-                  {/* Only show error section if there are errors */}
-                  {importErrors.length > 0 && (
-                    <div className="bg-red-50 border border-red-200 rounded p-4">
-                      <div className="flex gap-3 mb-3">
-                        <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-                        <div>
-                          <h4 className="font-semibold text-red-800 mb-1">ERROR(S) FOUND DURING IMPORT</h4>
-                          <p className="text-sm text-red-700">
-                            Records with errors are shown below and will not be imported. You can download the error report to correct the source file and re-import.
-                          </p>
-                        </div>
-                      </div>
-
-                      <p className="text-sm font-medium text-red-800 mb-3">({importErrors.length}) Errors found</p>
-                      <ul className="text-sm text-red-700 space-y-1 mb-4">
-                        {importErrors.map((error, i) => (
-                          <li key={i}>• Row {error.row}: {error.errors.join(', ')}</li>
-                        ))}
-                      </ul>
-
-                      <div className="border rounded-lg overflow-x-auto mb-4 bg-white">
-                        <table className="w-full text-sm">
-                          <thead className="bg-gray-50">
-                            <tr>
-                              <th className="p-2 text-left font-medium border-r">#</th>
-                              {SYSTEM_FIELDS.map((field) => (
-                                <th key={field.field} className="p-2 text-left font-medium border-r last:border-r-0">
-                                  {field.field}
-                                </th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {importErrors.map((error) => (
-                              <tr key={error.row} className="border-t hover:bg-gray-50">
-                                <td className="p-2 border-r">{error.row}</td>
-                                <td className="p-2 border-r">{error.studentId}</td>
-                                <td className="p-2 border-r">{error.studentName}</td>
-                                <td className={`p-2 border-r ${
-                                  error.errors.some(e => e.includes('PUP Webmail')) ? "bg-red-100" : ""
-                                }`}>{error.email}</td>
-                                <td className="p-2 border-r">{error.groupCode}</td>
-                                <td className="p-2 border-r">{error.block}</td>
-                                <td className="p-2 border-r">{error.specialization}</td>
-                                <td className={`p-2 ${
-                                  error.errors.some(e => e.includes('Thesis Adviser')) ? "bg-red-100" : ""
-                                }`}>{error.thesisAdviser}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
@@ -419,7 +434,6 @@ export function StudentImportModal({ isOpen, onClose, onImportComplete }: Import
                   <span>Confirm Import</span>
                 </WizardButton>
               )}
-              
             </WizardNavigation>
           </div>
         </div>
