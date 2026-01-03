@@ -145,6 +145,9 @@ Route::prefix('faculty')->group(function () {
                     Route::get('/my_advisees', [MyAdvisees::class, 'index'])->name('faculty.management.adviser.advisee_management.my_advisees');
 
                     Route::get('/group_comp', [GroupComp::class, 'index'])->name('faculty.management.adviser.advisee_management.group_comp');
+                    Route::post('/group_comp', [GroupComp::class, 'store'])->name('faculty.management.adviser.advisee_management.group_comp.store');
+                    Route::put('/group_comp/{id}', [GroupComp::class, 'update'])->name('faculty.management.adviser.advisee_management.group_comp.update');
+                    Route::delete('/group_comp/{id}', [GroupComp::class, 'destroy'])->name('faculty.management.adviser.advisee_management.group_comp.destroy');
 
                     Route::get('/thesis_review', [ThesisReview::class, 'index'])->name('faculty.management.adviser.advisee_management.thesis_review');
 
