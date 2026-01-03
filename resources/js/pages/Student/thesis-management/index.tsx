@@ -5,7 +5,7 @@ import { Head } from '@inertiajs/react';
 import { type ReactNode } from 'react';
 import { cn } from '@/lib/utils'; 
 
-interface RepositoryLayoutProps {
+interface ThesisManagementLayoutProps {
     children: ReactNode;
     breadcrumbs?: BreadcrumbItem[];
     title?: string;
@@ -14,14 +14,14 @@ interface RepositoryLayoutProps {
 
 const breadcrumb: BreadcrumbItem[] = [
     {
-        title: 'Repository',
+        title: 'Management',
         href: thesisManagement().url,
     },
 ];
 
-export default function RepositoryLayout({ children, breadcrumbs, title, description }: RepositoryLayoutProps) {
+export default function ThesisManagementLayout({ children, breadcrumbs, title, description }: ThesisManagementLayoutProps) {
     return (
-        // WRAPPER FOR ALL REPOSITORY PAGES
+        // WRAPPER FOR ALL THESIS MANAGEMENT PAGES
         <AppLayout breadcrumbs={[...breadcrumb, ...(breadcrumbs ?? [])]}>
             {title && description && (
                 <header 
