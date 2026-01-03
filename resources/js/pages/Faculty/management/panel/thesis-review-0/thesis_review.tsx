@@ -205,26 +205,31 @@ import { SearchBar } from '@/components/filter-search';
                                     <TableHead className="text-white font-medium text-[13.33px] leading-[17px] h-[40px] text-center rounded-tl-[8px] w-[10%]">
                                         Defense ID
                                     </TableHead>
-                                    <TableHead className="text-white font-medium text-[13.33px] leading-[17px] h-[40px] text-center w-[20%]">
+                                    <TableHead className="text-white font-medium text-[13.33px] leading-[17px] h-[40px] text-center w-[18%]">
                                         Title
                                     </TableHead>
-                                    <TableHead className="text-white font-medium text-[13.33px] leading-[17px] h-[40px] text-center w-[10%]">
+                                    <TableHead className="text-white font-medium text-[13.33px] leading-[17px] h-[40px] text-center w-[8%]">
                                         {currentStatus === 'approved' ? 'Proponent' : 'Proponents'}
                                     </TableHead>
-                                    <TableHead className="text-white font-medium text-[13.33px] leading-[17px] h-[40px] text-center w-[15%]">
+                                    <TableHead className="text-white font-medium text-[13.33px] leading-[17px] h-[40px] text-center w-[13%]">
                                         Adviser
                                     </TableHead>
-                                    <TableHead className="text-white font-medium text-[13.33px] leading-[17px] h-[40px] text-center w-[10%]">
+                                    <TableHead className="text-white font-medium text-[13.33px] leading-[17px] h-[40px] text-center w-[9%]">
                                         Block
                                     </TableHead>
-                                    <TableHead className="text-white font-medium text-[13.33px] leading-[17px] h-[40px] text-center w-[12%]">
+                                    <TableHead className="text-white font-medium text-[13.33px] leading-[17px] h-[40px] text-center w-[11%]">
                                         Date & Time
                                     </TableHead>
                                     <TableHead className="text-white font-medium text-[13.33px] leading-[17px] h-[40px] text-center w-[10%]">
                                         {currentStatus === 'pending' ? 'Type' : 'Status'}
                                     </TableHead>
-                                    <TableHead className="text-white font-medium text-[13.33px] leading-[17px] h-[40px] text-center w-[13%] rounded-tr-[8px]">
-                                        {currentStatus === 'pending' ? 'Action' : 'Action'}
+                                    {currentStatus === 'approved' && (
+                                        <TableHead className="text-white font-medium text-[13.33px] leading-[17px] h-[40px] text-center w-[11%]">
+                                            Details
+                                        </TableHead>
+                                    )}
+                                    <TableHead className={`text-white font-medium text-[13.33px] leading-[17px] h-[40px] text-center ${currentStatus === 'approved' ? 'w-[10%]' : 'w-[13%]'} rounded-tr-[8px]`}>
+                                        Action
                                     </TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -285,10 +290,26 @@ import { SearchBar } from '@/components/filter-search';
                                                 )}
                                             </TableCell>
                                             
-                                            {/* Column 8: Action - Different content based on status */}
+                                            {/* Column 8: Details (only for approved) */}
+                                            {currentStatus === 'approved' && (
+                                                <TableCell className="text-center p-[10px]">
+                                                    <Button
+                                                        variant="tertiary"
+                                                        onClick={() => {
+                                                            setSelectedDefense(defense);
+                                                            setModalOpen(true);
+                                                        }}
+                                                        className="h-[32px] rounded-[8px]"
+                                                    >
+                                                        View Details
+                                                    </Button>
+                                                </TableCell>
+                                            )}
+                                            
+                                            {/* Column 8/9: Action */}
                                             <TableCell className="text-center p-[10px]">
                                                 {currentStatus === 'pending' ? (
-                                                   <Button
+                                                    <Button
                                                         variant="tertiary"
                                                         onClick={() => {
                                                             setSelectedDefense(defense);
@@ -322,12 +343,12 @@ import { SearchBar } from '@/components/filter-search';
                                 {filteredData.length} of {currentData.length} {currentStatus === 'pending' ? 'Upcoming' : 'Completed'} Defenses
                             </TableCaption>
                         </Table>
-                        {/* Thesis Modal */}
                         <ThesisModal
-                            defense={selectedDefense}
-                            open={modalOpen}
-                            onOpenChange={setModalOpen}
-                        />
+                        defense={selectedDefense}
+                        open={modalOpen}
+                        onOpenChange={setModalOpen}
+                        status={currentStatus}  // Add this line
+                    />
 
                     </div>
                 </div>

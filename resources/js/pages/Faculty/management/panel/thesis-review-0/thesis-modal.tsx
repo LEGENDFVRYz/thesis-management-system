@@ -23,9 +23,10 @@ interface ThesisModalProps {
   defense: Defense | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  status?: 'pending' | 'approved'; // Add status prop
 }
 
-export default function ThesisModal({ defense, open, onOpenChange }: ThesisModalProps) {
+export default function ThesisModal({ defense, open, onOpenChange, status = 'pending' }: ThesisModalProps) {
   if (!defense) return null;
 
   const [date, time] = defense.dateTime.split('\n');
@@ -53,9 +54,32 @@ export default function ThesisModal({ defense, open, onOpenChange }: ThesisModal
               <div className="text-[16px] font-bold leading-[21px] text-[#730000] mb-1">Defense ID</div>
               <div className="text-[16px] font-medium leading-[21px] text-[#000000]">{defense.id}</div>
             </div>
-            <div className="px-2 py-[2px] bg-[#730000] rounded-lg text-white text-[12px] font-medium leading-4 flex items-center justify-center h-[21.59px]">
-              Upcoming
-            </div>
+            {/* Conditional Badge based on status */}
+            {status === 'pending' ? (
+              <div className="px-2 py-[2px] bg-[#730000] rounded-lg text-white text-[12px] font-medium leading-4 flex items-center justify-center h-[21.59px]">
+                Upcoming
+              </div>
+            ) : (
+              <div 
+                className="flex flex-row justify-center items-center px-2 py-[2px] gap-1 rounded-lg"
+                style={{
+                  width: '74.08px',
+                  height: '21.59px',
+                  background: '#007000',
+                  boxSizing: 'border-box'
+                }}
+              >
+                <span 
+                  className="font-['DM_Sans'] font-medium text-[12px] leading-4 text-white"
+                  style={{
+                    width: '64px',
+                    height: '16px'
+                  }}
+                >
+                  Completed
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Title */}
