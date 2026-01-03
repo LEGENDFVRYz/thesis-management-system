@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import { thesisManagement } from '@/routes/student/repository';
+import { thesisManagement } from '@/routes/student';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { type ReactNode } from 'react';

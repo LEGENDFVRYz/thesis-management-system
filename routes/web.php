@@ -108,8 +108,8 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     })->name('student.notification');
 
     Route::get('student/thesis-management', function () {
-        return Inertia::render('Student/repository/thesis');
-    })->name('student.repository.thesis-management');
+        return Inertia::render('Student/thesis-management/thesis');
+    })->name('student.thesis-management');
 
     Route::get('student/ip-plagiarism', function () {
         return Inertia::render('Student/compliance-ip');

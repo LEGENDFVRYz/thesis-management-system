@@ -1,7 +1,7 @@
 import { Download, AlertCircle, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import DocumentPreview from '@/pages/Student/repository/thesis-preview';
+import DocumentPreview from '@/pages/Student/thesis-management/thesis-preview';
 import { useState } from "react";
 import ApprovedBadge from '@/components/badges/verdict_badges-Approved.svg'
 import RejectedBadge from '@/components/badges/verdict_badges-Rejected.svg'
