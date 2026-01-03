@@ -9,8 +9,8 @@ import { Alert } from '@/components/ui/alert';
 import StageSwitchToggle from '@/components/stage-toggle';
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
 import DefensePoliciesRubrics from '@/pages/Admin/management/dep-policies-rubrics';
-
-// ICONS
+import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import { LuUpload } from 'react-icons/lu'
 import EditIcon from '@/components/Icons/ic_edit-Default.svg';
 import DeleteIcon from '@/components/Icons/ic_delete-Default.svg';
 import AddIcon from '@/components/Icons/ic_add-Default.svg';
@@ -72,6 +72,13 @@ const WORKFLOWS: Record<Stage, WorkflowStepType[]> = {
   ],
 };
 
+// WORKFLOW TITLES
+const WORKFLOW_TITLES: Record<Stage, string> = {
+    mor: 'Methods of Research Workflow',
+    dp1: 'Design Project 1 Workflow',
+    dp2: 'Design Project 2 Workflow',
+};
+
 
 export default function DepartmentPolicy({ grading }: { grading: any[] }) {
     // GRADING CRITERIA FORM
@@ -86,6 +93,13 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
         name: '',
         value: '',
         status: 'Active',
+    });
+
+    // DOCUMENT REQUIREMENTS FORM
+    const documentRequirementForm = useForm({
+        name: '',
+        format: 'PDF',
+        status: 'Mandatory',
     });
 
     // WORKFLOW FORM
@@ -115,6 +129,15 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
         { category: 'Engineering Communication', weight: '20%', minimum: 15 },
         { category: 'Independent & Lifelong Learning', weight: '20%', minimum: 15 },
     ]);
+    const [documentRequirements, setDocumentRequirements] = useState(
+        [
+            { id: 1, name: 'Proposal Document', format: 'PDF', status: 'Mandatory' },
+            { id: 2, name: 'Ethics Clearance', format: 'PDF', status: 'Mandatory' },
+            { id: 3, name: 'Adviser Consent Form', format: 'PDF', status: 'Optional' },
+        ],
+    );
+    const [documentRequirementModalOpen, setDocumentRequirementModalOpen] = useState(false);
+    const [editingDocumentRequirementId, setEditingDocumentRequirementId] = useState<number | null>(null);
 
     // Tab Label
     const getTabLabel = (tabKey: string) => {
@@ -144,7 +167,7 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
         ));
     };
 
-    // System Rule CRUD Operations (TO BE REVISED)
+    // System Rule CRUD Operations (MOCK)
     const openCreateSystemRule = () => {
     systemRuleForm.reset();
     setEditingSystemRuleId(null);
@@ -205,7 +228,7 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
         systemRuleForm.reset();
     };
 
-    // Workflow CRUD Operations (TO BE REVISED)
+    // Workflow CRUD Operations (MOCK)
     // Edit Process
     const openEditWorkflow = (step: WorkflowStepType) => {
         workflowForm.setData({
@@ -257,6 +280,60 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
         workflowForm.reset();
     };
 
+     // Document Requirements CRUD (MOCK)
+    const openCreateDocumentRequirement = () => {
+        documentRequirementForm.reset();
+        setEditingDocumentRequirementId(null);
+        setDocumentRequirementModalOpen(true);
+    };
+
+    const openEditDocumentRequirement = (req: { id: number; name: string; format: string; status: string }) => {
+        documentRequirementForm.setData({
+            name: req.name,
+            format: req.format,
+            status: req.status,
+        });
+        setEditingDocumentRequirementId(req.id);
+        setDocumentRequirementModalOpen(true);
+    };
+
+    const submitDocumentRequirement = (e: React.FormEvent) => {
+        e.preventDefault();
+        const { name, format, status } = documentRequirementForm.data;
+
+        if (editingDocumentRequirementId) {
+            setDocumentRequirements(prev =>
+                prev.map(req =>
+                    req.id === editingDocumentRequirementId
+                        ? { ...req, name, format, status }
+                        : req,
+                ),
+            );
+            setAlertMessage('Document requirement updated successfully.');
+        } else {
+            const nextId = documentRequirements.length
+                ? Math.max(...documentRequirements.map(req => req.id)) + 1
+                : 1;
+            setDocumentRequirements(prev => [...prev, { id: nextId, name, format, status }]);
+            setAlertMessage('Document requirement added successfully.');
+        }
+
+        closeDocumentRequirementModal();
+    };
+
+    const closeDocumentRequirementModal = () => {
+        setDocumentRequirementModalOpen(false);
+        setEditingDocumentRequirementId(null);
+        documentRequirementForm.reset();
+    };
+
+    const deleteDocumentRequirement = (id: number) => {
+        openConfirm('Do you want to delete this document requirement?', () => {
+            setDocumentRequirements(prev => prev.filter(req => req.id !== id));
+            setAlertMessage('Document requirement deleted.');
+            setConfirmDialog(null);
+        });
+    };
 
     // Grading Policy CRUD Operations
     // Editing Proccess
@@ -438,7 +515,7 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
                         <>
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="font-medium text-[#730000]" style={{ fontSize: '24px' }}>
-                                    System Rules
+                                    System Rules Configuration
                                 </h2>
                                 <Button
                                     onClick={openCreateSystemRule}
@@ -455,12 +532,12 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
                                     <PoliciesHeader columns={['Rule Name', 'Value', 'Status', 'Action']} />
                                     <tbody>
                                         {[
-                                            { name: 'Title Proposal Submission', value: '2 weeks', status: 'Active' },
-                                            { name: 'Title Proposal Submission', value: '3 weeks', status: 'Active' },
-                                            { name: 'Title Proposal Submission', value: '1 week', status: 'Inactive' },
-                                            { name: 'Title Proposal Submission', value: '2 weeks', status: 'Active' },
-                                            { name: 'Title Proposal Submission', value: '4 weeks', status: 'Active' },
-                                            { name: 'Title Proposal Submission', value: '1 week', status: 'Active' },
+                                            { id: 1, name: 'Title Proposal Submission', value: '2 weeks', status: 'Active' },
+                                            { id: 2, name: 'Title Proposal Submission', value: '3 weeks', status: 'Active' },
+                                            { id: 3, name: 'Title Proposal Submission', value: '1 week', status: 'Inactive' },
+                                            { id: 4, name: 'Title Proposal Submission', value: '2 weeks', status: 'Active' },
+                                            { id: 5, name: 'Title Proposal Submission', value: '4 weeks', status: 'Active' },
+                                            { id: 6, name: 'Title Proposal Submission', value: '1 week', status: 'Active' },
                                         ].map((doc, i) => (
                                             <PoliciesRow
                                                 key={i}
@@ -479,7 +556,7 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
                     {activeTab === 'workflow' && (<>
                     <div className="flex items-center justify-between mb-6">
                     <h2 className="font-medium text-[#730000]" style={{ fontSize: '24px' }}>
-                        Workflow Approval
+                        {WORKFLOW_TITLES[stage]}
                     </h2>
 
                     <StageSwitchToggle
@@ -536,7 +613,7 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
                                     Document Requirements
                                 </h2>
                                 <Button
-                                    onClick={openCreate}
+                                    onClick={openCreateDocumentRequirement}
                                     variant="primary"
                                     className="flex items-center gap-2"
                                 >
@@ -549,16 +626,12 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
                                 <table className="w-full text-sm">
                                     <PoliciesHeader columns={['Rule Name', 'Format', 'Status', 'Action']} />
                                     <tbody>
-                                        {[
-                                            { name: 'Proposal Document', format: 'PDF', status: 'Mandatory' },
-                                            { name: 'Ethics Clearance', format: 'PDF', status: 'Mandatory' },
-                                            { name: 'Adviser Consent Form', format: 'PDF', status: 'Optional' },
-                                        ].map((doc, i) => (
+                                        {documentRequirements.map((doc, i) => (
                                             <PoliciesRow
                                                 key={i}
                                                 data={doc}
-                                                onEdit={() => {}}
-                                                onDelete={() => {}}
+                                                onEdit={() => openEditDocumentRequirement(doc)}
+                                                onDelete={() => deleteDocumentRequirement(doc.id)}
                                             />
                                         ))}
                                     </tbody>
@@ -664,15 +737,17 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
                                     variant="primary"
                                     className="flex items-center gap-2"
                                 >
-                                    <img src={AddIcon} className="w-4 h-4" />
+                                    <LuUpload className="w-4 h-4" />
                                     Upload New Policy Guide
                                 </Button>
                             </div>
 
-                            <div className="bg-white rounded-xl border p-6">
-                                <p className="text-sm text-gray-500 text-center py-20">
-                                    No guidelines document uploaded yet. Click "Upload PDF" to add department guidelines.
-                                </p>
+                            <div className="bg-[#5A5A5AB2] rounded-xl border p-6">
+                                <div className="flex flex-col gap-3">
+                                    <div className="relative rounded-lg bg-white border border-[#5A5A5AB2] h-80 overflow-y-auto flex items-center justify-center">
+                                        <PlaceholderPattern className="absolute inset-0 w-full h-full text-[#5A5A5A66] stroke-[#5A5A5A80] stroke-[1]" />
+                                    </div>
+                                </div>
                             </div>
                         </>
                     )}
@@ -906,6 +981,58 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
                     onClose={() => setRubricModalOpen(false)}
                     onUpdate={handleRubricUpdate}
                 />
+            )}
+
+            {/* Document Requirement Modal */}
+            {documentRequirementModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+                    <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+                        <h2 className="mb-4 text-lg font-semibold text-[#730000]">
+                            {editingDocumentRequirementId ? 'Edit Document Requirement' : 'Add Document Requirement'}
+                        </h2>
+
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium">Rule Name</label>
+                            <input
+                                type="text"
+                                value={documentRequirementForm.data.name}
+                                onChange={e => documentRequirementForm.setData('name', e.target.value)}
+                                className="w-full rounded-md border px-3 py-2 text-sm"
+                            />
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium">Format</label>
+                            <input
+                                type="text"
+                                value={documentRequirementForm.data.format}
+                                onChange={e => documentRequirementForm.setData('format', e.target.value)}
+                                className="w-full rounded-md border px-3 py-2 text-sm"
+                            />
+                        </div>
+
+                        <div className="mb-6">
+                            <label className="block text-sm font-medium">Status</label>
+                            <select
+                                value={documentRequirementForm.data.status}
+                                onChange={e => documentRequirementForm.setData('status', e.target.value)}
+                                className="w-full rounded-md border px-3 py-2 text-sm"
+                            >
+                                <option value="Mandatory">Mandatory</option>
+                                <option value="Optional">Optional</option>
+                            </select>
+                        </div>
+
+                        <div className="flex justify-end gap-2">
+                            <Button variant="secondary" onClick={closeDocumentRequirementModal}>
+                                Cancel
+                            </Button>
+                            <Button variant="primary" onClick={submitDocumentRequirement}>
+                                {editingDocumentRequirementId ? 'Save' : 'Create'}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
             )}
 
         </ManagementLayout>

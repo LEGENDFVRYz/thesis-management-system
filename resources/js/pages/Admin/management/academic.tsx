@@ -5,6 +5,7 @@ import { Head } from '@inertiajs/react';
 import { academic } from '@/routes/admin/management/index';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { toast } from 'sonner';
 import { Card, CardHeader, CardTitle, CardContent,} from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AcademicYearRangePicker from '@/components/acad-year-range-picker';
@@ -32,6 +33,34 @@ const DEADLINE_EVENTS = [
 
 export default function AcademicSettings() {
   const [eventStatus, setEventStatus] = useState<'Active' | 'Past'>('Active');
+  
+  // Academic Year state
+  const [academicYear, setAcademicYear] = useState({
+    startDate: null,
+    endDate: null,
+    newYear: null,
+  });
+
+  // Semester state
+  const [semester, setSemester] = useState({
+    activeSemester: 'first',
+    semesterStart: null,
+    semesterEnd: null,
+    defenseStart: null,
+    defenseEnd: null,
+  });
+
+  const handleSaveAcademicYear = () => {
+    // send data
+    console.log('Saving academic year:', academicYear);
+    toast.success('Academic year saved successfully');
+  };
+
+  const handleSaveSemester = () => {
+    // send data
+    console.log('Saving semester:', semester);
+    toast.success('Semester configuration saved successfully');
+  };
 
   return (
     <ManagementLayout
@@ -44,7 +73,7 @@ export default function AcademicSettings() {
       description="Configure academic year, semester parameters, and system timeline">
 
       {/* GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 text-[#730000]">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-3 text-[#730000]">
 
         {/* ACADEMIC YEAR MANAGEMENT */}
         <div className="flex flex-col gap-6">
@@ -54,7 +83,7 @@ export default function AcademicSettings() {
               <img src={AcademicYearIcon} className="w-6 h-6" alt="Academic year management" />
               <CardTitle>Academic Year Management</CardTitle>
             </div>
-            <Button variant="primary">
+            <Button variant="primary" onClick={handleSaveAcademicYear}>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M10.1333 2C10.485 2.00501 10.8205 2.14878 11.0667 2.4L13.6 4.93333C13.8512 5.17951 13.995 5.51497 14 5.86667V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 3.33333C2 2.97971 2.14048 2.64057 2.39052 2.39052C2.64057 2.14048 2.97971 2 3.33333 2H10.1333Z" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M11.3332 13.9998V9.33317C11.3332 9.15636 11.2629 8.98679 11.1379 8.86177C11.0129 8.73674 10.8433 8.6665 10.6665 8.6665H5.33317C5.15636 8.6665 4.98679 8.73674 4.86177 8.86177C4.73674 8.98679 4.6665 9.15636 4.6665 9.33317V13.9998" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
@@ -141,7 +170,7 @@ export default function AcademicSettings() {
             <img src={SemesterIcon} className="w-6 h-6" alt="Semester configuration" />
             <CardTitle>Semester Configuration</CardTitle>
             </div>
-            <Button variant="primary">
+            <Button variant="primary" onClick={handleSaveSemester}>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M10.1333 2C10.485 2.00501 10.8205 2.14878 11.0667 2.4L13.6 4.93333C13.8512 5.17951 13.995 5.51497 14 5.86667V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 3.33333C2 2.97971 2.14048 2.64057 2.39052 2.39052C2.64057 2.14048 2.97971 2 3.33333 2H10.1333Z" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M11.3332 13.9998V9.33317C11.3332 9.15636 11.2629 8.98679 11.1379 8.86177C11.0129 8.73674 10.8433 8.6665 10.6665 8.6665H5.33317C5.15636 8.6665 4.98679 8.73674 4.86177 8.86177C4.73674 8.98679 4.6665 9.15636 4.6665 9.33317V13.9998" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
@@ -152,7 +181,10 @@ export default function AcademicSettings() {
           <CardContent className="space-y-4">
             <label className="text-sm font-medium">Active Semester</label>
 
-            <Select defaultValue="first">
+            <Select 
+              value={semester.activeSemester} 
+              onValueChange={(value) => setSemester({...semester, activeSemester: value})}
+            >
               <SelectTrigger className="w-full bg-[#F3EFD0] border-1px border-[#7300001A] text-[#730000] rounded-md">
                 <SelectValue placeholder="Select Semester" />
               </SelectTrigger>
@@ -206,8 +238,7 @@ export default function AcademicSettings() {
   );
 }
 
-/* ---------- HELPERS ---------- */
-
+/* HELPERS */
 function DateField({ label }: { label: string }) {
   return (
     <div>
