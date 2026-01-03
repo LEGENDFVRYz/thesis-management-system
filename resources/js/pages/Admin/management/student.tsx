@@ -14,6 +14,7 @@ import { GroupCardView } from './student_management/student_groupcard_view';
 import { ViewToggle } from './student_management/student_view_toggle';
 import { StudentProfileModal } from './student_management/student_viewStudprofile_modal';
 import { GroupProfileModal } from './student_management/student_viewgroup_modal';
+import { StudentImportModal } from './student_management/student_import_modal';
 
 // TYPES AND SAMPLE DATA
 import { Student, GroupData, FilterState } from './student_management/student_interface';
@@ -36,6 +37,8 @@ export default function StudentManagement({ students }: { students?: any[] }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<GroupData | null>(null);
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
+  // ADD THIS LINE - Import Modal State
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   // Grouping students by group code for the group card view
   const groupedData = useMemo(() => {
@@ -116,7 +119,7 @@ export default function StudentManagement({ students }: { students?: any[] }) {
         <ViewToggle
           view={view}
           onViewChange={setView}
-          onImport={() => {/* Handle import */}}
+          onImport={() => setIsImportModalOpen(true)}
         />
 
         {/* Results Info */}
@@ -152,8 +155,16 @@ export default function StudentManagement({ students }: { students?: any[] }) {
           onClose={handleCloseGroupModal}
           group={selectedGroup}
         />
-      </ManagementLayout>
 
+        <StudentImportModal 
+          isOpen={isImportModalOpen}
+          onClose={() => setIsImportModalOpen(false)}
+          onImportComplete={(data) => {
+            // Handle successful import 
+          }}
+        />
+      </ManagementLayout>
+          
       <NavFooter />
     </>
   );
