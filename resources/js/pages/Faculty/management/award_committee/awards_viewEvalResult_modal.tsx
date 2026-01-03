@@ -1,4 +1,3 @@
-// ViewResultsModal.tsx
 import { X, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -94,7 +93,7 @@ export const ViewResultsModal = ({ isOpen, onClose, evaluationData }: ViewResult
                         </div>
                     </div>
 
-                    {/* Criteria 1: Design Project Output */}
+                    {/* Criteria 1*/}
                     <div className="mb-6">
                         <div>
                             <h4 className="font-semibold text-gray-800">
@@ -122,7 +121,7 @@ export const ViewResultsModal = ({ isOpen, onClose, evaluationData }: ViewResult
                         )}
                     </div>
 
-                    {/* Criteria 2: Design Project Proposal Defense Performance */}
+                    {/* Criteria 2*/}
                     <div className="mb-6">
                         <div>
                             <h4 className="font-semibold text-gray-800">
@@ -150,7 +149,7 @@ export const ViewResultsModal = ({ isOpen, onClose, evaluationData }: ViewResult
                         )}
                     </div>
 
-                    {/* Criteria 3: Technological Development */}
+                    {/* Criteria 3 */}
                     <div className="mb-6">
                         <div>
                             <h4 className="font-semibold text-gray-800">

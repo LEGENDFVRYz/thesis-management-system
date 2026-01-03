@@ -1,4 +1,3 @@
-// mockData.ts
 import { EvaluationRow, ResultRow } from './awards_types';
 
 export const evaluationData: EvaluationRow[] = [
@@ -127,7 +126,7 @@ export const resultsData: ResultRow[] = [
     { rank: 10, groupCode: '4602', title: 'Smart Waste Management System', criteria1: null, criteria2: null, criteria3: null, totalScore: null, isComplete: false },
 ];
 
-// Detailed evaluation results for the View Results Modal
+// Sample evaluation results for the View Results Modal
 export const detailedEvaluationResults = {
     '4101': {
         groupCode: '4101',

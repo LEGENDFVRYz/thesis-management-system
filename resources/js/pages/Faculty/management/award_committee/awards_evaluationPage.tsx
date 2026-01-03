@@ -1,4 +1,3 @@
-// EvaluationPage.tsx
 import { Button } from '@/components/ui/button';
 import { EvaluationRow } from './awards_types';
 import { getCriteriaColor, getStatusColor } from './awards_utils';

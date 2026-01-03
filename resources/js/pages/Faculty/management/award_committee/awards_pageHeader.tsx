@@ -1,4 +1,3 @@
-// PageHeader.tsx
 import { EvaluationStatus } from './awards_types';
 
 interface PageHeaderProps {

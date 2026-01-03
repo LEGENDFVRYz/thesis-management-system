@@ -1,4 +1,3 @@
-// ResultsPage.tsx
 import { Button } from '@/components/ui/button';
 import { ResultRow } from './awards_types';
 import { getRankColor } from './awards_utils';

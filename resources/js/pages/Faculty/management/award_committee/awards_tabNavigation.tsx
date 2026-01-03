@@ -1,3 +1,5 @@
+import { Button } from "@headlessui/react";
+
 interface TabNavigationProps {
     activeTab: 'evaluation' | 'results';
     onTabChange: (tab: 'evaluation' | 'results') => void;
@@ -6,7 +8,7 @@ interface TabNavigationProps {
 export const TabNavigation = ({ activeTab, onTabChange }: TabNavigationProps) => {
     return (
         <div className="flex gap-6 border-b border-gray-300 mb-8">
-            <button
+            <Button
                 onClick={() => onTabChange('evaluation')}
                 className={`flex items-center gap-2 pb-3 border-b-2 font-medium transition-colors ${
                     activeTab === 'evaluation'
@@ -15,8 +17,8 @@ export const TabNavigation = ({ activeTab, onTabChange }: TabNavigationProps) =>
                 }`}
             >
                 Evaluation Page
-            </button>
-            <button
+            </Button>
+            <Button
                 onClick={() => onTabChange('results')}
                 className={`flex items-center gap-2 pb-3 border-b-2 font-medium transition-colors ${
                     activeTab === 'results'
@@ -25,7 +27,7 @@ export const TabNavigation = ({ activeTab, onTabChange }: TabNavigationProps) =>
                 }`}
             >
                 Results Page
-            </button>
+            </Button>
         </div>
     );
 };

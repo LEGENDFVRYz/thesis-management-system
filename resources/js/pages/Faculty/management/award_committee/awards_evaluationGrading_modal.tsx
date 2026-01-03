@@ -112,13 +112,12 @@ export function EvaluationGradingModal({
                 <DialogHeader className="bg-primary text-white p-6 sticky top-0 z-10">
                     <div className="flex items-center justify-between">
                         <DialogTitle className="text-xl font-semibold">Evaluation</DialogTitle>
-                        <button
+                        <Button
                             onClick={onClose}
                             className="text-white hover:text-gray-200 transition-colors"
                         >
                             <X className="h-5 w-5" />
-                            <span className="sr-only">Close</span>
-                        </button>
+                        </Button>
                     </div>
                 </DialogHeader>
 
@@ -168,7 +167,7 @@ export function EvaluationGradingModal({
                         </p>
 
                         {/* Sub-criteria */}
-                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <div className="border border-gray-200 rounded-lg p-4">
                             <h5 className="font-semibold text-gray-900 mb-3">Sub-criteria</h5>
                             <ul className="space-y-4">
                                 {criteriaData.subCriteria.map((subCriterion, index) => (
@@ -205,18 +204,17 @@ export function EvaluationGradingModal({
                     {/* Feedback Section */}
                     <div className="mb-6">
                         <h5 className="font-semibold text-gray-900 mb-2">Feedback</h5>
-                        <textarea
+                        <Input
                             value={feedback}
                             onChange={(e) => setFeedback(e.target.value)}
-                            placeholder="Provide detailed feedback..."
-                            className="w-full min-h-[120px] bg-yellow-50 border border-yellow-200 rounded-md p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                            placeholder="Provide feedback/comments..."
+                            className="!w-full min-h-[120px] border border-yellow-200 rounded-md p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary"
                         />
                     </div>
 
                     {/* Action Buttons */}
                     <div className="flex justify-end gap-3">
                         <Button variant="outline" onClick={handleSaveDraft}> Save Draft </Button>
-                            
                         <Button onClick={handleSubmitEvaluation} 
                         className="bg-primary hover:bg-primary/90"> Submit Evaluation </Button>
                     </div>

@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { Head } from '@inertiajs/react';
-
-// SHARED COMPONENTS
-import { AppHeader } from '@/components/app-header';
-import { AppContent } from '@/components/app-content';
+import { awards_evaluation } from '@/routes/faculty/management/award'; 
 import { NavFooter } from '@/components/nav-footer';
 
-//
+import FacultyManagementLayout from '@/pages/Faculty/management/index';
+
+// COMPONENTS
 import { TabNavigation } from './awards_tabNavigation';
 import { PageHeader } from './awards_pageHeader';
 import { EvaluationPage } from './awards_evaluationPage';
@@ -40,8 +39,7 @@ export default function Dashboard() {
     };
 
     const handleExport = () => {
-        // Export logic here
-        console.log('Exporting evaluation results...');
+        // Export btn logic here
     };
 
     const evaluationStatus = getEvaluationStatus(resultsData);
@@ -49,15 +47,20 @@ export default function Dashboard() {
     return (
         <>
             <Head title="Awards Evaluation" />
-            <AppHeader />
-
-            <AppContent
+            
+            <FacultyManagementLayout
                 title={activeTab === 'evaluation' ? 'Evaluation Page' : 'Results Page'}
-                subtitle={
+                description={
                     activeTab === 'evaluation'
                         ? 'Page for evaluating top 10 project groups based on output, defense, and tech development'
                         : 'View summarized scores, rankings, and awards results'
                 }
+                breadcrumbs={[
+                    {
+                        title: 'Awards Evaluation',
+                        href: awards_evaluation.url(), 
+                    }
+                ]}
             >
                 {/* Header Section with Tabs */}
                 <div className="mb-6">
@@ -81,7 +84,7 @@ export default function Dashboard() {
                         onExport={handleExport}
                     />
                 )}
-            </AppContent>
+            </FacultyManagementLayout>
 
             <NavFooter />
 
