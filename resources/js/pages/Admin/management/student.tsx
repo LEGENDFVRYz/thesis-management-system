@@ -1,18 +1,18 @@
 // IMPORTS
 import { useState, useMemo } from 'react';
 import { Head } from '@inertiajs/react';
+import ManagementLayout from '@/pages/Admin/management/index';
+import { type BreadcrumbItem } from '@/types';
 
 // SHARED COMPONENTS 
-import { AppHeader } from '@/components/app-header';
-import { AppContent } from '@/components/app-content';
 import { NavFooter } from '@/components/nav-footer';
 
-// 
+// STUDENT MNGMT COMPONENTS
 import { FilterSection } from './student_management/student_filter_section';
 import { StudentTableView } from './student_management/student_table_view';
 import { GroupCardView } from './student_management/student_groupcard_view';
 import { ViewToggle } from './student_management/student_view_toggle';
-import { StudentProfileModal } from './student_management/student_viewprofile_modal';
+import { StudentProfileModal } from './student_management/student_viewStudprofile_modal';
 import { GroupProfileModal } from './student_management/student_viewgroup_modal';
 
 // TYPES AND SAMPLE DATA
@@ -20,6 +20,10 @@ import { Student, GroupData, FilterState } from './student_management/student_in
 import { studentData, thesisTitles } from './student_management/student_sampleData';
 
 import { filterAndSortStudents, filterAndSortGroups, groupStudentsByCode } from './student_management/student_data_utilities';
+
+const breadcrumbs: BreadcrumbItem[] = [
+  { title: 'Student Management', href: '/admin/management/student' },
+];
 
 export default function StudentManagement({ students }: { students?: any[] }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -87,11 +91,10 @@ export default function StudentManagement({ students }: { students?: any[] }) {
   // Main Content
   return (
     <>
-      <Head title="Student Management" />
-      <AppHeader />
-      <AppContent 
-        title="Student Management" 
-        subtitle="View and Manage Student Accounts and Thesis Group Assignments"
+      <ManagementLayout
+        breadcrumbs={breadcrumbs}
+        title="Student Management"
+        description="View and Manage Student Accounts and Thesis Group Assignments"
       >
         {/* Filter & Search Section */}
         <FilterSection
@@ -137,20 +140,21 @@ export default function StudentManagement({ students }: { students?: any[] }) {
             onViewGroup={handleViewGroup}
           />
         )}
-      </AppContent>
-      <NavFooter />
 
-      {/* Modals */}
-      <StudentProfileModal 
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        student={selectedStudent}
-      />
-      <GroupProfileModal 
-        isOpen={isGroupModalOpen}
-        onClose={handleCloseGroupModal}
-        group={selectedGroup}
-      />
+        {/* Modals */}
+        <StudentProfileModal 
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          student={selectedStudent}
+        />
+        <GroupProfileModal 
+          isOpen={isGroupModalOpen}
+          onClose={handleCloseGroupModal}
+          group={selectedGroup}
+        />
+      </ManagementLayout>
+
+      <NavFooter />
     </>
   );
 }
