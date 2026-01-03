@@ -1,22 +1,23 @@
 import { useState, useEffect } from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { AppHeader } from '@/components/app-header';
-import { AppContent } from '@/components/app-content';
-import { NavFooter } from '@/components/nav-footer';
+import RepositoryLayout from './index';
+import { system } from '@/routes/admin/repository';
+import { type BreadcrumbItem } from '@/types';
 import { SystemRepositoryStorage } from '@/components/system-repository-storage';
 import { Icon } from '@/components/icon-index';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { TableHead } from '@/components/ui/table';
 import { AlertCircle, FileText, Trash2, Calendar } from 'lucide-react';
+import { NavFooter } from '@/components/nav-footer';
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'System',
+        href: system().url,
+    },
+];
 
 // Types
 interface SystemData {
@@ -38,7 +39,7 @@ interface SystemData {
   proponents: string[];
 }
 
-// Mock Data - Extended with more entries
+// Mock Data
 const mockSystemData: SystemData[] = [
   {
     id: '1',
@@ -259,12 +260,8 @@ export default function SystemRepository() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [syncedFilesCount] = useState(1);
 
-  const selectedThesis =
-    mockSystemData.find(item => item.id === selectedId) || mockSystemData[0];
-
-  const [currentSyncStatus, setCurrentSyncStatus] = useState<'Success' | 'Failed'>(
-    selectedThesis.syncStatus
-  );
+  const selectedThesis = mockSystemData.find(item => item.id === selectedId) || mockSystemData[0];
+  const [currentSyncStatus, setCurrentSyncStatus] = useState<'Success' | 'Failed'>(selectedThesis.syncStatus);
 
   useEffect(() => {
     setCurrentSyncStatus(selectedThesis.syncStatus);
@@ -277,7 +274,6 @@ export default function SystemRepository() {
   const handleSyncNow = () => {
     setIsSyncing(true);
     setShowSuccess(false);
-
     setTimeout(() => {
       setIsSyncing(false);
       setCurrentSyncStatus('Success');
@@ -287,302 +283,304 @@ export default function SystemRepository() {
 
   return (
     <>
+    <RepositoryLayout 
+      breadcrumbs={breadcrumbs}
+      title="System Archive"
+      subtitle="Manage complete thesis archive with backups for preservation"
+    >
       <Head title="System Repository" />
-      <AppHeader />
 
-      <AppContent
-        title="System Repository"
-        subtitle="Manage and monitor system storage and thesis data"
-      >
-        {/* Storage Card */}
-        <div className="mb-8">
-          <SystemRepositoryStorage />
-        </div>
+      {/* Storage Card */}
+      <div className="mb-8">
+        <SystemRepositoryStorage />
+      </div>
 
-{/* Table and Details Card Section */}
-        <div className="flex gap-6">
-          {/* Table Section */}
-          <div className="flex-1 rounded-lg border-[0.8px] border-primary overflow-hidden flex flex-col h-fit">
-            {/* Table Header */}
-            <div className="grid grid-cols-[300px_1fr_1fr_1fr] gap-[10px] h-10 bg-primary rounded-t-lg">
-              <TableHead className="flex items-center justify-center px-[10px]">
-                <span className="text-primary-foreground font-dm text-[13.33px] font-medium leading-normal">
-                  Name
-                </span>
-              </TableHead>
-              <TableHead className="flex items-center justify-center px-[10px]">
-                <span className="text-primary-foreground font-dm text-[13.33px] font-medium leading-normal">
-                  File Size
-                </span>
-              </TableHead>
-              <TableHead className="flex items-center justify-center px-[10px]">
-                <span className="text-primary-foreground font-dm text-[13.33px] font-medium leading-normal">
-                  Last Update
-                </span>
-              </TableHead>
-              <TableHead className="flex items-center justify-center px-[10px] pr-[22px]">
-                <span className="text-primary-foreground font-dm text-[13.33px] font-medium leading-normal">
-                  Action
-                </span>
-              </TableHead>
-            </div>
-
-            {/* Table Rows Container - scrollable */}
-            <div className="flex flex-col flex-1 overflow-y-auto">
-              {mockSystemData.map((item) => {
-                const isSelected = selectedId === item.id;
-                return (
-                  <div
-                    key={item.id}
-                    className={`grid grid-cols-[300px_1fr_1fr_1fr] gap-[10px] h-10 transition-colors ${
-                      isSelected ? 'bg-breadcrumb' : 'bg-background hover:bg-breadcrumb/50'
-                    }`}
-                  >
-                    {/* Name Column */}
-                    <div className="flex items-center justify-start gap-[10px] px-[10px]">
-                      <FileText className="h-[15px] w-[15px] text-primary flex-shrink-0" />
-                      <span className="text-foreground font-dm text-[13.33px] font-medium leading-normal truncate">
-                        {item.name}
-                      </span>
-                    </div>
-
-                    {/* File Size Column */}
-                    <div className="flex items-center justify-center px-[10px]">
-                      <span className="text-foreground font-dm text-[13.33px] font-medium leading-normal">
-                        {item.fileSize}
-                      </span>
-                    </div>
-
-                    {/* Last Update Column */}
-                    <div className="flex items-center justify-center px-[10px]">
-                      <span className="text-foreground font-dm text-[13.33px] font-medium leading-normal">
-                        {item.lastUpdate}
-                      </span>
-                    </div>
-
-                    {/* Action Column */}
-                    <div className="flex items-center justify-center px-[10px]">
-                      <button
-                        className="h-8 px-3 flex items-center justify-center gap-[6px] rounded-lg border-[0.8px] border-primary/75 hover:bg-breadcrumb transition-colors"
-                        onClick={() => setSelectedId(item.id)}
-                      >
-                        <span className="text-primary/75 font-dm text-[13.33px] font-medium leading-normal">
-                          View Details
-                        </span>
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Table Footer - View All */}
-            <Link href="/admin/repository/system-expanded">
-              <div className="h-10 border-t-[0.8px] border-primary bg-background flex items-center justify-center gap-[10px] cursor-pointer hover:bg-breadcrumb/30 transition-colors">
-                <span className="text-primary text-center font-dm text-[13.33px] font-medium leading-normal">
-                  View All
-                </span>
-                <Icon name="gotoDefault" size={18} />
-              </div>
-            </Link>
+      {/* Table and Details Card Section */}
+      <div className="flex gap-6">
+        {/* Table Section */}
+        <div className="flex-1 rounded-lg border-[0.8px] border-primary overflow-hidden flex flex-col h-fit">
+          {/* Table Header */}
+          <div className="grid grid-cols-[300px_1fr_1fr_1fr] gap-[10px] h-10 bg-primary rounded-t-lg">
+            <TableHead className="flex items-center justify-center px-[10px]">
+              <span className="text-primary-foreground font-dm text-[13.33px] font-medium leading-normal">
+                Name
+              </span>
+            </TableHead>
+            <TableHead className="flex items-center justify-center px-[10px]">
+              <span className="text-primary-foreground font-dm text-[13.33px] font-medium leading-normal">
+                File Size
+              </span>
+            </TableHead>
+            <TableHead className="flex items-center justify-center px-[10px]">
+              <span className="text-primary-foreground font-dm text-[13.33px] font-medium leading-normal">
+                Last Update
+              </span>
+            </TableHead>
+            <TableHead className="flex items-center justify-center px-[10px] pr-[22px]">
+              <span className="text-primary-foreground font-dm text-[13.33px] font-medium leading-normal">
+                Action
+              </span>
+            </TableHead>
           </div>
 
-          {/* Details Card */}
-          <div className="w-[456px] flex-shrink-0 rounded-lg border-[0.8px] border-primary bg-breadcrumb p-5 pb-[20.6px] flex flex-col gap-[22px]">
-            {/* Header */}
-            <div className="flex items-start justify-between border-b-[0.8px] border-primary pb-[5px]">
-              <div className="flex flex-col gap-2">
-                <h3 className="text-foreground font-dm text-[16px] font-bold leading-normal">
-                  Thesis Details
-                </h3>
+          {/* Table Rows Container - scrollable */}
+          <div className="flex flex-col flex-1 overflow-y-auto">
+            {mockSystemData.map((item) => {
+              const isSelected = selectedId === item.id;
+              return (
+                <div
+                  key={item.id}
+                  className={`grid grid-cols-[300px_1fr_1fr_1fr] gap-[10px] h-10 transition-colors ${
+                    isSelected ? 'bg-breadcrumb' : 'bg-background hover:bg-breadcrumb/50'
+                  }`}
+                >
+                  {/* Name Column */}
+                  <div className="flex items-center justify-start gap-[10px] px-[10px]">
+                    <FileText className="h-[15px] w-[15px] text-primary flex-shrink-0" />
+                    <span className="text-foreground font-dm text-[13.33px] font-medium leading-normal truncate">
+                      {item.name}
+                    </span>
+                  </div>
+
+                  {/* File Size Column */}
+                  <div className="flex items-center justify-center px-[10px]">
+                    <span className="text-foreground font-dm text-[13.33px] font-medium leading-normal">
+                      {item.fileSize}
+                    </span>
+                  </div>
+
+                  {/* Last Update Column */}
+                  <div className="flex items-center justify-center px-[10px]">
+                    <span className="text-foreground font-dm text-[13.33px] font-medium leading-normal">
+                      {item.lastUpdate}
+                    </span>
+                  </div>
+
+                  {/* Action Column */}
+                  <div className="flex items-center justify-center px-[10px]">
+                    <button
+                      className="h-8 px-3 flex items-center justify-center gap-[6px] rounded-lg border-[0.8px] border-primary/75 hover:bg-breadcrumb transition-colors"
+                      onClick={() => setSelectedId(item.id)}
+                    >
+                      <span className="text-primary/75 font-dm text-[13.33px] font-medium leading-normal">
+                        View Details
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Table Footer - View All */}
+          <Link href="/admin/repository/system-expanded">
+            <div className="h-10 border-t-[0.8px] border-primary bg-background flex items-center justify-center gap-[10px] cursor-pointer hover:bg-breadcrumb/30 transition-colors">
+              <span className="text-primary text-center font-dm text-[13.33px] font-medium leading-normal">
+                View All
+              </span>
+              <Icon name="gotoDefault" size={18} />
+            </div>
+          </Link>
+        </div>
+
+        {/* Details Card */}
+        <div className="w-[456px] flex-shrink-0 rounded-lg border-[0.8px] border-primary bg-breadcrumb p-5 pb-[20.6px] flex flex-col gap-[22px]">
+          {/* Header */}
+          <div className="flex items-start justify-between border-b-[0.8px] border-primary pb-[5px]">
+            <div className="flex flex-col gap-2">
+              <h3 className="text-foreground font-dm text-[16px] font-bold leading-normal">
+                Thesis Details
+              </h3>
+              <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
+                Complete information about the thesis
+              </p>
+            </div>
+            <Button
+              variant="default"
+              size="sm"
+              className="h-8 px-3 gap-[6px] rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              <Trash2 size={16} className="text-white" />
+              <span className="text-[12px] font-medium">Delete</span>
+            </Button>
+          </div>
+
+          {/* Content */}
+          <div className="flex flex-col gap-[10px]">
+            {/* Thesis ID & Sync Status */}
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-1">
+                <p className="text-primary font-dm text-[16px] font-bold leading-normal">
+                  Thesis ID
+              </p>
                 <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
-                  Complete information about the thesis
+                  {selectedThesis.thesisId}
                 </p>
               </div>
-              <Button
-                variant="default"
-                size="sm"
-                className="h-8 px-3 gap-[6px] rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                <Trash2 size={16} className="text-white" />
-                <span className="text-[12px] font-medium">Delete</span>
-              </Button>
-            </div>
-
-            {/* Content */}
-            <div className="flex flex-col gap-[10px]">
-              {/* Thesis ID Row */}
-              <div className="flex items-center justify-between">
-                <div className="flex flex-col gap-1">
-                  <p className="text-primary font-dm text-[16px] font-bold leading-normal">
-                    Thesis ID
-                  </p>
-                  <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
-                    {selectedThesis.thesisId}
-                  </p>
-                </div>
-                
+                  
+                {/* Sync Controls */}
                 <div className="flex items-center gap-2">
-                  {isFailed && !isSyncing && !showSuccess && (
-                    <button 
-                      onClick={handleSyncNow}
-                      className="text-foreground font-dm text-[12px] font-medium underline hover:text-primary"
-                    >
-                      Sync now
-                    </button>
-                  )}
-                  
-                  {isSyncing && (
-                    <div className="flex items-center gap-2">
-                      <Spinner type="ring" size="sm" />
-                      <span className="text-foreground font-dm text-[12px] font-medium">
-                        Syncing...
-                      </span>
-                    </div>
-                  )}
-                  
                   {!isSyncing && (
-                    <Badge
+                    <>
+                      {currentSyncStatus === 'Failed' && (
+                        <button
+                          onClick={handleSyncNow}
+                          className="text-foreground font-dm text-[12px] font-medium underline hover:text-primary"
+                        >
+                          Sync now
+                        </button>
+                      )}
+        
+                      <Badge
                         className={`rounded-[25px] px-[22px] py-[2px] border ${
-                        isFailed
+                          currentSyncStatus === 'Failed'
                             ? 'bg-transparent border-primary text-primary'
                             : 'bg-transparent border-[#0D542B] text-[#0D542B]'
                         } hover:bg-transparent`}
-                    >
+                      >
                         <span className="text-[12px] font-medium">{currentSyncStatus}</span>
-                    </Badge>
-                  )}
+                      </Badge>
+                  </>
+                )}
 
-                </div>
-              </div>
-
-              {/* Thesis Title */}
-              <div className="flex flex-col gap-1">
-                <p className="text-primary font-dm text-[16px] font-bold leading-normal">
-                  Thesis Title
-                </p>
-                <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
-                    {selectedThesis.lastSyncDate || 'Date Today'}
-                </p>
-              </div>
-
-              {/* Storage Details */}
-              <div className="flex flex-col gap-1">
-                <p className="text-primary font-dm text-[16px] font-bold leading-normal">
-                  Storage
-                </p>
-                <div className="flex justify-between items-center">
-                  <p className="text-foreground font-dm text-[15px] font-bold leading-normal">
-                    Total Bytes
-                  </p>
-                  <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
-                    {selectedThesis.totalBytes}
-                  </p>
-                </div>
-                <div className="flex justify-between items-center">
-                  <p className="text-foreground font-dm text-[15px] font-bold leading-normal">
-                    Primary
-                  </p>
-                  <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
-                    {selectedThesis.primary}
-                  </p>
-                </div>
-                <div className="flex justify-between items-center">
-                  <p className="text-foreground font-dm text-[15px] font-bold leading-normal">
-                    Replicated
-                  </p>
-                  <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
-                    {selectedThesis.replicated}
-                  </p>
-                </div>
-              </div>
-
-              {/* Schedule Details */}
-              <div className="grid grid-cols-2 gap-[5px]">
-                <div className="flex flex-col gap-1">
-                  <p className="text-primary font-dm text-[16px] font-bold leading-normal">
-                    Last Update
-                  </p>
+                {isSyncing && (
                   <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-primary" strokeWidth={1.33} />
-                    <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
-                      {selectedThesis.lastUpdateDate}
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex flex-col gap-1">
-                  <p className="text-primary font-dm text-[16px] font-bold leading-normal">
-                    Last Sync
-                  </p>
-                  <div className="flex items-center gap-2">
-                    {currentSyncStatus === 'Failed' ? (
-                      <>
-                        <AlertCircle size={16} className="text-primary" />
-                        <p className="text-primary font-dm text-[15px] font-medium leading-normal">
-                            Failed
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <Calendar className="h-4 w-4 text-primary" strokeWidth={1.33} />
-                        <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
-                          {selectedThesis.lastSyncDate || 'Date Today'}
-                        </p>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Block and Adviser */}
-              <div className="grid grid-cols-2 gap-[5px]">
-                <div className="flex flex-col justify-center gap-[1.6px]">
-                  <p className="text-primary font-dm text-[16px] font-bold leading-normal">
-                    Block
-                  </p>
-                  <div className="inline-flex items-center justify-center px-[5px] py-[5px] rounded-lg border-[0.8px] border-primary w-fit">
-                    <span className="text-foreground font-dm text-[12px] font-medium leading-normal">
-                      {selectedThesis.block}
+                    <Spinner type="ring" size="sm" />
+                    <span className="text-foreground font-dm text-[12px] font-medium">
+                      Syncing...
                     </span>
                   </div>
-                </div>
-                
-                <div className="flex flex-col gap-1">
-                  <p className="text-primary font-dm text-[16px] font-bold leading-normal">
-                    Thesis Adviser
-                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Thesis Title */}
+            <div className="flex flex-col gap-1">
+              <p className="text-primary font-dm text-[16px] font-bold leading-normal">
+                Thesis Title
+              </p>
+              <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
+                {selectedThesis.thesisTitle}
+              </p>
+            </div>
+
+            {/* Storage Details */}
+            <div className="flex flex-col gap-1">
+              <p className="text-primary font-dm text-[16px] font-bold leading-normal">
+                Storage
+              </p>
+              <div className="flex justify-between items-center">
+                <p className="text-foreground font-dm text-[15px] font-bold leading-normal">
+                  Total Bytes
+                </p>
+                <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
+                  {selectedThesis.totalBytes}
+                </p>
+              </div>
+              <div className="flex justify-between items-center">
+                <p className="text-foreground font-dm text-[15px] font-bold leading-normal">
+                  Primary
+                </p>
+                <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
+                  {selectedThesis.primary}
+                </p>
+              </div>
+              <div className="flex justify-between items-center">
+                <p className="text-foreground font-dm text-[15px] font-bold leading-normal">
+                  Replicated
+                </p>
+                <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
+                  {selectedThesis.replicated}
+                </p>
+              </div>
+            </div>
+
+            {/* Schedule Details */}
+            <div className="grid grid-cols-2 gap-[5px]">
+              <div className="flex flex-col gap-1">
+                <p className="text-primary font-dm text-[16px] font-bold leading-normal">
+                  Last Update
+                </p>
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-primary" strokeWidth={1.33} />
                   <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
-                    {selectedThesis.thesisAdviser}
+                    {selectedThesis.lastUpdateDate}
                   </p>
                 </div>
               </div>
-
-              {/* Proponents */}
-              <div className="flex flex-col gap-2">
+              
+              <div className="flex flex-col gap-1">
                 <p className="text-primary font-dm text-[16px] font-bold leading-normal">
-                  Proponents
+                  Last Sync
                 </p>
-                <div className="flex flex-wrap items-center gap-2">
-                  {selectedThesis.proponents.map((proponent, index) => (
-                    <div
-                      key={index}
-                      className="inline-flex items-center gap-2 rounded-lg bg-[rgba(255,189,0,0.5)] px-[8.8px] py-[2.6px]"
-                    >
-                      <Icon name="proponentsDefault" size={12} />
-                      <span className="text-foreground font-dm text-[12px] font-medium leading-[16px]">
-                        {proponent}
-                      </span>
-                    </div>
-                  ))}
+                <div className="flex items-center gap-2">
+                  {currentSyncStatus === 'Failed' ? (
+                    <>
+                      <AlertCircle size={16} className="text-primary" />
+                      <p className="text-primary font-dm text-[15px] font-medium leading-normal">
+                        Failed
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <Calendar className="h-4 w-4 text-primary" strokeWidth={1.33} />
+                      <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
+                        {selectedThesis.lastSyncDate || 'Date Today'}
+                      </p>
+                    </>
+                  )}
                 </div>
+              </div>
+            </div>
+
+            {/* Block and Adviser */}
+            <div className="grid grid-cols-2 gap-[5px]">
+              <div className="flex flex-col justify-center gap-[1.6px]">
+                <p className="text-primary font-dm text-[16px] font-bold leading-normal">
+                  Block
+                </p>
+                <div className="inline-flex items-center justify-center px-[5px] py-[5px] rounded-lg border-[0.8px] border-primary w-fit">
+                  <span className="text-foreground font-dm text-[12px] font-medium leading-normal">
+                    {selectedThesis.block}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="flex flex-col gap-1">
+                <p className="text-primary font-dm text-[16px] font-bold leading-normal">
+                  Thesis Adviser
+                </p>
+                <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
+                  {selectedThesis.thesisAdviser}
+                </p>
+              </div>
+            </div>
+
+            {/* Proponents */}
+            <div className="flex flex-col gap-2">
+              <p className="text-primary font-dm text-[16px] font-bold leading-normal">
+                Proponents
+              </p>
+              <div className="flex flex-wrap items-center gap-2">
+                {selectedThesis.proponents.map((proponent, index) => (
+                  <div
+                    key={index}
+                    className="inline-flex items-center gap-2 rounded-lg bg-[rgba(255,189,0,0.5)] px-[8.8px] py-[2.6px]"
+                  >
+                    <Icon name="proponentsDefault" size={12} />
+                    <span className="text-foreground font-dm text-[12px] font-medium leading-[16px]">
+                      {proponent}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
-      </AppContent>
-
-      <NavFooter />
+      </div>
+    </RepositoryLayout>
+    
+    <NavFooter />
     </>
   );
 }
