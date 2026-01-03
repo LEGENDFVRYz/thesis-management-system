@@ -88,7 +88,7 @@ Route::prefix('repository')->group(function () {
 
 /*
 ==================================================================================
-STUDENT ROUTES 
+STUDENT ROUTES
 ==================================================================================
 */
 Route::middleware('gues')->group(function () {
@@ -153,7 +153,7 @@ Route::prefix('faculty')->group(function () {
                 });
 
                 // DEFENSE MANAGEMENT OF ADVISER HAS BEEN JOINED WITH PANEL
-                // CHECK THE SPECIAL ROUTES FOR THIS SCENARIO... 
+                // CHECK THE SPECIAL ROUTES FOR THIS SCENARIO...
 
                 Route::get('endorsement', [Endorsement::class, 'index'])->name('faculty.management.adviser.endorsement');
 
@@ -166,15 +166,15 @@ Route::prefix('faculty')->group(function () {
                 Route::get('thesis_review', function () {
                     return Inertia::render('Faculty/management/panel/thesis_review');
                 })->name('faculty.management.panel.thesis_review');
-                
+
                 // DEFENSE MANAGEMENT OF PANEL HAS BEEN JOINED WITH ADVISER
-                // CHECK THE SPECIAL ROUTES FOR THIS SCENARIO... 
+                // CHECK THE SPECIAL ROUTES FOR THIS SCENARIO...
             });
 
 
             // --- SPECIAL ROUTES (ADVISER AND PANEL JOINT) ---
             Route::middleware('faculty.role:Panelist,Adviser')->group(function () {
-                Route::get('defense_management', [DefenseManagement::class, 'index'])->name('faculty.management.joint.defense_management'); 
+                Route::get('defense_management', [DefenseManagement::class, 'index'])->name('faculty.management.joint.defense_management');
             });
 
 
@@ -189,6 +189,7 @@ Route::prefix('faculty')->group(function () {
             // --- COMMITTEE ROUTES ---
             Route::middleware('faculty.role:Committee')->prefix('committee')->group(function () {
                 Route::get('proposal_review', [ProposalReview::class, 'index'])->name('faculty.management.committee.proposal_review');
+                Route::post('proposal_review', [ProposalReview::class, 'store'])->name('faculty.management.committee.proposal_review.store');
             });
 
 
@@ -251,7 +252,7 @@ Note: Temporary Routes only for frontend, but soon will have own controller depe
 ==================================================================================
 */
 Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->group(function () {
-    
+
     // Old Dashboard Route
     // Route::get('/', function () {
     //     return Inertia::render('Admin/dashboard');
@@ -317,7 +318,7 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
 
 /*
 ==================================================================================
-API ROUTES (temporary only)        
+API ROUTES (temporary only)
 ==================================================================================
 */
 Route::post('file-import', [FileImportController::class, 'store'])->name('file.import');
