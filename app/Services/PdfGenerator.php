@@ -54,7 +54,10 @@ class PdfGenerator
 
         $browsershot = Browsershot::html($html)
             ->format('A4')
-            ->margins(10, 10, 10, 10)
+            ->margins(40, 10, 10, 10)
+            ->showBrowserHeaderAndFooter()
+            ->headerHtml(view('pdf.header')->render())
+            ->hideFooter()
             ->showBackground()
             ->waitUntilNetworkIdle();
 
