@@ -1,20 +1,16 @@
 import React, { useState } from 'react';
 import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
-import { 
-    Upload, 
-    CheckCircle, 
-    XCircle, 
-    Download, 
-    Loader2, 
-    ClipboardCheck, 
-    ArrowUp,
+import {
+    Loader2,
+    ClipboardCheck,
     AlertTriangle
 } from 'lucide-react';
 
 // --- GLOBAL COMPONENTS ---
-import NavBar from '@/components/app-header'; 
-import Footer from '@/components/nav-footer'; 
+import { AppHeader } from '@/components/app-header';
+import { NavFooter } from '@/components/nav-footer';
+import { FileUpload } from '@/components/file-upload';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 
@@ -100,7 +96,7 @@ export default function IpPlagiarism({ auth }: PageProps) {
         <div className="min-h-screen bg-white font-sans text-gray-800 flex flex-col">
             <Head title="IP & Compliance" />
 
-            <NavBar user={auth.user} />
+            <AppHeader variant="student" />
 
             {/* --- 1. HEADER STRIP --- */}
             <div className="bg-white border-b-2 border-[#800000]/60 px-6 md:px-[5%] py-6 flex items-start gap-4">
@@ -169,49 +165,35 @@ export default function IpPlagiarism({ auth }: PageProps) {
                                 <label className="block text-base font-medium text-black mb-3">
                                     1. Plagiarism Check Report (PDF)
                                 </label>
-                                
-                                {/* Dashed Upload Zone */}
-                                <div 
-                                    onClick={() => !isScanning && document.getElementById('file-upload')?.click()}
-                                    className={`
-                                        border-2 border-dashed border-[#800000]/60 rounded-lg p-10 text-center transition-all group relative overflow-hidden
-                                        ${isScanning ? 'bg-gray-50 cursor-wait' : 'hover:bg-[#800000]/5 cursor-pointer'}
-                                    `}
-                                >
-                                    {isScanning ? (
-                                        <div className="flex flex-col items-center">
-                                            <Loader2 className="w-8 h-8 text-[#800000] animate-spin mb-2" />
-                                            <p className="text-[#800000] font-medium">Server Analyzing...</p>
-                                            <p className="text-xs text-gray-500">Extracting score from PDF</p>
-                                        </div>
-                                    ) : (
-                                        <>
-                                            <div className="border border-black rounded-lg w-10 h-10 flex items-center justify-center mx-auto mb-3">
-                                                <ArrowUp className="w-5 h-5 text-black" />
-                                            </div>
-                                            <p className="text-gray-500 text-sm mb-1 group-hover:text-[#800000] font-medium">
-                                                {data.plagiarism_report ? "Click to replace file" : "Click to upload report"}
-                                            </p>
-                                            <p className="text-gray-400 text-xs">PDF files only</p>
 
-                                            {scanError && (
-                                                <div className="mt-4 bg-red-100 text-red-600 text-xs py-2 px-3 rounded flex items-center justify-center gap-2">
-                                                    <AlertTriangle className="w-4 h-4" />
-                                                    {scanError}
-                                                </div>
-                                            )}
-                                        </>
-                                    )}
-                                    
-                                    <input 
-                                        id="file-upload"
-                                        type="file" 
-                                        className="hidden" 
-                                        accept=".pdf"
-                                        onChange={(e) => e.target.files && handleFileSelect(e.target.files[0])}
-                                        disabled={!isLeader || isScanning}
-                                    />
-                                </div>
+                                {isScanning ? (
+                                    <div className="border-2 border-dashed border-[#800000]/60 rounded-lg p-10 text-center bg-gray-50">
+                                        <Loader2 className="w-8 h-8 text-[#800000] animate-spin mb-2 mx-auto" />
+                                        <p className="text-[#800000] font-medium">Server Analyzing...</p>
+                                        <p className="text-xs text-gray-500">Extracting score from PDF</p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <FileUpload
+                                            onFileSelect={(files) => {
+                                                if (files.length > 0 && isLeader) {
+                                                    handleFileSelect(files[0]);
+                                                }
+                                            }}
+                                            onError={(error) => setScanError(error)}
+                                            maxSizeMB={10}
+                                            acceptedFileTypes={['.pdf']}
+                                            multiple={false}
+                                            isUploading={isScanning}
+                                        />
+                                        {scanError && (
+                                            <div className="mt-4 bg-red-100 text-red-600 text-xs py-2 px-3 rounded flex items-center justify-center gap-2">
+                                                <AlertTriangle className="w-4 h-4" />
+                                                {scanError}
+                                            </div>
+                                        )}
+                                    </>
+                                )}
                             </div>
 
                             {/* Scan Result Display */}
@@ -339,7 +321,7 @@ export default function IpPlagiarism({ auth }: PageProps) {
 
                 </div>
             </main>
-            <Footer />
+            <NavFooter />
         </div>
     );
 }

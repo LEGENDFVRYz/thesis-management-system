@@ -3,9 +3,9 @@ import { Head, useForm } from '@inertiajs/react';
 import { Paperclip, Clock, ListChecks, Mic2 } from 'lucide-react';
 
 // --- GLOBAL COMPONENTS ---
-import NavBar from '@/components/app-header'; 
-import Footer from '@/components/nav-footer'; 
-import FileUpload from '@/components/file-upload'; 
+import { AppHeader } from '@/components/app-header';
+import { NavFooter } from '@/components/nav-footer';
+import { FileUpload } from '@/components/file-upload'; 
 
 // --- TYPES ---
 interface AuditLog {
@@ -94,7 +94,7 @@ export default function PublicPresentation({ auth, thesis, audit_trail = [], sta
         <div className="min-h-screen bg-[#f5f5f5] font-sans text-[#333] flex flex-col">
             <Head title="Public Presentation" />
 
-            <NavBar user={auth?.user} />
+            <AppHeader variant="student" />
 
             <div className="bg-[#FFF8DC] border-b border-[#e0d0b0] px-6 md:px-[5%] py-4 flex justify-between items-center">
                 <h2 className="text-[#800000] text-xl font-bold flex items-center gap-2">
@@ -262,23 +262,26 @@ export default function PublicPresentation({ auth, thesis, audit_trail = [], sta
                                     {/* --- UPLOAD SECTION 1: MATERIALS --- */}
                                     <div className="mt-8 pt-6 border-t border-dashed border-[#ddd]">
                                         <h3 className="text-[1.1rem] font-bold text-[#800000] mb-4">2. Presentation Materials (Pre-Event)</h3>
-                                        
-                                        <FileUpload 
-                                            value={data.materials_file}
-                                            onChange={(file) => setData('materials_file', file)}
-                                            accept=".pdf,.ppt,.pptx"
-                                            disabled={!isLeader}
-                                            label="Click to Upload Slides (PPT/PDF)"
-                                            className="bg-[#fafafa] hover:bg-[#fffcf5] border-2 border-dashed border-[#ccc] hover:border-[#800000]"
+
+                                        <FileUpload
+                                            onFileSelect={(files) => {
+                                                if (files.length > 0 && isLeader) {
+                                                    setData('materials_file', files[0]);
+                                                }
+                                            }}
+                                            onError={(error) => console.error('Upload error:', error)}
+                                            acceptedFileTypes={['.pdf', '.ppt', '.pptx']}
+                                            maxSizeMB={50}
+                                            multiple={false}
                                         />
                                         <p className="text-[0.85rem] text-[#999] mt-2 text-center">Required for Adviser review before the event</p>
-                                        
-                                        {/* Example of showing existing file if already uploaded (needs logic from props) */}
-                                        {status !== 'draft' && !data.materials_file && (
+
+                                        {/* Show uploaded file if exists */}
+                                        {data.materials_file && (
                                             <div className="mt-4 bg-[#f0fdf4] p-2.5 rounded border border-[#bbf7d0] flex items-center justify-between">
                                                 <div className="flex items-center gap-2.5">
                                                     <Paperclip className="w-4 h-4 text-[#666]" />
-                                                    <strong className="text-sm">Submitted_Slides.pptx</strong>
+                                                    <strong className="text-sm">{data.materials_file.name || 'Uploaded File'}</strong>
                                                 </div>
                                                 <span className="text-[#198754] font-bold text-[0.9rem]">Uploaded ✔</span>
                                             </div>
@@ -288,16 +291,30 @@ export default function PublicPresentation({ auth, thesis, audit_trail = [], sta
                                     {/* --- UPLOAD SECTION 2: PROOF --- */}
                                     <div className="mt-8 pt-6 border-t border-dashed border-[#ddd]">
                                         <h3 className="text-[1.1rem] font-bold text-[#800000] mb-4">3. Proof of Completion (Post-Event)</h3>
-                                        
-                                        <FileUpload 
-                                            value={data.proof_file}
-                                            onChange={(file) => setData('proof_file', file)}
-                                            accept=".pdf,.jpg,.png"
-                                            disabled={!isLeader}
-                                            label="Upload Certificate / Photos"
-                                            className="bg-[#fafafa] hover:bg-[#fffcf5] border-2 border-dashed border-[#ccc] hover:border-[#800000]"
+
+                                        <FileUpload
+                                            onFileSelect={(files) => {
+                                                if (files.length > 0 && isLeader) {
+                                                    setData('proof_file', files[0]);
+                                                }
+                                            }}
+                                            onError={(error) => console.error('Upload error:', error)}
+                                            acceptedFileTypes={['.pdf', '.jpg', '.png']}
+                                            maxSizeMB={20}
+                                            multiple={false}
                                         />
                                         <p className="text-[0.85rem] text-[#999] mt-2 text-center">Upload this after the event to complete the requirement</p>
+
+                                        {/* Show uploaded file if exists */}
+                                        {data.proof_file && (
+                                            <div className="mt-4 bg-[#f0fdf4] p-2.5 rounded border border-[#bbf7d0] flex items-center justify-between">
+                                                <div className="flex items-center gap-2.5">
+                                                    <Paperclip className="w-4 h-4 text-[#666]" />
+                                                    <strong className="text-sm">{data.proof_file.name || 'Uploaded File'}</strong>
+                                                </div>
+                                                <span className="text-[#198754] font-bold text-[0.9rem]">Uploaded ✔</span>
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div className="mt-8 overflow-hidden">
@@ -362,8 +379,8 @@ export default function PublicPresentation({ auth, thesis, audit_trail = [], sta
                 </main>
 
             </div>
-            
-            <Footer />
+
+            <NavFooter />
         </div>
     );
 }
