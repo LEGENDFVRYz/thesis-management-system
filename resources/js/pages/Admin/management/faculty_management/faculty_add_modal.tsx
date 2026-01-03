@@ -1,3 +1,4 @@
+//MODAL for "Add Faculty" btn
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { RadioGroup } from "@/components/ui/radio-group";
