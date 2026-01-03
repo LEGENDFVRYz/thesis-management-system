@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { X } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox"
 
 interface ManageArchiveModalProps {
   isOpen: boolean;
@@ -203,170 +204,35 @@ export default function ManageArchiveModal({ isOpen, onClose }: ManageArchiveMod
                     </td>
                     <td style={{ textAlign: "center", padding: "10px 12px" }}>
                       <div style={{ display: "flex", justifyContent: "center" }}>
-                        <label style={{ cursor: level.viewDisabled ? "not-allowed" : "pointer" }}>
-                          <input
-                            type="checkbox"
-                            checked={level.view}
-                            disabled={level.viewDisabled}
-                            onChange={() => handleCheckboxChange(index, "view")}
-                            style={{ display: "none" }}
-                          />
-                          <div
-                            onMouseEnter={(e) => {
-                              if (!level.view && !level.viewDisabled) {
-                                e.currentTarget.style.border = "2px solid #9ca3af";
-                              }
-                            }}
-                            onMouseLeave={(e) => {
-                              if (!level.view) {
-                                e.currentTarget.style.border = "2px solid black";
-                              }
-                            }}
-                            style={{
-                              width: "19px",
-                              height: "19px",
-                              borderRadius: "5px",
-                              border: level.view ? "2px solid var(--primary)" : "2px solid black",
-                              backgroundColor: level.view ? "var(--primary)" : "transparent",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              transition: "all 0.2s ease",
-                              opacity: level.viewDisabled ? 0.5 : 1,
-                              cursor: level.viewDisabled ? "not-allowed" : "pointer",
-                            }}
-                          >
-                            {level.view && (
-                              <svg
-                                width="12"
-                                height="9"
-                                viewBox="0 0 12 9"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M1 4.5L4.5 8L11 1"
-                                  stroke="#FFBD00"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                            )}
-                          </div>
-                        </label>
+                        <Checkbox
+                          checked={level.view}
+                          locked={level.viewDisabled}
+                          onCheckedChange={() =>
+                            handleCheckboxChange(index, "view")
+                          }
+                        />
                       </div>
                     </td>
                     <td style={{ textAlign: "center", padding: "10px 12px" }}>
                       <div style={{ display: "flex", justifyContent: "center" }}>
-                        <label style={{ cursor: level.updateDisabled ? "not-allowed" : "pointer" }}>
-                          <input
-                            type="checkbox"
-                            checked={level.update}
-                            disabled={level.updateDisabled}
-                            onChange={() => handleCheckboxChange(index, "update")}
-                            style={{ display: "none" }}
-                          />
-                          <div
-                            onMouseEnter={(e) => {
-                              if (!level.update && !level.updateDisabled) {
-                                e.currentTarget.style.border = "2px solid #9ca3af";
-                              }
-                            }}
-                            onMouseLeave={(e) => {
-                              if (!level.update) {
-                                e.currentTarget.style.border = "2px solid black";
-                              }
-                            }}
-                            style={{
-                              width: "19px",
-                              height: "19px",
-                              borderRadius: "5px",
-                              border: level.update ? "2px solid var(--primary)" : "2px solid black",
-                              backgroundColor: level.update ? "var(--primary)" : "transparent",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              transition: "all 0.2s ease",
-                              opacity: level.updateDisabled ? 0.5 : 1,
-                              cursor: level.updateDisabled ? "not-allowed" : "pointer",
-                            }}
-                          >
-                            {level.update && (
-                              <svg
-                                width="12"
-                                height="9"
-                                viewBox="0 0 12 9"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M1 4.5L4.5 8L11 1"
-                                  stroke="#FFBD00"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                            )}
-                          </div>
-                        </label>
+                        <Checkbox
+                          checked={level.update}
+                          locked={level.updateDisabled}
+                          onCheckedChange={() =>
+                            handleCheckboxChange(index, "update")
+                          }
+                        />
                       </div>
                     </td>
                     <td style={{ textAlign: "center", padding: "10px 12px" }}>
                       <div style={{ display: "flex", justifyContent: "center" }}>
-                        <label style={{ cursor: level.deleteDisabled ? "not-allowed" : "pointer" }}>
-                          <input
-                            type="checkbox"
-                            checked={level.delete}
-                            disabled={level.deleteDisabled}
-                            onChange={() => handleCheckboxChange(index, "delete")}
-                            style={{ display: "none" }}
-                          />
-                          <div
-                            onMouseEnter={(e) => {
-                              if (!level.delete && !level.deleteDisabled) {
-                                e.currentTarget.style.border = "2px solid #9ca3af";
-                              }
-                            }}
-                            onMouseLeave={(e) => {
-                              if (!level.delete) {
-                                e.currentTarget.style.border = "2px solid black";
-                              }
-                            }}
-                            style={{
-                              width: "19px",
-                              height: "19px",
-                              borderRadius: "5px",
-                              border: level.delete ? "2px solid var(--primary)" : "2px solid black",
-                              backgroundColor: level.delete ? "var(--primary)" : "transparent",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              transition: "all 0.2s ease",
-                              opacity: level.deleteDisabled ? 0.5 : 1,
-                              cursor: level.deleteDisabled ? "not-allowed" : "pointer",
-                            }}
-                          >
-                            {level.delete && (
-                              <svg
-                                width="12"
-                                height="9"
-                                viewBox="0 0 12 9"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M1 4.5L4.5 8L11 1"
-                                  stroke="#FFBD00"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                            )}
-                          </div>
-                        </label>
+                        <Checkbox
+                          checked={level.delete}
+                          locked={level.deleteDisabled}
+                          onCheckedChange={() =>
+                            handleCheckboxChange(index, "delete")
+                          }
+                        />
                       </div>
                     </td>
                   </tr>
