@@ -106,6 +106,10 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('notification', function () {
         return Inertia::render('Shared/notification');
     })->name('student.notification');
+
+    Route::get('progress', function () {
+        return Inertia::render('Student/progress');
+    })->name('student.progress');
 });
 
 
