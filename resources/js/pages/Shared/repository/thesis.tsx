@@ -5,6 +5,9 @@ import { AppContent } from '@/components/app-content';
 import { NavFooter } from '@/components/nav-footer';
 import { ArchiveCard } from '@/components/ui/card';
 import { RepositoryFilterBar } from '@/components/repository-filter-bar';
+import RepositoryLayout from './index';
+import { index, theses } from '@/routes/repository';
+import { type BreadcrumbItem } from '@/types';
 
 interface ThesisProps {
     search?: string;
@@ -22,6 +25,11 @@ export default function Thesis({ search = '' }: ThesisProps) {
         selectedSpecialization: '',
         tags: []
     });
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: 'Repository', href: index().url },
+        { title: 'Thesis', href: theses().url },
+    ];
 
     // Sample repository data
     const allRepositories = [
@@ -137,23 +145,12 @@ export default function Thesis({ search = '' }: ThesisProps) {
 
     // Filter repositories based on search query and tags
     const repositories = allRepositories.filter((repo) => {
-        // Filter by search query from landing page
-        if (search && !repo.title.toLowerCase().includes(search.toLowerCase())) {
-            return false;
-        }
-
-        // Filter by search term from filter bar
-        if (filters.searchTerm && !repo.title.toLowerCase().includes(filters.searchTerm.toLowerCase())) {
-            return false;
-        }
-
-        // Filter by year (if selected)
+        if (search && !repo.title.toLowerCase().includes(search.toLowerCase())) return false;
+        if (filters.searchTerm && !repo.title.toLowerCase().includes(filters.searchTerm.toLowerCase())) return false;
         if (filters.selectedYear) {
             const selectedYear = filters.selectedYear.getFullYear();
-            const repoYear = parseInt(repo.date.split(' ')[1]); // Extract year from "Month YYYY"
-            if (repoYear !== selectedYear) {
-                return false;
-            }
+            const repoYear = parseInt(repo.date.split(' ')[1]);
+            if (repoYear !== selectedYear) return false;
         }
 
         // Filter by tags (if any tags are selected, the repo must have at least one matching badge)
@@ -161,9 +158,7 @@ export default function Thesis({ search = '' }: ThesisProps) {
             const hasMatchingTag = filters.tags.some(tag =>
                 repo.badges.some(badge => badge.toLowerCase() === tag.toLowerCase())
             );
-            if (!hasMatchingTag) {
-                return false;
-            }
+            if (!hasMatchingTag) return false;
         }
 
         // Filter by specialization (if selected)
@@ -171,9 +166,7 @@ export default function Thesis({ search = '' }: ThesisProps) {
             const hasMatchingSpecialization = repo.badges.some(badge =>
                 badge.toLowerCase().includes(filters.selectedSpecialization.toLowerCase().replace('-', ' '))
             );
-            if (!hasMatchingSpecialization) {
-                return false;
-            }
+            if (!hasMatchingSpecialization) return false;
         }
 
         return true;
@@ -182,50 +175,51 @@ export default function Thesis({ search = '' }: ThesisProps) {
     return (
         <>
             <Head title="Repository" />
-            <AppHeader />
+
+            <RepositoryLayout breadcrumbs={breadcrumbs}>
 
             <AppContent
                 title="Thesis Repository"
                 subtitle="Browse and explore student thesis projects"
             >
-                {/* Filter Bar */}
-                <div className="mb-8">
-                    <RepositoryFilterBar onFilterChange={setFilters} />
-                </div>
-
-                {/* Search Results Info */}
-                {search && (
-                    <div className="mb-4">
-                        <p className="text-sm text-gray-600 font-['DM_Sans']">
-                            Found {repositories.length} result{repositories.length !== 1 ? 's' : ''} for "{search}"
-                        </p>
+                    {/* Filter Bar */}
+                    <div className="mb-8">
+                        <RepositoryFilterBar onFilterChange={setFilters} />
                     </div>
-                )}
 
-                {/* Repository Cards Grid - 3 per row on large screens */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-10">
-                    {repositories.length > 0 ? (
-                        repositories.map((repo, index) => (
-                            <Link key={index} href="/test-thesis-preview">
-                                <ArchiveCard
-                                    title={repo.title}
-                                    members={repo.members}
-                                    date={repo.date}
-                                    badges={repo.badges}
-                                    variant="with-link"
-                                    href="/test-thesis-preview"
-                                />
-                            </Link>
-                        ))
-                    ) : (
-                        <div className="col-span-full text-center py-12">
-                            <p className="text-gray-500 font-['DM_Sans']">
-                                No thesis projects found matching your search.
+                    {/* Search Results Info */}
+                    {search && (
+                        <div className="mb-4">
+                            <p className="text-sm text-gray-600 font-['DM_Sans']">
+                                Found {repositories.length} result{repositories.length !== 1 ? 's' : ''} for "{search}"
                             </p>
                         </div>
                     )}
-                </div>
-            </AppContent>
+
+                    {/* Repository Cards Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-10">
+                        {repositories.length > 0 ? (
+                            repositories.map((repo, index) => (
+                                <Link key={index} href="/test-thesis-preview">
+                                    <ArchiveCard
+                                        title={repo.title}
+                                        members={repo.members}
+                                        date={repo.date}
+                                        badges={repo.badges}
+                                        variant="with-link"
+                                    />
+                                </Link>
+                            ))
+                        ) : (
+                            <div className="col-span-full text-center py-12">
+                                <p className="text-gray-500 font-['DM_Sans']">
+                                    No thesis projects found matching your search.
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                </AppContent>
+            </RepositoryLayout>
 
             <NavFooter />
         </>
