@@ -1,14 +1,8 @@
 import { useState } from 'react';
 import { Trash2, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog';
+import {Dialog,DialogContent,DialogHeader,DialogTitle,DialogDescription,DialogFooter,} from '@/components/ui/dialog';
+import InputError from '@/components/input-error';
 
 interface Member {
   id: number;
@@ -29,6 +23,10 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
     { id: 1, name: '', studentNumber: '', email: '', isLeader: true },
     { id: 2, name: '', studentNumber: '', email: '', isLeader: false },
   ]);
+  const [errors, setErrors] = useState<{
+    block?: string;
+    members?: { [key: number]: { name?: string; studentNumber?: string; email?: string } };
+  }>({});
 
   const handleAddMember = () => {
     if (members.length < 4) {
@@ -45,6 +43,14 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
   const handleRemoveMember = (id: number) => {
     if (members.length > 2) {
       setMembers(members.filter(m => m.id !== id));
+      // Clear errors for removed member
+      if (errors.members?.[id]) {
+        const newErrors = { ...errors };
+        if (newErrors.members) {
+          delete newErrors.members[id];
+        }
+        setErrors(newErrors);
+      }
     }
   };
 
@@ -59,11 +65,67 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
     setMembers(members.map(m =>
       m.id === id ? { ...m, [field]: value } : m
     ));
+    // Clear error for this field when user starts typing
+    if (errors.members?.[id]?.[field]) {
+      const newErrors = { ...errors };
+      if (newErrors.members) {
+        delete newErrors.members[id][field];
+        if (Object.keys(newErrors.members[id]).length === 0) {
+          delete newErrors.members[id];
+        }
+      }
+      setErrors(newErrors);
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors: {
+      block?: string;
+      members?: { [key: number]: { name?: string; studentNumber?: string; email?: string } };
+    } = {};
+
+    // Validate block selection
+    if (!selectedBlock) {
+      newErrors.block = 'Please select a block';
+    }
+
+    // Validate members
+    const memberErrors: { [key: number]: { name?: string; studentNumber?: string; email?: string } } = {};
+    members.forEach(member => {
+      const errors: { name?: string; studentNumber?: string; email?: string } = {};
+      
+      if (!member.name.trim()) {
+        errors.name = 'Name is required';
+      }
+      
+      if (!member.studentNumber.trim()) {
+        errors.studentNumber = 'Student number is required';
+      }
+      
+      if (!member.email.trim()) {
+        errors.email = 'Email is required';
+      } else if (!member.email.includes('@')) {
+        errors.email = 'Please enter a valid email';
+      }
+
+      if (Object.keys(errors).length > 0) {
+        memberErrors[member.id] = errors;
+      }
+    });
+
+    if (Object.keys(memberErrors).length > 0) {
+      newErrors.members = memberErrors;
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleCreateGroup = () => {
-    console.log('Creating group:', { selectedBlock, members });
-    onClose();
+    if (validateForm()) {
+      console.log('Creating group:', { selectedBlock, members });
+      onClose();
+    }
   };
 
   const handleCancel = () => {
@@ -72,6 +134,7 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
       { id: 1, name: '', studentNumber: '', email: '', isLeader: true },
       { id: 2, name: '', studentNumber: '', email: '', isLeader: false },
     ]);
+    setErrors({});
     onClose();
   };
 
@@ -95,7 +158,12 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
             </label>
             <select
               value={selectedBlock}
-              onChange={(e) => setSelectedBlock(e.target.value)}
+              onChange={(e) => {
+                setSelectedBlock(e.target.value);
+                if (errors.block) {
+                  setErrors({ ...errors, block: undefined });
+                }
+              }}
               className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#730000]"
             >
               <option value="">Select Block...</option>
@@ -103,6 +171,7 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
               <option value="block-b">Block B</option>
               <option value="block-c">Block C</option>
             </select>
+            <InputError message={errors.block} className="mt-1" />
           </div>
 
           {/* Members Header */}
@@ -165,6 +234,7 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
                       onChange={(e) => handleMemberChange(member.id, 'name', e.target.value)}
                       className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
                     />
+                    <InputError message={errors.members?.[member.id]?.name} className="mt-1" />
                   </div>
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">Student Number</label>
@@ -175,6 +245,7 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
                       onChange={(e) => handleMemberChange(member.id, 'studentNumber', e.target.value)}
                       className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
                     />
+                    <InputError message={errors.members?.[member.id]?.studentNumber} className="mt-1" />
                   </div>
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">Email</label>
@@ -185,6 +256,7 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
                       onChange={(e) => handleMemberChange(member.id, 'email', e.target.value)}
                       className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
                     />
+                    <InputError message={errors.members?.[member.id]?.email} className="mt-1" />
                   </div>
                 </div>
               </div>

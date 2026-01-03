@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 type Stage = 'mor' | 'dp1' | 'dp2';
 
 export default function StageSwitchToggle({
-  value = 'mor',
+  value: controlledValue,
   onChange,
   className,
 }: {
@@ -12,7 +12,13 @@ export default function StageSwitchToggle({
   onChange?: (stage: Stage) => void;
   className?: string;
 }) {
+  const [internalValue, setInternalValue] = useState<Stage>('mor');
+  
+  // Use controlled value if provided, otherwise use internal state
+  const value = controlledValue ?? internalValue;
+
   const handleClick = (stage: Stage) => {
+    setInternalValue(stage);
     onChange?.(stage);
   };
 

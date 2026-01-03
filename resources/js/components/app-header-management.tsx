@@ -46,12 +46,9 @@ export function GlobalNavDropdown({
             <Button
                 variant="primary"
                 className={cn(
-                    "w-fit h-10 px-4 transition-all rounded-md flex items-center justify-start gap-5 border-none shadow-md", isStudent && "min-w-[160px]", "w-full justify-between",
-                    /* Combined the hover states for clarity */
-                    "bg-primary text-background hover:bg-destructive", 
+                    "mx-1 border-none shadow-none",
                     /* Added underline and ensured text remains yellow on hover */
-                    "hover:text-primary-foreground-2 hover:underline", 
-                    "text-sm font-semibold tracking-wide"
+                    "hover:text-primary-foreground-2 hover:underline"
                 )}
             >
                 <span>{label}</span>
