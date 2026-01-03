@@ -26,8 +26,8 @@ export function GroupProfileModal({ isOpen, onClose, group }: GroupProfileModalP
       >
         {/* Header */}
         <div className="bg-primary rounded-t-lg p-6 relative">
-          <h2 className="text-white text-3xl font-bold">Group Profile</h2>
-          <Button 
+          <h2 className="text-white text-2xl font-bold">Group Profile</h2>
+          <Button variant="link"
             onClick={onClose} 
             className="absolute top-6 right-6 text-white hover:text-gray-200 hover:bg-primary-foreground/10 transition-colors"
           >
