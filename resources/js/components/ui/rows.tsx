@@ -1,6 +1,7 @@
 import { Download, Edit2, Trash2, Eye, Bell, Check, AlertCircle, FileText, LucideUsers, Edit } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export function DefaultRows() {
   return (
@@ -47,16 +48,53 @@ export function RowColumn1() {
   );
 }
 
+interface RowData {
+  value: React.ReactNode; // Can be string, badge, or icon
+  isBadge?: boolean;
+  badgeVariant?: string; // Optional: to pass specific badge styles
+}
 
-export function MethodologyRow() {
+interface MethodologyRowProps {
+  variant: 'static' | 'dynamic';
+  data?: RowData[]; // Only used for dynamic
+}
+
+export function MethodologyRow({ variant, data = [] }: MethodologyRowProps) {
+  
+  // Variant 1: Static (Original hardcoded structure)
+  if (variant === 'static') {
+    return (
+      <div className="flex items-center justify-between gap-4 rounded bg-white px-5 py-3">
+        <span className="min-w-[100px] text-sm text-gray-800 text-center">Row Column 1</span>
+        <Badge className="bg-[#E9D4FF] border border-[#8200DB] text-[#8200DB] hover:bg-[#E9D4FF] text-center">
+          Methodology Change
+        </Badge>
+        <span className="min-w-[100px] text-sm text-gray-800 text-center">Row Column 3</span>
+        <Badge className="bg-green-600 border-transparent text-center">Graded</Badge>
+      </div>
+    );
+  }
+
+  // Variant 2: Dynamic (Loops through passed data)
   return (
-    <div className="flex items-center justify-between gap-4 rounded bg-white px-5 py-3">
-      <span className="min-w-[100px] text-sm text-gray-800 text-center">Row Column 1</span>
-      <Badge className="bg-[#E9D4FF] border border-[#8200DB] text-[#8200DB] hover:bg-[#E9D4FF] text-center">
-        Methodology Change
-      </Badge>
-      <span className="min-w-[100px] text-sm text-gray-800 text-center">Row Column 3</span>
-      <Badge className="bg-green-600 border-transparent text-center">Graded</Badge>
+    <div className="flex items-center justify-between gap-4 rounded bg-background px-5 py-3 hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0">
+      {data.map((item, index) => (
+        <div 
+          key={index} 
+          className={cn(
+            "flex-1 flex",
+            index === 0 ? "justify-start text-left" : "justify-center text-center"
+          )}
+        >
+          {typeof item.value === 'string' ? (
+            <span className="text-sm text-gray-800 leading-tight font-medium">
+                {item.value}
+            </span>
+          ) : (
+            item.value 
+          )}
+        </div>
+      ))}
     </div>
   );
 }
