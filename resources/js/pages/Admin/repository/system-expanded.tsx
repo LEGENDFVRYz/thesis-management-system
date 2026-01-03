@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Head } from '@inertiajs/react';
 import RepositoryLayout from './index';
-import { systemExpanded } from '@/routes/admin/repository';
+import { system, systemExpanded } from '@/routes/admin/repository';
 import { type BreadcrumbItem } from '@/types';
 import { SystemRepositoryStorage } from '@/components/system-repository-storage';
 import { Icon } from '@/components/icon-index';
@@ -15,12 +15,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from '@/components/ui/label';
 import { AlertCircle, FileText, Trash2, Calendar, X, CheckCircle } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
+import { index, theses } from '@/routes/repository';
+import { AppContent } from '@/components/app-content';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'System',
-        href: systemExpanded().url,
-    },
+    { title: 'Repository', href: index().url },
+    { title: 'System', href: system().url },
 ];
 
 // Types
@@ -478,557 +478,560 @@ export default function SystemRepositoryExpanded() {
 
   return (
     <>
-      <RepositoryLayout 
-        breadcrumbs={breadcrumbs}
+      <Head title="Repository" />
+
+      <RepositoryLayout breadcrumbs={breadcrumbs}>
+
+      <AppContent
         title="System Archive"
-        subtitle="Manage complete thesis archive with backups for preservation"
+        subtitle="Browse and explore student thesis projects"
       >
 
-      {/* Storage Card */}
-      <div className="mb-8">
-        <SystemRepositoryStorage />
-      </div>
-
-      {/* Controls Bar */}
-      <div className="flex items-center justify-between mb-6">
-        {/* Left: Toggle Group */}
-        <div className="flex items-center gap-4">
-          <ToggleGroup
-            type="single"
-            value={filterStatus}
-            onValueChange={(value) =>
-              value && setFilterStatus(value as "synced" | "failed")
-            }
-            className="flex"
-          >
-            <ToggleGroupItem
-              value="synced"
-              className="px-6 py-2 min-w-[220px] flex justify-center"
-            >
-              <span className="font-dm text-[13.33px] font-medium whitespace-nowrap">
-                Synced Successfully ({syncedCount})
-              </span>
-            </ToggleGroupItem>
-
-            <ToggleGroupItem
-              value="failed"
-              className="px-6 py-2 min-w-[220px] flex justify-center"
-            >
-              <span className="font-dm text-[13.33px] font-medium whitespace-nowrap">
-                Sync Failed ({failedCount})
-              </span>
-            </ToggleGroupItem>
-          </ToggleGroup>
+        {/* Storage Card */}
+        <div className="mb-8">
+          <SystemRepositoryStorage />
         </div>
 
-        {/* Right: Select Item and Sort */}
-        <div className="flex items-center gap-3 relative">
-          {/* Sync Now - only for failed tab */}
-          {filterStatus === 'failed' && (
-            !failedIsSyncing ? (
-              <button
-                onClick={handleFailedSyncNow}
-                className="underline text-primary font-medium hover:opacity-80 h-10 flex items-center px-2"
-                type="button"
-              >
-                Sync Now
-              </button>
-            ) : (
-              <div
-                className="h-10 w-10 flex items-center justify-center"
-                aria-label="Syncing"
-              >
-                <div className="h-5 w-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-              </div>
-            )
-          )}
-
-          {/* Select Item */}
-          <button
-            onClick={() => {
-              if (isFailedTab) {
-                if (failedSelectMode) {
-                  setFailedSelectMode(false);
-                  setFailedSelectedIds([]);
-                } else {
-                  setFailedSelectMode(true);
-                }
-              } else {
-                if (isSelectMode) {
-                  handleClearSelection();
-                } else {
-                  setIsSelectMode(true);
-                }
+        {/* Controls Bar */}
+        <div className="flex items-center justify-between mb-6">
+          {/* Left: Toggle Group */}
+          <div className="flex items-center gap-4">
+            <ToggleGroup
+              type="single"
+              value={filterStatus}
+              onValueChange={(value) =>
+                value && setFilterStatus(value as "synced" | "failed")
               }
-            }}
-            className={`h-10 px-4 flex items-center rounded-lg border-[0.8px] font-dm text-[13.33px] font-medium transition-colors ${
-              activeSelectMode
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-background text-foreground border-primary/15 hover:bg-breadcrumb"
-            }`}
-          >
-            {activeSelectMode ? (
-              <>
-                <X size={16} />
-                <span className="mx-3 h-4 w-px bg-primary-foreground/40" />
-                <span>{activeSelectedIds.length} Selected</span>
-              </>
-            ) : (
-              <span>Select Item</span>
-            )}
-          </button>
-
-          {/* Delete Button */}
-          {activeSelectMode && selectedIds.length > 0 && (
-            <button
-              onClick={handleDeleteClick}
-              className="h-10 w-10 flex items-center justify-center rounded-lg border-[0.8px] border-primary/15 bg-background text-foreground hover:bg-breadcrumb transition-colors"
-              aria-label="Delete selected items"
+              className="flex"
             >
-              <Trash2 size={16} />
-            </button>
-          )}
-
-          {/* Delete Confirmation Modal */}
-          {showDeleteConfirm && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-              <div
-                className="w-[400px] rounded-lg bg-background p-6"
-                style={{
-                  border: "1px solid var(--primary)",
-                  boxShadow: "0 10px 20px rgb(115 0 0 / 0.25)",
-                }}
+              <ToggleGroupItem
+                value="synced"
+                className="px-6 py-2 min-w-[220px] flex justify-center"
               >
-                <AlertCircle
-                  size={48}
-                  className="mx-auto mb-5"
-                  style={{ color: "var(--primary)" }}
-                />
-                <p
-                  className="mb-2 text-center font-dm font-medium text-body-2"
-                  style={{ color: "var(--primary)" }}
-                >
-                  Are you sure you want to delete this item?
-                </p>
-                <p
-                  className="mb-6 text-center font-dm text-body-4"
-                  style={{ color: "var(--muted-foreground)" }}
-                >
-                  This action cannot be undone.
-                </p>
-                <div className="flex justify-center gap-4">
-                  <Button
-                    variant="secondary"
-                    className="rounded-full px-8"
-                    onClick={() => setShowDeleteConfirm(false)}
-                    size="default"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    variant="negative"
-                    className="rounded-full px-8"
-                    onClick={handleConfirmDelete}
-                    size="default"
-                  >
-                    Confirm
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
+                <span className="font-dm text-[13.33px] font-medium whitespace-nowrap">
+                  Synced Successfully ({syncedCount})
+                </span>
+              </ToggleGroupItem>
 
-          {/* Delete Success Modal */}
-          {showDeleteSuccess && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-              <div
-                className="w-[400px] rounded-lg bg-background p-6"
-                style={{
-                  border: "1px solid var(--alert-success)", // thinner green border
-                  boxShadow: "0 10px 20px rgb(20 83 45 / 0.25)",
-                }}
+              <ToggleGroupItem
+                value="failed"
+                className="px-6 py-2 min-w-[220px] flex justify-center"
               >
-                <CheckCircle
-                  size={48}
-                  className="mx-auto mb-5"
-                  style={{ color: "var(--alert-success)" }}
-                />
-                <p
-                  className="mb-6 text-center font-dm font-medium text-body-2"
-                  style={{ color: "var(--alert-success)" }}
-                >
-                  Item deleted successfully.
-                </p>
-                <div className="flex justify-center">
-                  <Button
-                    variant="secondary"
-                    className="rounded-full px-10 bg-alert-success text-primary-foreground hover:bg-alert-success"
-                    onClick={() => setShowDeleteSuccess(false)}
-                    size="default"
-                  >
-                    Done
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
+                <span className="font-dm text-[13.33px] font-medium whitespace-nowrap">
+                  Sync Failed ({failedCount})
+                </span>
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
 
-          {/* Sort Button */}
+          {/* Right: Select Item and Sort */}
           <div className="flex items-center gap-3 relative">
+            {/* Sync Now - only for failed tab */}
+            {filterStatus === 'failed' && (
+              !failedIsSyncing ? (
+                <button
+                  onClick={handleFailedSyncNow}
+                  className="underline text-primary font-medium hover:opacity-80 h-10 flex items-center px-2"
+                  type="button"
+                >
+                  Sync Now
+                </button>
+              ) : (
+                <div
+                  className="h-10 w-10 flex items-center justify-center"
+                  aria-label="Syncing"
+                >
+                  <div className="h-5 w-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                </div>
+              )
+            )}
+
+            {/* Select Item */}
             <button
-              onClick={() => setShowSortDropdown(!showSortDropdown)}
-              className="h-10 px-4 flex items-center justify-center gap-2 rounded-lg border-[0.8px] border-primary/15 bg-background text-foreground hover:bg-breadcrumb transition-colors font-dm text-[13.33px] font-medium"
+              onClick={() => {
+                if (isFailedTab) {
+                  if (failedSelectMode) {
+                    setFailedSelectMode(false);
+                    setFailedSelectedIds([]);
+                  } else {
+                    setFailedSelectMode(true);
+                  }
+                } else {
+                  if (isSelectMode) {
+                    handleClearSelection();
+                  } else {
+                    setIsSelectMode(true);
+                  }
+                }
+              }}
+              className={`h-10 px-4 flex items-center rounded-lg border-[0.8px] font-dm text-[13.33px] font-medium transition-colors ${
+                activeSelectMode
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-background text-foreground border-primary/15 hover:bg-breadcrumb"
+              }`}
             >
-              <Icon name="sortDefault" size={16} />
-              <span>Sort</span>
+              {activeSelectMode ? (
+                <>
+                  <X size={16} />
+                  <span className="mx-3 h-4 w-px bg-primary-foreground/40" />
+                  <span>{activeSelectedIds.length} Selected</span>
+                </>
+              ) : (
+                <span>Select Item</span>
+              )}
             </button>
 
-            <SortDropdown 
-              isOpen={showSortDropdown} 
-              onClose={() => setShowSortDropdown(false)}
-              onApply={(sort) => console.log('Sort applied:', sort)}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Failed Sync Success Modal */}
-      {failedShowSuccess && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div
-            className="w-[400px] rounded-lg bg-background p-6"
-            style={{
-              border: "1px solid var(--alert-success)", // thin green border
-              boxShadow: "0 10px 20px rgb(20 83 45 / 0.25)",
-            }}
-          >
-            <CheckCircle
-              size={48}
-              className="mx-auto mb-5"
-              style={{ color: "var(--alert-success)" }}
-            />
-            <p
-              className="mb-6 text-center font-dm font-medium text-body-2"
-              style={{ color: "var(--alert-success)" }}
-            >
-              Successfully synced {failedSyncedCount} {failedSyncedCount === 1 ? "thesis" : "theses"}.
-            </p>
-            <div className="flex justify-center">
-              <Button
-                variant="secondary"
-                className="rounded-full px-10 bg-alert-success text-primary-foreground hover:bg-alert-success"
-                onClick={() => setFailedShowSuccess(false)}
-                size="default"
-              >
-                Done
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Expanded Table */}
-      <div className="rounded-lg border-[0.8px] border-primary overflow-hidden">
-        {/* Table Header */}
-        <div
-          className={`grid ${
-            activeSelectMode
-              ? "grid-cols-[40px_80px_minmax(240px,1fr)_120px_180px_120px]"
-              : "grid-cols-[80px_minmax(240px,1fr)_120px_180px_120px]"
-          } gap-[10px] h-10 bg-primary`}
-        >
-          {activeSelectMode && (
-            <TableHead className="flex items-center justify-center px-[10px]">
-              <Checkbox
-                checked={
-                  activeSelectedIds.length === filteredData.length &&
-                  filteredData.length > 0
-                }
-                onCheckedChange={handleSelectAll}
-              />
-            </TableHead>
-          )}
-
-          <TableHead className="flex items-center justify-center px-[10px]">
-            <span className="text-primary-foreground font-dm text-[13.33px] font-medium">
-              Thesis ID
-            </span>
-          </TableHead>
-
-          <TableHead className="flex items-center justify-center px-[10px]">
-            <span className="text-primary-foreground font-dm text-[13.33px] font-medium">
-              Title
-            </span>
-          </TableHead>
-
-          <TableHead className="flex items-center justify-center px-[10px]">
-            <span className="text-primary-foreground font-dm text-[13.33px] font-medium">
-              File Size
-            </span>
-          </TableHead>
-
-          <TableHead className="flex items-center justify-center px-[10px]">
-            <span className="text-primary-foreground font-dm text-[13.33px] font-medium">
-              Last Update
-            </span>
-          </TableHead>
-
-          <TableHead className="flex items-center justify-center px-[10px]">
-            <span className="text-primary-foreground font-dm text-[13.33px] font-medium">
-              Action
-            </span>
-          </TableHead>
-        </div>
-
-        {/* Table Body */}
-        <div className="bg-background">
-          {filteredData.map((item) => (
-            <div
-              key={item.id}
-              className={`grid ${
-                activeSelectMode
-                  ? "grid-cols-[40px_80px_minmax(240px,1fr)_120px_180px_120px]"
-                  : "grid-cols-[80px_minmax(240px,1fr)_120px_180px_120px]"
-              } gap-[10px] h-10 border-b border-primary/10 hover:bg-breadcrumb/50 transition-colors`}
-            >
-              {activeSelectMode && (
-                <div className="flex items-center justify-center px-[10px]">
-                  <Checkbox
-                    checked={activeSelectedIds.includes(item.id)}
-                    onCheckedChange={() => toggleRowSelection(item.id)}
-                  />
-                </div>
-              )}
-              <div className="flex items-center justify-center px-[10px]">
-                <span className="text-foreground font-dm text-[13.33px] font-medium">
-                  {item.thesisId}
-                </span>
-              </div>
-              <div className="flex items-center justify-start gap-2 px-[10px]">
-                <FileText className="h-[15px] w-[15px] text-primary flex-shrink-0" />
-                <span className="text-foreground font-dm text-[13.33px] font-medium truncate">
-                  {item.name}
-                </span>
-              </div>
-              <div className="flex items-center justify-center px-[10px]">
-                <span className="text-foreground font-dm text-[13.33px] font-medium">
-                  {item.fileSize}
-                </span>
-              </div>
-              <div className="flex items-center justify-center text-center px-[10px]">
-                <span className="text-foreground font-dm text-[13.33px] font-medium">
-                  {item.lastUpdate}
-                </span>
-              </div>
-              <div className="flex items-center justify-center px-[10px]">
-                <button
-                  onClick={() => handleViewDetails(item)}
-                  className="h-8 px-4 min-w-[110px] flex items-center justify-center gap-[6px] rounded-lg border-[0.8px] border-primary/75 hover:bg-breadcrumb transition-colors whitespace-nowrap"
-                >
-                  <span className="text-primary/75 font-dm text-[13.33px] font-medium">
-                    View Details
-                  </span>
-                </button>
-              </div>
-            </div>
-          ))}
-
-          {/* Table Footer: Row Count */}
-          <div
-            className={`grid ${
-              isSelectMode
-                ? "grid-cols-[40px_80px_minmax(240px,1fr)_120px_180px_120px]"
-                : "grid-cols-[80px_minmax(240px,1fr)_120px_180px_120px]"
-            } gap-[10px] h-10 bg-background border-t border-primary/10`}
-          >
-            <div
-              className={`${
-                isSelectMode ? "col-span-6" : "col-span-5"
-              } flex items-center justify-center text-muted-foreground font-dm text-[13.33px] font-medium`}
-            >
-              {filterStatus === "synced"
-                ? `${filteredData.length} of ${mockSystemData.filter(
-                    (i) => i.syncStatus === "Success"
-                  ).length} Successfully Synced Theses`
-                : `${filteredData.length} of ${mockSystemData.filter(
-                    (i) => i.syncStatus === "Failed"
-                  ).length} Sync Failed Theses`}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Details Modal */}
-        {showDetailsModal && selectedThesis && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="w-[456px] rounded-lg border-[0.8px] border-primary bg-background p-5 pb-[20.6px] flex flex-col gap-[22px] relative">
-              
-              {/* Close Button */}
+            {/* Delete Button */}
+            {activeSelectMode && selectedIds.length > 0 && (
               <button
-                onClick={() => setShowDetailsModal(false)}
-                className="absolute top-4 right-4 text-foreground hover:text-primary"
+                onClick={handleDeleteClick}
+                className="h-10 w-10 flex items-center justify-center rounded-lg border-[0.8px] border-primary/15 bg-background text-foreground hover:bg-breadcrumb transition-colors"
+                aria-label="Delete selected items"
               >
-                <X size={20} />
+                <Trash2 size={16} />
+              </button>
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {showDeleteConfirm && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                <div
+                  className="w-[400px] rounded-lg bg-background p-6"
+                  style={{
+                    border: "1px solid var(--primary)",
+                    boxShadow: "0 10px 20px rgb(115 0 0 / 0.25)",
+                  }}
+                >
+                  <AlertCircle
+                    size={48}
+                    className="mx-auto mb-5"
+                    style={{ color: "var(--primary)" }}
+                  />
+                  <p
+                    className="mb-2 text-center font-dm font-medium text-body-2"
+                    style={{ color: "var(--primary)" }}
+                  >
+                    Are you sure you want to delete this item?
+                  </p>
+                  <p
+                    className="mb-6 text-center font-dm text-body-4"
+                    style={{ color: "var(--muted-foreground)" }}
+                  >
+                    This action cannot be undone.
+                  </p>
+                  <div className="flex justify-center gap-4">
+                    <Button
+                      variant="secondary"
+                      className="rounded-full px-8"
+                      onClick={() => setShowDeleteConfirm(false)}
+                      size="default"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="negative"
+                      className="rounded-full px-8"
+                      onClick={handleConfirmDelete}
+                      size="default"
+                    >
+                      Confirm
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Delete Success Modal */}
+            {showDeleteSuccess && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                <div
+                  className="w-[400px] rounded-lg bg-background p-6"
+                  style={{
+                    border: "1px solid var(--alert-success)", // thinner green border
+                    boxShadow: "0 10px 20px rgb(20 83 45 / 0.25)",
+                  }}
+                >
+                  <CheckCircle
+                    size={48}
+                    className="mx-auto mb-5"
+                    style={{ color: "var(--alert-success)" }}
+                  />
+                  <p
+                    className="mb-6 text-center font-dm font-medium text-body-2"
+                    style={{ color: "var(--alert-success)" }}
+                  >
+                    Item deleted successfully.
+                  </p>
+                  <div className="flex justify-center">
+                    <Button
+                      variant="secondary"
+                      className="rounded-full px-10 bg-alert-success text-primary-foreground hover:bg-alert-success"
+                      onClick={() => setShowDeleteSuccess(false)}
+                      size="default"
+                    >
+                      Done
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Sort Button */}
+            <div className="flex items-center gap-3 relative">
+              <button
+                onClick={() => setShowSortDropdown(!showSortDropdown)}
+                className="h-10 px-4 flex items-center justify-center gap-2 rounded-lg border-[0.8px] border-primary/15 bg-background text-foreground hover:bg-breadcrumb transition-colors font-dm text-[13.33px] font-medium"
+              >
+                <Icon name="sortDefault" size={16} />
+                <span>Sort</span>
               </button>
 
-              {/* Header */}
-              <div className="flex items-start justify-between border-b-[0.8px] border-primary pb-[5px] pr-8">
-                <div className="flex flex-col gap-2">
-                  <h3 className="text-foreground font-dm text-[16px] font-bold leading-normal">
-                    Thesis Details
-                  </h3>
-                  <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
-                    Complete information about the thesis
-                  </p>
-                </div>
+              <SortDropdown 
+                isOpen={showSortDropdown} 
+                onClose={() => setShowSortDropdown(false)}
+                onApply={(sort) => console.log('Sort applied:', sort)}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Failed Sync Success Modal */}
+        {failedShowSuccess && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div
+              className="w-[400px] rounded-lg bg-background p-6"
+              style={{
+                border: "1px solid var(--alert-success)", // thin green border
+                boxShadow: "0 10px 20px rgb(20 83 45 / 0.25)",
+              }}
+            >
+              <CheckCircle
+                size={48}
+                className="mx-auto mb-5"
+                style={{ color: "var(--alert-success)" }}
+              />
+              <p
+                className="mb-6 text-center font-dm font-medium text-body-2"
+                style={{ color: "var(--alert-success)" }}
+              >
+                Successfully synced {failedSyncedCount} {failedSyncedCount === 1 ? "thesis" : "theses"}.
+              </p>
+              <div className="flex justify-center">
                 <Button
-                  variant="default"
-                  size="sm"
-                  className="h-8 px-3 gap-[6px] rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
+                  variant="secondary"
+                  className="rounded-full px-10 bg-alert-success text-primary-foreground hover:bg-alert-success"
+                  onClick={() => setFailedShowSuccess(false)}
+                  size="default"
                 >
-                  <Trash2 size={16} />
-                  <span className="text-[12px] font-medium">Delete</span>
+                  Done
                 </Button>
-              </div>
-
-              {/* Content */}
-              <div className="flex flex-col gap-[15px]">
-                {/* Thesis ID & Sync Status */}
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-col gap-1">
-                    <p className="text-primary font-dm text-[16px] font-bold leading-normal">
-                      Thesis ID
-                    </p>
-                    <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
-                      {selectedThesis.thesisId}
-                    </p>
-                  </div>
-
-                  {/* Sync Controls */}
-                  <div className="flex items-center gap-2">
-                    {!isSyncing && (
-                      <>
-                        {currentModalSyncStatus === 'Failed' && (
-                          <button
-                            onClick={handleSyncNow}
-                            className="text-foreground font-dm text-[12px] font-medium underline hover:text-primary"
-                          >
-                            Sync now
-                          </button>
-                        )}
-
-                        <Badge
-                          className={`rounded-[25px] px-[22px] py-[2px] border ${
-                            currentModalSyncStatus === 'Failed'
-                              ? 'bg-transparent border-primary text-primary'
-                              : 'bg-transparent border-[#0D542B] text-[#0D542B]'
-                          } hover:bg-transparent`}
-                        >
-                          <span className="text-[12px] font-medium">{currentModalSyncStatus}</span>
-                        </Badge>
-                      </>
-                    )}
-
-                    {isSyncing && (
-                      <div className="flex items-center gap-2">
-                        <Spinner type="ring" size="sm" />
-                        <span className="text-foreground font-dm text-[12px] font-medium">
-                          Syncing...
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Thesis Title */}
-                <div className="flex flex-col gap-1">
-                  <p className="text-primary font-dm text-[16px] font-bold leading-normal">
-                    Thesis Title
-                  </p>
-                  <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
-                    {selectedThesis.thesisTitle}
-                  </p>
-                </div>
-
-                {/* Storage Details */}
-                <div className="flex flex-col gap-1">
-                  <p className="text-primary font-dm text-[16px] font-bold leading-normal">Storage</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-foreground font-dm text-[15px] font-bold">Total Bytes</span>
-                    <span className="text-foreground font-dm text-[15px] font-medium">{selectedThesis.totalBytes}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-foreground font-dm text-[15px] font-bold">Primary</span>
-                    <span className="text-foreground font-dm text-[15px] font-medium">{selectedThesis.primary}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-foreground font-dm text-[15px] font-bold">Replicated</span>
-                    <span className="text-foreground font-dm text-[15px] font-medium">{selectedThesis.replicated}</span>
-                  </div>
-                </div>
-
-                {/* Schedule Details */}
-                <div className="grid grid-cols-2 gap-[10px]">
-                  <div className="flex flex-col gap-1">
-                    <p className="text-primary font-dm text-[16px] font-bold leading-normal">Last Update</p>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-primary" strokeWidth={1.33} />
-                      <span className="text-foreground font-dm text-[15px] font-medium">{selectedThesis.lastUpdateDate}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <p className="text-primary font-dm text-[16px] font-bold leading-normal">Last Sync</p>
-                    <div className="flex items-center gap-2">
-                      {currentModalSyncStatus === 'Failed' ? (
-                        <>
-                          <AlertCircle size={16} className="text-primary" />
-                          <span className="text-primary font-dm text-[15px] font-medium">Failed</span>
-                        </>
-                      ) : (
-                        <>
-                          <Calendar className="h-4 w-4 text-primary" strokeWidth={1.33} />
-                          <span className="text-foreground font-dm text-[15px] font-medium">
-                            {selectedThesis.lastSyncDate || 'Date Today'}
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Block & Adviser */}
-                <div className="grid grid-cols-2 gap-[10px]">
-                  <div className="flex flex-col gap-[1.6px]">
-                    <p className="text-primary font-dm text-[16px] font-bold leading-normal">Block</p>
-                    <div className="inline-flex items-center justify-center px-[5px] py-[5px] rounded-lg border-[0.8px] border-primary w-fit">
-                      <span className="text-foreground font-dm text-[12px] font-medium">{selectedThesis.block}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <p className="text-primary font-dm text-[16px] font-bold leading-normal">Thesis Adviser</p>
-                    <span className="text-foreground font-dm text-[15px] font-medium">{selectedThesis.thesisAdviser}</span>
-                  </div>
-                </div>
-
-                {/* Proponents */}
-                <div className="flex flex-col gap-2">
-                  <p className="text-primary font-dm text-[16px] font-bold leading-normal">Proponents</p>
-                  <div className="flex flex-wrap items-center gap-2">
-                    {selectedThesis.proponents.map((proponent: string, index: number) => (
-                      <div key={index} className="inline-flex items-center gap-2 rounded-lg bg-[rgba(255,189,0,0.5)] px-[8.8px] py-[2.6px]">
-                        <Icon name="proponentsDefault" size={12} />
-                        <span className="text-foreground font-dm text-[12px] font-medium leading-[16px]">{proponent}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </div>
             </div>
           </div>
         )}
 
+        {/* Expanded Table */}
+        <div className="rounded-lg border-[0.8px] border-primary overflow-hidden">
+          {/* Table Header */}
+          <div
+            className={`grid ${
+              activeSelectMode
+                ? "grid-cols-[40px_80px_minmax(240px,1fr)_120px_180px_120px]"
+                : "grid-cols-[80px_minmax(240px,1fr)_120px_180px_120px]"
+            } gap-[10px] h-10 bg-primary`}
+          >
+            {activeSelectMode && (
+              <TableHead className="flex items-center justify-center px-[10px]">
+                <Checkbox
+                  checked={
+                    activeSelectedIds.length === filteredData.length &&
+                    filteredData.length > 0
+                  }
+                  onCheckedChange={handleSelectAll}
+                />
+              </TableHead>
+            )}
+
+            <TableHead className="flex items-center justify-center px-[10px]">
+              <span className="text-primary-foreground font-dm text-[13.33px] font-medium">
+                Thesis ID
+              </span>
+            </TableHead>
+
+            <TableHead className="flex items-center justify-center px-[10px]">
+              <span className="text-primary-foreground font-dm text-[13.33px] font-medium">
+                Title
+              </span>
+            </TableHead>
+
+            <TableHead className="flex items-center justify-center px-[10px]">
+              <span className="text-primary-foreground font-dm text-[13.33px] font-medium">
+                File Size
+              </span>
+            </TableHead>
+
+            <TableHead className="flex items-center justify-center px-[10px]">
+              <span className="text-primary-foreground font-dm text-[13.33px] font-medium">
+                Last Update
+              </span>
+            </TableHead>
+
+            <TableHead className="flex items-center justify-center px-[10px]">
+              <span className="text-primary-foreground font-dm text-[13.33px] font-medium">
+                Action
+              </span>
+            </TableHead>
+          </div>
+
+          {/* Table Body */}
+          <div className="bg-background">
+            {filteredData.map((item) => (
+              <div
+                key={item.id}
+                className={`grid ${
+                  activeSelectMode
+                    ? "grid-cols-[40px_80px_minmax(240px,1fr)_120px_180px_120px]"
+                    : "grid-cols-[80px_minmax(240px,1fr)_120px_180px_120px]"
+                } gap-[10px] h-10 border-b border-primary/10 hover:bg-breadcrumb/50 transition-colors`}
+              >
+                {activeSelectMode && (
+                  <div className="flex items-center justify-center px-[10px]">
+                    <Checkbox
+                      checked={activeSelectedIds.includes(item.id)}
+                      onCheckedChange={() => toggleRowSelection(item.id)}
+                    />
+                  </div>
+                )}
+                <div className="flex items-center justify-center px-[10px]">
+                  <span className="text-foreground font-dm text-[13.33px] font-medium">
+                    {item.thesisId}
+                  </span>
+                </div>
+                <div className="flex items-center justify-start gap-2 px-[10px]">
+                  <FileText className="h-[15px] w-[15px] text-primary flex-shrink-0" />
+                  <span className="text-foreground font-dm text-[13.33px] font-medium truncate">
+                    {item.name}
+                  </span>
+                </div>
+                <div className="flex items-center justify-center px-[10px]">
+                  <span className="text-foreground font-dm text-[13.33px] font-medium">
+                    {item.fileSize}
+                  </span>
+                </div>
+                <div className="flex items-center justify-center text-center px-[10px]">
+                  <span className="text-foreground font-dm text-[13.33px] font-medium">
+                    {item.lastUpdate}
+                  </span>
+                </div>
+                <div className="flex items-center justify-center px-[10px]">
+                  <button
+                    onClick={() => handleViewDetails(item)}
+                    className="h-8 px-4 min-w-[110px] flex items-center justify-center gap-[6px] rounded-lg border-[0.8px] border-primary/75 hover:bg-breadcrumb transition-colors whitespace-nowrap"
+                  >
+                    <span className="text-primary/75 font-dm text-[13.33px] font-medium">
+                      View Details
+                    </span>
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {/* Table Footer: Row Count */}
+            <div
+              className={`grid ${
+                isSelectMode
+                  ? "grid-cols-[40px_80px_minmax(240px,1fr)_120px_180px_120px]"
+                  : "grid-cols-[80px_minmax(240px,1fr)_120px_180px_120px]"
+              } gap-[10px] h-10 bg-background border-t border-primary/10`}
+            >
+              <div
+                className={`${
+                  isSelectMode ? "col-span-6" : "col-span-5"
+                } flex items-center justify-center text-muted-foreground font-dm text-[13.33px] font-medium`}
+              >
+                {filterStatus === "synced"
+                  ? `${filteredData.length} of ${mockSystemData.filter(
+                      (i) => i.syncStatus === "Success"
+                    ).length} Successfully Synced Theses`
+                  : `${filteredData.length} of ${mockSystemData.filter(
+                      (i) => i.syncStatus === "Failed"
+                    ).length} Sync Failed Theses`}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Details Modal */}
+          {showDetailsModal && selectedThesis && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+              <div className="w-[456px] rounded-lg border-[0.8px] border-primary bg-background p-5 pb-[20.6px] flex flex-col gap-[22px] relative">
+                
+                {/* Close Button */}
+                <button
+                  onClick={() => setShowDetailsModal(false)}
+                  className="absolute top-4 right-4 text-foreground hover:text-primary"
+                >
+                  <X size={20} />
+                </button>
+
+                {/* Header */}
+                <div className="flex items-start justify-between border-b-[0.8px] border-primary pb-[5px] pr-8">
+                  <div className="flex flex-col gap-2">
+                    <h3 className="text-foreground font-dm text-[16px] font-bold leading-normal">
+                      Thesis Details
+                    </h3>
+                    <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
+                      Complete information about the thesis
+                    </p>
+                  </div>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="h-8 px-3 gap-[6px] rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    <Trash2 size={16} />
+                    <span className="text-[12px] font-medium">Delete</span>
+                  </Button>
+                </div>
+
+                {/* Content */}
+                <div className="flex flex-col gap-[15px]">
+                  {/* Thesis ID & Sync Status */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-1">
+                      <p className="text-primary font-dm text-[16px] font-bold leading-normal">
+                        Thesis ID
+                      </p>
+                      <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
+                        {selectedThesis.thesisId}
+                      </p>
+                    </div>
+
+                    {/* Sync Controls */}
+                    <div className="flex items-center gap-2">
+                      {!isSyncing && (
+                        <>
+                          {currentModalSyncStatus === 'Failed' && (
+                            <button
+                              onClick={handleSyncNow}
+                              className="text-foreground font-dm text-[12px] font-medium underline hover:text-primary"
+                            >
+                              Sync now
+                            </button>
+                          )}
+
+                          <Badge
+                            className={`rounded-[25px] px-[22px] py-[2px] border ${
+                              currentModalSyncStatus === 'Failed'
+                                ? 'bg-transparent border-primary text-primary'
+                                : 'bg-transparent border-[#0D542B] text-[#0D542B]'
+                            } hover:bg-transparent`}
+                          >
+                            <span className="text-[12px] font-medium">{currentModalSyncStatus}</span>
+                          </Badge>
+                        </>
+                      )}
+
+                      {isSyncing && (
+                        <div className="flex items-center gap-2">
+                          <Spinner type="ring" size="sm" />
+                          <span className="text-foreground font-dm text-[12px] font-medium">
+                            Syncing...
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Thesis Title */}
+                  <div className="flex flex-col gap-1">
+                    <p className="text-primary font-dm text-[16px] font-bold leading-normal">
+                      Thesis Title
+                    </p>
+                    <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
+                      {selectedThesis.thesisTitle}
+                    </p>
+                  </div>
+
+                  {/* Storage Details */}
+                  <div className="flex flex-col gap-1">
+                    <p className="text-primary font-dm text-[16px] font-bold leading-normal">Storage</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-foreground font-dm text-[15px] font-bold">Total Bytes</span>
+                      <span className="text-foreground font-dm text-[15px] font-medium">{selectedThesis.totalBytes}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-foreground font-dm text-[15px] font-bold">Primary</span>
+                      <span className="text-foreground font-dm text-[15px] font-medium">{selectedThesis.primary}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-foreground font-dm text-[15px] font-bold">Replicated</span>
+                      <span className="text-foreground font-dm text-[15px] font-medium">{selectedThesis.replicated}</span>
+                    </div>
+                  </div>
+
+                  {/* Schedule Details */}
+                  <div className="grid grid-cols-2 gap-[10px]">
+                    <div className="flex flex-col gap-1">
+                      <p className="text-primary font-dm text-[16px] font-bold leading-normal">Last Update</p>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-primary" strokeWidth={1.33} />
+                        <span className="text-foreground font-dm text-[15px] font-medium">{selectedThesis.lastUpdateDate}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <p className="text-primary font-dm text-[16px] font-bold leading-normal">Last Sync</p>
+                      <div className="flex items-center gap-2">
+                        {currentModalSyncStatus === 'Failed' ? (
+                          <>
+                            <AlertCircle size={16} className="text-primary" />
+                            <span className="text-primary font-dm text-[15px] font-medium">Failed</span>
+                          </>
+                        ) : (
+                          <>
+                            <Calendar className="h-4 w-4 text-primary" strokeWidth={1.33} />
+                            <span className="text-foreground font-dm text-[15px] font-medium">
+                              {selectedThesis.lastSyncDate || 'Date Today'}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Block & Adviser */}
+                  <div className="grid grid-cols-2 gap-[10px]">
+                    <div className="flex flex-col gap-[1.6px]">
+                      <p className="text-primary font-dm text-[16px] font-bold leading-normal">Block</p>
+                      <div className="inline-flex items-center justify-center px-[5px] py-[5px] rounded-lg border-[0.8px] border-primary w-fit">
+                        <span className="text-foreground font-dm text-[12px] font-medium">{selectedThesis.block}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <p className="text-primary font-dm text-[16px] font-bold leading-normal">Thesis Adviser</p>
+                      <span className="text-foreground font-dm text-[15px] font-medium">{selectedThesis.thesisAdviser}</span>
+                    </div>
+                  </div>
+
+                  {/* Proponents */}
+                  <div className="flex flex-col gap-2">
+                    <p className="text-primary font-dm text-[16px] font-bold leading-normal">Proponents</p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {selectedThesis.proponents.map((proponent: string, index: number) => (
+                        <div key={index} className="inline-flex items-center gap-2 rounded-lg bg-[rgba(255,189,0,0.5)] px-[8.8px] py-[2.6px]">
+                          <Icon name="proponentsDefault" size={12} />
+                          <span className="text-foreground font-dm text-[12px] font-medium leading-[16px]">{proponent}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </AppContent>
       </RepositoryLayout>
 
       <NavFooter />
