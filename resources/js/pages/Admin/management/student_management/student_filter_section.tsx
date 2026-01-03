@@ -4,7 +4,8 @@ import { SearchBar } from '@/components/filter-search';
 import { Filter as FilterIcon } from 'lucide-react';
 import { Icon } from '@/components/icon-index';
 import { Dropdown } from './student_dropdown';
-import { StudentFilterAndSort } from './student_filterandsort_wrapper';
+import { StudentFilterWrapper } from './student_filter_wrapper';
+import { TableSortWrapper } from './student_tableview_sort';
 import { GroupSortWrapper } from './student_groupcard_sort';
 import { FilterState } from './student_interface';
 
@@ -65,79 +66,58 @@ export function FilterSection({
 
           {/* Action Buttons */}
           <div className="flex flex-row items-center gap-[10px]">
-            {/* For Table View: Combined Sort & Filter Button */}
-            {view === 'table' ? (
-              <div className="relative">
-                <Button 
-                  ref={filterButtonRef}
-                  variant="secondary" 
-                  size="icon" 
-                  className="rounded-lg border-none"
-                  onClick={onFilterToggle}
-                >
-                  <FilterIcon className="w-4 h-4" />
-                </Button>
-                <Dropdown 
-                  isOpen={filterOpen} 
-                  onClose={onFilterClose}
-                  triggerRef={filterButtonRef}
-                >
-                  <StudentFilterAndSort 
-                    onApplyFilter={onApplyFilter}
-                    onApplySort={onApplySort}
-                    onClose={onFilterClose}
-                  />
-                </Dropdown>
-              </div>
-            ) : (
-              /* For Group Card View: Separate Sort & Filter */
-              <>
-                <div className="relative">
-                  <Button 
-                    ref={sortButtonRef}
-                    variant="secondary" 
-                    size="icon" 
-                    className="rounded-lg border-none"
-                    onClick={onSortToggle}
-                  >
-                    <Icon name="sortDefault" size={16} />
-                  </Button>
-                  <Dropdown 
-                    isOpen={sortOpen} 
+            {/* Sort Button */}
+            <div className="relative">
+              <Button 
+                ref={sortButtonRef}
+                variant="secondary" 
+                size="icon" 
+                className="rounded-lg border-none"
+                onClick={onSortToggle}
+              >
+                <Icon name="sortDefault" size={16} />
+              </Button>
+              <Dropdown 
+                isOpen={sortOpen} 
+                onClose={onSortClose}
+                triggerRef={sortButtonRef}
+              >
+                {view === 'table' ? (
+                  <TableSortWrapper 
+                    onApply={onApplySort}
                     onClose={onSortClose}
-                    triggerRef={sortButtonRef}
-                  >
-                    <GroupSortWrapper 
-                      onApply={onApplySort}
-                      onClose={onSortClose}
-                    />
-                  </Dropdown>
-                </div>
+                  />
+                ) : (
+                  <GroupSortWrapper 
+                    onApply={onApplySort}
+                    onClose={onSortClose}
+                  />
+                )}
+              </Dropdown>
+            </div>
 
-                <div className="relative">
-                  <Button 
-                    ref={filterButtonRef}
-                    variant="secondary" 
-                    size="icon" 
-                    className="rounded-lg border-none"
-                    onClick={onFilterToggle}
-                  >
-                    <FilterIcon className="w-4 h-4" />
-                  </Button>
-                  <Dropdown 
-                    isOpen={filterOpen} 
-                    onClose={onFilterClose}
-                    triggerRef={filterButtonRef}
-                  >
-                    <StudentFilterAndSort 
-                      onApplyFilter={onApplyFilter}
-                      onApplySort={onApplySort}
-                      onClose={onFilterClose}
-                    />
-                  </Dropdown>
-                </div>
-              </>
-            )}
+            {/* Filter Button */}
+            <div className="relative">
+              <Button 
+                ref={filterButtonRef}
+                variant="secondary" 
+                size="icon" 
+                className="rounded-lg border-none"
+                onClick={onFilterToggle}
+              >
+                <FilterIcon className="w-4 h-4" />
+              </Button>
+              <Dropdown 
+                isOpen={filterOpen} 
+                onClose={onFilterClose}
+                triggerRef={filterButtonRef}
+              >
+                <StudentFilterWrapper 
+                  onApply={onApplyFilter}
+                  onClose={onFilterClose}
+                />
+              </Dropdown>
+            </div>
 
             {/* Clear Filter Button */}
             <Button 

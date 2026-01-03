@@ -3,12 +3,12 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup } from "@/components/ui/radio-group";
 import { RadioGroupItemWithLabel } from "@/components/ui/radio-group-with-label";
 
-interface GroupSortWrapperProps {
+interface TableSortWrapperProps {
   onApply: (sortOption: string) => void;
   onClose: () => void;
 }
 
-export function GroupSortWrapper({ onApply, onClose }: GroupSortWrapperProps) {
+export function TableSortWrapper({ onApply, onClose }: TableSortWrapperProps) {
   const [selectedSort, setSelectedSort] = useState("");
 
   const handleClear = () => {
@@ -27,21 +27,21 @@ export function GroupSortWrapper({ onApply, onClose }: GroupSortWrapperProps) {
       </h2>
       <div className="border-t my-4" />
 
-      {/* Group Code */}
+      {/* Student ID */}
       <div className="mb-4">
-        <label className="block text-gray-900 mb-2 font-medium">Group Code</label>
+        <label className="block text-gray-900 mb-2 font-medium">Student ID</label>
         <RadioGroup value={selectedSort} onValueChange={setSelectedSort} className="flex flex-col gap-3">
-          <RadioGroupItemWithLabel id="group-code-asc" value="group-code-asc" label="Ascending" />
-          <RadioGroupItemWithLabel id="group-code-desc" value="group-code-desc" label="Descending" />
+          <RadioGroupItemWithLabel id="student-id-asc" value="student-id-asc" label="Ascending" />
+          <RadioGroupItemWithLabel id="student-id-desc" value="student-id-desc" label="Descending" />
         </RadioGroup>
       </div>
 
-      {/* Thesis Title */}
+      {/* Student Name */}
       <div className="mb-4">
-        <label className="block text-gray-900 mb-2 font-medium">Thesis Title</label>
+        <label className="block text-gray-900 mb-2 font-medium">Student Name</label>
         <RadioGroup value={selectedSort} onValueChange={setSelectedSort} className="flex flex-col gap-3">
-          <RadioGroupItemWithLabel id="thesis-title-a-z" value="thesis-title-a-z" label="A-Z" />
-          <RadioGroupItemWithLabel id="thesis-title-z-a" value="thesis-title-z-a" label="Z-A" />
+          <RadioGroupItemWithLabel id="student-name-a-z" value="student-name-a-z" label="First Name (A-Z)" />
+          <RadioGroupItemWithLabel id="student-name-z-a" value="student-name-z-a" label="First Name (Z-A)" />
         </RadioGroup>
       </div>
 
