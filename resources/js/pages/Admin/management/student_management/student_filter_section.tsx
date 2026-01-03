@@ -6,7 +6,7 @@ import { Icon } from '@/components/icon-index';
 import { Dropdown } from './student_dropdown';
 import { StudentFilterWrapper } from './student_filter_wrapper';
 import { TableSortWrapper } from './student_tableview_sort';
-import { GroupSortWrapper } from './student_groupcard_sort';
+import { GroupSortWrapper } from './student_groupcardView_sort';
 import { FilterState } from './student_interface';
 
 interface FilterSectionProps {
