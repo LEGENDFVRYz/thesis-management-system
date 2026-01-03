@@ -110,6 +110,14 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('student/thesis-management', function () {
         return Inertia::render('Student/repository/thesis');
     })->name('student.repository.thesis-management');
+
+    Route::get('student/ip-plagiarism', function () {
+        return Inertia::render('Student/compliance-ip');
+    })->name('student.compliance_ip');
+
+    Route::get('student/public-presentation', function () {
+        return Inertia::render('Student/public-presentation');
+    })->name('student.public_presentation');
 });
 
 
