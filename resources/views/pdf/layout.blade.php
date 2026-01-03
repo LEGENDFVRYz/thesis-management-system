@@ -55,14 +55,6 @@
 </head>
 <body class="text-black text-2md">
     
-    {{-- Header --}}
-    <div class="mb-8 border-b pb-4">
-        <h1 class="text-2xl font-bold uppercase">Department Report</h1>
-        <div class="text-gray-500 text-xs">
-            Generated: {{ now()->toFormattedDateString() }}
-        </div>
-    </div>
-
     {{-- Content Slot --}}
     @yield('content')
 
