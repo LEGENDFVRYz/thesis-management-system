@@ -300,12 +300,12 @@ function SortDropdown({ isOpen, onClose, onApply }: { isOpen: boolean; onClose: 
         <label className="block text-foreground mb-2 font-medium">Block</label>
         <RadioGroup value={selectedSort} onValueChange={setSelectedSort} className="flex flex-col gap-3">
           <div className="flex items-center space-x-2">
-            <RadioGroupItem value="block-a-z" id="block-a-z" />
-            <Label htmlFor="block-a-z">A-Z</Label>
+            <RadioGroupItem value="block-asc" id="block-asc" />
+            <Label htmlFor="block-asc">Ascending</Label>
           </div>
           <div className="flex items-center space-x-2">
-            <RadioGroupItem value="block-z-a" id="block-z-a" />
-            <Label htmlFor="block-z-a">Z-A</Label>
+            <RadioGroupItem value="block-desc" id="block-desc" />
+            <Label htmlFor="block-desc">Descending</Label>
           </div>
         </RadioGroup>
       </div>
@@ -366,12 +366,35 @@ export default function SystemRepositoryExpanded() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
 
+  {/* Sort Data */}
+  const [sortOption, setSortOption] = useState<string>('');
+
   {/* Filtered Data */}
-  const filteredData = mockSystemData.filter(item =>
+  const filteredData = [...mockSystemData]
+  .filter(item =>
     filterStatus === 'synced'
       ? item.syncStatus === 'Success'
       : item.syncStatus === 'Failed'
-  );
+  )
+  .sort((a, b) => {
+    switch (sortOption) {
+      case 'thesis-id-asc':
+        return a.thesisId.localeCompare(b.thesisId);
+      case 'thesis-id-desc':
+        return b.thesisId.localeCompare(a.thesisId);
+      case 'block-asc':
+        return a.block.localeCompare(b.block);
+      case 'block-desc':
+        return b.block.localeCompare(a.block);
+      case 'date-oldest':
+        return new Date(a.lastUpdateDate).getTime() - new Date(b.lastUpdateDate).getTime();
+      case 'date-newest':
+        return new Date(b.lastUpdateDate).getTime() - new Date(a.lastUpdateDate).getTime();
+      default:
+        return 0;
+    }
+  });
+
 
   {/* Count Metrics */}
   const syncedCount = mockSystemData.filter(i => i.syncStatus === 'Success').length;
@@ -689,7 +712,7 @@ export default function SystemRepositoryExpanded() {
               <SortDropdown 
                 isOpen={showSortDropdown} 
                 onClose={() => setShowSortDropdown(false)}
-                onApply={(sort) => console.log('Sort applied:', sort)}
+                onApply={(sort) => setSortOption(sort)}
               />
             </div>
           </div>
