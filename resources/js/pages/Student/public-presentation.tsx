@@ -7,6 +7,7 @@ import NavBar from '@/components/app-header';
 import Footer from '@/components/nav-footer'; 
 import FileUpload from '@/components/file-upload'; 
 
+// --- TYPES ---
 interface AuditLog {
     id: number;
     user: string;
@@ -24,20 +25,26 @@ interface PageProps {
             role_in_group: 'Leader' | 'Member';
         };
     };
+    // Backend should pass the thesis details
+    thesis: {
+        title: string;
+        id: number;
+    };
     audit_trail?: AuditLog[];
     status?: 'draft' | 'submitted' | 'approved' | 'verified'; 
 }
 
-export default function PublicPresentation({ auth, audit_trail = [], status = 'draft' }: PageProps) {
+export default function PublicPresentation({ auth, thesis, audit_trail = [], status = 'draft' }: PageProps) {
     const isLeader = auth?.user?.role_in_group === 'Leader';
 
+    // Fallback mock data if DB is empty
     const logs: AuditLog[] = audit_trail.length > 0 ? audit_trail : [
-        { id: 1, date: 'Oct 20, 2023 • 10:00 AM', user: 'Juan Dela Cruz', role: 'Leader', action: 'Created', details: 'Initial registration draft created', type: 'created' },
-        { id: 2, date: 'Oct 20, 2023 • 10:05 AM', user: 'Juan Dela Cruz', role: 'Leader', action: 'Uploaded', details: 'Uploaded Hydroponics_Final_Slides.pptx', type: 'uploaded' },
+        { id: 1, date: 'Oct 20, 2023 • 10:00 AM', user: 'System', role: 'Admin', action: 'Initialized', details: 'Form ready for submission', type: 'created' },
     ];
 
-    const { data, setData, post, processing } = useForm({
-        title: 'Automated Hydroponics System using IoT and Machine Learning', 
+    // --- FORM HANDLER ---
+    const { data, setData, post, processing, errors } = useForm({
+        title: thesis?.title || '', // Dynamic Title from Database
         event_name: '',
         venue: '',
         event_date: '',
@@ -48,13 +55,24 @@ export default function PublicPresentation({ auth, audit_trail = [], status = 'd
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        alert("Submission sent!");
+        
+        // Real Submission Logic
+        post(route('public-presentation.store'), {
+            preserveScroll: true,
+            forceFormData: true, // Crucial for file uploads
+            onSuccess: () => {
+                // Optional: Show toast notification here
+                console.log("Submitted successfully");
+            }
+        });
     };
 
+    // --- UI LOGIC ---
     const isEventDetailsFilled = !!(data.event_name && data.venue && data.event_date);
     const isMaterialsUploaded = !!data.materials_file;
     const isProofUploaded = !!data.proof_file;
-    const isCertificateUploaded = false;
+    // This logic usually comes from the backend status, assuming false for form
+    const isCertificateUploaded = status === 'verified'; 
 
     const currentStepIndex = useMemo(() => {
         switch(status) {
@@ -66,10 +84,10 @@ export default function PublicPresentation({ auth, audit_trail = [], status = 'd
     }, [status]);
 
     const steps = [
-        { title: 'Draft Created', date: 'Oct 20, 2023 • 10:00 AM', stepIdx: 1 },
-        { title: 'Submitted for Review', date: 'Pending Adviser Action', stepIdx: 2 },
-        { title: 'Department Approval', date: 'Waiting for Step 2', stepIdx: 3 },
-        { title: 'Presentation Verified', date: '--', stepIdx: 4 },
+        { title: 'Draft Created', date: logs.find(l => l.type === 'created')?.date || '--', stepIdx: 1 },
+        { title: 'Submitted for Review', date: status !== 'draft' ? 'Done' : 'Pending', stepIdx: 2 },
+        { title: 'Department Approval', date: status === 'approved' || status === 'verified' ? 'Approved' : 'Pending', stepIdx: 3 },
+        { title: 'Presentation Verified', date: status === 'verified' ? 'Verified' : '--', stepIdx: 4 },
     ];
 
     return (
@@ -94,15 +112,15 @@ export default function PublicPresentation({ auth, audit_trail = [], status = 'd
                 {/* === LEFT ASIDE (Sticky) === */}
                 <aside className="sticky top-6 space-y-6 order-2 lg:order-1">
                     
-                    {/* CARD: Approval Status (Dynamic Timeline) */}
+                    {/* CARD: Approval Status */}
                     <div className="bg-white rounded-lg shadow-sm border-2 border-[#800000] overflow-hidden">
                         <div className="bg-[#800000] text-[#FFD700] px-6 py-4 font-semibold tracking-wide flex items-center gap-2">
                             <Clock className="w-4 h-4 opacity-80" />
                             Approval Status
                         </div>
                         <div className="p-6">
+                            
                             <div className="relative pl-5 mt-2 space-y-0 before:absolute before:left-0 before:top-[5px] before:bottom-0 before:w-0.5 before:bg-[#eee]">
-                                
                                 {steps.map((step, index) => {
                                     let circleClass = "bg-[#e0e0e0] border-[#ddd] shadow-[#ddd]";
                                     if (currentStepIndex > step.stepIdx) {
@@ -119,12 +137,11 @@ export default function PublicPresentation({ auth, audit_trail = [], status = 'd
                                         </div>
                                     );
                                 })}
-
                             </div>
                         </div>
                     </div>
 
-                    {/* CARD: Requirements Checklist (Dynamic) */}
+                    {/* CARD: Requirements Checklist */}
                     <div className="bg-white rounded-lg shadow-sm border-2 border-[#800000] overflow-hidden">
                         <div className="bg-[#800000] text-[#FFD700] px-6 py-4 font-semibold tracking-wide flex items-center gap-2">
                             <ListChecks className="w-4 h-4 opacity-80" />
@@ -200,6 +217,7 @@ export default function PublicPresentation({ auth, audit_trail = [], status = 'd
                                                 onChange={e => setData('event_name', e.target.value)}
                                                 disabled={!isLeader}
                                             />
+                                            {errors.event_name && <div className="text-red-600 text-xs mt-1">{errors.event_name}</div>}
                                         </div>
 
                                         <div>
@@ -255,12 +273,12 @@ export default function PublicPresentation({ auth, audit_trail = [], status = 'd
                                         />
                                         <p className="text-[0.85rem] text-[#999] mt-2 text-center">Required for Adviser review before the event</p>
                                         
-                                        {!data.materials_file && (
+                                        {/* Example of showing existing file if already uploaded (needs logic from props) */}
+                                        {status !== 'draft' && !data.materials_file && (
                                             <div className="mt-4 bg-[#f0fdf4] p-2.5 rounded border border-[#bbf7d0] flex items-center justify-between">
                                                 <div className="flex items-center gap-2.5">
                                                     <Paperclip className="w-4 h-4 text-[#666]" />
-                                                    <strong className="text-sm">Hydroponics_Final_Slides.pptx</strong>
-                                                    <span className="text-[0.8rem] text-[#666]">(5.2 MB)</span>
+                                                    <strong className="text-sm">Submitted_Slides.pptx</strong>
                                                 </div>
                                                 <span className="text-[#198754] font-bold text-[0.9rem]">Uploaded ✔</span>
                                             </div>
@@ -287,7 +305,7 @@ export default function PublicPresentation({ auth, audit_trail = [], status = 'd
                                             <button 
                                                 type="submit" 
                                                 disabled={processing}
-                                                className="float-right bg-[#800000] hover:bg-[#600000] text-white px-10 py-3.5 rounded-md font-bold text-[1rem] transition-colors disabled:opacity-50"
+                                                className="float-right bg-[#800000] hover:bg-[#600000] text-white px-10 py-3.5 rounded-md font-bold text-[1rem] transition-colors disabled:opacity-50 flex items-center gap-2"
                                             >
                                                 {processing ? "Saving..." : "Save & Submit Registration"}
                                             </button>
