@@ -407,6 +407,9 @@ export default function SystemRepositoryExpanded() {
   const activeSelectMode = isFailedTab ? failedSelectMode : isSelectMode;
   const activeSelectedIds = isFailedTab ? failedSelectedIds : selectedIds;
 
+  const deleteCount = activeSelectedIds.length;
+  const thesisLabel = deleteCount === 1 ? 'item' : 'items';
+
   const toggleSelectMode = () => {
     if (isFailedTab) {
       setFailedSelectMode(prev => !prev);
@@ -462,7 +465,10 @@ export default function SystemRepositoryExpanded() {
     setShowDeleteConfirm(true);
   };
 
+  const [deletedCount, setDeletedCount] = useState(0);
+
   const handleConfirmDelete = () => {
+    setDeletedCount(deleteCount);
     setShowDeleteConfirm(false);
     setShowDeleteSuccess(true);
     handleClearSelection();
@@ -605,7 +611,7 @@ export default function SystemRepositoryExpanded() {
             </button>
 
             {/* Delete Button */}
-            {activeSelectMode && selectedIds.length > 0 && (
+            {activeSelectMode && activeSelectedIds.length > 0 && (
               <button
                 onClick={handleDeleteClick}
                 className="h-10 w-10 flex items-center justify-center rounded-lg border-[0.8px] border-primary/15 bg-background text-foreground hover:bg-breadcrumb transition-colors"
@@ -634,7 +640,7 @@ export default function SystemRepositoryExpanded() {
                     className="mb-2 text-center font-dm font-medium text-body-2"
                     style={{ color: "var(--primary)" }}
                   >
-                    Are you sure you want to delete this item?
+                    Are you sure you want to delete {deleteCount} {thesisLabel} in this repository?
                   </p>
                   <p
                     className="mb-6 text-center font-dm text-body-4"
@@ -683,7 +689,7 @@ export default function SystemRepositoryExpanded() {
                     className="mb-6 text-center font-dm font-medium text-body-2"
                     style={{ color: "var(--alert-success)" }}
                   >
-                    Item deleted successfully.
+                    Successfully deleted {deletedCount} {deletedCount === 1 ? 'item' : 'items'}.
                   </p>
                   <div className="flex justify-center">
                     <Button
@@ -737,7 +743,7 @@ export default function SystemRepositoryExpanded() {
                 className="mb-6 text-center font-dm font-medium text-body-2"
                 style={{ color: "var(--alert-success)" }}
               >
-                Successfully synced {failedSyncedCount} {failedSyncedCount === 1 ? "thesis" : "theses"}.
+                Successfully synced {failedSyncedCount} {failedSyncedCount === 1 ? "item" : "items"}.
               </p>
               <div className="flex justify-center">
                 <Button
@@ -1028,7 +1034,7 @@ export default function SystemRepositoryExpanded() {
                     <div className="flex flex-col gap-[1.6px]">
                       <p className="text-primary font-dm text-[16px] font-bold leading-normal">Block</p>
                       <div className="inline-flex items-center justify-center px-[5px] py-[5px] rounded-lg border-[0.8px] border-primary w-fit">
-                        <span className="text-foreground font-dm text-[12px] font-medium">{selectedThesis.block}</span>
+                        <span className="texst-foreground font-dm text-[12px] font-medium">{selectedThesis.block}</span>
                       </div>
                     </div>
 
