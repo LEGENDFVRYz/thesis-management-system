@@ -10,7 +10,7 @@ import { FileUpload } from '@/components/file-upload'
 import ThesisIcon from '@/components/Icons/thesis_icon.svg'
 
 /* TABS */
-const TABS = [
+const LEADER_TABS = [
   { key: 'documents', label: 'Documents' },
   { key: 'upload', label: 'Upload' },
   { key: 'history', label: 'History' },
@@ -18,6 +18,14 @@ const TABS = [
   { key: 'workflow', label: 'Workflow' },
   { key: 'final_submission', label: 'Final Submission' },
   { key: 'change_request', label: 'Change Request' },
+]
+
+const MEMBER_TABS = [
+  { key: 'documents', label: 'Documents' },
+  { key: 'history', label: 'History' },
+  { key: 'compare', label: 'Compare' },
+  { key: 'workflow', label: 'Workflow' },
+  { key: 'transfer_request', label: 'Transfer Request' },
 ]
 
 /* SAMPLE DATA  */
@@ -54,6 +62,9 @@ const DOCUMENTS = [
 
 export default function ThesisManagement() {
   const [activeTab, setActiveTab] = useState('documents')
+  const [userRole, setUserRole] = useState<'leader' | 'member'>('leader') // Change default role as needed
+  // User role 
+  const TABS = userRole === 'leader' ? LEADER_TABS : MEMBER_TABS
 
   const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Thesis Management', href: thesisManagement().url },
@@ -64,24 +75,20 @@ export default function ThesisManagement() {
   ]
 
   return (
-    <RepositoryLayout breadcrumbs={breadcrumbs}>
+    <RepositoryLayout 
+      breadcrumbs={breadcrumbs}
+      title={
+        <div className="flex items-center gap-2">
+          <img src={ThesisIcon} alt="Thesis Icon" className="h-8 w-8" />
+          <span className="font-medium">Thesis Management</span>
+        </div>
+      }
+      description="Access and manage your thesis documents"
+    >
       <Head title="Thesis Management" />
 
-      {/* HEADER */}
-      <div className="mb-6 pb-4" style={{ borderBottom: '1px solid #730000' }}>
-        <div className="flex items-center gap-3">
-          <img src={ThesisIcon} alt="Thesis" className="h-8 w-8" />
-          <h1 className="text-3xl font-medium text-[#FFBD00]">
-            Thesis Management
-          </h1>
-        </div>
-        <p className="text-sm text-gray-600">
-          Access and manage your thesis documents
-        </p>
-      </div>
-
       {/* TABS */}
-      <div className="flex">
+      <div className="flex mt-6">
         {TABS.map(tab => (
           <TabButton
             key={tab.key}
@@ -160,13 +167,7 @@ export default function ThesisManagement() {
         )}
 
         {/* PLACEHOLDER TABS */}
-        {[
-          'history',
-          'compare',
-          'workflow',
-          'final_submission',
-          'change_request',
-        ].includes(activeTab) && (
+        {activeTab !== 'documents' && activeTab !== 'upload' && (
           <div className="py-20 text-center text-gray-500">
             <p className="text-sm">
               This section is under development.
