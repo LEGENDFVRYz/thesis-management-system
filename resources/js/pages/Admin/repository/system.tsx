@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { TableHead } from '@/components/ui/table';
-import { AlertCircle, FileText, Trash2, Calendar } from 'lucide-react';
+import { AlertCircle, FileText, Trash2, Calendar, CheckCircle } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import { index, theses } from '@/routes/repository';
 import { AppContent } from '@/components/app-content';
@@ -263,6 +263,18 @@ export default function SystemRepository() {
   const selectedThesis = mockSystemData.find(item => item.id === selectedId) || mockSystemData[0];
   const [currentSyncStatus, setCurrentSyncStatus] = useState<'Success' | 'Failed'>(selectedThesis.syncStatus);
 
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
+
+  const handleDeleteClick = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = () => {
+    setShowDeleteConfirm(false);
+    setShowDeleteSuccess(true);
+  };
+
   useEffect(() => {
     setCurrentSyncStatus(selectedThesis.syncStatus);
     setShowSuccess(false);
@@ -400,6 +412,7 @@ export default function SystemRepository() {
               <Button
                 variant="default"
                 size="sm"
+                onClick={handleDeleteClick}
                 className="h-8 px-3 gap-[6px] rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 <Trash2 size={16} className="text-white" />
@@ -580,6 +593,97 @@ export default function SystemRepository() {
             </div>
           </div>
         </div>
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div
+              className="w-[400px] rounded-lg bg-background p-6"
+              style={{
+                border: "1px solid var(--primary)",
+                boxShadow: "0 10px 20px rgb(115 0 0 / 0.25)",
+              }}
+            >
+              <AlertCircle
+                size={48}
+                className="mx-auto mb-5"
+                style={{ color: "var(--primary)" }}
+              />
+
+              <p
+                className="mb-2 text-center font-dm font-medium text-body-2"
+                style={{ color: "var(--primary)" }}
+              >
+                Are you sure you want to delete this thesis in this repository?
+              </p>
+
+              <p
+                className="mb-6 text-center font-dm text-body-4"
+                style={{ color: "var(--muted-foreground)" }}
+              >
+                This action cannot be undone.
+              </p>
+
+              <div className="flex justify-center gap-4">
+                <Button
+                  variant="secondary"
+                  className="rounded-full px-8"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  size="default"
+                >
+                  Cancel
+                </Button>
+
+                <Button
+                  variant="negative"
+                  className="rounded-full px-8"
+                  onClick={handleConfirmDelete}
+                  size="default"
+                >
+                  Confirm
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Success Modal */}
+        {showDeleteSuccess && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div
+              className="w-[400px] rounded-lg bg-background p-6"
+              style={{
+                border: "1px solid var(--alert-success)",
+                boxShadow: "0 10px 20px rgb(0 128 0 / 0.25)",
+              }}
+            >
+              <CheckCircle
+                size={48}
+                className="mx-auto mb-5"
+                style={{ color: "var(--alert-success)" }}
+              />
+
+              <p
+                className="mb-6 text-center font-dm font-medium text-body-2"
+                style={{ color: "var(--alert-success)" }}
+              >
+                Successfully deleted this thesis.
+              </p>
+
+              <div className="flex justify-center">
+                <Button
+                  variant="secondary"
+                  className="rounded-full px-10 bg-alert-success text-primary-foreground hover:bg-alert-success"
+                  onClick={() => setShowDeleteSuccess(false)}
+                  size="default"
+                >
+                  Done
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </AppContent>
     </RepositoryLayout>
     
