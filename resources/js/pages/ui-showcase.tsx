@@ -1236,8 +1236,8 @@ export default function UIShowcase() {
                             <div>
                                 <h3 className="text-lg font-semibold mb-3 text-white">Methodology Change</h3>
                                 <div className="overflow-hidden rounded-lg">
-                                    <MethodologyHeader />
-                                    <MethodologyRow />
+                                    <MethodologyHeader variant='static' />
+                                    <MethodologyRow variant='static' />
                                 </div>
                             </div>
 
