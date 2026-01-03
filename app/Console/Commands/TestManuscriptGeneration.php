@@ -27,14 +27,10 @@ class TestManuscriptGeneration extends Command
     public function handle()
     {
         $count = $this->argument('count');
-        $path = storage_path('app/private/testing');
+        $path = 'testing';
 
-        // Ensure directory exists
-        if (!file_exists($path)) {
-            mkdir($path, 0755, true);
-        }
 
-        $this->info("Dispatching {$count} manuscript jobs to: {$path}");
+        $this->info("Dispatching {$count} manuscript jobs to: {$path} folder");
         $bar = $this->output->createProgressBar($count);
         $bar->start();
 

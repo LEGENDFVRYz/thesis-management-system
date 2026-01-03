@@ -56,7 +56,7 @@ class GenerateDummyManuscriptJob implements ShouldQueue
         }
 
         // Prepare Path
-        $cleanPath = rtrim($this->path, '/');
+        $cleanPath = rtrim(storage_path('app/private/' . $this->path), '/');
         $fullFilePath = "{$cleanPath}/{$this->filename}";
 
         $pdfGenerator->save(
