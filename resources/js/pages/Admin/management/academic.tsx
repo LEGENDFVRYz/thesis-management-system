@@ -80,17 +80,8 @@ export default function AcademicSettings() {
         <div className="flex flex-col gap-6">
         <Card className="bg-[#FDFCF6] h-fit border border-[#73000042] shadow-[0_1px_16px_#00000040,0_1px_3px_#0000000A]">
           <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <div className="flex items-center gap-2">
-              <img src={AcademicYearIcon} className="w-6 h-6" alt="Academic year management" />
-              <CardTitle>Academic Year Management</CardTitle>
-            </div>
-            <Button variant="primary" onClick={handleSaveAcademicYear}>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M10.1333 2C10.485 2.00501 10.8205 2.14878 11.0667 2.4L13.6 4.93333C13.8512 5.17951 13.995 5.51497 14 5.86667V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 3.33333C2 2.97971 2.14048 2.64057 2.39052 2.39052C2.64057 2.14048 2.97971 2 3.33333 2H10.1333Z" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M11.3332 13.9998V9.33317C11.3332 9.15636 11.2629 8.98679 11.1379 8.86177C11.0129 8.73674 10.8433 8.6665 10.6665 8.6665H5.33317C5.15636 8.6665 4.98679 8.73674 4.86177 8.86177C4.73674 8.98679 4.6665 9.15636 4.6665 9.33317V13.9998" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M4.6665 2V4.66667C4.6665 4.84348 4.73674 5.01305 4.86177 5.13807C4.98679 5.2631 5.15636 5.33333 5.33317 5.33333H9.99984" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              Save</Button>
+            <img src={AcademicYearIcon} className="w-6 h-6" alt="Academic year management" />
+            <CardTitle>Academic Year Management</CardTitle>
           </CardHeader>
 
           <CardContent className="grid grid-cols-2 gap-4">
@@ -184,17 +175,8 @@ export default function AcademicSettings() {
         {/* SEMESTER CONFIGURATION */}
         <Card className="bg-[#FDFCF6] border border-[#73000042] shadow-[0_1px_16px_#00000040,0_1px_3px_#0000000A] h-fit">
             <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <div className="flex items-center gap-2">
             <img src={SemesterIcon} className="w-6 h-6" alt="Semester configuration" />
             <CardTitle>Semester Configuration</CardTitle>
-            </div>
-            <Button variant="primary" onClick={handleSaveSemester}>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M10.1333 2C10.485 2.00501 10.8205 2.14878 11.0667 2.4L13.6 4.93333C13.8512 5.17951 13.995 5.51497 14 5.86667V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 3.33333C2 2.97971 2.14048 2.64057 2.39052 2.39052C2.64057 2.14048 2.97971 2 3.33333 2H10.1333Z" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M11.3332 13.9998V9.33317C11.3332 9.15636 11.2629 8.98679 11.1379 8.86177C11.0129 8.73674 10.8433 8.6665 10.6665 8.6665H5.33317C5.15636 8.6665 4.98679 8.73674 4.86177 8.86177C4.73674 8.98679 4.6665 9.15636 4.6665 9.33317V13.9998" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M4.6665 2V4.66667C4.6665 4.84348 4.73674 5.01305 4.86177 5.13807C4.98679 5.2631 5.15636 5.33333 5.33317 5.33333H9.99984" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              Save</Button>
           </CardHeader>
           <CardContent className="space-y-4">
             <label className="text-sm font-medium">Active Semester</label>
