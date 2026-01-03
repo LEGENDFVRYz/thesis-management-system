@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { X, Upload } from 'lucide-react';
+import { useFacultyValidation } from './faculty_validation';
 
 interface Faculty {
   id: string;
@@ -42,6 +43,17 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
     status: "Active",
   });
 
+  const {
+    errors,
+    touched,
+    isSubmitAttempted,
+    handleBlur,
+    handleInputChange,
+    handleRoleToggle: hookHandleRoleToggle,
+    handleSubmit,
+    resetValidation,
+  } = useFacultyValidation();
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -74,24 +86,52 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
     }
   };
 
-  const handleRoleToggle = (role: string) => {
+  const onRoleToggle = (role: string) => {
+    hookHandleRoleToggle(role, formData.roles, formData);
     setFormData(prev => ({
       ...prev,
       roles: prev.roles.includes(role) 
         ? prev.roles.filter(r => r !== role) 
-        : [...prev.roles, role]
+        : [...prev.roles, role],
+      // Clear advisee block if removing Thesis Adviser
+      adviseeBlock: role === "Thesis Adviser" && prev.roles.includes(role) ? "" : prev.adviseeBlock
     }));
   };
 
-  const handleSave = () => {
-    console.log("Saved faculty data:", formData);
-    setIsEditing(false);
-    onClose();
+  const onSave = () => {
+    handleSubmit(formData, () => {
+      console.log("Saved faculty data:", formData);
+      setIsEditing(false);
+      onClose();
+    });
   };
 
   const handleArchive = () => {
     console.log("Archive faculty:", faculty?.id);
     onClose();
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    resetValidation();
+    
+    // Reset form data to original faculty data
+    if (faculty) {
+      const [firstName, ...lastNameParts] = faculty.name.split(' ');
+      setFormData({
+        firstName: firstName || "",
+        lastName: lastNameParts.join(' ') || "",
+        suffix: "",
+        facultyId: faculty.id,
+        pupWebmail: faculty.email,
+        title: "",
+        facultyType: faculty.type,
+        roles: faculty.roles,
+        adviseeBlock: "",
+        photoPreview: faculty.hasPhoto ? "" : null,
+        status: "Active",
+      });
+    }
   };
 
   if (!isOpen || !faculty) return null;
@@ -116,7 +156,7 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
           {/* Photo */}
           <div className="flex flex-col items-center mb-6">
             <div 
-              className={`w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden ${
+              className={`w-45 h-45 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden ${
                 isEditing ? 'cursor-pointer hover:opacity-80' : ''
               } transition-opacity`}
               onClick={() => isEditing && fileInputRef.current?.click()}
@@ -125,7 +165,7 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
                 <img src={formData.photoPreview || ""} alt="Faculty" className="w-full h-full object-cover" />
               ) : (
                 <div className="flex flex-col items-center justify-center w-full h-full bg-[#ECECF0]">
-                  <span className="text-black font-arimo text-2xl font-medium">
+                  <span className="text-black text-[60px] font-medium">
                     {faculty.initials}
                   </span>
                 </div>
@@ -140,7 +180,7 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
                   onChange={handlePhotoUpload}
                   className="hidden"
                 />
-                <Button
+                <Button variant="link"
                   onClick={() => fileInputRef.current?.click()}
                   className="mt-2 text-primary bg-transparent text-sm hover:underline"
                 >
@@ -186,9 +226,16 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
                       id="firstName"
                       placeholder="First Name"
                       value={formData.firstName}
-                      onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
-                      className="!w-60"
+                      onChange={(e) => {
+                        setFormData(prev => ({ ...prev, firstName: e.target.value }));
+                        handleInputChange('firstName', e.target.value, formData);
+                      }}
+                      onBlur={() => handleBlur('firstName', formData)}
+                      className={`!w-60 ${errors.firstName && touched.firstName && isSubmitAttempted ? 'border-red-500' : ''}`}
                     />
+                    {errors.firstName && touched.firstName && isSubmitAttempted && (
+                      <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="lastName" className="text-sm font-medium mb-1 block">
@@ -198,9 +245,16 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
                       id="lastName"
                       placeholder="Last Name"
                       value={formData.lastName}
-                      onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
-                      className="!w-60"
+                      onChange={(e) => {
+                        setFormData(prev => ({ ...prev, lastName: e.target.value }));
+                        handleInputChange('lastName', e.target.value, formData);
+                      }}
+                      onBlur={() => handleBlur('lastName', formData)}
+                      className={`!w-60 ${errors.lastName && touched.lastName && isSubmitAttempted ? 'border-red-500' : ''}`}
                     />
+                    {errors.lastName && touched.lastName && isSubmitAttempted && (
+                      <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="suffix" className="text-sm font-medium mb-1 block">
@@ -225,9 +279,16 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
                       id="facultyId"
                       placeholder="Faculty ID"
                       value={formData.facultyId}
-                      onChange={(e) => setFormData(prev => ({ ...prev, facultyId: e.target.value }))}
-                      className="!w-80"
+                      onChange={(e) => {
+                        setFormData(prev => ({ ...prev, facultyId: e.target.value }));
+                        handleInputChange('facultyId', e.target.value, formData);
+                      }}
+                      onBlur={() => handleBlur('facultyId', formData)}
+                      className={`!w-80 ${errors.facultyId && touched.facultyId && isSubmitAttempted ? 'border-red-500' : ''}`}
                     />
+                    {errors.facultyId && touched.facultyId && isSubmitAttempted && (
+                      <p className="text-red-500 text-xs mt-1">{errors.facultyId}</p>
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="pupWebmail" className="text-sm font-medium mb-1 block">
@@ -237,9 +298,16 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
                       id="pupWebmail"
                       placeholder="PUP Webmail"
                       value={formData.pupWebmail}
-                      onChange={(e) => setFormData(prev => ({ ...prev, pupWebmail: e.target.value }))}
-                      className="!w-92"
+                      onChange={(e) => {
+                        setFormData(prev => ({ ...prev, pupWebmail: e.target.value }));
+                        handleInputChange('pupWebmail', e.target.value, formData);
+                      }}
+                      onBlur={() => handleBlur('pupWebmail', formData)}
+                      className={`!w-92 ${errors.pupWebmail && touched.pupWebmail && isSubmitAttempted ? 'border-red-500' : ''}`}
                     />
+                    {errors.pupWebmail && touched.pupWebmail && isSubmitAttempted && (
+                      <p className="text-red-500 text-xs mt-1">{errors.pupWebmail}</p>
+                    )}
                   </div>
                 </div>
 
@@ -261,13 +329,22 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
                     </Label>
                     <RadioGroup
                       value={formData.facultyType}
-                      onValueChange={(value) => setFormData(prev => ({ ...prev, facultyType: value }))}
+                      onValueChange={(value) => {
+                        setFormData(prev => ({ ...prev, facultyType: value }));
+                        handleInputChange('facultyType', value, formData);
+                        if (isSubmitAttempted) {
+                          handleBlur('facultyType', formData);
+                        }
+                      }}
                       className="flex flex-col gap-2"
                     >
                       <RadioGroupItemWithLabel id="fullTime-edit" value="Full-Time" label="Full-Time" />
                       <RadioGroupItemWithLabel id="partTime-edit" value="Part-Time" label="Part-Time" />
                       <RadioGroupItemWithLabel id="external-edit" value="External (Non-Faculty)" label="External (Non-Faculty)" />
                     </RadioGroup>
+                    {errors.facultyType && touched.facultyType && isSubmitAttempted && (
+                      <p className="text-red-500 text-xs mt-1">{errors.facultyType}</p>
+                    )}
                   </div>
                 </div>
               </>
@@ -339,32 +416,38 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
                     id="thesisCoordinator-edit"
                     label="Thesis Coordinator"
                     checked={formData.roles.includes("Thesis Coordinator")}
-                    onCheckedChange={() => handleRoleToggle("Thesis Coordinator")}
+                    onCheckedChange={() => onRoleToggle("Thesis Coordinator")}
                   />
                   <CheckboxWithLabel
                     id="thesisAdviser-edit"
                     label="Thesis Adviser"
                     checked={formData.roles.includes("Thesis Adviser")}
-                    onCheckedChange={() => handleRoleToggle("Thesis Adviser")}
+                    onCheckedChange={() => onRoleToggle("Thesis Adviser")}
                   />
                   <CheckboxWithLabel
                     id="panelMember-edit"
                     label="Panel Member"
                     checked={formData.roles.includes("Panel Member")}
-                    onCheckedChange={() => handleRoleToggle("Panel Member")}
+                    onCheckedChange={() => onRoleToggle("Panel Member")}
                   />
                 </div>
 
                 {formData.roles.includes("Thesis Adviser") && (
                   <div>
                     <Label htmlFor="adviseeBlock-edit" className="text-sm font-medium mb-1 block">
-                      THESIS ADVISEE BLOCK ASSIGNMENT
+                      THESIS ADVISEE BLOCK ASSIGNMENT <span className="text-red-500">*</span>
                     </Label>
                     <Select
                       value={formData.adviseeBlock}
-                      onValueChange={(value) => setFormData(prev => ({ ...prev, adviseeBlock: value }))}
+                      onValueChange={(value) => {
+                        setFormData(prev => ({ ...prev, adviseeBlock: value }));
+                        handleInputChange('adviseeBlock', value, formData);
+                      }}
                     >
-                      <SelectTrigger id="adviseeBlock-edit" className="!w-100 text-sm">
+                      <SelectTrigger 
+                        id="adviseeBlock-edit" 
+                        className={`!w-100 text-sm ${errors.adviseeBlock && touched.adviseeBlock && isSubmitAttempted ? 'border-red-500' : ''}`}
+                      >
                         <SelectValue placeholder="Select Block..." />
                       </SelectTrigger>
                       <SelectContent className='!w-100'>
@@ -377,6 +460,9 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
                         <SelectItem value="BSCPE Section 7">BSCPE Section 7</SelectItem>
                       </SelectContent>
                     </Select>
+                    {errors.adviseeBlock && touched.adviseeBlock && isSubmitAttempted && (
+                      <p className="text-red-500 text-xs mt-1">{errors.adviseeBlock}</p>
+                    )}
                   </div>
                 )}
               </>
@@ -413,8 +499,8 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
               <>
                 <Button onClick={handleArchive} className='!text-white'> Archive </Button>
                 <div className="flex gap-3">
-                  <Button variant="outline" onClick={() => setIsEditing(false)}> Cancel </Button>
-                  <Button onClick={handleSave} className="bg-primary hover:bg-primary/90"> Save </Button>
+                  <Button variant="outline" onClick={handleCancelEdit}> Cancel </Button>
+                  <Button onClick={onSave} className="bg-primary hover:bg-primary/90"> Save </Button>
                 </div>
               </>
             ) : (
