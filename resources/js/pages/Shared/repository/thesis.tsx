@@ -28,7 +28,7 @@ export default function Thesis({ search = '' }: ThesisProps) {
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Repository', href: index().url },
-        { title: 'Thesis', href: theses().url },
+        { title: 'Thesis Archive', href: theses().url },
     ];
 
     // Sample repository data
@@ -342,12 +342,12 @@ export default function Thesis({ search = '' }: ThesisProps) {
 
     return (
         <>
-            <Head title="Repository" />
+            <Head title="Thesis Archive" />
 
             <RepositoryLayout breadcrumbs={breadcrumbs}>
 
             <AppContent
-                title="Thesis Repository"
+                title="Thesis Archive"
                 subtitle="Browse and explore student thesis projects"
             >
                     {/* Filter Bar */}

@@ -20,7 +20,7 @@ import { AppContent } from '@/components/app-content';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Repository', href: index().url },
-    { title: 'System', href: system().url },
+    { title: 'System Archive', href: system().url },
 ];
 
 // Types
@@ -478,7 +478,7 @@ export default function SystemRepositoryExpanded() {
 
   return (
     <>
-      <Head title="Repository" />
+      <Head title="System Archive" />
 
       <RepositoryLayout breadcrumbs={breadcrumbs}>
 

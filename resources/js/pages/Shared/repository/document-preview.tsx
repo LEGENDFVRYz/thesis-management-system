@@ -80,7 +80,7 @@ export default function DocumentPreview({ thesis }: DocumentPreviewProps) {
 
     return (
         <>
-            <Head title="Document Review" />
+            <Head title="Thesis Archive" />
             <AppHeader />
 
             <div className="min-h-screen bg-background">
