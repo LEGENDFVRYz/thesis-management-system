@@ -88,7 +88,7 @@ export function FacultyTable({ data, onViewEdit }: FacultyTableProps) {
                     </span>
                   </div>
                 )}
-                <span className="text-[#0A0A0A] text-center text-[13.33px] font-medium">
+                <span className="text-black text-center text-[13.33px] font-medium">
                   {faculty.name}
                 </span>
               </div>
