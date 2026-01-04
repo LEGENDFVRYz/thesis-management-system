@@ -126,6 +126,10 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('student/defense', function () {
         return Inertia::render('Student/defense');
     })->name('student.defense');
+
+    Route::get('student/profilemanagement', function () {
+        return Inertia::render('Student/profilemanagement');
+    })->name('student.profilemanagement');
 });
 
 
