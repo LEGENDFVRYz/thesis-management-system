@@ -15,6 +15,7 @@ interface DefenseCalendarProps {
   value?: Date;
   onChange?: (date: Date) => void;
   className?: string;
+  showLegend?: boolean;
 }
 
 const sectionColors: Record<string, string> = {
@@ -46,6 +47,7 @@ export function DefenseCalendar({
   value,
   onChange,
   className = "",
+  showLegend = true,
 }: DefenseCalendarProps) {
   const [currentDate, setCurrentDate] = useState(value || new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(value || null);
@@ -330,57 +332,59 @@ export function DefenseCalendar({
       </div>
 
       {/* Legend */}
-      <div
-        style={{
-          padding: "12px 16px",
-          borderTop: "1px solid #e5e7eb",
-          display: "flex",
-          flexDirection: "column",
-          gap: 12,
-        }}
-      >
-        {["3", "4"].map((yearLevel) => (
-          <div
-            key={yearLevel}
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              gap: 8,
-              fontSize: 12,
-            }}
-          >
-            <span style={{ fontWeight: 600, color: "#111827" }}>
-              {yearLevel}{yearLevel === "3" ? "rd" : "th"} Year:
-            </span>
+      {showLegend && (
+        <div
+          style={{
+            padding: "12px 16px",
+            borderTop: "1px solid #e5e7eb",
+            display: "flex",
+            flexDirection: "column",
+            gap: 12,
+          }}
+        >
+          {["3", "4"].map((yearLevel) => (
+            <div
+              key={yearLevel}
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                gap: 8,
+                fontSize: 12,
+              }}
+            >
+              <span style={{ fontWeight: 600, color: "#111827" }}>
+                {yearLevel}{yearLevel === "3" ? "rd" : "th"} Year:
+              </span>
 
-            {Object.entries(sectionColors)
-              .filter(([key]) => key.startsWith(yearLevel))
-              .map(([section, color]) => (
-                <div
-                  key={section}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 4,
-                  }}
-                >
+              {Object.entries(sectionColors)
+                .filter(([key]) => key.startsWith(yearLevel))
+                .map(([section, color]) => (
                   <div
+                    key={section}
                     style={{
-                      width: 12,
-                      height: 12,
-                      borderRadius: "4px",
-                      backgroundColor: color,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 4,
                     }}
-                  />
-                  <span style={{ fontSize: 11, color: "#374151" }}>
-                    BSCPE {section}
-                  </span>
-                </div>
-              ))}
-          </div>
-        ))}
-      </div>
+                  >
+                    <div
+                      style={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: "4px",
+                        backgroundColor: color,
+                      }}
+                    />
+                    <span style={{ fontSize: 11, color: "#374151" }}>
+                      BSCPE {section}
+                    </span>
+                  </div>
+                ))}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

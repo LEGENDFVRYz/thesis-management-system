@@ -85,7 +85,7 @@ const studentManagementItems = [
             { title: 'Overall Progress', href: '/student/progress/overall' },
             { title: 'Consultations', href: '/student/progress/consultations' },
             { title: 'Status Reports', href: '/student/progress/status-reports' },
-            { title: 'Thesis Management', href: '/student/thesis' },
+            { title: 'Thesis Management', href: '/student/thesis-management' },
             { title: 'Defense Management', href: '/student/defense' },
             { title: 'Compliance & IP', href: '/student/compliance', isHeader: true },
             { title: 'IP & Plagiarism', href: '/student/ip-plagiarism' },

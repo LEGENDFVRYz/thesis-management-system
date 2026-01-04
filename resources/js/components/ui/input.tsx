@@ -19,6 +19,7 @@ const inputVariants = cva(
       inputSize: {
         default: "sm:w-[384px] h-[36px] px-[12px] py-[4px] text-[13.33px]",
         filter: "h-9 px-3 text-sm",
+        full: "w-full h-[36px] px-[12px] py-[4px] text-[13.33px]",
       },
     },
     defaultVariants: {

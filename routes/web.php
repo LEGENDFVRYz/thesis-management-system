@@ -122,6 +122,10 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('student/progress', function () {
         return Inertia::render('Student/progress-tracking/progress');
     })->name('student.progress');
+
+    Route::get('student/defense', function () {
+        return Inertia::render('Student/defense');
+    })->name('student.defense');
 });
 
 
