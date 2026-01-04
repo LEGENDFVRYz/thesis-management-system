@@ -45,7 +45,7 @@ export default function Evaluation({ advisory, id, rubrics, peerEvaluations }: P
     // --- STATE ---
     const [ratings, setRatings] = useState<Record<number, number>>({});
     const [comment, setComment] = useState('');
-    const [verdict, setVerdict] = useState<'Accepted' | 'Rejected' | ''>('');
+    const [verdict, setVerdict] = useState<'Approved' | 'Rejected' | ''>('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -168,7 +168,7 @@ export default function Evaluation({ advisory, id, rubrics, peerEvaluations }: P
                                     <div>
                                         <p className="text-xs font-bold text-[#7A2E2E] uppercase mb-1">Evaluation Decision</p>
                                         <span className={`px-3 py-1 rounded-full text-xs font-bold text-white
-                                            ${evaluator.remarks === 'Accepted' ? 'bg-[#1B5E20]' : 
+                                            ${evaluator.remarks === 'Approved' ? 'bg-[#1B5E20]' : 
                                               evaluator.remarks === 'Rejected' ? 'bg-[#B71C1C]' : 
                                               evaluator.remarks === 'Re-defense' ? 'bg-[#E65100]' : 'bg-gray-500'}`}>
                                             {evaluator.remarks}
@@ -180,7 +180,7 @@ export default function Evaluation({ advisory, id, rubrics, peerEvaluations }: P
                                 <div>
                                     <p className="text-xs font-bold text-[#7A2E2E] uppercase mb-2">Comments/Recommendations</p>
                                     <p className="text-sm text-gray-700 leading-relaxed line-clamp-4">
-                                        {evaluator.comment || "No comments provided."}
+                                        {evaluator.comment || <span className="italic">No comments provided.</span>}
                                     </p>
                                 </div>
                             </div>
@@ -273,12 +273,12 @@ export default function Evaluation({ advisory, id, rubrics, peerEvaluations }: P
                                     <input 
                                         type="radio" 
                                         name="verdict" 
-                                        value="Accepted"
-                                        checked={verdict === 'Accepted'}
-                                        onChange={() => setVerdict('Accepted')}
+                                        value="Approved"
+                                        checked={verdict === 'Approved'}
+                                        onChange={() => setVerdict('Approved')}
                                         className="w-5 h-5 text-green-600"
                                     />
-                                    <span className="font-medium text-gray-700 dark:text-gray-300">Accepted</span>
+                                    <span className="font-medium text-gray-700 dark:text-gray-300">Approved</span>
                                 </label>
 
                                 <label className="flex items-center gap-2 cursor-pointer">
