@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Faculty\Coordinator\DefenseManagement;
 
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+
+
 
 class Matrix extends Controller
 {
@@ -24,6 +27,14 @@ class Matrix extends Controller
         $userId = Auth::id(); // 1. Get Logged in User ID
 
         // Subquery for active school year
+        
+         // 1️⃣ Get active year
+        $activeYear = DB::table('tbl_school_years as sy2')
+            ->join('tbl_semesters as sem2', 'sy2.id', '=', 'sem2.school_year_id')
+            ->where('sem2.is_active', 1)
+            ->value('sy2.year');
+
+
         $activeYearSub = DB::table('tbl_school_years as sy2')
             ->join('tbl_semesters as sem2', 'sy2.id', '=', 'sem2.school_year_id')
             ->where('sem2.is_active', 1)
@@ -106,11 +117,44 @@ class Matrix extends Controller
                 DB::raw("CASE WHEN cp.panel_count = 3 THEN 'SCHEDULED' ELSE 'PENDING' END AS status")
             )
             ->get();
+        
+            
+        $userId = Auth::id();
 
+        // Get all school years where the user is a coordinator
+        $coordinatorSYIds = DB::table('tbl_faculty_assignments as fa')
+            ->join('tbl_faculties as f', 'fa.faculty_id', '=', 'f.id')
+            ->where('f.user_id', $userId)
+            ->where('fa.role_id', 4) // coordinator
+            ->pluck('fa.sy_id');
+
+        $availableProjects = DB::table('tbl_endorsements as e')
+            ->join('tbl_theses as t', 'e.thesis_id', '=', 't.id')
+            ->join('tbl_proposals as p', 't.proposal_id', '=', 'p.id')
+            ->join('tbl_thesis_groups as tg', 'p.group_id', '=', 'tg.id')
+            ->join('tbl_section_advisers as sa', 'tg.section_adviser_id', '=', 'sa.id')
+            ->join('tbl_faculty_assignments as fa', 'sa.faculty_assign_id', '=', 'fa.id')
+            ->join('tbl_school_years as sy', 'fa.sy_id', '=', 'sy.id')
+            ->whereIn('sy.id', $coordinatorSYIds) // ✅ filter only batches the coordinator teaches
+            ->where('e.is_adviser_approved', 1)
+            ->where('e.is_coordinator_approved', 1)
+            ->whereNotExists(function($query) {
+                $query->select(DB::raw(1))
+                    ->from('tbl_defense_matrices as dm')
+                    ->whereColumn('dm.endorsement_id', 'e.id');
+            })
+            ->select(
+                'e.id as endorsement_id',
+                't.title as project_title',
+                DB::raw("CONCAT((3 + ($activeYear - sy.year)), sa.section, LPAD(tg.group_number, 2, '0')) as group_code")
+            )
+            ->get();
+
+
+        // 6️⃣ Render the Inertia page
         return Inertia::render('Faculty/management/coordinator/defense_management/matrix', [
             'defenseMatrices' => $defenseMatrices,
-
-         
+            'availableProjects' => $availableProjects,
         ]);
 
     }
@@ -128,11 +172,45 @@ class Matrix extends Controller
     {
         // TASK 3.1: Timo       --part 2/4
         // Note: Granted permission, you can add new route in routes/web.php dependent on your logic
-
         // Used the testing modal to create a group and get all need information
-
         // Saved it into the database
+        // Validate the form input
+        $userId = Auth::id();
+
+        // Get the active year
+        $activeYear = DB::table('tbl_school_years as sy2')
+            ->join('tbl_semesters as sem2', 'sy2.id', '=', 'sem2.school_year_id')
+            ->where('sem2.is_active', 1)
+            ->value('sy2.year');
+
+        // ===== 1️⃣ Validate the modal form =====
+        $request->validate([
+            'endorsement_id' => 'required|exists:tbl_endorsements,id',
+            'group_code'     => 'required|string',
+            'room'           => 'required|numeric|digits_between:1,3',
+            'date'           => 'required|date',
+            'time'           => 'required',
+        ]);
+
+        // ===== 2️⃣ Build datetime for defense schedule =====
+        $defenseDateTime = $request->date . ' ' . $request->time;
+
+        // ===== 3️⃣ Insert into tbl_defense_matrices =====
+        DB::table('tbl_defense_matrices')->insert([
+            'endorsement_id'  => $request->endorsement_id,
+            'group_code'      => $request->group_code,
+            'defense_room'    => $request->room,
+            'defense_schedule'=> $defenseDateTime,
+            'created_at'      => now(),
+            'updated_at'      => now(),
+        ]);
+
+        // ===== 4️⃣ Redirect back with success message =====
+        return redirect()->route('faculty.defense.index')
+            ->with('success', 'Defense scheduled successfully!');
+            
     }
+
 
     /**
      * Display the specified resource.

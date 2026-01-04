@@ -13,7 +13,6 @@ import {
     LayoutList,
     CalendarDays
 } from 'lucide-react';
-
 // Import Shared Components
 import { Button } from '@/components/ui/button'; 
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +20,7 @@ import { SidebarInset } from '@/components/ui/sidebar';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"; 
 import { DefenseCalendarWeekly, type WeeklyEventType } from '@/components/defense-calendar-weekly'; 
 import { cn } from '@/lib/utils';
+
 
 // ----------------------------------------------------------------------
 // CUSTOM TABS COMPONENT
@@ -275,10 +275,17 @@ const breadcrumb: BreadcrumbItem[] = [
     },
 ];
 
-export default function MatrixManagement({ defenseMatrices }: { defenseMatrices: any[] }) {
+export default function MatrixManagement({ defenseMatrices = [], availableProjects = [] }: { defenseMatrices: any[] , availableProjects: any[] }) {
     const [viewMode, setViewMode] = useState<'table' | 'calendar'>('calendar');
     const [currentDate, setCurrentDate] = useState(new Date('2025-11-28'));
     const [isModalOpen, setIsModalOpen] = useState(false);
+    // ====== Modal States ======
+    const [selectedProject, setSelectedProject] = useState('');
+    const [selectedGroupCode, setSelectedGroupCode] = useState('');
+    const [room, setRoom] = useState('');
+    const [date, setDate] = useState('');
+    const [time, setTime] = useState('');
+
 
     const openModal = () => {
         setIsModalOpen(true);
@@ -385,54 +392,116 @@ export default function MatrixManagement({ defenseMatrices }: { defenseMatrices:
                         <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-lg">
                             <h2 className="text-xl font-bold mb-4">Schedule a Defense</h2>
 
-                            {/* Form fields */}
                             <div className="space-y-4">
-                                {/* Project Title Dropdown */}
+                                {/* Project Dropdown */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Project Title</label>
-                                    <select className="w-full border border-gray-300 rounded px-3 py-2">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Project Title
+                                    </label>
+                                    <select
+                                        className="w-full border border-gray-300 rounded px-3 py-2"
+                                        value={selectedProject}
+                                        onChange={(e) => { 
+                                            const projectId = e.target.value;
+                                            setSelectedProject(projectId);
+
+                                            const matchedGroup = availableProjects.find(proj => String(proj.endorsement_id) === projectId);
+                                            setSelectedGroupCode(matchedGroup ? matchedGroup.group_code : '');
+                                        }}
+                                    >
                                         <option value="">Select Project</option>
-                                        {dummyProjects.map((proj, idx) => (
-                                            <option key={idx} value={proj}>{proj}</option>
+                                        {availableProjects.map((proj: any) => (
+                                            <option key={proj.endorsement_id} value={proj.endorsement_id}>
+                                                {proj.project_title}
+                                            </option>
                                         ))}
                                     </select>
                                 </div>
 
                                 {/* Group Code Dropdown */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Group Code</label>
-                                    <select className="w-full border border-gray-300 rounded px-3 py-2">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Group Code
+                                    </label>
+                                    <select
+                                        className="w-full border border-gray-300 rounded px-3 py-2"
+                                        value={selectedGroupCode}
+                                        onChange={(e) => { 
+                                            const groupCode = e.target.value;
+                                            setSelectedGroupCode(groupCode);
+
+                                            const matchedProject = availableProjects.find(proj => proj.group_code === groupCode);
+                                            setSelectedProject(matchedProject ? String(matchedProject.endorsement_id) : '');
+                                        }}
+                                    >
                                         <option value="">Select Group</option>
-                                        {dummyGroupCodes.map((code, idx) => (
-                                            <option key={idx} value={code}>{code}</option>
+                                        {availableProjects.map((proj: any) => (
+                                            <option key={proj.group_code} value={proj.group_code}>
+                                                {proj.group_code}
+                                            </option>
                                         ))}
                                     </select>
                                 </div>
 
-                                {/* Room */}
+                                {/* Room, Date, Time */}
+                                {/* Room, Date, Time */}
                                 <input
                                     type="text"
                                     placeholder="Room"
-                                    className="w-full border border-gray-300 rounded px-3 py-2"
+                                    className="w-full border rounded px-3 py-2"
+                                    value={room}
+                                    maxLength={3}
+                                    onChange={(e) => {
+                                        // Only allow numbers
+                                        const value = e.target.value.replace(/\D/g, '');
+                                        setRoom(value);
+                                    }}
                                 />
                                 <input
                                     type="date"
-                                    className="w-full border border-gray-300 rounded px-3 py-2"
+                                    className="w-full border rounded px-3 py-2"
+                                    value={date}
+                                    onChange={(e) => setDate(e.target.value)}
                                 />
                                 <input
                                     type="time"
-                                    className="w-full border border-gray-300 rounded px-3 py-2"
+                                    className="w-full border rounded px-3 py-2"
+                                    value={time}
+                                    onChange={(e) => setTime(e.target.value)}
                                 />
                             </div>
 
-
                             {/* Action Buttons */}
-                            <div className="flex justify-end mt-6 gap-2">
+                            <div className="flex justify-end gap-2 mt-6">
                                 <Button variant="secondary" onClick={closeModal}>Cancel</Button>
-                                <Button variant="primary" onClick={() => { 
-                                    console.log("Save new defense"); 
-                                    closeModal();
-                                }}>Save</Button>
+                                <Button
+                                    variant="primary"
+                                    onClick={() => {
+                                        if (!selectedProject || !selectedGroupCode || !room || !date || !time) {
+                                            alert('Please fill in all fields');
+                                            return;
+                                        }
+
+                                        // ✅ Send form data to Laravel
+                                        router.post('/faculty/defense-management/matrix', {
+                                            endorsement_id: selectedProject,
+                                            group_code: selectedGroupCode,
+                                            room: room,
+                                            date: date,
+                                            time: time,
+                                        }, {
+                                            onSuccess: () => {
+                                                closeModal(); // close the modal
+                                            },
+                                            onError: (errors) => {
+                                                console.error(errors);
+                                            }
+                                        });
+                                    }}
+                                >
+                                    Save
+                                </Button>
+
                             </div>
                         </div>
                     </div>
