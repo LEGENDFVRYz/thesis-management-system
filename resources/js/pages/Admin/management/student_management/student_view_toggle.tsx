@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Table as TableIcon, LayoutGrid } from 'lucide-react';
+import { Table, LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ViewToggleProps {
@@ -24,7 +24,7 @@ export function ViewToggle({ view, onViewChange, onImport }: ViewToggleProps) {
           )}
           onClick={() => onViewChange('table')}
         >
-          <TableIcon className="w-4 h-4" /> Table View
+          <Table className="w-4 h-4" /> Table View
         </Button>
         <Button
           variant={view === 'card' ? 'default' : 'outline'}
@@ -42,7 +42,7 @@ export function ViewToggle({ view, onViewChange, onImport }: ViewToggleProps) {
       </div>
 
       {/* Import Button */}
-      {onImport && (
+      {onImport && view === 'table' && (
         <Button onClick={onImport}>
           Import
         </Button>
