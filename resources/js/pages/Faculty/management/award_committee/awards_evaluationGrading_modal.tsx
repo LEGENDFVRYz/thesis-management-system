@@ -31,6 +31,7 @@ export function EvaluationGradingModal({
 }: EvaluationGradingModalProps) {
     const [scores, setScores] = useState<{ [key: number]: string }>({});
     const [feedback, setFeedback] = useState('');
+    const [errors, setErrors] = useState<{ [key: number]: string }>({});
 
     // Define sub-criteria based on criteria number
     const getCriteriaData = () => {
@@ -82,10 +83,31 @@ export function EvaluationGradingModal({
     
     if (!criteriaData) return null;
 
-    const handleScoreChange = (index: number, value: string) => {
-        // Only allow numbers
+    const handleScoreChange = (index: number, value: string, maxScore: number) => {
+        // allow numbers only
         if (value === '' || /^\d+$/.test(value)) {
-            setScores({ ...scores, [index]: value });
+            const numValue = parseInt(value) || 0;
+            
+            // Validate against max score
+            if (numValue > maxScore) {
+                // Don't update the score, just show error
+                setErrors({ ...errors, [index]: `Score cannot exceed ${maxScore}` });
+                // Clear error after 3 seconds
+                setTimeout(() => {
+                    setErrors(prev => {
+                        const newErrors = { ...prev };
+                        delete newErrors[index];
+                        return newErrors;
+                    });
+                }, 3000);
+            } else {
+               
+                const newErrors = { ...errors };
+                delete newErrors[index];
+                setErrors(newErrors);
+                
+                setScores({ ...scores, [index]: value });
+            }
         }
     };
 
@@ -101,6 +123,12 @@ export function EvaluationGradingModal({
     };
 
     const handleSubmitEvaluation = () => {
+        // Check if there are any errors
+        if (Object.keys(errors).length > 0) {
+            alert('Please fix the score errors before submitting.');
+            return;
+        }
+        
         // Handle submit evaluation logic
         console.log('Submitting evaluation...', { scores, feedback });
         onClose();
@@ -113,7 +141,7 @@ export function EvaluationGradingModal({
                 <DialogHeader className="bg-primary text-white p-6 sticky top-0 z-10">
                     <div className="flex items-center justify-between">
                         <DialogTitle className="text-xl font-semibold">Evaluation</DialogTitle>
-                        <Button
+                        <Button variant="link"
                             onClick={onClose}
                             className="text-white hover:text-gray-200 transition-colors"
                         >
@@ -172,21 +200,28 @@ export function EvaluationGradingModal({
                             <h5 className="font-semibold text-gray-900 mb-3">Sub-criteria</h5>
                             <ul className="space-y-4">
                                 {criteriaData.subCriteria.map((subCriterion, index) => (
-                                    <li key={index} className="flex items-center justify-between gap-4">
+                                    <li key={index} className="flex items-start justify-between gap-4">
                                         <span className="text-sm text-gray-700 flex-1">
                                             • {subCriterion.text}
                                         </span>
-                                        <div className="flex items-center gap-2 flex-shrink-0">
-                                            <Input
-                                                type="text"
-                                                value={scores[index] || ''}
-                                                onChange={(e) => handleScoreChange(index, e.target.value)}
-                                                placeholder="Enter Score"
-                                                className="!w-25 h-9 text-center"
-                                            />
-                                            <span className="text-sm font-medium text-gray-700">
-                                                / {subCriterion.maxScore}
-                                            </span>
+                                        <div className="flex flex-col gap-1 flex-shrink-0">
+                                            <div className="flex items-center gap-2">
+                                                <Input
+                                                    type="text"
+                                                    value={scores[index] || ''}
+                                                    onChange={(e) => handleScoreChange(index, e.target.value, subCriterion.maxScore)}
+                                                    placeholder="Enter Score"
+                                                    className={`!w-25 h-9 text-center ${errors[index] ? 'border-red-500' : ''}`}
+                                                />
+                                                <span className="text-sm font-medium text-gray-700">
+                                                    / {subCriterion.maxScore}
+                                                </span>
+                                            </div>
+                                            {errors[index] && (
+                                                <span className="text-xs text-red-500 text-right">
+                                                    {errors[index]}
+                                                </span>
+                                            )}
                                         </div>
                                     </li>
                                 ))}
