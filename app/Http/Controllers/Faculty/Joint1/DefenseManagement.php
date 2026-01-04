@@ -99,7 +99,7 @@ class DefenseManagement extends Controller
             
                 return $defense;
             });
-            dd(vars: $defenses);
+            // dd(vars: $defenses);
     
         // Main Query 2: All Accepted Requests will be displayed for the “Calendar View” Button
         $acceptedRequests = $defenses->where('all_confirmed', true)->values();
