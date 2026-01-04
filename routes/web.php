@@ -78,9 +78,7 @@ Route::prefix('guest')->group(function () {
         return Inertia::render('Guest/filter-search');
     })->name('guest.search');
 
-    Route::get('/preview', function () {
-        return Inertia::render('Guest/document-preview');
-    })->name('guest.preview');
+    Route::get('/preview/{id}',  [ThesisArchive::class, 'show'])->name('guest.preview');
 });
 
 // PUBLIC ARCHIVE (legacy routes - redirect to guest)

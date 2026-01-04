@@ -2,8 +2,15 @@ import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, FileText } from 'lucide-react';
 import { AppHeader } from '@/components/app-header';
 import { NavFooter } from '@/components/nav-footer';
+import PdfViewer from '@/components/pdf-viewer';
 
-export default function DocumentPreview() {
+
+
+export default function DocumentPreview({ url }: { url: string }) {
+    // FORCE TESTING
+    const targetId = 1; 
+    const pdfUrl = `/manuscripts/${targetId}/stream`;
+
     return (
         <>
             <Head title="Document Review" />
@@ -54,8 +61,12 @@ export default function DocumentPreview() {
                                 borderRadius: '4px'
                             }}
                         >
-                            <FileText className="w-16 h-16 text-gray-400 mb-4" />
-                            <p className="text-gray-600 font-['DM_Sans']">Document Preview Area</p>
+                            {/* <FileText className="w-16 h-16 text-gray-400 mb-4" />
+                            <p className="text-gray-600 font-['DM_Sans']">Document Preview Area</p> */}
+                            <PdfViewer 
+                                fileUrl={pdfUrl} 
+                                className="shadow-lg bg-accent-foreground"
+                            />
                         </div>
                     </div>
                 </div>
