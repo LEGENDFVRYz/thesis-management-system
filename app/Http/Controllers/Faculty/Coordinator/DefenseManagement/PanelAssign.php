@@ -20,8 +20,7 @@ class PanelAssign extends Controller
         $activeYear = DB::table('tbl_school_years')
             ->join('tbl_semesters', 'tbl_school_years.id', '=', 'tbl_semesters.school_year_id')
             ->where('tbl_semesters.is_active', true)
-            ->value('year');
-        $activeYear = $activeYear ?? 2025;
+            ->value('year') ?? 2025;
 
         $sections = DB::table('tbl_students as s')
             // Join tbl_school_years to get the year for the calculation
@@ -76,7 +75,8 @@ class PanelAssign extends Controller
             ->get()
             ->map(function ($thesis) {
                 $panels = DB::table('tbl_endorsed_panels as ep')
-                    ->join('tbl_faculties as f', 'ep.panel_id', '=', 'f.id')
+                    ->join('tbl_faculty_assignments as fa', 'ep.panel_id', '=', 'fa.id')
+                    ->join('tbl_faculties as f', 'fa.faculty_id', '=', 'f.id')
                     ->where('ep.defense_matrix_id', $thesis->defense_matrix_id)
                     ->select(
                         'f.id',
