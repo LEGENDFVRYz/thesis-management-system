@@ -118,6 +118,10 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('student/public-presentation', function () {
         return Inertia::render('Student/public-presentation');
     })->name('student.public_presentation');
+
+    Route::get('student/progress', function () {
+        return Inertia::render('Student/progress');
+    })->name('student.progress');
 });
 
 

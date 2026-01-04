@@ -67,7 +67,7 @@ export function ViewEvaluateModal({ isOpen, onClose, evaluationData }: ViewEvalu
                     <DialogHeader className="border-b border-gray-200 p-6 pb-4 sticky top-0 bg-white z-10">
                         <div className="flex items-center justify-between">
                             <DialogTitle className="text-2xl font-semibold">View & Evaluate</DialogTitle>
-                            <Button onClick={onClose}>
+                            <Button variant="link" onClick={onClose}>
                                 <X/>
                             </Button>
                         </div>

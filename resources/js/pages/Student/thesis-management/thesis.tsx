@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { BreadcrumbItem } from '@/types'
 import { Head } from '@inertiajs/react'
-import RepositoryLayout from '@/pages/Student/thesis-management/index'
+import ThesisManagementLayout from '@/pages/Student/thesis-management/index'
 import { TabButton } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { thesisManagement } from '@/routes/student'
@@ -75,7 +75,7 @@ export default function ThesisManagement() {
   ]
 
   return (
-    <RepositoryLayout 
+    <ThesisManagementLayout 
       breadcrumbs={breadcrumbs}
       title={
         <div className="flex items-center gap-2">
@@ -175,6 +175,6 @@ export default function ThesisManagement() {
           </div>
         )}
       </div>
-    </RepositoryLayout>
+    </ThesisManagementLayout>
   )
 }
