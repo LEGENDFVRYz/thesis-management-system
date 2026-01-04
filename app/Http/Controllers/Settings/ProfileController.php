@@ -28,7 +28,9 @@ class ProfileController extends Controller
         $user = Auth::user();
     
         $profileData = [];
-    
+        $facultyList = [];
+        $isAdmin = false;
+
         if ($user->role === 'student') {
             $profileData = DB::table('tbl_students')
                 ->where('user_id', $user->id)
@@ -97,8 +99,6 @@ class ProfileController extends Controller
                         'email' => $f->email,
                     ])
                     ->toArray();
-            } else {
-                $facultyList = [];
             }
         }
         
