@@ -22,6 +22,7 @@ use App\Http\Controllers\Faculty\Coordinator\ThesisMonitoring\ThesisRegistry;
 use App\Http\Controllers\Faculty\Joint1\DefenseManagement;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\FileImportController;
+use App\Http\Controllers\PdfViewerController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\Shared\ThesisArchive;
 use Illuminate\Support\Facades\Route;
@@ -310,6 +311,7 @@ API ROUTES (temporary only)
 */
 Route::post('file-import', [FileImportController::class, 'store'])->name('file.import');
 Route::get('/resources/{filekey}/download', [ResourceController::class, 'download'])->name('resources.download');
+Route::get('/manuscripts/{id}/stream', [PdfViewerController::class, 'streamPdf'])->name('manuscripts.stream');
 
 
 require __DIR__.'/settings.php';
