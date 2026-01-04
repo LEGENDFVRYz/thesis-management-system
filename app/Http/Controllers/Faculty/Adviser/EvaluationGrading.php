@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Faculty\Adviser;
 
 use App\Http\Controllers\Controller;
 use App\Models\DefenseEvaluation;
+use App\Models\FacultyRole;
 use App\Models\RubricScore;
+use App\Models\Semester;
+use Database\Seeders\FacultyRoleSeeder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -383,24 +386,27 @@ class EvaluationGrading extends Controller
      */
     public function store(Request $request)
     {
-        // 1. Validate Input
+        // Validate Input
         $request->validate([
             'defense_id' => 'required|exists:tbl_defense_matrices,id',
             'grade'      => 'required|numeric|min:0|max:100',
             'remarks'    => 'required|string',
             'comment'    => 'nullable|string',
-            'ratings'    => 'required|array', // Expects { rubric_id: rating }
+            'ratings'    => 'required|array',
         ]);
 
         $userId = Auth::id();
+        $adviserRoleId = FacultyRole::where('role_name', 'Adviser')->value('id');
+        $activeSemester = Semester::where('is_active', true)->first();
+        $syId = $activeSemester ? $activeSemester->school_year_id : null;
 
-        // 2. Determine the correct Evaluator ID (Assignment ID)
+        // Determine the correct Evaluator ID (Assignment ID)
         // We need to find the faculty_assignment ID for the logged-in user corresponding to their panel role
-        // Or simply find any active assignment for this user (Simplified for now)
         $evaluatorAssignment = DB::table('tbl_faculty_assignments')
             ->join('tbl_faculties', 'tbl_faculty_assignments.faculty_id', '=', 'tbl_faculties.id')
             ->where('tbl_faculties.user_id', $userId)
-            // Ideally add filters for active SY and Role here
+            ->where('tbl_faculty_assignments.role_id', $adviserRoleId)
+            ->where('tbl_faculty_assignments.sy_id', $syId)            
             ->select('tbl_faculty_assignments.id')
             ->first();
 
@@ -410,7 +416,7 @@ class EvaluationGrading extends Controller
 
         DB::transaction(function () use ($request, $evaluatorAssignment) {
             
-            // 3. Create/Update the Main Evaluation Header
+            // Create/Update the Main Evaluation Header
             // Use updateOrCreate to prevent duplicate submissions from the same person for the same defense
             $evaluation = DefenseEvaluation::updateOrCreate(
                 [
@@ -425,7 +431,7 @@ class EvaluationGrading extends Controller
                 ]
             );
 
-            // 4. Save Rubric Scores
+            // Save Rubric Scores
             // First, remove old scores if they are re-submitting (clean slate)
             RubricScore::where('evaluation_id', $evaluation->id)->delete();
 
@@ -445,7 +451,7 @@ class EvaluationGrading extends Controller
             }
         });
 
-        // 5. Redirect back to the main table or show success
+        // Redirect back to the main table or show success
         return redirect()->route('faculty.management.adviser.eval_n_grading')
             ->with('success', 'Evaluation submitted successfully.');
     }
