@@ -10,6 +10,7 @@ use App\Models\FacultyAssignment;
 use App\Models\FacultyRole;
 use App\Models\SchoolYear;
 use App\Models\Semester;
+use App\Models\User;
 
 class SectionAdviserSeeder extends Seeder
 {
@@ -18,57 +19,128 @@ class SectionAdviserSeeder extends Seeder
      */
     public function run()
     {
-        // 1. Fetch the Adviser Role ID
+
         $adviserRole = FacultyRole::where('role_name', 'Adviser')->first();
+        $committeeRole = FacultyRole::where('role_name', 'Committee')->first();
+        if (!$adviserRole) return;
 
-        if (!$adviserRole) {
-            $this->command->error("Adviser role not found. Seed roles first.");
-            return;
-        }
-
-        // 2. Fetch ALL School Years (Both Active 2025 and Past 2024)
         $schoolYears = SchoolYear::all(); 
-
-        // 3. Define your Sections
         $sections = [1, 2, 3, 4, 5, 6, 7];
 
-        // 4. OUTER LOOP: Iterate through each School Year (Batch)
+        // 1. Find our specific "Adviser User" (Ensures Section 1 is always him)
+        $testAdviserUser = User::where('email', 'adviser@example.com')->first();
+        $testAdviserFaculty = $testAdviserUser ? Faculty::where('user_id', $testAdviserUser->id)->first() : null;
+
         foreach ($schoolYears as $sy) {
-            
-            $this->command->info("Seeding Section Advisers for School Year: {$sy->year}");
+            $this->command->info("Seeding Section Advisers for SY: {$sy->year}");
 
-            // A. Find existing Faculty Assignments for this specific SY and Role
-            $availableAssignments = FacultyAssignment::where('role_id', $adviserRole->id)
-                ->where('sy_id', $sy->id)
-                ->get();
-
-            // INNER LOOP: Iterate through Sections
-            foreach ($sections as $index => $section) {
+            foreach ($sections as $section) {
                 
-                // B. Get an adviser for this specific batch
-                // If we don't have enough existing assignments, CREATE one on the fly.
-                if ($index < $availableAssignments->count()) {
-                    $assignmentId = $availableAssignments[$index]->id;
-                } else {
-                    // Fallback: Create a new Faculty Assignment specifically for this SY
-                    // This ensures we never have a "null" adviser for a section
-                    $newAssignment = FacultyAssignment::factory()->create([
-                        'role_id'   => $adviserRole->id,
-                        'sy_id'     => $sy->id,
-                        'faculty_id'=> Faculty::inRandomOrder()->first()->id ?? Faculty::factory(),
-                        'is_active' => true,
-                    ]);
-                    $assignmentId = $newAssignment->id;
+                // --- SAFETY CHECK: Prevent Duplicates ---
+                // If this section already has an adviser for this specific year, SKIP IT.
+                $exists = SectionAdviser::where('section', $section)
+                    ->whereHas('assignment', fn($q) => $q->where('sy_id', $sy->id))
+                    ->exists();
+
+                if ($exists) {
+                    continue; 
                 }
 
-                // C. Create the Section Adviser Record
-                // This creates: { id: ..., section: 1, faculty_assign_id: [Linked to SY 2025] }
-                // AND later:    { id: ..., section: 1, faculty_assign_id: [Linked to SY 2024] }
+                // --- LOGIC: Choose the Faculty ---
+                if ($section === 1 && $testAdviserFaculty) {
+                    // Section 1: Always the Test Adviser
+                    $chosenFacultyId = $testAdviserFaculty->id;
+                } else {
+                    // Sections 2-7: Pick random faculty NOT already an adviser for this SY
+                    // This distributes the load so one person isn't advising everyone
+                    $existingAdviserIds = FacultyAssignment::where('role_id', $adviserRole->id)
+                        ->where('sy_id', $sy->id)
+                        ->pluck('faculty_id');
+
+                    $randomFaculty = Faculty::whereNotIn('id', $existingAdviserIds)
+                        ->inRandomOrder()
+                        ->first();
+                    
+                    // Fallback: If we ran out of unique faculties, reuse one or create new
+                    $chosenFacultyId = $randomFaculty 
+                        ? $randomFaculty->id 
+                        : (Faculty::inRandomOrder()->value('id') ?? Faculty::factory()->create()->id);
+                }
+
+                // --- LOGIC: Assign Roles (Adviser + Committee) ---
+                
+                // 1. Assign Adviser Role
+                $adviserAssignment = FacultyAssignment::firstOrCreate([
+                    'faculty_id' => $chosenFacultyId,
+                    'role_id'    => $adviserRole->id,
+                    'sy_id'      => $sy->id,
+                ], ['is_active' => true]);
+
+                // 2. Assign Committee Role (Because you requested Adviser = Committee)
+                if ($committeeRole) {
+                    FacultyAssignment::firstOrCreate([
+                        'faculty_id' => $chosenFacultyId,
+                        'role_id'    => $committeeRole->id,
+                        'sy_id'      => $sy->id,
+                    ], ['is_active' => true]);
+                }
+
+                // --- CREATE: The Section Adviser Record ---
                 SectionAdviser::create([
-                    'section'           => $section,
-                    'faculty_assign_id' => $assignmentId,
+                    'section' => $section,
+                    'faculty_assign_id' => $adviserAssignment->id
                 ]);
             }
         }
+
+
+        // $adviserRole = \App\Models\FacultyRole::where('role_name', 'Adviser')->first();
+        // if (!$adviserRole) return;
+
+        // $schoolYears = \App\Models\SchoolYear::all(); 
+        // $sections = [1, 2, 3, 4, 5, 6, 7];
+
+        // foreach ($schoolYears as $sy) {
+        //     $this->command->info("Seeding Sections for SY: {$sy->year}");
+
+        //     foreach ($sections as $section) {
+                
+        //         // 1. Check if Section Adviser already exists (Safety Check)
+        //         $exists = \App\Models\SectionAdviser::where('section', $section)
+        //             ->whereHas('assignment', fn($q) => $q->where('sy_id', $sy->id))
+        //             ->exists();
+
+        //         if ($exists) continue;
+
+        //         // 2. Find or Create a Faculty Assignment (Preventing Duplicates)
+        //         // Try to find an existing random adviser for this SY
+        //         $assignment = \App\Models\FacultyAssignment::where('role_id', $adviserRole->id)
+        //             ->where('sy_id', $sy->id)
+        //             ->inRandomOrder()
+        //             ->first();
+
+        //         // If none exists, create one using firstOrCreate to avoid duplicates
+        //         if (!$assignment) {
+        //             // Pick a random faculty
+        //             $randomFacultyId = \App\Models\Faculty::inRandomOrder()->value('id') 
+        //                 ?? \App\Models\Faculty::factory()->create()->id;
+
+        //             $assignment = \App\Models\FacultyAssignment::firstOrCreate(
+        //                 [
+        //                     'faculty_id' => $randomFacultyId,
+        //                     'role_id'    => $adviserRole->id,
+        //                     'sy_id'      => $sy->id,
+        //                 ],
+        //                 ['is_active' => true]
+        //             );
+        //         }
+
+        //         // 3. Create the Section Adviser
+        //         \App\Models\SectionAdviser::create([
+        //             'section' => $section,
+        //             'faculty_assign_id' => $assignment->id,
+        //         ]);
+        //     }
+        // }
     }
 }

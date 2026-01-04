@@ -25,15 +25,15 @@ class DatabaseSeeder extends Seeder
             
             UserSeeder::class,
             FacultySeeder::class,
+            SectionAdviserSeeder::class,
+            ThesisGroupSeeder::class,
             AvailabilitySeeder::class,
-
-            // rading criteria seeder
+            
+            // Grading criteria seeder
             GradingCriteriasSeeder::class,
             GradingRubricsSeeder::class,
             RubricLevelsSeeder::class,
             
-            SectionAdviserSeeder::class,
-            ThesisGroupSeeder::class,
             ProposalSeeder::class,
             ProposalEvaluationSeeder::class,
             ThesesSeeder::class,
