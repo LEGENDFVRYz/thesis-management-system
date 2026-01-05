@@ -133,6 +133,7 @@ class ProfileController extends Controller
             'middle_name' => ['nullable', 'string', 'max:100'],
             'suffix'      => ['nullable', 'string', 'max:20'],
             'email'       => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'current_password' => ['required', 'current_password'],
         ]);
     
         DB::transaction(function () use ($validated, $user) {
@@ -172,10 +173,7 @@ class ProfileController extends Controller
                 ->update([
                     'name' => $fullName,
                     'email' => $validated['email'],
-                    'email_verified_at' =>
-                        $validated['email'] !== $user->email
-                            ? null
-                            : $user->email_verified_at,
+                    'email_verified_at' => $validated['email'] !== $user->email ? null : $user->email_verified_at,
                     'updated_at' => now(),
                 ]);
         });

@@ -148,6 +148,23 @@ export default function Profile() {
                                     </div>
                                 )}
 
+                                {/* Current Password for Verification */}
+                                <div className="grid gap-2 border-t pt-6 mt-6">
+                                    <Label htmlFor="current_password">Confirm Password</Label>
+                                    <p className="text-xs text-muted-foreground">
+                                        Please enter your current password to confirm these changes.
+                                    </p>
+                                    <Input
+                                        id="current_password"
+                                        name="current_password"
+                                        type="password"
+                                        required
+                                        autoComplete="current-password"
+                                        placeholder="Enter current password"
+                                    />
+                                    <InputError message={errors.current_password} />
+                                </div>
+
                                 {/* Actions */}
                                 <div className="flex items-center gap-4">
                                     <Button disabled={processing} data-test="update-profile-button">
