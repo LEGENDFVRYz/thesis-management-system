@@ -42,12 +42,12 @@ function DefenseDetailsModal({ open, onOpenChange, data }: { open: boolean, onOp
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             {/* Modal Container: Optimized for 900x605 layout per Figma specs */}
-            <DialogContent className="w-[900px] h-[605px] max-w-none bg-background rounded-[10px] border-[0.8px] border-border shadow-lg p-0 font-dm overflow-hidden">
+            <DialogContent className="gap-0 w-[900px] h-[605px] max-w-none bg-background rounded-[10px] border-[0.8px] border-border shadow-lg p-0 font-dm overflow-hidden">
                 
                 {/* Header Section: Sticky top with border-bottom divider */}
                 <div className="px-6 py-[17px] border-b border-border flex items-start justify-between bg-background z-20">
-                    <DialogHeader className="gap-2 text-left">
-                        <DialogTitle className="text-alert-default text-xl">
+                    <DialogHeader className="gap-1 text-left">
+                        <DialogTitle className="text-alert-default text-xl text-left">
                             Defense Details
                         </DialogTitle>
                         <DialogDescription className="text-[15px] font-medium text-alert-desc">
@@ -81,21 +81,21 @@ function DefenseDetailsModal({ open, onOpenChange, data }: { open: boolean, onOp
                         </span>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-3 gap-6">
                         <div className="flex flex-col gap-1">
                             <span className="text-base font-bold text-primary">Date</span>
                             <div className="flex items-center gap-2 text-foreground">
                                 <Icon name="calendarDefault" size={16} />
-                                <span className="text-base font-medium">{data.defense_date || "11/25/2025"}</span>
+                                <span className="text-sm font-medium">{data.defense_date || "11/25/2025"}</span>
                             </div>
                         </div>
                         <div className="flex flex-col gap-1">
                             <span className="text-base font-bold text-primary">Time</span>
-                            <span className="text-base font-medium text-foreground">{data.defense_time || "09:00 AM"}</span>
+                            <span className="text-sm font-medium text-foreground">{data.defense_time || "09:00 AM"}</span>
                         </div>
                         <div className="flex flex-col gap-1">
                             <span className="text-base font-bold text-primary">Venue</span>
-                            <span className="text-base font-medium text-foreground">{data.venue || "Room 313, CEA"}</span>
+                            <span className="text-sm font-medium text-foreground">{data.venue || "Room 313, CEA"}</span>
                         </div>
                     </div>
 
@@ -166,74 +166,79 @@ export default function DefenseTable({ defenses }: { defenses: any[] }) {
                         subtitle="Monitor all defense schedules and panel assignments"
                         icon={<Icon name="calendarDefault" className="w-8 h-8 text-primary" />}
                         variant="header"
-                        className="w-screen relative left-[50%] right-[50%] -ml-[50vw] -mr-[50vw]"
                     >
 
-                    <div className="space-y-6 font-dm pb-10">
-                        {/* Global Search & Search Filters */}
-                        <FilterSearchSection variant="DefenseManagement" />
+                    <div className="space-y-6 font-dm pb-10 flex flex-col items-center w-full">
+                    
+                        {/* 1. Filter Section: Ensure it's centered */}
+                        <div className="w-full flex justify-center">
+                            <FilterSearchSection variant="DefenseManagement" />
+                        </div>
 
-                        {/* View Controls: Toggle pill-style UI */}
-                        <div className="flex flex-row justify-between items-center gap-4 w-full">
-                            
-                            {/* Status Filter Toggle Group */}
-                            <ToggleGroup 
-                                type="single" 
-                                value={statusFilter} 
-                                onValueChange={(val) => val && setStatusFilter(val)} 
-                                className="bg-breadcrumb p-1 rounded-full border border-primary/10"
-                            >
-                                {["upcoming", "completed"].map((status) => (
+                        {/* View Controls: Wrap in a matching width container */}
+                        <div className="w-full max-w-[1360px] mx-auto px-1"> 
+                            <div className="flex flex-row justify-between items-center gap-4 w-full">
+                                
+                                {/* Status Filter Toggle Group */}
+                                <ToggleGroup 
+                                    type="single" 
+                                    value={statusFilter} 
+                                    onValueChange={(val) => val && setStatusFilter(val)} 
+                                    className="bg-breadcrumb p-1 rounded-full border border-primary/10"
+                                >
+                                    {["upcoming", "completed"].map((status) => (
+                                        <ToggleGroupItem 
+                                            key={status}
+                                            value={status} 
+                                            className={cn(
+                                                "h-10 px-6 rounded-full transition-all font-bold text-xs uppercase whitespace-nowrap", 
+                                                statusFilter === status ? "bg-primary text-white shadow-md" : "text-primary hover:bg-white/50"
+                                            )}
+                                        >
+                                            {status} Defenses
+                                        </ToggleGroupItem>
+                                    ))}
+                                </ToggleGroup>
+
+                                {/* Switcher: Table View vs Calendar View */}
+                                <ToggleGroup 
+                                    type="single" 
+                                    value={view} 
+                                    onValueChange={(val) => val && setView(val)} 
+                                    className="bg-breadcrumb p-1 rounded-full border border-primary/10"
+                                >
                                     <ToggleGroupItem 
-                                        key={status}
-                                        value={status} 
+                                        value="table" 
                                         className={cn(
-                                            "h-10 px-6 rounded-full transition-all font-bold text-xs uppercase", 
-                                            statusFilter === status ? "bg-primary text-white shadow-md" : "text-primary hover:bg-white/50"
+                                            "gap-2 h-10 px-6 rounded-full text-xs font-bold uppercase transition-all", 
+                                            view === 'table' ? "bg-primary text-white shadow-md" : "text-primary hover:bg-white/50"
                                         )}
                                     >
-                                        {status} Defenses
+                                        <TableIcon className="w-4 h-4" /> Table
                                     </ToggleGroupItem>
-                                ))}
-                            </ToggleGroup>
-
-                            {/* Switcher: Table View vs Calendar View */}
-                            <ToggleGroup 
-                                type="single" 
-                                value={view} 
-                                onValueChange={(val) => val && setView(val)} 
-                                className="bg-breadcrumb p-1 rounded-full border border-primary/10"
-                            >
-                                <ToggleGroupItem 
-                                    value="table" 
-                                    className={cn(
-                                        "gap-2 h-10 px-6 rounded-full text-xs font-bold uppercase transition-all", 
-                                        view === 'table' ? "bg-primary text-white shadow-md" : "text-primary hover:bg-white/50"
-                                    )}
-                                >
-                                    <TableIcon className="w-4 h-4" /> Table
-                                </ToggleGroupItem>
-                                <ToggleGroupItem 
-                                    value="calendar" 
-                                    className={cn(
-                                        "gap-2 h-10 px-6 rounded-full text-xs font-bold uppercase transition-all", 
-                                        view === 'calendar' ? "bg-primary text-white shadow-md" : "text-primary hover:bg-white/50"
-                                    )}
-                                >
-                                    <Calendar className="w-4 h-4" /> Calendar
-                                </ToggleGroupItem>
-                            </ToggleGroup>
+                                    <ToggleGroupItem 
+                                        value="calendar" 
+                                        className={cn(
+                                            "gap-2 h-10 px-6 rounded-full text-xs font-bold uppercase transition-all", 
+                                            view === 'calendar' ? "bg-primary text-white shadow-md" : "text-primary hover:bg-white/50"
+                                        )}
+                                    >
+                                        <Calendar className="w-4 h-4" /> Calendar
+                                    </ToggleGroupItem>
+                                </ToggleGroup>
+                            </div>
                         </div>
 
                         {/* Data Visualization Area */}
-                        <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+                        <div className="w-full max-w-[1360px] mx-auto rounded-xl border border-border bg-card shadow-sm overflow-hidden">
                             {view === 'table' ? (
+                                <div className="relative h-[550px] overflow-y-auto custom-scrollbar">
                                 <Table>
                                     <TableCaption className="pb-4 font-dm text-alert-desc">End of defense records.</TableCaption>
-                                    <TableHeader className="bg-primary">
-                                        <TableRow className="hover:bg-transparent border-none">
+                                    <TableHeader className="bg-primary sticky top-0 z-20 shadow-sm">
+                                        <TableRow className="hover:bg-transparent border-none sticky top-0 z-20 shadow-sm">
                                             {["ID", "Title", "Proponents", "Adviser", "Block", "Date & Time", "Type", "Action"].map((head) => (
-                                                <TableHead key={head} className="text-primary-foreground text-center text-[13px] font-bold">
+                                                <TableHead key={head} className="text-primary-foreground text-center text-[13px] font-bold sticky top-0 z-20 shadow-sm">
                                                     {head}
                                                 </TableHead>
                                             ))}
@@ -255,7 +260,7 @@ export default function DefenseTable({ defenses }: { defenses: any[] }) {
                                                             <span>{def.proponents_count || '0'}</span>
                                                         </div>
                                                     </TableCell>
-                                                    <TableCell className="px-6 text-alert-desc text-left">
+                                                    <TableCell className="px-6 text-alert-desc text-center">
                                                         {def.adviser || 'Dr. Cherry D. Casuat'}
                                                     </TableCell>
                                                     <TableCell className="text-center text-alert-desc">
@@ -290,7 +295,7 @@ export default function DefenseTable({ defenses }: { defenses: any[] }) {
                                             </TableRow>
                                         )}
                                     </TableBody>
-                                </Table>
+                                </Table> </div>
                             ) : (
                                 <CardContent className='w-full px-0'>
                                     <DefenseCalendar events={filteredData} value={new Date()} />
