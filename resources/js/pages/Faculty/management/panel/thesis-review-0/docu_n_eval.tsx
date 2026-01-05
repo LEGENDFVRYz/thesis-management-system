@@ -8,12 +8,54 @@ import { Calendar, Users } from 'lucide-react';
 import * as React from 'react';
 import { useState } from 'react';
 import { Tabs } from './doc_n_eval_tabs';
+import { ConfirmDialog } from './modals-components';
 import { RubricTable } from './rubric-table';
+import { SuccessDialog } from './success-dialog';
 
 const CompletedBadge = badgesRegistry.scheduledBadgesCompleted;
 const BackIcon = iconRegistry.backDefault;
 
 export default function Dashboard() {
+    const [isSaveDraftOpen, setIsSaveDraftOpen] = useState(false);
+    const [isAddCommentOpen, setIsAddCommentOpen] = useState(false);
+    const [isSubmitCommentOpen, setIsSubmitCommentOpen] = useState(false);
+    const [isSubmitGradesOpen, setIsSubmitGradesOpen] = useState(false);
+
+    const [isSuccessOpen, setIsSuccessOpen] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
+
+    const handleSubmit = () => {
+        console.log('Grades submitted');
+
+        setIsSubmitGradesOpen(false);
+        setSuccessMessage('Grades submitted successfully.');
+        setIsSuccessOpen(true);
+    };
+
+    const handleSaveDraft = () => {
+        // save as draft logic
+        console.log('Draft saved');
+
+        setIsSaveDraftOpen(false);
+        setSuccessMessage('Draft saved successfully.');
+        setIsSuccessOpen(true);
+    };
+
+    const handleAddComment = () => {
+        // add comment logic
+        console.log('Comment saved');
+        setIsAddCommentOpen(false);
+        setSuccessMessage('Comment submitted successfully.');
+        setIsSuccessOpen(true);
+    };
+    const handleSubmitComment = () => {
+        console.log('Comment submitted');
+
+        setIsSubmitCommentOpen(false);
+        setSuccessMessage('Comment submitted successfully.');
+        setIsSuccessOpen(true);
+    };
+
     const [activeTab, setActiveTab] = useState('Documentation');
 
     const [selectedDoc, setSelectedDoc] = useState({
@@ -229,7 +271,7 @@ export default function Dashboard() {
                             </div>
 
                             <div className="text-right">
-                                <p className="mb-1 text-sm text-primary">
+                                <p className="mr-23 mb-1 text-sm text-primary">
                                     Defense ID
                                 </p>
                                 <div className="flex items-center justify-end gap-3">
@@ -388,9 +430,22 @@ export default function Dashboard() {
                                             rows={2}
                                         />
                                     </div>
-                                    <Button variant="secondary">
+                                    <Button
+                                        variant="secondary"
+                                        onClick={() =>
+                                            setIsAddCommentOpen(true)
+                                        }
+                                    >
                                         Add Comment
                                     </Button>
+                                    <ConfirmDialog
+                                        open={isAddCommentOpen}
+                                        onOpenChange={setIsAddCommentOpen}
+                                        title="Are you sure you want to submit?"
+                                        description="This action cannot be undone."
+                                        confirmLabel="Confirm"
+                                        onConfirm={handleAddComment}
+                                    />
                                 </div>
                             </div>
 
@@ -406,9 +461,22 @@ export default function Dashboard() {
                                     />
                                 </div>
                                 <div className="mt-4 flex justify-end">
-                                    <Button variant="primary">
+                                    <Button
+                                        variant="primary"
+                                        onClick={() =>
+                                            setIsSubmitCommentOpen(true)
+                                        }
+                                    >
                                         Submit Comment
                                     </Button>
+                                    <ConfirmDialog
+                                        open={isSubmitCommentOpen}
+                                        onOpenChange={setIsSubmitCommentOpen}
+                                        title="Are you sure you want to submit?"
+                                        description="This action cannot be undone."
+                                        confirmLabel="Confirm"
+                                        onConfirm={handleSubmitComment}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -439,7 +507,7 @@ export default function Dashboard() {
                             </div>
 
                             <div className="text-right">
-                                <p className="mb-1 text-sm text-primary">
+                                <p className="mr-23 mb-1 text-sm text-primary">
                                     Defense ID
                                 </p>
                                 <div className="flex items-center justify-end gap-3">
@@ -633,8 +701,34 @@ export default function Dashboard() {
                             />
                         </div>
                         <div className="mt-4 flex justify-end gap-4">
-                            <Button variant="primary">Save as Draft</Button>
-                            <Button variant="primary">Submit Grades</Button>
+                            <Button
+                                variant="primary"
+                                onClick={() => setIsSaveDraftOpen(true)}
+                            >
+                                Save as Draft
+                            </Button>
+                            <ConfirmDialog
+                                open={isSaveDraftOpen}
+                                onOpenChange={setIsSaveDraftOpen}
+                                title="Are you sure you want to save changes?"
+                                description="This action cannot be undone."
+                                confirmLabel="Confirm"
+                                onConfirm={handleSaveDraft}
+                            />
+                            <Button
+                                variant="primary"
+                                onClick={() => setIsSubmitGradesOpen(true)}
+                            >
+                                Submit Grades
+                            </Button>
+                            <ConfirmDialog
+                                open={isSubmitGradesOpen}
+                                onOpenChange={setIsSubmitGradesOpen}
+                                title="Are you sure you want to submit?"
+                                description="This action cannot be undone."
+                                confirmLabel="Confirm"
+                                onConfirm={handleSubmit}
+                            />
                         </div>
                     </div>
                 </div>
@@ -658,6 +752,11 @@ export default function Dashboard() {
             </div>
 
             <div>{tabContent[activeTab]}</div>
+            <SuccessDialog
+                open={isSuccessOpen}
+                onOpenChange={setIsSuccessOpen}
+                message={successMessage}
+            />
         </FacultyManagementLayout>
     );
 }
