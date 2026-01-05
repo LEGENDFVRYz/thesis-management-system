@@ -96,7 +96,7 @@ const studentManagementItems = [
 
 interface AppHeaderProps {
     breadcrumbs?: any[];
-    variant?: 'admin' | 'faculty' | 'coordinator' | 'committee' | 'student';
+    variant?: 'admin' | 'faculty' | 'coordinator' | 'committee' | 'student' | 'guest';
 }
 
 export function AppHeader({ breadcrumbs = [], variant }: AppHeaderProps) {
@@ -203,65 +203,88 @@ export function AppHeader({ breadcrumbs = [], variant }: AppHeaderProps) {
                                 <SharedLinks />
                             </>
                         )}
+
+                        {activeRole === 'guest' && (
+                            <>
+                                <Button variant="primary" asChild className="mx-1 border-none shadow-none">
+                                    <Link href="/" className='hover:text-primary-foreground-2'>Home</Link>
+                                </Button>
+                                <Button variant="primary" asChild className="mx-1 border-none shadow-none">
+                                    <Link href="/guest/repository" className='hover:text-primary-foreground-2'>Repository</Link>
+                                </Button>
+                            </>
+                        )}
                     </nav>
 
                     {/* RIGHT: Action Icons */}
                     <div className="flex items-center gap-4 text-white">
-                        
-                        {/* Profile Icon */}
-                        <Link 
-                            href="/profile" // To change pa
-                            className="cursor-pointer transition-transform hover:scale-110"
-                            onMouseEnter={() => setHoveredIcon('profile')}
-                            onMouseLeave={() => {
-                                setHoveredIcon(null);
-                                setClickedIcon(null);
-                            }}
-                            onMouseDown={() => setClickedIcon('profile')}
-                            onMouseUp={() => setClickedIcon(null)}
-                        >
-                            <Icon name={getIconName('profile')} size={24} />
-                        </Link>
-                        
-                        {/* Notifications Icon */}
-                        <Link 
-                            href="/notifications" // To change pa
-                            className="cursor-pointer transition-transform hover:scale-110"
-                            onMouseEnter={() => setHoveredIcon('notification')}
-                            onMouseLeave={() => {
-                                setHoveredIcon(null);
-                                setClickedIcon(null);
-                            }}
-                            onMouseDown={() => setClickedIcon('notification')}
-                            onMouseUp={() => setClickedIcon(null)}
-                        >
-                            <Icon name={getIconName('notification')} size={24} />
-                        </Link>
-                        
-                        {/* FAQ Icon */}
-                        <Link 
-                            href="/faq" // To change pa
-                            className="cursor-pointer transition-transform hover:scale-110"
-                            onMouseEnter={() => setHoveredIcon('faq')}
-                            onMouseLeave={() => {
-                                setHoveredIcon(null);
-                                setClickedIcon(null);
-                            }}
-                            onMouseDown={() => setClickedIcon('faq')}
-                            onMouseUp={() => setClickedIcon(null)}
-                        >
-                            <Icon name={getIconName('faq')} size={24} />
-                        </Link>
 
-                        {/* Avatar Dropdown */}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <button className="size-9 bg-primary-foreground-2 rounded-full border-2 border-white/10 hover:border-white/30 transition-all cursor-pointer outline-white" />
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <UserMenuContent user={auth.user} />
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        {/* Profile Icon */}
+                        {activeRole === 'guest' ? (
+                            <a
+                                href="/login"
+                                className="cursor-pointer transition-transform hover:scale-110 block group"
+                            >
+                                <div className="group-hover:hidden">
+                                    <Icon name="profileDefault" size={24} />
+                                </div>
+                                <div className="hidden group-hover:block">
+                                    <Icon name="profileHover" size={24} />
+                                </div>
+                            </a>
+                        ) : (
+                            <a
+                                href="/profile"
+                                className="cursor-pointer transition-transform hover:scale-110 block group"
+                            >
+                                <div className="group-hover:hidden">
+                                    <Icon name="profileDefault" size={24} />
+                                </div>
+                                <div className="hidden group-hover:block">
+                                    <Icon name="profileHover" size={24} />
+                                </div>
+                            </a>
+                        )}
+
+                        {/* Notifications Icon - Hidden for guest variant */}
+                        {activeRole !== 'guest' && (
+                            <a
+                                href="/notification"
+                                className="cursor-pointer transition-transform hover:scale-110 block group"
+                            >
+                                <div className="group-hover:hidden">
+                                    <Icon name="notificationDefault" size={24} />
+                                </div>
+                                <div className="hidden group-hover:block">
+                                    <Icon name="notificationHover" size={24} />
+                                </div>
+                            </a>
+                        )}
+
+                        {/* FAQ Icon */}
+                        <a
+                            href="/faq"
+                            className="cursor-pointer transition-transform hover:scale-110 block group"
+                        >
+                            <div className="group-hover:hidden">
+                                <Icon name="faqDefault" size={24} />
+                            </div>
+                            <div className="hidden group-hover:block">
+                                <Icon name="faqHover" size={24} />
+                            </div>
+                        </a>
+
+                        {/* Avatar Dropdown - Hidden for guest variant */}
+                        {activeRole !== 'guest' && (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button className="size-9 bg-primary-foreground-2 rounded-full border-2 border-white/10 hover:border-white/30 transition-all cursor-pointer outline-white" />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <UserMenuContent user={auth.user} />
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        )}
                     </div>
                 </div>
             </div>

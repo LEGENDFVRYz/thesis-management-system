@@ -16,7 +16,8 @@ export default function QuickLinks() {
             }}
         >
             <div className="grid grid-cols-2 gap-6">
-                <button
+                <Link
+                    href="/login"
                     className="flex flex-col items-center gap-3 transition-all"
                     onMouseEnter={() => setHoveredItem('login')}
                     onMouseLeave={() => setHoveredItem(null)}
@@ -26,7 +27,7 @@ export default function QuickLinks() {
                         size={127}
                     />
                     <span className="text-primary font-bold font-['DM_Sans']">Login</span>
-                </button>
+                </Link>
                 <Link
                     href="/guest/repository"
                     className="flex flex-col items-center gap-3 transition-all"

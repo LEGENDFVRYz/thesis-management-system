@@ -62,10 +62,6 @@ Route::get('/faq', function () {
 
 // GUEST ROUTES
 Route::prefix('guest')->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('Guest/landing');
-    })->name('guest.landing');
-
     Route::get('/repository', function () {
         return Inertia::render('Guest/repository');
     })->name('guest.repository');
