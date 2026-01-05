@@ -6,7 +6,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
-import { logout } from '@/routes/student';                  // temporary, since we dont have mobile yet
+import { logout } from '@/routes/faculty';                  // temporary, since we dont have mobile yet
 import { edit } from '@/routes/profile';
 import { dashboard as fcltyDashboard } from '@/routes/faculty';
 import { dashboard as adminDashboard } from '@/routes/admin';

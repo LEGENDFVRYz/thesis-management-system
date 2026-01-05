@@ -158,13 +158,17 @@ export default function DefenseTable({ defenses }: { defenses: any[] }) {
     return (
         <>
             <Head title="Defense Management" />
+            
             <AppLayout breadcrumbs={[{ title: 'Management', href: '/admin/management' }, { title: 'Defense', href: defensesRoute().url }]}>
-                <AppContent
-                    title="Defense Management"
-                    subtitle="Monitor all defense schedules and panel assignments"
-                    icon={<Icon name="calendarDefault" className="w-8 h-8 text-primary" />}
-                    variant="header"
-                >
+                    
+                    <AppContent
+                        title="Defense Management"
+                        subtitle="Monitor all defense schedules and panel assignments"
+                        icon={<Icon name="calendarDefault" className="w-8 h-8 text-primary" />}
+                        variant="header"
+                        className="w-screen relative left-[50%] right-[50%] -ml-[50vw] -mr-[50vw]"
+                    >
+
                     <div className="space-y-6 font-dm pb-10">
                         {/* Global Search & Search Filters */}
                         <FilterSearchSection variant="DefenseManagement" />

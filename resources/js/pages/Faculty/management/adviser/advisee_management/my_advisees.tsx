@@ -1,4 +1,4 @@
-import { SearchBar } from '@/components/filter-search';
+import { SearchBar, Sort2 } from '@/components/filter-search';
 import { Icon } from '@/components/icon-index';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,7 @@ import { Head } from '@inertiajs/react';
 import { Filter, Users } from 'lucide-react';
 import { useState } from 'react';
 import AdviseeManagementLayout from '.';
+import { BlockAndTagsFilter } from './advisee-filter-search';
 
 const breadcrumb: BreadcrumbItem[] = [
     {
@@ -27,24 +28,34 @@ const breadcrumb: BreadcrumbItem[] = [
 
 
 
-interface MyAdviseesProps {
-    advisees: Advisee[];
-}
 interface Advisee {
     student_id: string;
     student_name: string;
     pup_webmail: string;
     group_code: string;
     block: string;
+    thesis_stage: string; // ADDED: thesis stage field
 }
-// Sample data - 1 student duplicated 20 times
-const sampleAdvisees: Advisee[] = Array(20).fill({
-    student_id: '2022-12345-MN-0',
-    student_name: 'Rona Dela Cruz',
-    pup_webmail: 'ronadelacruz@iskolarngbayan.pup.edu.ph',
-    group_code: '3301',
-    block: 'BSCPE 3-3',
-});
+
+interface MyAdviseesProps {
+    advisees: Advisee[];
+}
+
+// Sample data - with thesis_stage added
+const sampleAdvisees: Advisee[] = Array(20)
+    .fill(null)
+    .map((_, index) => ({
+        student_id: '2022-12345-MN-0',
+        student_name: 'Rona Dela Cruz',
+        pup_webmail: 'ronadelacruz@iskolarngbayan.pup.edu.ph',
+        group_code: '3301',
+        block: 'BSCPE 3-3',
+        thesis_stage: [
+            'Title Proposal',
+            'Manuscript Submission',
+            'DP1 Manuscript Revision',
+        ][index % 3],
+    }));
 
 export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
     const displayAdvisees = advisees.length > 0 ? advisees : sampleAdvisees;
@@ -52,11 +63,17 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
     const [selectedAdvisee, setSelectedAdvisee] = useState<Advisee | null>(
         null,
     );
+    const [isSortOpen, setIsSortOpen] = useState(false);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [selectedBlock, setSelectedBlock] = useState('');
 
-    // Filter advisees based on search query
-    const filteredAdvisees = displayAdvisees.filter(
-        (advisee) =>
+    // FIX: Start with empty array so all data shows initially
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+    // FIX: Corrected filter logic
+    const filteredAdvisees = displayAdvisees.filter((advisee) => {
+        const matchesSearch =
             advisee.student_name
                 .toLowerCase()
                 .includes(searchQuery.toLowerCase()) ||
@@ -65,12 +82,17 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                 .includes(searchQuery.toLowerCase()) ||
             advisee.pup_webmail
                 .toLowerCase()
-                .includes(searchQuery.toLowerCase()) ||
-            advisee.group_code
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase()) ||
-            advisee.block.toLowerCase().includes(searchQuery.toLowerCase()),
-    );
+                .includes(searchQuery.toLowerCase());
+
+        const matchesBlock = !selectedBlock || advisee.block === selectedBlock;
+
+        // FIX: Check thesis_stage instead of student_name
+        const matchesTags =
+            selectedTags.length === 0 ||
+            selectedTags.includes(advisee.thesis_stage);
+
+        return matchesSearch && matchesBlock && matchesTags;
+    });
 
     return (
         <AdviseeManagementLayout
@@ -109,6 +131,7 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                             variant="secondary"
                             size="icon"
                             className="rounded-lg border-none font-dm"
+                            onClick={() => setIsSortOpen(true)}
                         >
                             <Icon name="sortDefault" size={16} />
                         </Button>
@@ -118,6 +141,7 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                             variant="secondary"
                             size="icon"
                             className="rounded-lg border-none font-dm"
+                            onClick={() => setIsFilterOpen(true)}
                         >
                             <Filter className="h-4 w-4" />
                         </Button>
@@ -126,7 +150,11 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                         <Button
                             variant="negative"
                             className="h-9 min-w-[101px] gap-2 rounded-lg px-4 py-2 font-dm"
-                            onClick={() => setSearchQuery('')}
+                            onClick={() => {
+                                setSearchQuery('');
+                                setSelectedBlock('');
+                                setSelectedTags([]);
+                            }}
                         >
                             <span className="font-dm text-[13.33px] font-medium">
                                 Clear Filter
@@ -157,6 +185,9 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                                 Block
                             </TableHead>
                             <TableHead className="text-center text-primary-foreground">
+                                Thesis Stage
+                            </TableHead>
+                            <TableHead className="text-center text-primary-foreground">
                                 Action
                             </TableHead>
                         </TableRow>
@@ -181,6 +212,9 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                                         {advisee.block}
                                     </TableCell>
                                     <TableCell className="text-center">
+                                        {advisee.thesis_stage}
+                                    </TableCell>
+                                    <TableCell className="text-center">
                                         <Button
                                             variant="tertiary"
                                             size="sm"
@@ -197,7 +231,7 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                         ) : (
                             <TableRow>
                                 <TableCell
-                                    colSpan={6}
+                                    colSpan={7}
                                     className="h-64 text-center"
                                 >
                                     <div className="flex flex-col items-center justify-center text-alert-desc">
@@ -206,8 +240,10 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                                             No advisees found
                                         </p>
                                         <p className="text-sm">
-                                            {searchQuery
-                                                ? 'Try adjusting your search'
+                                            {searchQuery ||
+                                            selectedBlock ||
+                                            selectedTags.length > 0
+                                                ? 'Try adjusting your search or filters'
                                                 : 'Students will appear here once assigned'}
                                         </p>
                                     </div>
@@ -343,7 +379,7 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                                             Thesis Stage
                                         </p>
                                         <p className="font-medium">
-                                            Manuscript Submission
+                                            {selectedAdvisee?.thesis_stage}
                                         </p>
                                     </div>
 
@@ -378,6 +414,31 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                             </Button>
                         </div>
                     </div>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isSortOpen} onOpenChange={setIsSortOpen}>
+                <DialogContent className="p-0">
+                    <Sort2 />
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+                <DialogContent
+                    className="p-0 [&_[data-slot=dialog-overlay]]:bg-foreground/20 [&_[data-slot=dialog-overlay]]:backdrop-blur-sm"
+                    style={{ maxWidth: '350px' }}
+                >
+                    <BlockAndTagsFilter
+                        block={selectedBlock}
+                        onBlockChange={setSelectedBlock}
+                        tags={selectedTags}
+                        onTagsChange={setSelectedTags}
+                        onApply={() => setIsFilterOpen(false)}
+                        onReset={() => {
+                            setSelectedBlock('');
+                            setSelectedTags([]);
+                        }}
+                    />
                 </DialogContent>
             </Dialog>
         </AdviseeManagementLayout>
