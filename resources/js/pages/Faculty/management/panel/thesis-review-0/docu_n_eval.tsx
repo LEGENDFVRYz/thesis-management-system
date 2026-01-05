@@ -4,6 +4,9 @@ import { iconRegistry } from '@/components/icons-registry';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
+import { docu_n_eval } from '@/routes/faculty/management/panel/thesis_review_0';
+import { type BreadcrumbItem } from '@/types';
+import { Link } from '@inertiajs/react';
 import { Calendar, Users } from 'lucide-react';
 import * as React from 'react';
 import { useState } from 'react';
@@ -11,6 +14,13 @@ import { Tabs } from './doc_n_eval_tabs';
 import { ConfirmDialog } from './modals-components';
 import { RubricTable } from './rubric-table';
 import { SuccessDialog } from './success-dialog';
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Document Review and Evaluation',
+        href: docu_n_eval().url,
+    },
+];
 
 const CompletedBadge = badgesRegistry.scheduledBadgesCompleted;
 const BackIcon = iconRegistry.backDefault;
@@ -737,11 +747,18 @@ export default function Dashboard() {
     };
 
     return (
-        <FacultyManagementLayout title="" description="">
-            <div className="mb-6 flex items-center gap-2">
+        <FacultyManagementLayout
+            breadcrumbs={breadcrumbs}
+            title=""
+            description=""
+        >
+            <Link
+                href="/faculty/management/panel/thesis-review-0/thesis_review"
+                className="mb-6 flex items-center gap-2"
+            >
                 <BackIcon className="h-6 w-6 text-primary" />
                 <span className="text-primary underline">Return</span>
-            </div>
+            </Link>
 
             <div className="flex justify-end">
                 <Tabs
