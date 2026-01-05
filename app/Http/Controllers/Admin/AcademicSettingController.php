@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\SchoolYear;
 use App\Models\Semester;
+use App\Models\User;
+use App\Notifications\AcademicYearAnnounced;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Notification;
 
 class AcademicSettingController extends Controller
 {
@@ -122,12 +125,12 @@ public function update(Request $request)
             }
 
             // Ensures to deactivate ALL semesters in the database
-            DB::transaction(function () use ($schoolYear, $validated) {
+            $newSemester = DB::transaction(function () use ($schoolYear, $validated) {
                 
                 Semester::query()->update(['is_active' => false]);
 
                 // Update or Create the Semester record linked to that School Year
-                Semester::updateOrCreate(
+                return Semester::updateOrCreate(
                     [
                         'school_year_id' => $schoolYear->id,
                         'semester'       => $validated['sem_index']
@@ -140,6 +143,12 @@ public function update(Request $request)
                 );
             });
 
+            // dd($newSemester->load('schoolYear'));
+
+            // Notify the users:
+            // $users = User::all();
+            // Notification::send($users, new AcademicYearAnnounced($academicYear));
+            
             return redirect()->route('admin.management.academic');
         } 
         
@@ -164,12 +173,12 @@ public function update(Request $request)
             // $activeSemester = Semester::where('is_active', true)->value('semester');
 
             // Ensures to deactivate ALL semesters in the database
-            DB::transaction(function () use ($schoolYear, $validated) {
+            $newSemester = DB::transaction(function () use ($schoolYear, $validated) {
                 
                 Semester::query()->update(['is_active' => false]);
 
                 // Force Activate the First Semester (temporary soln -- depends, maybe we used the activeSemester)
-                Semester::updateOrCreate(
+                return Semester::updateOrCreate(
                     [
                         'school_year_id' => $schoolYear->id,
                         'semester'       => 0,              
@@ -179,6 +188,21 @@ public function update(Request $request)
                     ]
                 );
             });
+
+            // dd($newSemester->load('schoolYear')->toArray());
+
+            // Clear the old notifications
+            DB::table('notifications')
+                ->where('type', AcademicYearAnnounced::class) // Target this specific notification class
+                ->whereNull('read_at') // Only remove them if they haven't been read yet
+                ->delete();
+
+            // Notify the users:
+            $users = User::first(); // try
+            // Notification::send($users, new AcademicYearAnnounced($newSemester->load('schoolYear')->toArray()));
+            $users->notify(
+                new AcademicYearAnnounced($newSemester->load('schoolYear'))
+            );
 
             return redirect()->route('admin.management.academic');
         }

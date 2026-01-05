@@ -52,11 +52,12 @@ class AcademicYearAnnounced extends Notification
         return [
             'title' => 'New Academic Year Updated',
             'message' => sprintf(
-                'The academic year S.Y. %02d%02d has been set. Check your dashboard for details.',
+                'The academic year S.Y. %02d%02d SEM%d has been set. Check your dashboard for details.',
                 $this->semester->schoolYear->year % 100,
-                ($this->semester->schoolYear->year + 1) % 100
+                ($this->semester->schoolYear->year + 1) % 100,
+                $this->semester->semester + 1,
             ),
-            'action_url' => route('dashboard'),   
+            'action_url' => route('admin.dashboard'),   
             'type' => 'schedule',                       
         ];
     }

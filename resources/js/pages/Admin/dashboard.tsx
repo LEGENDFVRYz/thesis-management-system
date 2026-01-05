@@ -1,7 +1,9 @@
+import { NotificationListItem, NotificationType } from '@/components/ui/notification-list';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
+import { getTimeAgo } from '@/lib/utils';
 import { dashboard } from '@/routes';
-import { type BreadcrumbItem } from '@/types';
+import { NotificationItem, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import {
     CalendarDays,
@@ -30,6 +32,7 @@ const quickMenuItems = [
     { icon: BookCopy, label: 'Resources'         },
 ];
 
+
 interface ActiveTerm {
     semester_id: number;
     semester: number; // 0 or 1
@@ -40,9 +43,13 @@ interface ActiveTerm {
 interface DashboardProps {
     activeTerm: ActiveTerm;
     currentDate: string;
+    notifications: NotificationItem[];
 }
 
-export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
+
+export default function Dashboard({ activeTerm, currentDate, notifications }: DashboardProps) {
+    console.log('Notifications:', notifications);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
@@ -129,8 +136,22 @@ export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
 
                         </div>
                     </div>
-                </div>
 
+                    <div>
+                        <div className="flex flex-col gap-2">
+                            {notifications.map((notification) => (
+                                <NotificationListItem
+                                    key={notification.id}
+                                    type={notification.data.type ?? null}   // null for internal fallback (defaulkt: bell icon)
+                                    title={notification.data.title} 
+                                    description={notification.data.message} 
+                                    timestamp={getTimeAgo(notification.created_at)} 
+                                    isUnread={notification.read_at === null} 
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </div>
             </div>
         </AppLayout>
     );
