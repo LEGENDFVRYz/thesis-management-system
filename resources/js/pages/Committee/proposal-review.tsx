@@ -3,7 +3,7 @@ import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { AppContent } from '@/components/app-content';
-import { FileText, Search, Edit3, ArrowRight, CheckCircle2, MessageSquare, XCircle, Eye } from 'lucide-react';
+import { FileText, Search, Edit3, ArrowRight, CheckCircle2, MessageSquare, XCircle, Eye, Trash } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import { Icon } from '@/components/icon-index';
 import { CommitteeCard } from '@/components/ui/card';
@@ -62,25 +62,39 @@ const RightActionPane = ({
     evaluations, 
     onToggleEval, 
     comments, 
-    onAddComment 
+    onAddComment,
+    onUpdateComment,
+    onDeleteComment,
+    actionState 
 }: any) => {
-    // Shared states for both tabs
-    const [actionState, setActionState] = useState<'idle' | 'approved' | 'rejected' | 'clarifying'>('idle');
     const [commentText, setCommentText] = useState("");
     const [clarificationText, setClarificationText] = useState("");
-    
-    // Reset state when the selected item changes
+    const [isClarifying, setIsClarifying] = useState(false);
+
+    // Edit State
+    const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
+    const [editValue, setEditValue] = useState("");
+
     React.useEffect(() => {
-        setActionState('idle');
         setCommentText("");
         setClarificationText("");
+        setIsClarifying(false);
+        setEditingCommentId(null);
     }, [selectedItem?.id]);
 
-    const handleUploadComment = (status: 'approved' | 'rejected' | 'clarifying') => {
-        if (!commentText.trim()) return;
-        onAddComment(selectedItem.id, commentText, status);
-        setActionState(status);
+    const handleUploadComment = (status: 'approved' | 'rejected' | 'clarifying', text: string) => {
+        if (!text.trim()) return;
+        onAddComment(selectedItem.id, text, status);
         setCommentText("");
+        setClarificationText("");
+        setIsClarifying(false);
+    };
+
+    const handleSaveEdit = (commentId: number) => {
+        if (!editValue.trim()) return;
+        onUpdateComment(selectedItem.id, commentId, editValue);
+        setEditingCommentId(null);
+        setEditValue("");
     };
 
     if (!selectedItem) {
@@ -99,6 +113,7 @@ const RightActionPane = ({
 
     if (activeTab === 'endorsed') {
         const currentEvals = evaluations[selectedItem.id] || [];
+
         return (
             <div className="flex flex-col gap-4 h-[1460px] font-dm">
                 <div className="bg-background border border-border rounded-xl p-5 shadow-sm">
@@ -109,18 +124,9 @@ const RightActionPane = ({
                             <p className="text-sm font-bold text-foreground leading-tight">{selectedItem.title}</p>
                         </div>
                         <div className="grid grid-cols-3 gap-2">
-                            <div>
-                                <p className="text-[10px] uppercase font-bold text-alert-desc">Adviser:</p>
-                                <p className="text-[11px] text-foreground font-medium truncate">{selectedItem.adviser}</p>
-                            </div>
-                            <div>
-                                <p className="text-[10px] uppercase font-bold text-alert-desc">Block:</p>
-                                <p className="text-[11px] text-foreground font-medium">{selectedItem.block}</p>
-                            </div>
-                            <div>
-                                <p className="text-[10px] uppercase font-bold text-alert-desc">Submitted:</p>
-                                <p className="text-[11px] text-foreground font-medium">Nov 30, 2025</p>
-                            </div>
+                            <div><p className="text-[10px] uppercase font-bold text-alert-desc">Adviser:</p><p className="text-[11px] text-foreground font-medium truncate">{selectedItem.adviser}</p></div>
+                            <div><p className="text-[10px] uppercase font-bold text-alert-desc">Block:</p><p className="text-[11px] text-foreground font-medium">{selectedItem.block}</p></div>
+                            <div><p className="text-[10px] uppercase font-bold text-alert-desc">Submitted:</p><p className="text-[11px] text-foreground font-medium">Nov 30, 2025</p></div>
                         </div>
                         <Button variant="outline" className="tertiary-btn w-full mt-2 h-9 text-xs font-bold gap-2">
                             <Eye className="w-4 h-4" /> View Proposal
@@ -136,14 +142,11 @@ const RightActionPane = ({
                         {['Dr. Maria Santos', 'Dr. Juan Cruz', 'Dr. Lisa Fernandez', 'Dr. Robert Chen', 'Dr. Anna Reyes', 'Dr. Carlos Gomez'].map(name => (
                             <div key={name} className="flex items-center gap-2">
                                 <Checkbox 
-                                    id={name} 
-                                    className='h-4 w-4'
+                                    id={name} className='h-4 w-4'
                                     checked={currentEvals.includes(name)}
                                     onCheckedChange={() => onToggleEval(selectedItem.id, name)}
                                 />
-                                <Label htmlFor={name} className="font-normal cursor-pointer text-foreground text-[11px]">
-                                    {name}
-                                </Label>
+                                <Label htmlFor={name} className="font-normal cursor-pointer text-foreground text-[11px]">{name}</Label>
                             </div>
                         ))}
                     </div>
@@ -153,78 +156,99 @@ const RightActionPane = ({
                     <h3 className="text-md font-bold text-primary mb-4 border-b border-border pb-2">Comments & Feedback</h3>
                     <div className="flex-1 overflow-y-auto space-y-4 custom-scrollbar pr-2 min-h-[400px]">
                         {comments.length > 0 ? comments.map((comment: any) => (
-                            <div 
-                                key={comment.id} 
-                                className={cn(
-                                    "p-3 rounded-lg border text-xs transition-colors",
+                            <div key={comment.id} className={cn("p-4 rounded-xl border text-xs transition-colors",
                                     comment.status === 'approved' && "border-alert-success bg-alert-success/5",
                                     comment.status === 'clarifying' && "border-primary-foreground-2 bg-primary-foreground-2/5",
-                                    comment.status === 'rejected' && "border-alert-warning bg-alert-warning/5"
+                                    comment.status === 'rejected' && "border-alert-warning bg-alert-warning/5")}>
+                                
+                                {editingCommentId === comment.id ? (
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between items-center">
+                                            <p className="font-bold text-foreground text-[13px]">{comment.author}</p>
+                                            <div className="flex items-center gap-1 opacity-40">
+                                                <span className="text-[10px] font-medium">Edit</span>
+                                                <Edit3 className="w-3 h-3" />
+                                            </div>
+                                        </div>
+                                        
+                                        <Input 
+                                            className="h-[100px] w-full bg-white pt-2 pb-16 align-top text-xs border-border leading-tight" 
+                                            value={editValue} 
+                                            inputSize="full"
+                                            onChange={(e) => setEditValue(e.target.value)} 
+                                        />
+                                        
+                                        <div className="flex gap-2">
+                                            <Button 
+                                                disabled={!editValue.trim()}
+                                                onClick={() => handleSaveEdit(comment.id)} 
+                                                className="bg-[#600000] text-white h-8 px-4 text-xs hover:bg-[#4a0000]"
+                                            >
+                                                Save
+                                            </Button>
+                                            <Button 
+                                                onClick={() => setEditingCommentId(null)} 
+                                                variant="outline" 
+                                                className="bg-[#fcf8e3] text-[#600000] border-none h-8 px-4 text-xs flex items-center gap-2 hover:bg-[#f9f2d0] transition-colors"
+                                            >
+                                                Cancel <XCircle className="w-3.5 h-3.5" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="flex justify-between items-start mb-2">
+                                            <div>
+                                                <p className={cn("font-bold text-[13px]",
+                                                    comment.status === 'approved' && "text-alert-success",
+                                                    comment.status === 'clarifying' && "text-alert-yellow-selected",
+                                                    comment.status === 'rejected' && "text-alert-warning")}>{comment.author}</p>
+                                                <p className="text-[10px] text-alert-desc">{comment.date}</p>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <Edit3 
+                                                    className="w-4 h-4 cursor-pointer text-foreground/40 hover:text-foreground transition-colors" 
+                                                    onClick={() => { 
+                                                        setEditingCommentId(comment.id); 
+                                                        setEditValue(comment.text); 
+                                                    }}
+                                                />
+                                                <Trash 
+                                                    className="w-4 h-4 cursor-pointer text-primary/40 hover:text-primary transition-colors" 
+                                                    onClick={() => onDeleteComment(selectedItem.id, comment.id)}
+                                                />
+                                            </div>
+                                        </div>
+                                        <p className="text-foreground leading-relaxed text-[13px]">{comment.text}</p>
+                                    </>
                                 )}
-                            >
-                                <div className="flex justify-between items-start mb-2">
-                                    <div>
-                                        <p className={cn(
-                                            "font-bold",
-                                            comment.status === 'approved' && "text-alert-success",
-                                            comment.status === 'clarifying' && "text-alert-yellow-selected",
-                                            comment.status === 'rejected' && "text-alert-warning"
-                                        )}>
-                                            {comment.author}
-                                        </p>
-                                        <p className="text-[10px] text-alert-desc">{comment.date}</p>
-                                    </div>
-                                    <div className="flex gap-2 opacity-40">
-                                        <Edit3 className="w-3.5 h-3.5 cursor-pointer" />
-                                        <XCircle className="w-3.5 h-3.5 cursor-pointer" />
-                                    </div>
-                                </div>
-                                <p className="text-foreground leading-relaxed">{comment.text}</p>
                             </div>
-                        )) : (
-                            <div className="h-full flex items-center justify-center text-alert-desc text-xs">No comments yet</div>
-                        )}
+                        )) : <div className="h-full flex items-center justify-center text-alert-desc text-xs">No comments yet</div>}
                     </div>
 
                     <div className="mt-4 pt-4 border-t border-border space-y-3">
                         {actionState === 'idle' ? (
                             <>
                                 <p className="text-[11px] font-medium text-alert-desc">Provide your feedback and submit your decision</p>
-                                <Input 
-                                    className="h-[120px] pt-2 align-top text-xs" 
-                                    inputSize="full" 
-                                    placeholder="Text field input..." 
-                                    value={commentText}
-                                    onChange={(e) => setCommentText(e.target.value)} 
-                                />
+                                <Input className="h-[120px] pt-2 align-top text-xs" inputSize="full" placeholder="Text field input..." value={commentText} onChange={(e) => setCommentText(e.target.value)} />
                                 <div className="grid grid-cols-2 gap-3">
-                                    <Button onClick={() => handleUploadComment('approved')} variant={'tertiary'} className="bg-alert-success/10 text-alert-success border-alert-success/50 h-10 text-xs">
-                                        <CheckCircle2 className="w-4 h-4 mr-2" /> Approve
-                                    </Button>
-                                    <Button onClick={() => handleUploadComment('rejected')} variant={'tertiary'} className="bg-alert-warning/10 text-alert-warning border-alert-warning/50 h-10 text-xs">
-                                        <XCircle className="w-4 h-4 mr-2" /> Reject
-                                    </Button>
+                                    {/* onClick restored here */}
+                                    <Button onClick={() => handleUploadComment('approved', commentText)} variant={'tertiary'} className="bg-alert-success/10 text-alert-success border-alert-success/50 h-10 text-xs"><CheckCircle2 className="w-4 h-4 mr-2" /> Approve</Button>
+                                    <Button onClick={() => handleUploadComment('rejected', commentText)} variant={'tertiary'} className="bg-alert-warning/10 text-alert-warning border-alert-warning/50 h-10 text-xs"><XCircle className="w-4 h-4 mr-2" /> Reject</Button>
                                 </div>
-                                <Button onClick={() => handleUploadComment('clarifying')} variant="outline" className="w-full h-10 font-bold text-xs">
-                                     <Edit3 className="w-4 h-4 mr-2" /> Request Revision
-                                </Button>
+                                <Button onClick={() => handleUploadComment('clarifying', commentText)} variant="outline" className="w-full h-10 font-bold text-xs"><Edit3 className="w-4 h-4 mr-2" /> Request Revision</Button>
                             </>
                         ) : (
                             <div className="bg-muted/30 border border-border rounded-xl p-4 flex flex-col items-center text-center space-y-3">
                                 <div className="flex items-center gap-3 text-left w-full">
                                     <CheckCircle2 className="w-6 h-6 text-alert-info" />
-                                    <div>
-                                        <p className="text-sm font-bold text-foreground">Your Evaluation Submitted</p>
-                                        <p className="text-[11px] text-alert-desc leading-none">Waiting for other members</p>
-                                    </div>
+                                    <div><p className="text-sm font-bold text-foreground">Your Evaluation Submitted</p><p className="text-[11px] text-alert-desc leading-none">Waiting for other members</p></div>
                                 </div>
                                 <div className="pt-3 border-t border-border w-full flex justify-center">
-                                   <div className={cn(
-                                       "text-[10px] font-bold px-4 py-1 rounded-full flex items-center gap-1.5 border",
+                                   <div className={cn("text-[10px] font-bold px-4 py-1 rounded-full border",
                                        actionState === 'approved' && "bg-evaluated-bg text-evaluated-font-color border-evaluated-border",
                                        actionState === 'rejected' && "bg-alert-warning/10 text-alert-warning border-alert-warning/30",
-                                       actionState === 'clarifying' && "bg-primary-foreground-2/10 text-alert-yellow-selected border-primary-foreground-2/30"
-                                   )}>
+                                       actionState === 'clarifying' && "bg-primary-foreground-2/10 text-alert-yellow-selected border-primary-foreground-2/30")}>
                                       {actionState === 'approved' ? 'Approved' : actionState === 'rejected' ? 'Rejected' : 'For Revision'}
                                    </div>
                                 </div>
@@ -236,139 +260,60 @@ const RightActionPane = ({
         );
     }
 
-    // --- CHANGE REQUEST TAB VIEW ---
     return (
         <div className="bg-background border border-border rounded-xl p-5 shadow-sm h-[620px] overflow-y-auto custom-scrollbar flex flex-col gap-4 font-dm">
             <div>
                 <h3 className="text-md font-bold text-primary">Request Details</h3>
                 <p className="text-[13px] text-foreground font-medium mt-1 leading-tight">{selectedItem.title}</p>
             </div>
-
-            <div className="grid grid-cols-2 gap-3 bg-background border border-border rounded-xl p-4 shadow-sm text-xs">
-                <div>
-                    <p className="uppercase font-bold text-alert-desc">Adviser</p>
-                    <p className="font-bold">{selectedItem.adviser || 'Dr. Maria Santos'}</p>
-                </div>
-                <div>
-                    <p className="uppercase font-bold text-alert-desc">Section</p>
-                    <p className="font-bold">{selectedItem.block || 'BSCPE 4-2'}</p>
-                </div>
+            <div className="grid grid-cols-2 gap-3 bg-background border border-border rounded-xl p-4 shadow-sm text-xs text-foreground">
+                <div><p className="uppercase font-bold text-alert-desc">Adviser</p><p className="font-bold">{selectedItem.adviser || 'Dr. Maria Santos'}</p></div>
+                <div><p className="uppercase font-bold text-alert-desc">Section</p><p className="font-bold">{selectedItem.block || 'BSCPE 4-2'}</p></div>
             </div>
-
             <div className="space-y-3">
-                <div className="bg-muted/10 border border-border rounded-xl p-3">
-                    <div className="flex items-center gap-2 mb-1">
-                        <ArrowRight className="w-3.5 h-3.5 text-alert-desc" />
-                        <span className="text-[10px] font-bold text-alert-desc uppercase">Current Version (DP1)</span>
-                    </div>
-                    <p className="text-[12px] text-foreground leading-relaxed">Initial methodology involves data collection from surveys.</p>
+                <div className="bg-muted/10 border border-border rounded-xl p-3 text-xs">
+                    <div className="flex items-center gap-2 mb-1"><ArrowRight className="w-3.5 h-3.5 text-alert-desc" /><span className="font-bold text-alert-desc uppercase text-[10px]">Current Version (DP1)</span></div>
+                    <p className="leading-relaxed">Initial methodology involves data collection from surveys.</p>
                 </div>
-
-                <div className="bg-primary/5 border border-primary/20 rounded-xl p-3">
-                    <div className="flex items-center gap-2 mb-1">
-                        <ArrowRight className="w-3.5 h-3.5 text-primary" />
-                        <span className="text-[10px] font-bold text-primary uppercase">Proposed Change (DP2)</span>
-                    </div>
-                    <p className="text-[12px] text-foreground leading-relaxed">Change data collection to include both surveys and interviews.</p>
+                <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 text-xs">
+                    <div className="flex items-center gap-2 mb-1"><ArrowRight className="w-3.5 h-3.5 text-primary" /><span className="font-bold text-primary uppercase text-[10px]">Proposed Change (DP2)</span></div>
+                    <p className="leading-relaxed">Change data collection to include both surveys and interviews.</p>
                 </div>
             </div>
-
             <div className="bg-under-eval-bg border border-under-eval-border rounded-xl p-3 text-xs">
-                <div className="flex items-center gap-2 mb-1">
-                    <ArrowRight className="w-3.5 h-3.5 text-under-eval-font-color" />
-                    <span className="font-bold text-under-eval-font-color uppercase">Justification</span>
-                </div>
-                <p className="leading-relaxed">Interviews will provide deeper insights into student performance.</p>
+                <div className="flex items-center gap-2 mb-1"><ArrowRight className="w-3.5 h-3.5 text-under-eval-font-color" /><span className="font-bold text-under-eval-font-color uppercase text-[10px]">Justification</span></div>
+                <p className="leading-relaxed text-[12px] text-foreground">Interviews will provide deeper insights into student performance.</p>
             </div>
-
             <div className="bg-evaluated-bg border border-evaluated-border rounded-xl p-3 text-xs">
-                <div className="flex items-center gap-2 mb-1">
-                    <ArrowRight className="w-3.5 h-3.5 text-evaluated-font-color" />
-                    <span className="font-bold text-evaluated-font-color uppercase">Adviser Recommendation</span>
-                </div>
-                <p className="leading-relaxed">Consider conducting a pilot study to validate the new methodology.</p>
+                <div className="flex items-center gap-2 mb-1"><ArrowRight className="w-3.5 h-3.5 text-evaluated-font-color" /><span className="font-bold text-evaluated-font-color uppercase text-[10px]">Adviser Recommendation</span></div>
+                <p className="leading-relaxed text-[12px] text-foreground">Consider conducting a pilot study to validate the new methodology.</p>
             </div>
 
-            {/* ACTION SECTION */}
             <div className="mt-auto pt-4 space-y-3">
-                {actionState === 'idle' && (
+                {actionState === 'idle' && !isClarifying && (
                     <div className="grid grid-cols-3 gap-2">
-                        <Button 
-                            onClick={() => setActionState('approved')}
-                            className="bg-alert-success/10 text-alert-success border border-alert-success/50 hover:bg-alert-success hover:text-white text-[11px] font-bold h-10 shadow-none"
-                        >
-                            <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Approve
-                        </Button>
-                        <Button 
-                            onClick={() => setActionState('clarifying')}
-                            variant="outline" 
-                            className="bg-background text-alert-desc text-[11px] font-bold h-10 border-border"
-                        >
-                            <MessageSquare className="w-3.5 h-3.5 mr-1" /> Clarify
-                        </Button>
-                        <Button 
-                            onClick={() => setActionState('rejected')}
-                            className="bg-alert-warning/10 text-alert-warning border border-alert-warning/50 hover:bg-alert-warning hover:text-white text-[11px] font-bold h-10 shadow-none"
-                        >
-                            <XCircle className="w-3.5 h-3.5 mr-1" /> Reject
-                        </Button>
+                        <Button onClick={() => handleUploadComment('approved', "Request approved.")} className="bg-alert-success/10 text-alert-success border-alert-success/50 hover:bg-alert-success hover:text-white text-[11px] font-bold h-10 shadow-none"><CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Approve</Button>
+                        <Button onClick={() => setIsClarifying(true)} variant="outline" className="bg-background text-alert-desc text-[11px] font-bold h-10 border-border"><MessageSquare className="w-3.5 h-3.5 mr-1" /> Clarify</Button>
+                        <Button onClick={() => handleUploadComment('rejected', "Request rejected.")} className="bg-alert-warning/10 text-alert-warning border-alert-warning/50 hover:bg-alert-warning hover:text-white text-[11px] font-bold h-10 shadow-none"><XCircle className="w-3.5 h-3.5 mr-1" /> Reject</Button>
                     </div>
                 )}
-
-                {actionState === 'clarifying' && (
+                {isClarifying && actionState === 'idle' && (
                     <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 space-y-3 w-full">
                         <p className="text-[11px] font-bold text-primary uppercase">Clarify...</p>
-                        <Input 
-                            className="h-[100px] w-full bg-white pt-2 align-top text-xs" 
-                            inputSize="full"
-                            placeholder="Provide details for revision..." 
-                            value={clarificationText}
-                            onChange={(e) => setClarificationText(e.target.value)}
-                        />
+                        <Input className="h-[100px] w-full bg-white pt-2 align-top text-xs" inputSize="full" placeholder="Provide details..." value={clarificationText} onChange={(e) => setClarificationText(e.target.value)} />
                         <div className="flex justify-between items-center">
-                            {/* Cancel Button to return to idle state */}
-                            <Button 
-                                variant="ghost" 
-                                onClick={() => setActionState('idle')}
-                                className="text-[11px] h-8 text-alert-desc hover:bg-transparent hover:text-foreground p-0"
-                            >
-                                Cancel
-                            </Button>
-
+                            <Button variant="ghost" onClick={() => setIsClarifying(false)} className="text-[11px] h-8 text-alert-desc p-0">Cancel</Button>
                             <div className="flex items-center gap-2">
-                                {/* Comment/Submit Button */}
-                                <Button 
-                                    onClick={() => handleUploadComment('clarifying')}
-                                    className="h-8 px-3 text-[11px] bg-primary text-white hover:bg-primary/90"
-                                >
-                                    <MessageSquare className="w-3 h-3 mr-1.5" />
-                                    Comment
-                                </Button>
+                                <Button disabled={!clarificationText.trim()} onClick={() => handleUploadComment('clarifying', clarificationText)} className="h-8 px-3 text-[11px] bg-primary text-white">Comment</Button>
+                                <Badge name="statusBadgePendingReview" className="bg-primary-foreground-2/20 text-alert-yellow-selected border-primary-foreground-2/30">Clarification</Badge>
                             </div>
                         </div>
                     </div>
                 )}
-
-                {(actionState === 'approved' || actionState === 'rejected') && (
+                {actionState !== 'idle' && (
                     <div className="bg-muted/30 border border-border rounded-xl p-4 flex flex-col items-center text-center space-y-2">
-                        <div className="flex items-center gap-3 text-left w-full">
-                            <CheckCircle2 className={cn("w-6 h-6", actionState === 'approved' ? "text-alert-info" : "text-alert-warning")} />
-                            <div>
-                                <p className="text-sm font-bold text-foreground">Submitted</p>
-                                <p className="text-[11px] text-alert-desc leading-none">You have responded to this request.</p>
-                            </div>
-                        </div>
-                        <div className="pt-2 border-t border-border w-full flex justify-center">
-                            <div className={cn(
-                                "text-[10px] font-bold px-4 py-1 rounded-full flex items-center gap-1.5 border",
-                                actionState === 'approved' 
-                                    ? "bg-evaluated-bg text-evaluated-font-color border-evaluated-border" 
-                                    : "bg-alert-warning/10 text-alert-warning border-alert-warning/30"
-                            )}>
-                                {actionState === 'approved' ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
-                                {actionState === 'approved' ? 'Approved' : 'Rejected'}
-                            </div>
-                        </div>
+                        <div className="flex items-center gap-3 text-left w-full"><CheckCircle2 className={cn("w-6 h-6", actionState === 'approved' ? "text-alert-info" : "text-alert-warning")} /><div><p className="text-sm font-bold text-foreground">Submitted</p><p className="text-[11px] text-alert-desc leading-none">You have responded to this request.</p></div></div>
+                        <div className="pt-2 border-t border-border w-full flex justify-center"><div className={cn("text-[10px] font-bold px-4 py-1 rounded-full border", actionState === 'approved' ? "bg-evaluated-bg text-evaluated-font-color border-evaluated-border" : "bg-alert-warning/10 text-alert-warning border-alert-warning/30")}>{actionState === 'approved' ? 'Approved' : 'Rejected'}</div></div>
                     </div>
                 )}
             </div>
@@ -379,7 +324,6 @@ const RightActionPane = ({
 export default function ProposalReview() {
     const [activeTab, setActiveTab] = useState<'endorsed' | 'changes'>('endorsed');
     const [selectedItem, setSelectedItem] = useState<any>(null);
-    
     const [evaluations, setEvaluations] = useState<Record<number, string[]>>({});
     const [allComments, setAllComments] = useState<Record<number, any[]>>({});
     const [actionStates, setActionStates] = useState<Record<number, string>>({});
@@ -392,10 +336,30 @@ export default function ProposalReview() {
     };
 
     const handleAddComment = (id: number, text: string, status: string) => {
-        if (!text.trim()) return;
-        const newComment = { id: Date.now(), author: 'Dr. Juan Cruz', date: new Date().toLocaleString(), text, status, isUser: true };
+        const newComment = { id: Date.now(), author: 'Dr. Juan Cruz', date: new Date().toLocaleString(), text, status };
         setAllComments(prev => ({ ...prev, [id]: [...(prev[id] || []), newComment] }));
         setActionStates(prev => ({ ...prev, [id]: status }));
+    };
+
+    const handleUpdateComment = (proposalId: number, commentId: number, newText: string) => {
+        setAllComments(prev => {
+            const proposalComments = prev[proposalId] || [];
+            return {
+                ...prev,
+                [proposalId]: proposalComments.map(comment => 
+                    comment.id === commentId 
+                        ? { ...comment, text: newText, date: `${new Date().toLocaleString()} (Edited)` } 
+                        : comment
+                )
+            };
+        });
+    };
+
+    const handleDeleteComment = (proposalId: number, commentId: number) => {
+        setAllComments(prev => ({
+            ...prev,
+            [proposalId]: (prev[proposalId] || []).filter(comment => comment.id !== commentId)
+        }));
     };
 
     const changeRequests = [
@@ -430,7 +394,6 @@ export default function ProposalReview() {
         stage: 0
     }).map((item, i) => ({ ...item, id: i + 20 }));
 
-
     const renderProposalSection = (title: string, headerColor: string, count: number, data: any[]) => (
         <section className="bg-background rounded-2xl border border-border overflow-hidden shadow-sm flex flex-col font-dm">
             <div className={cn("p-3 flex justify-between items-center px-5 shrink-0", headerColor)}>
@@ -446,14 +409,7 @@ export default function ProposalReview() {
                             </div>
                         ))}
                     </div>
-                ) : (
-                    <div className="h-full flex flex-col items-center justify-center py-12 text-alert-desc">
-                        <div className="bg-muted p-4 rounded-full mb-3">
-                            <Icon name="docuDefault" size={32} className="opacity-40" />
-                        </div>
-                        <p className="text-sm font-semibold">No proposals found</p>
-                    </div>
-                )}
+                ) : <div className="h-full flex flex-col items-center justify-center py-12 text-alert-desc"><div className="bg-muted p-4 rounded-full mb-3"><Icon name="docuDefault" size={32} className="opacity-40" /></div><p className="text-sm font-semibold">No proposals found</p></div>}
             </div>
         </section>
     );
@@ -462,7 +418,7 @@ export default function ProposalReview() {
         <>
             <AppLayout breadcrumbs={[{ title: 'Proposal Review', href: '/proposal-review' }, { title: activeTab === 'endorsed' ? 'Endorsed Proposals' : 'Change Requests' } as BreadcrumbItem]}>
                 <Head title="Proposal Review" />
-                <AppContent title="Proposal Review" subtitle="Review and evaluate thesis proposals submitted for committee approval" icon={<FileText className="w-8 h-8 text-primary-foreground-2" />} variant="header" />
+                <AppContent title="Proposal Review" subtitle="Review proposals" icon={<FileText className="w-8 h-8 text-primary-foreground-2" />} variant="header" />
                 <div className="px-6 max-w-[1440px] mx-auto w-full space-y-6 font-dm pb-10">
                     <div className="flex border-b border-border w-full">
                         <Button variant="ghost" onClick={() => {setActiveTab('endorsed'); setSelectedItem(null);}} className={cn("flex items-center gap-2 px-6 py-3 text-sm font-bold border-b-2 rounded-sm rounded-b-none", activeTab === 'endorsed' ? "border-primary text-primary" : "border-transparent text-alert-desc")}>Endorsed Proposal</Button>
@@ -473,13 +429,9 @@ export default function ProposalReview() {
                         {activeTab === 'endorsed' ? <EndorsedProposalsSection mockEndorsed={mockEndorsed} mockEvaluating={mockEvaluating} selectedItem={selectedItem} setSelectedItem={setSelectedItem} renderProposalSection={renderProposalSection} /> : <ChangeRequestsSection changeRequests={changeRequests} selectedItem={selectedItem} setSelectedItem={setSelectedItem} />}
                         <div className="w-[400px] shrink-0 sticky top-6">
                             <RightActionPane 
-                                selectedItem={selectedItem} 
-                                activeTab={activeTab} 
-                                evaluations={evaluations} 
-                                onToggleEval={handleToggleEval} 
-                                comments={allComments[selectedItem?.id] || []} 
-                                onAddComment={handleAddComment} 
-                                actionState={actionStates[selectedItem?.id] || 'idle'} 
+                                selectedItem={selectedItem} activeTab={activeTab} evaluations={evaluations} 
+                                onToggleEval={handleToggleEval} comments={allComments[selectedItem?.id] || []} 
+                                onAddComment={handleAddComment} onUpdateComment={handleUpdateComment} onDeleteComment={handleDeleteComment} actionState={actionStates[selectedItem?.id] || 'idle'} 
                             />
                         </div>
                     </div>
