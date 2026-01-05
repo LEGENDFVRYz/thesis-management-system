@@ -30,7 +30,7 @@ class PanelAssign extends Controller
             ->join('tbl_school_years as sy', 'fa.sy_id', '=', 'sy.id')
             ->select(DB::raw("CONCAT('BSCPE ', (3 + ($activeYear - sy.year)), '-', s.section) AS section"))
             ->distinct()
-            ->orderBy('s.section', 'asc')
+            ->orderBy('section', 'asc')
             ->get();
         // dd(vars: $sections);
 

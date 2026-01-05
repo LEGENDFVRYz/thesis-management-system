@@ -3,14 +3,17 @@ import * as React from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { communication } from '@/routes/faculty/management/coordinator';
 import { type BreadcrumbItem } from '@/types';
-import { SidebarInset } from '@/components/ui/sidebar'; // Ensure this exists or adjust import
+import { SidebarInset } from '@/components/ui/sidebar';
 
 import { 
     Megaphone, 
     Users, 
     FileText, 
     LayoutGrid,
-    ChevronDown
+    ChevronDown,
+    User,
+    Plus,   // Added Plus icon
+    Check   // Added Check icon for selected state
 } from 'lucide-react';
 
 // Import Shared Components
@@ -21,6 +24,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+
+// ----------------------------------------------------------------------
+// DATA: Audience Options
+// ----------------------------------------------------------------------
+const AUDIENCE_OPTIONS = [
+    { id: 'everyone', label: 'Everyone', count: '699 members' },
+    { id: 'advisers', label: 'All Advisers', count: '15 members' },
+    { id: 'students', label: 'All Students', count: '300 members' },
+    { id: 'panel', label: 'All Panel Members', count: '30 members' },
+];
 
 // ----------------------------------------------------------------------
 // PROVIDED COMPONENTS (HeaderCard & AppContent)
@@ -119,9 +132,21 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Dashboard() {
     // State to track the selected priority
     const [priority, setPriority] = useState<string>("");
+    
+    // State to track selected audiences
+    const [selectedAudiences, setSelectedAudiences] = useState<string[]>([]);
 
     // Options for priority
     const priorities = ["Low", "Normal", "High", "Urgent"];
+
+    // Handler to toggle audience selection
+    const toggleAudience = (id: string) => {
+        setSelectedAudiences(prev => 
+            prev.includes(id) 
+                ? prev.filter(item => item !== id) 
+                : [...prev, id]
+        );
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -163,7 +188,7 @@ export default function Dashboard() {
                                     />
                                 </div>
 
-                                {/* Priority Level - REPLACED WITH DROPDOWN */}
+                                {/* Priority Level */}
                                 <div className="space-y-1">
                                     <label className="text-base font-medium text-[#800000] dark:text-red-400">Priority Level</label>
                                     <DropdownMenu>
@@ -242,41 +267,49 @@ export default function Dashboard() {
                             </div>
 
                             <div className="space-y-3">
-                                {/* Audience Item: Everyone */}
-                                <div className="flex cursor-pointer items-center gap-4 rounded-lg border p-4 hover:border-[#800000] hover:bg-red-50 transition-all dark:hover:bg-red-900/20">
-                                    <LayoutGrid className="size-5 text-black dark:text-white" />
-                                    <div>
-                                        <p className="font-semibold text-[#800000] dark:text-red-400">Everyone</p>
-                                        <p className="text-xs text-muted-foreground">699 members</p>
-                                    </div>
-                                </div>
+                                {AUDIENCE_OPTIONS.map((audience) => {
+                                    const isSelected = selectedAudiences.includes(audience.id);
+                                    
+                                    return (
+                                        <div 
+                                            key={audience.id}
+                                            // Layout Logic: justify-between pushes button to right
+                                            className={`flex cursor-pointer items-center justify-between rounded-lg border p-4 transition-all hover:border-[#800000] hover:bg-red-50 dark:hover:bg-red-900/20 ${
+                                                isSelected ? 'border-[#800000] bg-red-50 dark:bg-red-900/10' : ''
+                                            }`}
+                                            onClick={() => toggleAudience(audience.id)}
+                                        >
+                                            {/* Left Side: Icon & Text */}
+                                            <div className="flex items-center gap-4">
+                                                <User className="size-5 text-black dark:text-white" />
+                                                <div>
+                                                    <p className="font-semibold text-[#800000] dark:text-red-400">{audience.label}</p>
+                                                    <p className="text-xs text-muted-foreground">{audience.count}</p>
+                                                </div>
+                                            </div>
 
-                                 {/* Audience Item: Advisers */}
-                                 <div className="flex cursor-pointer items-center gap-4 rounded-lg border p-4 hover:border-[#800000] hover:bg-red-50 transition-all dark:hover:bg-red-900/20">
-                                    <LayoutGrid className="size-5 text-black dark:text-white" />
-                                    <div>
-                                        <p className="font-semibold text-[#800000] dark:text-red-400">All Advisers</p>
-                                        <p className="text-xs text-muted-foreground">15 members</p>
-                                    </div>
-                                </div>
-
-                                 {/* Audience Item: Students */}
-                                 <div className="flex cursor-pointer items-center gap-4 rounded-lg border p-4 hover:border-[#800000] hover:bg-red-50 transition-all dark:hover:bg-red-900/20">
-                                    <LayoutGrid className="size-5 text-black dark:text-white" />
-                                    <div>
-                                        <p className="font-semibold text-[#800000] dark:text-red-400">All Students</p>
-                                        <p className="text-xs text-muted-foreground">300 members</p>
-                                    </div>
-                                </div>
-
-                                 {/* Audience Item: Panel Members */}
-                                 <div className="flex cursor-pointer items-center gap-4 rounded-lg border p-4 hover:border-[#800000] hover:bg-red-50 transition-all dark:hover:bg-red-900/20">
-                                    <LayoutGrid className="size-5 text-black dark:text-white" />
-                                    <div>
-                                        <p className="font-semibold text-[#800000] dark:text-red-400">All Panel Members</p>
-                                        <p className="text-xs text-muted-foreground">30 members</p>
-                                    </div>
-                                </div>
+                                            {/* Right Side: Button */}
+                                            <Button
+                                                type="button"
+                                                variant={isSelected ? "default" : "outline"} // Change style based on state
+                                                size="sm"
+                                                className={isSelected ? "bg-[#800000] hover:bg-[#600000] h-8" : "h-8 border-[#800000] text-[#800000] hover:bg-red-50"}
+                                            >
+                                                {isSelected ? (
+                                                    <>
+                                                        <Check className="size-3.5 mr-1" />
+                                                        Added
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Plus className="size-3.5 mr-1" />
+                                                        Add
+                                                    </>
+                                                )}
+                                            </Button>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
 
@@ -286,18 +319,24 @@ export default function Dashboard() {
                             <div className="space-y-3">
                                 <div className="text-sm font-medium text-[#800000] dark:text-red-300 flex justify-between">
                                     <span>Total Recipients:</span>
-                                    <span>-</span>
+                                    <span>
+                                        {/* Simple Logic to count recipients if needed, or just count groups selected */}
+                                        {selectedAudiences.length > 0 ? `${selectedAudiences.length} Groups` : '-'}
+                                    </span>
                                 </div>
                                 <div className="text-sm font-medium text-[#800000] dark:text-red-300 flex justify-between">
                                     <span>Priority Level:</span>
-                                    {/* This now updates based on selection */}
                                     <span className={priority ? "text-black dark:text-white" : "text-gray-400"}>
                                         {priority || "Not selected"}
                                     </span>
                                 </div>
                                 <div className="text-sm font-medium text-[#800000] dark:text-red-300 flex justify-between">
                                     <span>Groups Selected:</span>
-                                    <span>-</span>
+                                    <span className={selectedAudiences.length > 0 ? "text-black dark:text-white" : "text-gray-400"}>
+                                        {selectedAudiences.length > 0 
+                                            ? selectedAudiences.map(id => AUDIENCE_OPTIONS.find(opt => opt.id === id)?.label).join(", ") 
+                                            : "None"}
+                                    </span>
                                 </div>
                             </div>
                         </div>
