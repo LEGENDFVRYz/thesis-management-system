@@ -35,3 +35,24 @@ export function isSectionUrl(
 export function formatLocal(date: Date) {
     return date.toLocaleDateString('en-CA');
 };
+
+// Recieved created_at or updated_at to check the past time
+export function getTimeAgo(date: string | Date): string {
+    const inputDate = typeof date === 'string' ? new Date(date) : date;
+
+    if (isNaN(inputDate.getTime())) return '';
+
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - inputDate.getTime()) / 1000);
+
+    if (diffInSeconds < 60) return 'Just now';
+
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+
+    const diffInDays = Math.floor(diffInHours / 24);
+    return `${diffInDays}d ago`;
+}

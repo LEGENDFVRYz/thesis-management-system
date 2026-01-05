@@ -54,3 +54,21 @@ export interface UserInfo {
     faculty_id?: number;
     faculty_roles?: string[];
 }
+
+
+// 'data' column structure in notification packet
+interface NotificationData {
+    title: string;
+    message: string;
+    action_url?: string;
+    type: string;
+}
+
+// The actual db record of notification
+export interface NotificationItem {
+    id: string;
+    type: string;
+    data: NotificationData;
+    read_at: string | null;
+    created_at: string;
+}
