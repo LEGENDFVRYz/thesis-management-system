@@ -3,7 +3,7 @@ import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { AppContent } from '@/components/app-content';
-import { FileText, Search, Edit3, ArrowRight, CheckCircle2, MessageSquare, XCircle } from 'lucide-react';
+import { FileText, Search, Edit3, ArrowRight, CheckCircle2, MessageSquare, XCircle, Eye } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import { Icon } from '@/components/icon-index';
 import { CommitteeCard } from '@/components/ui/card';
@@ -13,17 +13,11 @@ import { Button } from '@/components/ui/button';
 import { MethodologyHeader } from '@/components/ui/headers';
 import { MethodologyRow } from '@/components/ui/rows';
 import { Badge } from '@/components/badges-index';
-import { Eye } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 
-/**
- * SECTION 1: Endorsed Proposals View
- * Displays three categorized tiers of proposals. 
- * Uses theme variables: --primary (Maroon), --primary-foreground-2 (Yellow), and --evaluated-border (Green).
- */
 const EndorsedProposalsSection = ({ mockEndorsed, mockEvaluating, selectedItem, setSelectedItem, renderProposalSection }: any) => (
     <div className="flex-1 space-y-8 font-dm">
         {renderProposalSection("Pending Evaluations", "bg-primary", mockEndorsed.length, mockEndorsed)}
@@ -32,11 +26,6 @@ const EndorsedProposalsSection = ({ mockEndorsed, mockEvaluating, selectedItem, 
     </div>
 );
 
-/**
- * SECTION 2: Change Requests View
- * Tabular layout for tracking methodology and scope revisions.
- * Utilizes custom-scrollbar from base layer.
- */
 const ChangeRequestsSection = ({ changeRequests, selectedItem, setSelectedItem }: any) => (
     <div className="flex flex-col space-y-4 text-left flex-1 font-dm">
         <div className="bg-background rounded-xl border border-border overflow-hidden shadow-sm h-[620px] flex flex-col">
@@ -67,21 +56,32 @@ const ChangeRequestsSection = ({ changeRequests, selectedItem, setSelectedItem }
     </div>
 );
 
-/**
- * SECTION 3: Dynamic Right Action Pane
- * Interactive feedback system for approving or rejecting submissions.
- */
-const RightActionPane = ({ selectedItem, activeTab }: any) => {
-    // State to track the local status of the current change request
-    // In a real app, this would likely come from your 'selectedItem.status'
+const RightActionPane = ({ 
+    selectedItem, 
+    activeTab, 
+    evaluations, 
+    onToggleEval, 
+    comments, 
+    onAddComment 
+}: any) => {
+    // Shared states for both tabs
     const [actionState, setActionState] = useState<'idle' | 'approved' | 'rejected' | 'clarifying'>('idle');
+    const [commentText, setCommentText] = useState("");
     const [clarificationText, setClarificationText] = useState("");
-
+    
     // Reset state when the selected item changes
     React.useEffect(() => {
         setActionState('idle');
+        setCommentText("");
         setClarificationText("");
     }, [selectedItem?.id]);
+
+    const handleUploadComment = (status: 'approved' | 'rejected' | 'clarifying') => {
+        if (!commentText.trim()) return;
+        onAddComment(selectedItem.id, commentText, status);
+        setActionState(status);
+        setCommentText("");
+    };
 
     if (!selectedItem) {
         return (
@@ -98,19 +98,15 @@ const RightActionPane = ({ selectedItem, activeTab }: any) => {
     }
 
     if (activeTab === 'endorsed') {
+        const currentEvals = evaluations[selectedItem.id] || [];
         return (
             <div className="flex flex-col gap-4 h-[1460px] font-dm">
-                {/* Proposal Details Card */}
                 <div className="bg-background border border-border rounded-xl p-5 shadow-sm">
                     <h3 className="text-md font-bold text-primary mb-4 border-b border-border pb-2">Proposal Details</h3>
                     <div className="space-y-3">
                         <div>
                             <p className="text-[10px] uppercase font-bold text-alert-desc">Title:</p>
                             <p className="text-sm font-bold text-foreground leading-tight">{selectedItem.title}</p>
-                        </div>
-                        <div>
-                            <p className="text-[10px] uppercase font-bold text-alert-desc">Proponents:</p>
-                            <p className="text-sm font-medium text-foreground">Sofia Torres, Miguel Lopez, Ana Garcia</p>
                         </div>
                         <div className="grid grid-cols-3 gap-2">
                             <div>
@@ -132,16 +128,20 @@ const RightActionPane = ({ selectedItem, activeTab }: any) => {
                     </div>
                 </div>
 
-                {/* Evaluation Progress Card */}
                 <div className="bg-background border border-border rounded-xl p-5 shadow-sm">
                     <h3 className="text-md font-bold text-primary mb-4">Evaluation Progress</h3>
-                    <Skeleton variant="eval" progress={4} />
+                    <Skeleton variant="eval" progress={currentEvals.length} />
                     <p className="text-xs text-muted-foreground uppercase mb-2 mt-3">Pending evaluation:</p>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                         {['Dr. Maria Santos', 'Dr. Juan Cruz', 'Dr. Lisa Fernandez', 'Dr. Robert Chen', 'Dr. Anna Reyes', 'Dr. Carlos Gomez'].map(name => (
                             <div key={name} className="flex items-center gap-2">
-                                <Checkbox id="names" className='h-4 w-4'/>
-                                <Label htmlFor="names" className="font-normal cursor-pointer text-foreground">
+                                <Checkbox 
+                                    id={name} 
+                                    className='h-4 w-4'
+                                    checked={currentEvals.includes(name)}
+                                    onCheckedChange={() => onToggleEval(selectedItem.id, name)}
+                                />
+                                <Label htmlFor={name} className="font-normal cursor-pointer text-foreground text-[11px]">
                                     {name}
                                 </Label>
                             </div>
@@ -149,32 +149,94 @@ const RightActionPane = ({ selectedItem, activeTab }: any) => {
                     </div>
                 </div>
 
-                {/* Comments & Feedback Card */}
                 <div className="bg-background border border-border rounded-xl p-5 shadow-sm flex-1 flex flex-col">
                     <h3 className="text-md font-bold text-primary mb-4 border-b border-border pb-2">Comments & Feedback</h3>
-                    <div className="flex-1 flex flex-col items-center justify-center text-alert-desc">
-                         <p className="text-xs">No Comments yet</p>
+                    <div className="flex-1 overflow-y-auto space-y-4 custom-scrollbar pr-2 min-h-[400px]">
+                        {comments.length > 0 ? comments.map((comment: any) => (
+                            <div 
+                                key={comment.id} 
+                                className={cn(
+                                    "p-3 rounded-lg border text-xs transition-colors",
+                                    comment.status === 'approved' && "border-alert-success bg-alert-success/5",
+                                    comment.status === 'clarifying' && "border-primary-foreground-2 bg-primary-foreground-2/5",
+                                    comment.status === 'rejected' && "border-alert-warning bg-alert-warning/5"
+                                )}
+                            >
+                                <div className="flex justify-between items-start mb-2">
+                                    <div>
+                                        <p className={cn(
+                                            "font-bold",
+                                            comment.status === 'approved' && "text-alert-success",
+                                            comment.status === 'clarifying' && "text-alert-yellow-selected",
+                                            comment.status === 'rejected' && "text-alert-warning"
+                                        )}>
+                                            {comment.author}
+                                        </p>
+                                        <p className="text-[10px] text-alert-desc">{comment.date}</p>
+                                    </div>
+                                    <div className="flex gap-2 opacity-40">
+                                        <Edit3 className="w-3.5 h-3.5 cursor-pointer" />
+                                        <XCircle className="w-3.5 h-3.5 cursor-pointer" />
+                                    </div>
+                                </div>
+                                <p className="text-foreground leading-relaxed">{comment.text}</p>
+                            </div>
+                        )) : (
+                            <div className="h-full flex items-center justify-center text-alert-desc text-xs">No comments yet</div>
+                        )}
                     </div>
-                    <div className="mt-4 space-y-3">
-                        <p className="text-sm font-medium text-alert-desc">Provide your feedback and submit your decision</p>
-                        <Input className="h-[200px] pt-1 pb-[140px] leading-tight" inputSize="full" placeholder="Text field input..." onChange={(e) => console.log(e.target.value)} />
-                        <div className="grid grid-cols-2 gap-3">
-                            <Button variant={'tertiary'} className="bg-alert-success/15 text-alert-success border-alert-success opacity-90 h-10 hover:bg-alert-success hover:text-white">
-                                <CheckCircle2 className="w-4 h-4 mr-2" /> Approve
-                            </Button>
-                            <Button variant={'tertiary'} className="bg-alert-warning/15 text-alert-warning border-alert-warning opacity-90 h-10 hover:bg-alert-warning hover:text-white">
-                                <XCircle className="w-4 h-4 mr-2" /> Reject
-                            </Button>
-                        </div>
-                        <Button variant="outline" className="tertiary-btn w-full h-10 font-bold">
-                             <Edit3 className="w-4 h-4 mr-2" /> Request Revision
-                        </Button>
+
+                    <div className="mt-4 pt-4 border-t border-border space-y-3">
+                        {actionState === 'idle' ? (
+                            <>
+                                <p className="text-[11px] font-medium text-alert-desc">Provide your feedback and submit your decision</p>
+                                <Input 
+                                    className="h-[120px] pt-2 align-top text-xs" 
+                                    inputSize="full" 
+                                    placeholder="Text field input..." 
+                                    value={commentText}
+                                    onChange={(e) => setCommentText(e.target.value)} 
+                                />
+                                <div className="grid grid-cols-2 gap-3">
+                                    <Button onClick={() => handleUploadComment('approved')} variant={'tertiary'} className="bg-alert-success/10 text-alert-success border-alert-success/50 h-10 text-xs">
+                                        <CheckCircle2 className="w-4 h-4 mr-2" /> Approve
+                                    </Button>
+                                    <Button onClick={() => handleUploadComment('rejected')} variant={'tertiary'} className="bg-alert-warning/10 text-alert-warning border-alert-warning/50 h-10 text-xs">
+                                        <XCircle className="w-4 h-4 mr-2" /> Reject
+                                    </Button>
+                                </div>
+                                <Button onClick={() => handleUploadComment('clarifying')} variant="outline" className="w-full h-10 font-bold text-xs">
+                                     <Edit3 className="w-4 h-4 mr-2" /> Request Revision
+                                </Button>
+                            </>
+                        ) : (
+                            <div className="bg-muted/30 border border-border rounded-xl p-4 flex flex-col items-center text-center space-y-3">
+                                <div className="flex items-center gap-3 text-left w-full">
+                                    <CheckCircle2 className="w-6 h-6 text-alert-info" />
+                                    <div>
+                                        <p className="text-sm font-bold text-foreground">Your Evaluation Submitted</p>
+                                        <p className="text-[11px] text-alert-desc leading-none">Waiting for other members</p>
+                                    </div>
+                                </div>
+                                <div className="pt-3 border-t border-border w-full flex justify-center">
+                                   <div className={cn(
+                                       "text-[10px] font-bold px-4 py-1 rounded-full flex items-center gap-1.5 border",
+                                       actionState === 'approved' && "bg-evaluated-bg text-evaluated-font-color border-evaluated-border",
+                                       actionState === 'rejected' && "bg-alert-warning/10 text-alert-warning border-alert-warning/30",
+                                       actionState === 'clarifying' && "bg-primary-foreground-2/10 text-alert-yellow-selected border-primary-foreground-2/30"
+                                   )}>
+                                      {actionState === 'approved' ? 'Approved' : actionState === 'rejected' ? 'Rejected' : 'For Revision'}
+                                   </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
         );
     }
 
+    // --- CHANGE REQUEST TAB VIEW ---
     return (
         <div className="bg-background border border-border rounded-xl p-5 shadow-sm h-[620px] overflow-y-auto custom-scrollbar flex flex-col gap-4 font-dm">
             <div>
@@ -182,25 +244,24 @@ const RightActionPane = ({ selectedItem, activeTab }: any) => {
                 <p className="text-[13px] text-foreground font-medium mt-1 leading-tight">{selectedItem.title}</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 bg-background border border-border rounded-xl p-4 shadow-sm">
+            <div className="grid grid-cols-2 gap-3 bg-background border border-border rounded-xl p-4 shadow-sm text-xs">
                 <div>
-                    <p className="text-[10px] uppercase font-bold text-alert-desc">Adviser</p>
-                    <p className="text-[13px] font-bold text-foreground">{selectedItem.adviser || 'Dr. Maria Santos'}</p>
+                    <p className="uppercase font-bold text-alert-desc">Adviser</p>
+                    <p className="font-bold">{selectedItem.adviser || 'Dr. Maria Santos'}</p>
                 </div>
                 <div>
-                    <p className="text-[10px] uppercase font-bold text-alert-desc">Section</p>
-                    <p className="text-[13px] font-bold text-foreground">{selectedItem.block || 'BSCPE 4-2'}</p>
+                    <p className="uppercase font-bold text-alert-desc">Section</p>
+                    <p className="font-bold">{selectedItem.block || 'BSCPE 4-2'}</p>
                 </div>
             </div>
 
-            {/* Current vs Proposed - Static Example from Image */}
             <div className="space-y-3">
                 <div className="bg-muted/10 border border-border rounded-xl p-3">
                     <div className="flex items-center gap-2 mb-1">
                         <ArrowRight className="w-3.5 h-3.5 text-alert-desc" />
                         <span className="text-[10px] font-bold text-alert-desc uppercase">Current Version (DP1)</span>
                     </div>
-                    <p className="text-[12px] text-foreground">Initial methodology involves data collection from surveys.</p>
+                    <p className="text-[12px] text-foreground leading-relaxed">Initial methodology involves data collection from surveys.</p>
                 </div>
 
                 <div className="bg-primary/5 border border-primary/20 rounded-xl p-3">
@@ -208,27 +269,27 @@ const RightActionPane = ({ selectedItem, activeTab }: any) => {
                         <ArrowRight className="w-3.5 h-3.5 text-primary" />
                         <span className="text-[10px] font-bold text-primary uppercase">Proposed Change (DP2)</span>
                     </div>
-                    <p className="text-[12px] text-foreground">Change data collection to include both surveys and interviews.</p>
+                    <p className="text-[12px] text-foreground leading-relaxed">Change data collection to include both surveys and interviews.</p>
                 </div>
             </div>
 
-            <div className="bg-under-eval-bg border border-under-eval-border rounded-xl p-3">
+            <div className="bg-under-eval-bg border border-under-eval-border rounded-xl p-3 text-xs">
                 <div className="flex items-center gap-2 mb-1">
                     <ArrowRight className="w-3.5 h-3.5 text-under-eval-font-color" />
-                    <span className="text-[10px] font-bold text-under-eval-font-color uppercase">Justification</span>
+                    <span className="font-bold text-under-eval-font-color uppercase">Justification</span>
                 </div>
-                <p className="text-[12px] text-foreground leading-relaxed">Interviews will provide deeper insights into student performance.</p>
+                <p className="leading-relaxed">Interviews will provide deeper insights into student performance.</p>
             </div>
 
-            <div className="bg-evaluated-bg border border-evaluated-border rounded-xl p-3">
+            <div className="bg-evaluated-bg border border-evaluated-border rounded-xl p-3 text-xs">
                 <div className="flex items-center gap-2 mb-1">
                     <ArrowRight className="w-3.5 h-3.5 text-evaluated-font-color" />
-                    <span className="text-[10px] font-bold text-evaluated-font-color uppercase">Adviser Recommendation</span>
+                    <span className="font-bold text-evaluated-font-color uppercase">Adviser Recommendation</span>
                 </div>
-                <p className="text-[12px] text-foreground leading-relaxed">Consider conducting a pilot study to validate the new methodology.</p>
+                <p className="leading-relaxed">Consider conducting a pilot study to validate the new methodology.</p>
             </div>
 
-            {/* DYNAMIC SECTION BASED ON ACTION */}
+            {/* ACTION SECTION */}
             <div className="mt-auto pt-4 space-y-3">
                 {actionState === 'idle' && (
                     <div className="grid grid-cols-3 gap-2">
@@ -241,7 +302,7 @@ const RightActionPane = ({ selectedItem, activeTab }: any) => {
                         <Button 
                             onClick={() => setActionState('clarifying')}
                             variant="outline" 
-                            className="text-alert-desc text-[11px] font-bold h-10 border-border"
+                            className="bg-background text-alert-desc text-[11px] font-bold h-10 border-border"
                         >
                             <MessageSquare className="w-3.5 h-3.5 mr-1" /> Clarify
                         </Button>
@@ -255,24 +316,41 @@ const RightActionPane = ({ selectedItem, activeTab }: any) => {
                 )}
 
                 {actionState === 'clarifying' && (
-                    <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 space-y-3">
+                    <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 space-y-3 w-full">
                         <p className="text-[11px] font-bold text-primary uppercase">Clarify...</p>
                         <Input 
-                            className="h-[100px] bg-white pt-2 align-top text-xs" 
-                            placeholder="Text field input..." 
+                            className="h-[100px] w-full bg-white pt-2 align-top text-xs" 
+                            inputSize="full"
+                            placeholder="Provide details for revision..." 
                             value={clarificationText}
                             onChange={(e) => setClarificationText(e.target.value)}
                         />
-                        <div className="flex justify-end">
-                            <Badge name="statusBadgePendingReview" className="bg-primary/20 text-primary border-primary/30">
-                                <Edit3 className="w-3 h-3 mr-1" /> For Revision
-                            </Badge>
+                        <div className="flex justify-between items-center">
+                            {/* Cancel Button to return to idle state */}
+                            <Button 
+                                variant="ghost" 
+                                onClick={() => setActionState('idle')}
+                                className="text-[11px] h-8 text-alert-desc hover:bg-transparent hover:text-foreground p-0"
+                            >
+                                Cancel
+                            </Button>
+
+                            <div className="flex items-center gap-2">
+                                {/* Comment/Submit Button */}
+                                <Button 
+                                    onClick={() => handleUploadComment('clarifying')}
+                                    className="h-8 px-3 text-[11px] bg-primary text-white hover:bg-primary/90"
+                                >
+                                    <MessageSquare className="w-3 h-3 mr-1.5" />
+                                    Comment
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 )}
 
                 {(actionState === 'approved' || actionState === 'rejected') && (
-                    <div className="bg-muted/30 border border-border rounded-xl p-4 flex flex-col items-center text-center space-y-3">
+                    <div className="bg-muted/30 border border-border rounded-xl p-4 flex flex-col items-center text-center space-y-2">
                         <div className="flex items-center gap-3 text-left w-full">
                             <CheckCircle2 className={cn("w-6 h-6", actionState === 'approved' ? "text-alert-info" : "text-alert-warning")} />
                             <div>
@@ -280,7 +358,7 @@ const RightActionPane = ({ selectedItem, activeTab }: any) => {
                                 <p className="text-[11px] text-alert-desc leading-none">You have responded to this request.</p>
                             </div>
                         </div>
-                        <div className="pt-3 border-t border-border w-full flex justify-center">
+                        <div className="pt-2 border-t border-border w-full flex justify-center">
                             <div className={cn(
                                 "text-[10px] font-bold px-4 py-1 rounded-full flex items-center gap-1.5 border",
                                 actionState === 'approved' 
@@ -301,8 +379,25 @@ const RightActionPane = ({ selectedItem, activeTab }: any) => {
 export default function ProposalReview() {
     const [activeTab, setActiveTab] = useState<'endorsed' | 'changes'>('endorsed');
     const [selectedItem, setSelectedItem] = useState<any>(null);
+    
+    const [evaluations, setEvaluations] = useState<Record<number, string[]>>({});
+    const [allComments, setAllComments] = useState<Record<number, any[]>>({});
+    const [actionStates, setActionStates] = useState<Record<number, string>>({});
 
-    // Filter/Mock data remains unchanged to preserve functionality
+    const handleToggleEval = (id: number, name: string) => {
+        setEvaluations(prev => {
+            const current = prev[id] || [];
+            return { ...prev, [id]: current.includes(name) ? current.filter(n => n !== name) : [...current, name] };
+        });
+    };
+
+    const handleAddComment = (id: number, text: string, status: string) => {
+        if (!text.trim()) return;
+        const newComment = { id: Date.now(), author: 'Dr. Juan Cruz', date: new Date().toLocaleString(), text, status, isUser: true };
+        setAllComments(prev => ({ ...prev, [id]: [...(prev[id] || []), newComment] }));
+        setActionStates(prev => ({ ...prev, [id]: status }));
+    };
+
     const changeRequests = [
         { id: 101, title: "AI Analytics for Centralized Machine Learning Hub", type: "Methodology", date: "Jan 1", status: "Approved" },
         { id: 102, title: "Blockchain System for Secure Transactions", type: "Scope", date: "Jan 3", status: "Pending" },
@@ -335,118 +430,57 @@ export default function ProposalReview() {
         stage: 0
     }).map((item, i) => ({ ...item, id: i + 20 }));
 
-    const renderProposalSection = (title: string, headerColor: string, count: number, data: any[]) => {
-        return (
-            <section className="bg-background rounded-2xl border border-border overflow-hidden shadow-sm flex flex-col font-dm">
-                <div className={cn("p-3 flex justify-between items-center px-5 shrink-0", headerColor)}>
-                    <span className="font-bold text-sm text-white">{title}</span>
-                    <div className="bg-white/90 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center justify-center min-w-[20px]">
-                        <span className={cn(
-                            "font-bold",
-                            headerColor === "bg-primary" ? "text-primary" : headerColor === "bg-primary-foreground-2" ? "text-alert-yellow-selected" : "text-alert-success"
-                        )}>{count}</span>
-                    </div>
-                </div>
 
-                <div className="p-4 overflow-y-auto h-[420px] bg-muted/5 custom-scrollbar">
-                    {data.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                            {data.map((item) => (
-                                <div 
-                                    key={item.id} 
-                                    onClick={() => setSelectedItem(item)} 
-                                    className={cn(
-                                        "cursor-pointer transition-all duration-200 rounded-xl",
-                                        selectedItem?.id === item.id ? "ring-2 ring-primary ring-offset-2" : "hover:opacity-90"
-                                    )}
-                                >
-                                    <CommitteeCard
-                                        thesisTitle={item.title}
-                                        adviserName={item.adviser}
-                                        blockSection={item.block}
-                                        currentStage={item.stage}
-                                        totalStages={6} progress={3}
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="h-full flex flex-col items-center justify-center py-12 text-alert-desc">
-                            <div className="bg-muted p-4 rounded-full mb-3">
-                                <Icon name="docuDefault" size={32} className="opacity-40" />
+    const renderProposalSection = (title: string, headerColor: string, count: number, data: any[]) => (
+        <section className="bg-background rounded-2xl border border-border overflow-hidden shadow-sm flex flex-col font-dm">
+            <div className={cn("p-3 flex justify-between items-center px-5 shrink-0", headerColor)}>
+                <span className="font-bold text-sm text-white">{title}</span>
+                <div className="bg-white/90 text-[10px] font-bold px-2 py-0.5 rounded-full text-primary min-w-[20px] flex items-center justify-center">{count}</div>
+            </div>
+            <div className="p-4 overflow-y-auto h-[420px] bg-muted/5 custom-scrollbar">
+                {data.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                        {data.map((item) => (
+                            <div key={item.id} onClick={() => setSelectedItem(item)} className={cn("cursor-pointer transition-all rounded-xl", selectedItem?.id === item.id ? "ring-2 ring-primary ring-offset-2" : "hover:opacity-90")}>
+                                <CommitteeCard thesisTitle={item.title} adviserName={item.adviser} blockSection={item.block} totalStages={6} progress={evaluations[item.id]?.length || 0} currentStage={0} />
                             </div>
-                            <p className="text-sm font-semibold">No proposals found</p>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="h-full flex flex-col items-center justify-center py-12 text-alert-desc">
+                        <div className="bg-muted p-4 rounded-full mb-3">
+                            <Icon name="docuDefault" size={32} className="opacity-40" />
                         </div>
-                    )}
-                </div>
-            </section>
-        );
-    };
+                        <p className="text-sm font-semibold">No proposals found</p>
+                    </div>
+                )}
+            </div>
+        </section>
+    );
 
     return (
         <>
             <AppLayout breadcrumbs={[{ title: 'Proposal Review', href: '/proposal-review' }, { title: activeTab === 'endorsed' ? 'Endorsed Proposals' : 'Change Requests' } as BreadcrumbItem]}>
                 <Head title="Proposal Review" />
-
-                <AppContent
-                    title="Proposal Review"
-                    subtitle="Review and evaluate thesis proposals submitted for committee approval"
-                    icon={<FileText className="w-8 h-8 text-primary-foreground-2" />}
-                    variant="header"
-                />
-
+                <AppContent title="Proposal Review" subtitle="Review and evaluate thesis proposals submitted for committee approval" icon={<FileText className="w-8 h-8 text-primary-foreground-2" />} variant="header" />
                 <div className="px-6 max-w-[1440px] mx-auto w-full space-y-6 font-dm pb-10">
                     <div className="flex border-b border-border w-full">
-                        <Button 
-                            variant="ghost" 
-                            onClick={() => {setActiveTab('endorsed'); setSelectedItem(null);}} 
-                            className={cn(
-                                "flex items-center gap-2 px-6 py-3 text-sm font-bold transition-all rounded-b-none border-b-2", 
-                                activeTab === 'endorsed' ? "border-primary text-primary" : "border-transparent text-alert-desc hover:bg-muted"
-                            )}
-                        >
-                            <Icon name={activeTab === 'endorsed' ? "docuClicked" : "docuDefault"} size={16} />
-                            Endorsed Proposal
-                        </Button>
-                        <Button 
-                            variant="ghost" 
-                            onClick={() => {setActiveTab('changes'); setSelectedItem(null);}} 
-                            className={cn(
-                                "flex items-center gap-2 px-6 py-3 text-sm font-bold transition-all rounded-b-none border-b-2", 
-                                activeTab === 'changes' ? "border-primary text-primary" : "border-transparent text-alert-desc hover:bg-muted"
-                            )}
-                        >
-                            <Icon name={activeTab === 'changes' ? "editClicked" : "editDefault"} size={16} />
-                            Change Requests
-                        </Button>
+                        <Button variant="ghost" onClick={() => {setActiveTab('endorsed'); setSelectedItem(null);}} className={cn("flex items-center gap-2 px-6 py-3 text-sm font-bold border-b-2 rounded-sm rounded-b-none", activeTab === 'endorsed' ? "border-primary text-primary" : "border-transparent text-alert-desc")}>Endorsed Proposal</Button>
+                        <Button variant="ghost" onClick={() => {setActiveTab('changes'); setSelectedItem(null);}} className={cn("flex items-center gap-2 px-6 py-3 text-sm font-bold border-b-2 rounded-sm rounded-b-none", activeTab === 'changes' ? "border-primary text-primary" : "border-transparent text-alert-desc")}>Change Requests</Button>
                     </div>
-
                     <FilterSearchSection variant='Notifications'/>
-
                     <div className="flex flex-row items-start gap-[30px] w-full max-w-[1360px] mx-auto">
-                        {activeTab === 'endorsed' ? (
-                            <EndorsedProposalsSection 
-                                mockEndorsed={mockEndorsed} 
-                                mockEvaluating={mockEvaluating} 
+                        {activeTab === 'endorsed' ? <EndorsedProposalsSection mockEndorsed={mockEndorsed} mockEvaluating={mockEvaluating} selectedItem={selectedItem} setSelectedItem={setSelectedItem} renderProposalSection={renderProposalSection} /> : <ChangeRequestsSection changeRequests={changeRequests} selectedItem={selectedItem} setSelectedItem={setSelectedItem} />}
+                        <div className="w-[400px] shrink-0 sticky top-6">
+                            <RightActionPane 
                                 selectedItem={selectedItem} 
-                                setSelectedItem={setSelectedItem} 
-                                renderProposalSection={renderProposalSection}
+                                activeTab={activeTab} 
+                                evaluations={evaluations} 
+                                onToggleEval={handleToggleEval} 
+                                comments={allComments[selectedItem?.id] || []} 
+                                onAddComment={handleAddComment} 
+                                actionState={actionStates[selectedItem?.id] || 'idle'} 
                             />
-                        ) : (
-                            <ChangeRequestsSection 
-                                changeRequests={changeRequests} 
-                                selectedItem={selectedItem} 
-                                setSelectedItem={setSelectedItem} 
-                            />
-                        )}
-
-                        <div className="w-[400px] shrink-0">
-                            <div className="sticky top-6 flex flex-col gap-4">
-                                <RightActionPane 
-                                    selectedItem={selectedItem} 
-                                    activeTab={activeTab} 
-                                />
-                            </div>
                         </div>
                     </div>
                 </div>
