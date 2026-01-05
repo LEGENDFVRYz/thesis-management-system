@@ -194,20 +194,7 @@ export function AppHeader({ breadcrumbs = [], variant = 'default' }: AppHeaderPr
                         </div>
                     ) : (
                         <div className="flex items-center gap-4 text-white">
-                            {/* Profile Icon */}
-                            <div 
-                                className="flex items-center justify-center cursor-pointer transition-transform hover:scale-110" 
-                                title="Profile"
-                                onMouseEnter={() => setHoveredIcon('profile')}
-                                onMouseLeave={() => setHoveredIcon(null)}
-                                onClick={() => setClickedIcon(clickedIcon === 'profile' ? null : 'profile')}
-                            >
-                                <Icon 
-                                    name={getIconName('profile') as any} 
-                                    size={20} 
-                                />
-                            </div>
-                            
+                          
                             {/* Notifications Icon*/}
                             <div 
                                 className="relative flex items-center justify-center cursor-pointer transition-transform hover:scale-110" 
