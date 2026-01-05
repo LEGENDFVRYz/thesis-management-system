@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use phpDocumentor\Reflection\Types\Nullable;
 
 return new class extends Migration
 {
@@ -14,10 +15,10 @@ return new class extends Migration
         Schema::create('tbl_events', function (Blueprint $table) {
             $table->id();
             
-            $table->foreignId('dl_template_id')
-                  ->constrained('tbl_deadline_templates')
-                  ->onDelete('cascade');
-            
+            $table->foreignId('milestone_id')
+                  ->constrained('tbl_milestones')
+                  ->cascadeOnDelete();
+                  
             $table->foreignId('semester_id')
                   ->constrained('tbl_semesters')
                   ->onDelete('cascade');
@@ -25,7 +26,7 @@ return new class extends Migration
             // Derived
             // $table->string('title'); // Copied from template for convenience
             
-            $table->date('due_date');
+            $table->date('start_date')->nullable();
         });
     }
 

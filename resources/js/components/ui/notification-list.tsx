@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 export type NotificationType = 'schedule' | 'assignment' | 'reminder' | 'system';
 
 export interface NotificationItemProps extends React.HTMLAttributes<HTMLDivElement> {
-    type?: NotificationType;
+    type: string | null;    // Accept any string, since you have internal validation already
     title: string;
     description: string;
     timestamp: string;

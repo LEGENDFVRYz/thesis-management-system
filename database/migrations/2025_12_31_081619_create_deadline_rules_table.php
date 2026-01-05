@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tbl_deadline_templates', function (Blueprint $table) {
+        Schema::create('tbl_deadline_rules', function (Blueprint $table) {
             $table->id();
             
-            // $table->foreignId('id')
-            //       ->constrained('tbl_milestones')
-            //       ->cascadeOnDelete();
+            $table->foreignId('milestone_id')
+                  ->constrained('tbl_milestones')
+                  ->cascadeOnDelete();
 
             $table->string('role');
 
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tbl_deadline_templates');
+        Schema::dropIfExists('tbl_deadline_rules');
     }
 };

@@ -13,13 +13,14 @@ class Event extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'dl_template_id',
+        'milestone_id',
         'semester_id',
-        'due_date',
+        'start_date',
+        'offset'
     ];
 
     protected $casts = [
-        'due_date' => 'date',
+        'start_date' => 'date',
     ];
     
     /*
@@ -28,9 +29,14 @@ class Event extends Model
     ==================================================================================
     */
 
-    public function deadlineTemplate()
+    // public function deadlineTemplate()
+    // {
+    //     return $this->belongsTo(DeadlineTemplate::class, 'dl_template_id');
+    // }
+
+    public function milestone()
     {
-        return $this->belongsTo(DeadlineTemplate::class, 'dl_template_id');
+        return $this->belongsTo(Milestone::class, 'milestone_id');
     }
 
     public function semester()

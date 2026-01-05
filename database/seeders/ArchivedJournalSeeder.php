@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Jobs\GenerateDummyManuscriptJob;
 use App\Models\ArchivedJournal;
 use App\Models\DefenseEvaluation;
 use App\Models\DefenseMatrix;
+use Faker\Factory;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -39,12 +41,26 @@ class ArchivedJournalSeeder extends Seeder
                 }
 
                 // 5. Create Archive Record
-                ArchivedJournal::factory()->create([
+                $faker = Factory::create();
+                $dummy_filename = 'journal_' . $faker->uuid() . '.pdf';
+                $dummy_filepath = 'archives/2025/';
+
+                $archive = ArchivedJournal::factory()->create([
                     'thesis_id' => $defense->endorsement->thesis->id,
+                    'file_path' => $dummy_filepath . $dummy_filename,
                     
                     // Optional: Use words from the real thesis title as keywords
                     'keywords' => $this->generateKeywords($defense->endorsement->thesis->title ?? 'Research'),
                 ]);
+
+                // Generate Dummy Manuscript PDF for this archived journal
+                GenerateDummyManuscriptJob::dispatchSync(
+                    $dummy_filepath,                       // folder
+                    $dummy_filename,              // filename
+                    $archive->thesis->title ?? 'Untitled Manuscript'    // title
+                );
+
+                $this->command->info("✅ Dummy manuscript generated: {$dummy_filename}");
             }
         }
     }

@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\AcademicSettingController;
+use App\Http\Controllers\Admin\DeadlineController;
 use App\Http\Controllers\Admin\DefenseController;
 use App\Http\Controllers\Admin\DepartmentPoliciesController;
 use App\Http\Controllers\Admin\FacultyController;
@@ -20,6 +22,9 @@ use App\Http\Controllers\Faculty\Coordinator\ThesisMonitoring\ThesisRegistry;
 use App\Http\Controllers\Faculty\Joint1\DefenseManagement;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\FileImportController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PdfViewerController;
+use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\Shared\ThesisArchive;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -74,9 +79,7 @@ Route::prefix('guest')->group(function () {
         return Inertia::render('Guest/filter-search');
     })->name('guest.search');
 
-    Route::get('/preview', function () {
-        return Inertia::render('Guest/document-preview');
-    })->name('guest.preview');
+    Route::get('/preview/{id}',  [ThesisArchive::class, 'show'])->name('guest.preview');
 });
 
 // PUBLIC ARCHIVE (legacy routes - redirect to guest)
@@ -259,9 +262,7 @@ Route::prefix('faculty')->group(function () {
         });
 
 
-        Route::get('resources', function () {
-            return Inertia::render('Shared/resources');
-        })->name('faculty.resources');
+        Route::get('resources', [ResourceController::class, 'index'])->name('faculty.resources');
 
         Route::get('notification', function () {
             return Inertia::render('Shared/notification');
@@ -304,13 +305,12 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
 
         Route::get('faculty', [FacultyController::class, 'index'])->name('admin.management.faculty');
 
-        Route::get('academic-settings', function () {
-            return Inertia::render('Admin/management/academic');
-        })->name('admin.management.academic');
+        Route::get('academic-settings', [AcademicSettingController::class, 'index'])->name('admin.management.academic');
+        Route::put('academic-settings', [AcademicSettingController::class, 'update'])->name('admin.management.academic.update');
 
-        Route::get('deadline', function () {
-            return Inertia::render('Admin/management/deadline');
-        })->name('admin.management.deadline');
+        Route::get('deadline', [DeadlineController::class, 'index'])->name('admin.management.deadline');
+        Route::put('deadline/{id}', [DeadlineController::class, 'update'])->name('admin.management.deadline.update');
+
 
         // FULL CRUD OPERATIONS EXAMPLES
         Route::get('dept-policies', [DepartmentPoliciesController::class, 'index'])->name('admin.management.dep-policies');
@@ -319,6 +319,8 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
         Route::delete('dept-policies/grading-criteria/{id}', [DepartmentPoliciesController::class, 'destroy'])->name('admin.management.dep-policies.destroy');
         Route::post('dept-policies/grading-criteria', [DepartmentPoliciesController::class, 'store'])->name('admin.management.dep-policies.store');
 
+        Route::get('dept-policies/guidelines', [DepartmentPoliciesController::class, 'index2'])->name('admin.management.dep-policies.guidelines');
+        Route::post('dept-policies/update-guidelines', [DepartmentPoliciesController::class, 'updateGuidelines'])->name('admin.management.dep-policies.update-guidelines');
 
         Route::get('defenses', [DefenseController::class, 'index'])->name('admin.management.defenses');
     });
@@ -340,9 +342,11 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
         })->name('admin.repository.system-expanded');
     });
 
-    Route::get('resources', function () {
-        return Inertia::render('Shared/resources');
-    })->name('admin.resources');
+    Route::get('resources', [ResourceController::class, 'index'])->name('admin.resources');
+    Route::post('resources', [ResourceController::class, 'store'])->name('admin.resources.store');
+    Route::delete('resources/{resource}', [ResourceController::class, 'destroy'])->name('admin.resources.remove');
+    Route::patch('resources/{resource}/toggle', [ResourceController::class, 'toggle'])->name('admin.resources.toggle');
+    // Note: Download routes for resources is in public
 
     Route::get('notification', function () {
         return Inertia::render('Shared/notification');
@@ -361,7 +365,11 @@ API ROUTES (temporary only)
 ==================================================================================
 */
 Route::post('file-import', [FileImportController::class, 'store'])->name('file.import');
+Route::get('/resources/{filekey}/download', [ResourceController::class, 'download'])->name('resources.download');
+Route::get('/manuscripts/{id}/stream', [PdfViewerController::class, 'streamPdf'])->name('manuscripts.stream');
 
+Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 
 // TEMPORARY: view shared thesis page without affecting guest/admin routes
 Route::get('/test-thesis', function () {

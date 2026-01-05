@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Shared;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ThesisArchive extends Controller
@@ -46,6 +47,12 @@ class ThesisArchive extends Controller
          // Note: Granted permission, you can add new route in routes/web.php dependent on your logic
 
         // Show selected archive thesis information
+        $url_test = storage_path('app/testing/long.pdf');
+        // dd($url_test);
+
+        return Inertia::render('Guest/document-preview', [
+            'url' => $url_test,
+        ]);
     }
 
     /**
