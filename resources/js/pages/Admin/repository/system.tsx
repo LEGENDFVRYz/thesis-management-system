@@ -1,22 +1,23 @@
 import { useState, useEffect } from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { AppHeader } from '@/components/app-header';
-import { AppContent } from '@/components/app-content';
-import { NavFooter } from '@/components/nav-footer';
+import RepositoryLayout from './index';
+import { system } from '@/routes/admin/repository';
+import { type BreadcrumbItem } from '@/types';
 import { SystemRepositoryStorage } from '@/components/system-repository-storage';
 import { Icon } from '@/components/icon-index';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { AlertCircle, FileText, Trash2, Calendar } from 'lucide-react';
+import { TableHead } from '@/components/ui/table';
+import { AlertCircle, FileText, Trash2, Calendar, CheckCircle } from 'lucide-react';
+import { NavFooter } from '@/components/nav-footer';
+import { index, theses } from '@/routes/repository';
+import { AppContent } from '@/components/app-content';
+
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'Repository', href: index().url },
+    { title: 'System Archive', href: system().url },
+];
 
 // Types
 interface SystemData {
@@ -38,7 +39,7 @@ interface SystemData {
   proponents: string[];
 }
 
-// Mock Data - Extended with more entries
+// Mock Data
 const mockSystemData: SystemData[] = [
   {
     id: '1',
@@ -259,12 +260,20 @@ export default function SystemRepository() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [syncedFilesCount] = useState(1);
 
-  const selectedThesis =
-    mockSystemData.find(item => item.id === selectedId) || mockSystemData[0];
+  const selectedThesis = mockSystemData.find(item => item.id === selectedId) || mockSystemData[0];
+  const [currentSyncStatus, setCurrentSyncStatus] = useState<'Success' | 'Failed'>(selectedThesis.syncStatus);
 
-  const [currentSyncStatus, setCurrentSyncStatus] = useState<'Success' | 'Failed'>(
-    selectedThesis.syncStatus
-  );
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
+
+  const handleDeleteClick = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = () => {
+    setShowDeleteConfirm(false);
+    setShowDeleteSuccess(true);
+  };
 
   useEffect(() => {
     setCurrentSyncStatus(selectedThesis.syncStatus);
@@ -277,7 +286,6 @@ export default function SystemRepository() {
   const handleSyncNow = () => {
     setIsSyncing(true);
     setShowSuccess(false);
-
     setTimeout(() => {
       setIsSyncing(false);
       setCurrentSyncStatus('Success');
@@ -287,19 +295,21 @@ export default function SystemRepository() {
 
   return (
     <>
-      <Head title="System Repository" />
-      <AppHeader />
+      <Head title="System Archive" />
+
+      <RepositoryLayout breadcrumbs={breadcrumbs}>
 
       <AppContent
-        title="System Repository"
-        subtitle="Manage and monitor system storage and thesis data"
+        title="System Archive"
+        subtitle="Browse and explore student thesis projects"
       >
+
         {/* Storage Card */}
         <div className="mb-8">
           <SystemRepositoryStorage />
         </div>
 
-{/* Table and Details Card Section */}
+        {/* Table and Details Card Section */}
         <div className="flex gap-6">
           {/* Table Section */}
           <div className="flex-1 rounded-lg border-[0.8px] border-primary overflow-hidden flex flex-col h-fit">
@@ -402,6 +412,7 @@ export default function SystemRepository() {
               <Button
                 variant="default"
                 size="sm"
+                onClick={handleDeleteClick}
                 className="h-8 px-3 gap-[6px] rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 <Trash2 size={16} className="text-white" />
@@ -411,27 +422,42 @@ export default function SystemRepository() {
 
             {/* Content */}
             <div className="flex flex-col gap-[10px]">
-              {/* Thesis ID Row */}
+              {/* Thesis ID & Sync Status */}
               <div className="flex items-center justify-between">
                 <div className="flex flex-col gap-1">
                   <p className="text-primary font-dm text-[16px] font-bold leading-normal">
                     Thesis ID
-                  </p>
+                </p>
                   <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
                     {selectedThesis.thesisId}
                   </p>
                 </div>
-                
-                <div className="flex items-center gap-2">
-                  {isFailed && !isSyncing && !showSuccess && (
-                    <button 
-                      onClick={handleSyncNow}
-                      className="text-foreground font-dm text-[12px] font-medium underline hover:text-primary"
-                    >
-                      Sync now
-                    </button>
+                    
+                  {/* Sync Controls */}
+                  <div className="flex items-center gap-2">
+                    {!isSyncing && (
+                      <>
+                        {currentSyncStatus === 'Failed' && (
+                          <button
+                            onClick={handleSyncNow}
+                            className="text-foreground font-dm text-[12px] font-medium underline hover:text-primary"
+                          >
+                            Sync now
+                          </button>
+                        )}
+          
+                        <Badge
+                          className={`rounded-[25px] px-[22px] py-[2px] border ${
+                            currentSyncStatus === 'Failed'
+                              ? 'bg-transparent border-primary text-primary'
+                              : 'bg-transparent border-[#0D542B] text-[#0D542B]'
+                          } hover:bg-transparent`}
+                        >
+                          <span className="text-[12px] font-medium">{currentSyncStatus}</span>
+                        </Badge>
+                    </>
                   )}
-                  
+
                   {isSyncing && (
                     <div className="flex items-center gap-2">
                       <Spinner type="ring" size="sm" />
@@ -440,19 +466,6 @@ export default function SystemRepository() {
                       </span>
                     </div>
                   )}
-                  
-                  {!isSyncing && (
-                    <Badge
-                        className={`rounded-[25px] px-[22px] py-[2px] border ${
-                        isFailed
-                            ? 'bg-transparent border-primary text-primary'
-                            : 'bg-transparent border-[#0D542B] text-[#0D542B]'
-                        } hover:bg-transparent`}
-                    >
-                        <span className="text-[12px] font-medium">{currentSyncStatus}</span>
-                    </Badge>
-                  )}
-
                 </div>
               </div>
 
@@ -462,7 +475,7 @@ export default function SystemRepository() {
                   Thesis Title
                 </p>
                 <p className="text-foreground font-dm text-[15px] font-medium leading-normal">
-                    {selectedThesis.lastSyncDate || 'Date Today'}
+                  {selectedThesis.thesisTitle}
                 </p>
               </div>
 
@@ -520,7 +533,7 @@ export default function SystemRepository() {
                       <>
                         <AlertCircle size={16} className="text-primary" />
                         <p className="text-primary font-dm text-[15px] font-medium leading-normal">
-                            Failed
+                          Failed
                         </p>
                       </>
                     ) : (
@@ -580,9 +593,101 @@ export default function SystemRepository() {
             </div>
           </div>
         </div>
-      </AppContent>
 
-      <NavFooter />
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div
+              className="w-[400px] rounded-lg bg-background p-6"
+              style={{
+                border: "1px solid var(--primary)",
+                boxShadow: "0 10px 20px rgb(115 0 0 / 0.25)",
+              }}
+            >
+              <AlertCircle
+                size={48}
+                className="mx-auto mb-5"
+                style={{ color: "var(--primary)" }}
+              />
+
+              <p
+                className="mb-2 text-center font-dm font-medium text-body-2"
+                style={{ color: "var(--primary)" }}
+              >
+                Are you sure you want to delete this thesis in this repository?
+              </p>
+
+              <p
+                className="mb-6 text-center font-dm text-body-4"
+                style={{ color: "var(--muted-foreground)" }}
+              >
+                This action cannot be undone.
+              </p>
+
+              <div className="flex justify-center gap-4">
+                <Button
+                  variant="secondary"
+                  className="rounded-full px-8"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  size="default"
+                >
+                  Cancel
+                </Button>
+
+                <Button
+                  variant="negative"
+                  className="rounded-full px-8"
+                  onClick={handleConfirmDelete}
+                  size="default"
+                >
+                  Confirm
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Success Modal */}
+        {showDeleteSuccess && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div
+              className="w-[400px] rounded-lg bg-background p-6"
+              style={{
+                border: "1px solid var(--alert-success)",
+                boxShadow: "0 10px 20px rgb(0 128 0 / 0.25)",
+              }}
+            >
+              <CheckCircle
+                size={48}
+                className="mx-auto mb-5"
+                style={{ color: "var(--alert-success)" }}
+              />
+
+              <p
+                className="mb-6 text-center font-dm font-medium text-body-2"
+                style={{ color: "var(--alert-success)" }}
+              >
+                Successfully deleted this thesis.
+              </p>
+
+              <div className="flex justify-center">
+                <Button
+                  variant="secondary"
+                  className="rounded-full px-10 bg-alert-success text-primary-foreground hover:bg-alert-success"
+                  onClick={() => setShowDeleteSuccess(false)}
+                  size="default"
+                >
+                  Done
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </AppContent>
+    </RepositoryLayout>
+    
+    <NavFooter />
     </>
   );
 }

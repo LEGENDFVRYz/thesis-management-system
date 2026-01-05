@@ -7,20 +7,16 @@ import { Tabs, TabButton } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Alert } from '@/components/ui/alert';
 import StageSwitchToggle from '@/components/stage-toggle';
-
-// ICONS
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
+import DefensePoliciesRubrics from '@/pages/Admin/management/dep-policies-rubrics';
+import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import { LuUpload } from 'react-icons/lu'
 import EditIcon from '@/components/Icons/ic_edit-Default.svg';
 import DeleteIcon from '@/components/Icons/ic_delete-Default.svg';
 import AddIcon from '@/components/Icons/ic_add-Default.svg';
 import ManagementIcon from '@/components/Icons/ic_pen-settings-Default.svg';
+import { PoliciesHeader, PoliciesRow } from './policies-tables';
 
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Deadlines',
-        href: depPolicies().url,
-    },
-];
 
 const POLICY_TABS = [
     { key: 'system', label: 'System Rules' },
@@ -76,6 +72,13 @@ const WORKFLOWS: Record<Stage, WorkflowStepType[]> = {
   ],
 };
 
+// WORKFLOW TITLES
+const WORKFLOW_TITLES: Record<Stage, string> = {
+    mor: 'Methods of Research Workflow',
+    dp1: 'Design Project 1 Workflow',
+    dp2: 'Design Project 2 Workflow',
+};
+
 
 export default function DepartmentPolicy({ grading }: { grading: any[] }) {
     // GRADING CRITERIA FORM
@@ -90,6 +93,13 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
         name: '',
         value: '',
         status: 'Active',
+    });
+
+    // DOCUMENT REQUIREMENTS FORM
+    const documentRequirementForm = useForm({
+        name: '',
+        format: 'PDF',
+        status: 'Mandatory',
     });
 
     // WORKFLOW FORM
@@ -110,12 +120,54 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
     const [editingWorkflowId, setEditingWorkflowId] = useState<number | null>(null);
     const [workflows, setWorkflows] = useState<Record<Stage, WorkflowStepType[]>>(WORKFLOWS);
     const [stage, setStage] = useState<'mor' | 'dp1' | 'dp2'>('mor');
+    const [rubricModalOpen, setRubricModalOpen] = useState(false);
+    const [selectedRubricCategory, setSelectedRubricCategory] = useState<string>('');
+    const [rubrics, setRubrics] = useState([
+        { category: 'Research & Investigation Skills', weight: '20%', minimum: 15 },
+        { category: 'Teamwork & Leadership', weight: '20%', minimum: 15 },
+        { category: 'Engineering Problem Analysis', weight: '20%', minimum: 15 },
+        { category: 'Engineering Communication', weight: '20%', minimum: 15 },
+        { category: 'Independent & Lifelong Learning', weight: '20%', minimum: 15 },
+    ]);
+    const [documentRequirements, setDocumentRequirements] = useState(
+        [
+            { id: 1, name: 'Proposal Document', format: 'PDF', status: 'Mandatory' },
+            { id: 2, name: 'Ethics Clearance', format: 'PDF', status: 'Mandatory' },
+            { id: 3, name: 'Adviser Consent Form', format: 'PDF', status: 'Optional' },
+        ],
+    );
+    const [documentRequirementModalOpen, setDocumentRequirementModalOpen] = useState(false);
+    const [editingDocumentRequirementId, setEditingDocumentRequirementId] = useState<number | null>(null);
+
+    // Tab Label
+    const getTabLabel = (tabKey: string) => {
+        return POLICY_TABS.find(tab => tab.key === tabKey)?.label || 'Department Policies';
+    };
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Department Policies',
+            href: depPolicies().url,
+        },
+        {
+            title: getTabLabel(activeTab),
+            href: depPolicies().url,
+        },
+    ];
 
     const openConfirm = (message: string, onConfirm: () => void) => {
         setConfirmDialog({ message, onConfirm });
     };
 
-    // System Rule CRUD Operations (TO BE REVISED)
+    const handleRubricUpdate = (oldCategory: string, newCategory: string, newWeight: string) => {
+        setRubrics(prev => prev.map(rubric =>
+            rubric.category === oldCategory
+                ? { ...rubric, category: newCategory, weight: newWeight }
+                : rubric
+        ));
+    };
+
+    // System Rule CRUD Operations (MOCK)
     const openCreateSystemRule = () => {
     systemRuleForm.reset();
     setEditingSystemRuleId(null);
@@ -176,7 +228,7 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
         systemRuleForm.reset();
     };
 
-    // Workflow CRUD Operations (TO BE REVISED)
+    // Workflow CRUD Operations (MOCK)
     // Edit Process
     const openEditWorkflow = (step: WorkflowStepType) => {
         workflowForm.setData({
@@ -228,6 +280,60 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
         workflowForm.reset();
     };
 
+     // Document Requirements CRUD (MOCK)
+    const openCreateDocumentRequirement = () => {
+        documentRequirementForm.reset();
+        setEditingDocumentRequirementId(null);
+        setDocumentRequirementModalOpen(true);
+    };
+
+    const openEditDocumentRequirement = (req: { id: number; name: string; format: string; status: string }) => {
+        documentRequirementForm.setData({
+            name: req.name,
+            format: req.format,
+            status: req.status,
+        });
+        setEditingDocumentRequirementId(req.id);
+        setDocumentRequirementModalOpen(true);
+    };
+
+    const submitDocumentRequirement = (e: React.FormEvent) => {
+        e.preventDefault();
+        const { name, format, status } = documentRequirementForm.data;
+
+        if (editingDocumentRequirementId) {
+            setDocumentRequirements(prev =>
+                prev.map(req =>
+                    req.id === editingDocumentRequirementId
+                        ? { ...req, name, format, status }
+                        : req,
+                ),
+            );
+            setAlertMessage('Document requirement updated successfully.');
+        } else {
+            const nextId = documentRequirements.length
+                ? Math.max(...documentRequirements.map(req => req.id)) + 1
+                : 1;
+            setDocumentRequirements(prev => [...prev, { id: nextId, name, format, status }]);
+            setAlertMessage('Document requirement added successfully.');
+        }
+
+        closeDocumentRequirementModal();
+    };
+
+    const closeDocumentRequirementModal = () => {
+        setDocumentRequirementModalOpen(false);
+        setEditingDocumentRequirementId(null);
+        documentRequirementForm.reset();
+    };
+
+    const deleteDocumentRequirement = (id: number) => {
+        openConfirm('Do you want to delete this document requirement?', () => {
+            setDocumentRequirements(prev => prev.filter(req => req.id !== id));
+            setAlertMessage('Document requirement deleted.');
+            setConfirmDialog(null);
+        });
+    };
 
     // Grading Policy CRUD Operations
     // Editing Proccess
@@ -409,7 +515,7 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
                         <>
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="font-medium text-[#730000]" style={{ fontSize: '24px' }}>
-                                    System Rules
+                                    System Rules Configuration
                                 </h2>
                                 <Button
                                     onClick={openCreateSystemRule}
@@ -423,52 +529,22 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
 
                             <div className="bg-white rounded-xl border overflow-hidden">
                                 <table className="w-full text-sm">
-                                    <thead className="bg-[#9B000A] text-white">
-                                        <tr>
-                                            <th className="px-6 py-3 text-center text-base">Rule Name</th>
-                                            <th className="px-6 py-3 text-center text-base">Value</th>
-                                            <th className="px-6 py-3 text-center text-base">Status</th>
-                                            <th className="px-6 py-3 text-center text-base">Action</th>
-                                        </tr>
-                                    </thead>
+                                    <PoliciesHeader columns={['Rule Name', 'Value', 'Status', 'Action']} />
                                     <tbody>
                                         {[
-                                            { name: 'Title Proposal Submission', value: '2 weeks', status: 'Active' },
-                                            { name: 'Title Proposal Submission', value: '3 weeks', status: 'Active' },
-                                            { name: 'Title Proposal Submission', value: '1 week', status: 'Inactive' },
-                                            { name: 'Title Proposal Submission', value: '2 weeks', status: 'Active' },
-                                            { name: 'Title Proposal Submission', value: '4 weeks', status: 'Active' },
-                                            { name: 'Title Proposal Submission', value: '1 week', status: 'Active' },
+                                            { id: 1, name: 'Title Proposal Submission', value: '2 weeks', status: 'Active' },
+                                            { id: 2, name: 'Title Proposal Submission', value: '3 weeks', status: 'Active' },
+                                            { id: 3, name: 'Title Proposal Submission', value: '1 week', status: 'Inactive' },
+                                            { id: 4, name: 'Title Proposal Submission', value: '2 weeks', status: 'Active' },
+                                            { id: 5, name: 'Title Proposal Submission', value: '4 weeks', status: 'Active' },
+                                            { id: 6, name: 'Title Proposal Submission', value: '1 week', status: 'Active' },
                                         ].map((doc, i) => (
-                                            <tr key={i} className="border-t">
-                                                <td className="px-6 py-4 text-center text-sm-2">{doc.name}</td>
-                                                <td className="px-6 py-4 text-center text-sm-2">{doc.value}</td>
-                                                <td className="px-6 py-4 text-center text-sm-2">
-                                                    <span
-                                                        className="px-4 py-1 rounded-full text-xs font-semibold text-white"
-                                                        style={{
-                                                            backgroundColor:
-                                                                doc.status === 'Active'
-                                                                    ? '#0D542B'
-                                                                    : '#717182',
-                                                        }}
-                                                    >
-                                                        {doc.status}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 flex justify-center gap-3">
-                                                    <img
-                                                        src={EditIcon}
-                                                        className="w-6 h-6 cursor-pointer"
-                                                        onClick={() => openEditSystemRule(doc)}
-                                                    />
-                                                    <img
-                                                        src={DeleteIcon}
-                                                        className="w-6 h-6 cursor-pointer"
-                                                        onClick={() => deleteSystemRule(doc.id)}
-                                                    />
-                                                </td>
-                                            </tr>
+                                            <PoliciesRow
+                                                key={i}
+                                                data={doc}
+                                                onEdit={() => openEditSystemRule(doc)}
+                                                onDelete={() => deleteSystemRule(doc.id)}
+                                            />
                                         ))}
                                     </tbody>
                                 </table>
@@ -480,7 +556,7 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
                     {activeTab === 'workflow' && (<>
                     <div className="flex items-center justify-between mb-6">
                     <h2 className="font-medium text-[#730000]" style={{ fontSize: '24px' }}>
-                        Workflow Approval
+                        {WORKFLOW_TITLES[stage]}
                     </h2>
 
                     <StageSwitchToggle
@@ -537,7 +613,7 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
                                     Document Requirements
                                 </h2>
                                 <Button
-                                    onClick={openCreate}
+                                    onClick={openCreateDocumentRequirement}
                                     variant="primary"
                                     className="flex items-center gap-2"
                                 >
@@ -548,47 +624,15 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
 
                             <div className="bg-white rounded-xl border overflow-hidden">
                                 <table className="w-full text-sm">
-                                    <thead className="bg-[#9B000A] text-white">
-                                        <tr>
-                                            <th className="px-6 py-3 text-center text-base">Rule Name</th>
-                                            <th className="px-6 py-3 text-center text-base">Format</th>
-                                            <th className="px-6 py-3 text-center text-base">Status</th>
-                                            <th className="px-6 py-3 text-center text-base">Action</th>
-                                        </tr>
-                                    </thead>
+                                    <PoliciesHeader columns={['Rule Name', 'Format', 'Status', 'Action']} />
                                     <tbody>
-                                        {[
-                                            { name: 'Proposal Document', format: 'PDF', status: 'Mandatory' },
-                                            { name: 'Ethics Clearance', format: 'PDF', status: 'Mandatory' },
-                                            { name: 'Adviser Consent Form', format: 'PDF', status: 'Optional' },
-                                        ].map((doc, i) => (
-                                            <tr key={i} className="border-t">
-                                                <td className="px-6 py-4 text-center text-sm-2">{doc.name}</td>
-                                                <td className="px-6 py-4 text-center text-sm-2">{doc.format}</td>
-                                                <td className="px-6 py-4 text-center text-sm-2">
-                                                    <span
-                                                        className="px-4 py-1 rounded-full text-xs font-semibold text-white"
-                                                        style={{
-                                                            backgroundColor:
-                                                                doc.status === 'Mandatory'
-                                                                    ? '#730000'
-                                                                    : '#717182',
-                                                        }}
-                                                    >
-                                                        {doc.status}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 flex justify-center gap-3">
-                                                    <img
-                                                        src={EditIcon}
-                                                        className="w-6 h-6 cursor-pointer"
-                                                    />
-                                                    <img
-                                                        src={DeleteIcon}
-                                                        className="w-6 h-6 cursor-pointer"
-                                                    />
-                                                </td>
-                                            </tr>
+                                        {documentRequirements.map((doc, i) => (
+                                            <PoliciesRow
+                                                key={i}
+                                                data={doc}
+                                                onEdit={() => openEditDocumentRequirement(doc)}
+                                                onDelete={() => deleteDocumentRequirement(doc.id)}
+                                            />
                                         ))}
                                     </tbody>
                                 </table>
@@ -598,67 +642,87 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
 
                     {/* GRADING */}
                     {activeTab === 'grading' && (
-                        <div className="relative min-h-[100vh] p-8 flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                            <div className="flex items-center justify-between pb-4">
-                                <h1 className='font-bold pb-5'>Grade Policies</h1>
-                                <button
-                                    className="py-2 px-4 bg-primary text-sm text-primary-foreground hover:text-primary-foreground-2 cursor-pointer rounded-sm"
-                                    onClick={openCreate}
-                                    disabled={processing}
-                                >
-                                    Create
-                                </button>
+                        <div className="space-y-8">
+                            {/* DEFENSE RUBRICS TABLE */}
+                            <div>
+                                <h2 className="font-medium text-[#730000] mb-4" style={{ fontSize: '24px' }}>
+                                    Defense Rubrics
+                                </h2>
+                                <div className="bg-white rounded-xl border overflow-hidden">
+                                    <Table>
+                                        <TableHeader className="bg-[#730000] text-white">
+                                            <TableRow className="hover:bg-[#730000] border-none">
+                                                <TableHead className="px-6 py-3 text-center text-base text-white">Category</TableHead>
+                                                <TableHead className="px-6 py-3 text-center text-base text-white">Weight</TableHead>
+                                                <TableHead className="px-6 py-3 text-center text-base text-white">Minimum Score</TableHead>
+                                                <TableHead className="px-6 py-3 text-center text-base text-white">Action</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {rubrics.map((rubric, i) => (
+                                                <TableRow key={i}>
+                                                    <TableCell className="px-6 py-4 text-center">{rubric.category}</TableCell>
+                                                    <TableCell className="px-6 py-4 text-center">{rubric.weight}</TableCell>
+                                                    <TableCell className="px-6 py-4 text-center">{rubric.minimum}</TableCell>
+                                                    <TableCell className="px-6 py-4">
+                                                        <div className="flex justify-center">
+                                                            <img
+                                                                src={EditIcon}
+                                                                className="w-5 h-5 cursor-pointer"
+                                                                onClick={() => {
+                                                                    setSelectedRubricCategory(rubric.category);
+                                                                    setRubricModalOpen(true);
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </div>
                             </div>
 
-                            <table className="min-w-full text-left text-sm whitespace-nowrap">
-                                <thead className="uppercase tracking-wider border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                                    <tr>
-                                        <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100 text-center">Category</th>
-                                        <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100 text-center">Weight</th>
-                                        <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100 text-center">Minimum Score</th>
-                                        <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100 text-center">Action</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                    {grading && grading.length > 0 ? (
-                                        grading.map((criteria) => (
-                                            <tr key={criteria.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                                <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100 text-center">
-                                                    {criteria.category}
-                                                </td>
-                                                <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100 text-center">
-                                                    {criteria.weight}
-                                                </td>
-                                                <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100 text-center">
-                                                    {criteria.minimum}
-                                                </td>
-                                                <td className="px-6 py-4 flex gap-2 font-medium text-gray-900 dark:text-gray-100 justify-center">
-                                                    <button
-                                                        className="py-1 px-4 bg-primary text-primary-foreground hover:text-primary-foreground-2 cursor-pointer rounded-sm"
-                                                        onClick={() => openEdit(criteria)}
-                                                    >
-                                                        Edit
-                                                    </button>
-                                                    <button
-                                                        className="py-1 px-4 bg-primary text-primary-foreground hover:text-primary-foreground-2 cursor-pointer rounded-sm"
-                                                        onClick={() => handleDelete(criteria.id)}
-                                                        disabled={processing}
-                                                    >
-                                                        Delete
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan={4} className="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
-                                                No Grading Criteria has been created yet!
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                            {/* GRADING SCALE TABLE */}
+                            <div>
+                                <h2 className="font-medium text-[#730000] mb-4" style={{ fontSize: '24px' }}>
+                                    Grading Scale
+                                </h2>
+                                <div className="bg-white rounded-xl border overflow-hidden">
+                                    <Table>
+                                        <TableHeader className="bg-[#730000] text-white">
+                                            <TableRow className="hover:bg-[#730000] border-none">
+                                                <TableHead className="px-6 py-3 text-center text-base text-white">Grade</TableHead>
+                                                <TableHead className="px-6 py-3 text-center text-base text-white">Percentage / Equivalent</TableHead>
+                                                <TableHead className="px-6 py-3 text-center text-base text-white">Description</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {[
+                                                { grade: '1.0', percentage: '97 - 100', description: 'Excellent' },
+                                                { grade: '1.25', percentage: '94 - 96', description: 'Excellent' },
+                                                { grade: '1.5', percentage: '91 - 93', description: 'Very Good' },
+                                                { grade: '1.75', percentage: '88 - 90', description: 'Very Good' },
+                                                { grade: '2.0', percentage: '85 - 87', description: 'Good' },
+                                                { grade: '2.25', percentage: '82 - 84', description: 'Good' },
+                                                { grade: '2.50', percentage: '79 - 81', description: 'Satisfactory' },
+                                                { grade: '2.75', percentage: '76 - 78', description: 'Satisfactory' },
+                                                { grade: '3.0', percentage: '75', description: 'Passing' },
+                                                { grade: '5.0', percentage: '65 - 74', description: 'Failure' },
+                                                { grade: 'INC', percentage: '-', description: 'Incomplete' },
+                                                { grade: 'W', percentage: '-', description: 'Withdrawn' },
+                                                { grade: 'D', percentage: '-', description: 'Dropped' },
+                                            ].map((scale, i) => (
+                                                <TableRow key={i}>
+                                                    <TableCell className="px-6 py-4 text-center">{scale.grade}</TableCell>
+                                                    <TableCell className="px-6 py-4 text-center">{scale.percentage}</TableCell>
+                                                    <TableCell className="px-6 py-4 text-center">{scale.description}</TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </div>
+                            </div>
                         </div>
                     )}
 
@@ -673,15 +737,17 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
                                     variant="primary"
                                     className="flex items-center gap-2"
                                 >
-                                    <img src={AddIcon} className="w-4 h-4" />
+                                    <LuUpload className="w-4 h-4" />
                                     Upload New Policy Guide
                                 </Button>
                             </div>
 
-                            <div className="bg-white rounded-xl border p-6">
-                                <p className="text-sm text-gray-500 text-center py-20">
-                                    No guidelines document uploaded yet. Click "Upload PDF" to add department guidelines.
-                                </p>
+                            <div className="bg-[#5A5A5AB2] rounded-xl border p-6">
+                                <div className="flex flex-col gap-3">
+                                    <div className="relative rounded-lg bg-white border border-[#5A5A5AB2] h-80 overflow-y-auto flex items-center justify-center">
+                                        <PlaceholderPattern className="absolute inset-0 w-full h-full text-[#5A5A5A66] stroke-[#5A5A5A80] stroke-[1]" />
+                                    </div>
+                                </div>
                             </div>
                         </>
                     )}
@@ -902,6 +968,67 @@ export default function DepartmentPolicy({ grading }: { grading: any[] }) {
                             </Button>
                             <Button variant="primary" onClick={() => confirmDialog.onConfirm()}>
                                 Confirm
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Rubric Edit Modal */}
+            {rubricModalOpen && (
+                <DefensePoliciesRubrics
+                    category={selectedRubricCategory}
+                    onClose={() => setRubricModalOpen(false)}
+                    onUpdate={handleRubricUpdate}
+                />
+            )}
+
+            {/* Document Requirement Modal */}
+            {documentRequirementModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+                    <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+                        <h2 className="mb-4 text-lg font-semibold text-[#730000]">
+                            {editingDocumentRequirementId ? 'Edit Document Requirement' : 'Add Document Requirement'}
+                        </h2>
+
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium">Rule Name</label>
+                            <input
+                                type="text"
+                                value={documentRequirementForm.data.name}
+                                onChange={e => documentRequirementForm.setData('name', e.target.value)}
+                                className="w-full rounded-md border px-3 py-2 text-sm"
+                            />
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium">Format</label>
+                            <input
+                                type="text"
+                                value={documentRequirementForm.data.format}
+                                onChange={e => documentRequirementForm.setData('format', e.target.value)}
+                                className="w-full rounded-md border px-3 py-2 text-sm"
+                            />
+                        </div>
+
+                        <div className="mb-6">
+                            <label className="block text-sm font-medium">Status</label>
+                            <select
+                                value={documentRequirementForm.data.status}
+                                onChange={e => documentRequirementForm.setData('status', e.target.value)}
+                                className="w-full rounded-md border px-3 py-2 text-sm"
+                            >
+                                <option value="Mandatory">Mandatory</option>
+                                <option value="Optional">Optional</option>
+                            </select>
+                        </div>
+
+                        <div className="flex justify-end gap-2">
+                            <Button variant="secondary" onClick={closeDocumentRequirementModal}>
+                                Cancel
+                            </Button>
+                            <Button variant="primary" onClick={submitDocumentRequirement}>
+                                {editingDocumentRequirementId ? 'Save' : 'Create'}
                             </Button>
                         </div>
                     </div>

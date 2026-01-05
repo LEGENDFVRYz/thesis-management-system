@@ -106,6 +106,30 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('notification', function () {
         return Inertia::render('Shared/notification');
     })->name('student.notification');
+
+    Route::get('student/thesis-management', function () {
+        return Inertia::render('Student/thesis-management/thesis');
+    })->name('student.thesis-management');
+
+    Route::get('student/ip-plagiarism', function () {
+        return Inertia::render('Student/compliance and ip/compliance-ip');
+    })->name('student.compliance_ip');
+
+    Route::get('student/public-presentation', function () {
+        return Inertia::render('Student/compliance and ip/public-presentation');
+    })->name('student.public_presentation');
+
+    Route::get('student/progress', function () {
+        return Inertia::render('Student/progress-tracking/progress');
+    })->name('student.progress');
+
+    Route::get('student/defense', function () {
+        return Inertia::render('Student/defense');
+    })->name('student.defense');
+
+    Route::get('student/profilemanagement', function () {
+        return Inertia::render('Student/profilemanagement');
+    })->name('student.profilemanagement');
 });
 
 
@@ -166,6 +190,14 @@ Route::prefix('faculty')->group(function () {
                 Route::get('thesis_review', function () {
                     return Inertia::render('Faculty/management/panel/thesis_review');
                 })->name('faculty.management.panel.thesis_review');
+
+                Route::get('thesis-review-0/thesis_review', function () {
+                    return Inertia::render('Faculty/management/panel/thesis-review-0/thesis_review');
+                })->name('faculty.management.panel.thesis_review_0.thesis_review');
+
+                Route::get('thesis-review-0/docu_n_eval', function () {
+                    return Inertia::render('Faculty/management/panel/thesis-review-0/docu_n_eval');
+                })->name('faculty.management.panel.thesis_review_0.docu_n_eval');
                 
                 // DEFENSE MANAGEMENT OF PANEL HAS BEEN JOINED WITH ADVISER
                 // CHECK THE SPECIAL ROUTES FOR THIS SCENARIO... 
@@ -234,6 +266,10 @@ Route::prefix('faculty')->group(function () {
         Route::get('notification', function () {
             return Inertia::render('Shared/notification');
         })->name('faculty.notification');
+
+        Route::get('profilemanagement', function () {
+            return Inertia::render('Shared/profilemanagement'); 
+        })->name('faculty.profilemanagement');
 
         // Route::get('repository', function () {
         //     return Inertia::render('Shared/repository/thesis');
@@ -311,6 +347,10 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
     Route::get('notification', function () {
         return Inertia::render('Shared/notification');
     })->name('admin.notification');
+
+    Route::get('profilemanagement', function () {
+        return Inertia::render('Shared/profilemanagement'); 
+    })->name('admin.profilemanagement');
 });
 
 
@@ -337,5 +377,8 @@ Route::get('/test-thesis-preview', function () {
     ]);
 });
 
+Route::get('/committee/proposal-review', function () {
+    return Inertia::render('Committee/proposal-review');
+});
 
 require __DIR__.'/settings.php';
