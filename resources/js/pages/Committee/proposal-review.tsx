@@ -26,10 +26,42 @@ const EndorsedProposalsSection = ({ mockEndorsed, mockEvaluating, selectedItem, 
     </div>
 );
 
-const ChangeRequestsSection = ({ changeRequests, selectedItem, setSelectedItem }: any) => (
+const ChangeRequestsSection = ({ changeRequests, selectedItem, setSelectedItem }: any) => {
+    const getTypeBadgeName = (type: string) => {
+        switch (type) {
+            case 'Methodology': return 'changesBadgesMethodologyChange';
+            case 'Scope': return 'changesBadgesScopeChange';
+            case 'Title': return 'changesBadgesTitleChange';
+            default: return 'changesBadgesMethodologyChange';
+        }
+    };
+
+    const getStatusBadgeName = (status: string) => {
+        switch (status) {
+            case 'Approved': return 'statusBadgeApproved';
+            case 'Denied': return 'statusBadgeDenied';
+            case 'Pending Review': return 'statusBadgePendingReview';
+            default: return 'statusBadgePendingReview';
+        }
+    };
+
+    return (
     <div className="flex flex-col space-y-4 text-left flex-1 font-dm">
         <div className="bg-background rounded-xl border border-border overflow-hidden shadow-sm h-[620px] flex flex-col">
-            <MethodologyHeader variant='dynamic' columns={['Title', 'Type of Changes', 'Submitted', 'Status']} />
+            
+            {/* Header: Added pr-[10px] to account for the scrollbar gutter below */}
+            <div className="bg-primary pr-[10px]"> 
+                <MethodologyHeader 
+                    variant='dynamic' 
+                    columns={[
+                        { label: 'Title', className: 'w-[45%] text-center' }, 
+                        { label: 'Type of Changes', className: 'w-[20%] text-center' },
+                        { label: 'Submitted', className: 'w-[20%] text-center' },
+                        { label: 'Status', className: 'w-[15%] text-center' }
+                    ]}
+                />
+            </div>
+            
             <div className="flex-1 overflow-y-auto custom-scrollbar bg-muted/5">
                 {changeRequests.map((req: any) => (
                     <div 
@@ -43,10 +75,31 @@ const ChangeRequestsSection = ({ changeRequests, selectedItem, setSelectedItem }
                         <MethodologyRow
                             variant="dynamic"
                             data={[
-                                { value: <span className="text-foreground text-sm">{req.title}</span> },
-                                { value: <Badge name={'changesBadgesMethodologyChange'} className='text-sm px-4 py-2'/> },
-                                { value: <span className="text-alert-desc text-sm">{req.date}</span> },
-                                { value: <Badge name={req.status === 'Approved' ? 'statusBadgeApproved' : req.status === 'Denied' ? 'statusBadgeDenied' : 'statusBadgePendingReview'} /> }
+                                { 
+                                    value: <span className="text-foreground text-[13px] font-semibold leading-tight">{req.title}</span>,
+                                    className: 'w-[45%] pl-5' 
+                                },
+                                { 
+                                    value: (
+                                        <div className="flex justify-center items-center m-0 p-0 h-fit">
+                                            {/* Badge: Using h-fit and leading-none to ensure zero extra padding */}
+                                            <Badge name={getTypeBadgeName(req.type)} size={74} className='m-0 p-0 h-fit leading-none' />
+                                        </div>
+                                    ),
+                                    className: 'w-[20%] text-center' 
+                                },
+                                { 
+                                    value: <span className="text-foreground text-[13px] font-medium">{req.date}</span>,
+                                    className: 'w-[20%] text-center' 
+                                },
+                                { 
+                                    value: (
+                                        <div className="flex justify-center items-center m-0 p-0 h-fit">
+                                            <Badge name={getStatusBadgeName(req.status)} size={70} className='m-0 p-0 h-fit leading-none' />
+                                        </div>
+                                    ),
+                                    className: 'w-[15%] text-center' 
+                                }
                             ]}
                         />
                     </div>
@@ -55,6 +108,7 @@ const ChangeRequestsSection = ({ changeRequests, selectedItem, setSelectedItem }
         </div>
     </div>
 );
+};
 
 const RightActionPane = ({ 
     selectedItem, 
@@ -261,7 +315,7 @@ const RightActionPane = ({
     }
 
     return (
-        <div className="bg-background border border-border rounded-xl p-5 shadow-sm h-[620px] overflow-y-auto custom-scrollbar flex flex-col gap-4 font-dm">
+        <div className="bg-muted/10 border border-border rounded-xl p-5 shadow-sm h-[620px] overflow-hidden custom-scrollbar flex flex-col gap-4 font-dm">
             <div>
                 <h3 className="text-md font-bold text-primary">Request Details</h3>
                 <p className="text-[13px] text-foreground font-medium mt-1 leading-tight">{selectedItem.title}</p>
@@ -270,41 +324,90 @@ const RightActionPane = ({
                 <div><p className="uppercase font-bold text-alert-desc">Adviser</p><p className="font-bold">{selectedItem.adviser || 'Dr. Maria Santos'}</p></div>
                 <div><p className="uppercase font-bold text-alert-desc">Section</p><p className="font-bold">{selectedItem.block || 'BSCPE 4-2'}</p></div>
             </div>
-            <div className="space-y-3">
-                <div className="bg-muted/10 border border-border rounded-xl p-3 text-xs">
-                    <div className="flex items-center gap-2 mb-1"><ArrowRight className="w-3.5 h-3.5 text-alert-desc" /><span className="font-bold text-alert-desc uppercase text-[10px]">Current Version (DP1)</span></div>
-                    <p className="leading-relaxed">Initial methodology involves data collection from surveys.</p>
+            <div className='rounded-sm pr-0.5 gap-4 flex-1 space-y-4 overflow-y-auto custom-scrollbar'>
+                <div className="space-y-3">
+                    {/* DYNAMIC DP1 - Current Version */}
+                    <div className="bg-muted border border-border rounded-xl p-3 text-xs">
+                        <div className="flex items-center gap-2 mb-1">
+                            <ArrowRight className="w-3.5 h-3.5 text-alert-desc" />
+                            <span className="font-bold text-alert-desc uppercase text-[10px]">Current Version (DP1)</span>
+                        </div>
+                        <p className="leading-relaxed">
+                            {selectedItem.current_version || "No current version data available."}
+                        </p>
+                    </div>
+                    
+                    {/* DYNAMIC DP2 - Proposed Change */}
+                    <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 text-xs">
+                        <div className="flex items-center gap-2 mb-1">
+                            <ArrowRight className="w-3.5 h-3.5 text-primary" />
+                            <span className="font-bold text-primary uppercase text-[10px]">Proposed Change (DP2)</span>
+                        </div>
+                        <p className="leading-relaxed">
+                            {selectedItem.proposed_change || "No proposed change data available."}
+                        </p>
+                    </div>
                 </div>
-                <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 text-xs">
-                    <div className="flex items-center gap-2 mb-1"><ArrowRight className="w-3.5 h-3.5 text-primary" /><span className="font-bold text-primary uppercase text-[10px]">Proposed Change (DP2)</span></div>
-                    <p className="leading-relaxed">Change data collection to include both surveys and interviews.</p>
+
+                {/* DYNAMIC Justification */}
+                <div className="bg-under-eval-bg border border-under-eval-border rounded-xl p-3 text-xs">
+                    <div className="flex items-center gap-2 mb-1">
+                        <ArrowRight className="w-3.5 h-3.5 text-under-eval-font-color" />
+                        <span className="font-bold text-under-eval-font-color uppercase text-[10px]">Justification</span>
+                    </div>
+                    <p className="leading-relaxed text-[12px] text-foreground">
+                        {selectedItem.justification || "No justification provided."}
+                    </p>
                 </div>
-            </div>
-            <div className="bg-under-eval-bg border border-under-eval-border rounded-xl p-3 text-xs">
-                <div className="flex items-center gap-2 mb-1"><ArrowRight className="w-3.5 h-3.5 text-under-eval-font-color" /><span className="font-bold text-under-eval-font-color uppercase text-[10px]">Justification</span></div>
-                <p className="leading-relaxed text-[12px] text-foreground">Interviews will provide deeper insights into student performance.</p>
-            </div>
-            <div className="bg-evaluated-bg border border-evaluated-border rounded-xl p-3 text-xs">
-                <div className="flex items-center gap-2 mb-1"><ArrowRight className="w-3.5 h-3.5 text-evaluated-font-color" /><span className="font-bold text-evaluated-font-color uppercase text-[10px]">Adviser Recommendation</span></div>
-                <p className="leading-relaxed text-[12px] text-foreground">Consider conducting a pilot study to validate the new methodology.</p>
+
+                {/* DYNAMIC Adviser Recommendation */}
+                <div className="bg-evaluated-bg border border-evaluated-border rounded-xl p-3 text-xs">
+                    <div className="flex items-center gap-2 mb-1">
+                        <ArrowRight className="w-3.5 h-3.5 text-evaluated-font-color" />
+                        <span className="font-bold text-evaluated-font-color uppercase text-[10px]">Adviser Recommendation</span>
+                    </div>
+                    <p className="leading-relaxed text-[12px] text-foreground">
+                        {selectedItem.recommendation || "No recommendation provided."}
+                    </p>
+                </div>
+
+                {/* DYNAMIC CLARIFICATION COMMENTS SECTION */}
+                {comments.filter((c: any) => c.status === 'clarifying').map((comment: any) => (
+                    <div key={comment.id} className="bg-primary-foreground-2/10 border border-primary-foreground-2/30 rounded-xl p-3 text-xs">
+                        <div className="flex items-center justify-between mb-1">
+                            <div className="flex items-center gap-2">
+                                <ArrowRight className="w-3.5 h-3.5 text-alert-yellow-selected" />
+                                <span className="font-bold text-alert-yellow-selected uppercase text-[10px]">Clarification</span>
+                            </div>
+                            <Trash className="w-3.5 h-3.5 cursor-pointer text-primary/40" onClick={() => onDeleteComment(selectedItem.id, comment.id)} />
+                        </div>
+                        <p className="leading-relaxed text-foreground">{comment.text}</p>
+                    </div>
+                ))}
             </div>
 
-            <div className="mt-auto pt-4 space-y-3">
+            <div className="mt-auto pt-0 space-y-3">
                 {actionState === 'idle' && !isClarifying && (
                     <div className="grid grid-cols-3 gap-2">
-                        <Button onClick={() => handleUploadComment('approved', "Request approved.")} className="bg-alert-success/10 text-alert-success border-alert-success/50 hover:bg-alert-success hover:text-white text-[11px] font-bold h-10 shadow-none"><CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Approve</Button>
+                        <Button onClick={() => handleUploadComment('approved', "Request approved.")} variant={'tertiary'} className="bg-alert-success/10 text-alert-success border-alert-success/50 hover:bg-alert-success hover:text-white text-[11px] font-bold h-10 shadow-none"><CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Approve</Button>
                         <Button onClick={() => setIsClarifying(true)} variant="outline" className="bg-background text-alert-desc text-[11px] font-bold h-10 border-border"><MessageSquare className="w-3.5 h-3.5 mr-1" /> Clarify</Button>
-                        <Button onClick={() => handleUploadComment('rejected', "Request rejected.")} className="bg-alert-warning/10 text-alert-warning border-alert-warning/50 hover:bg-alert-warning hover:text-white text-[11px] font-bold h-10 shadow-none"><XCircle className="w-3.5 h-3.5 mr-1" /> Reject</Button>
+                        <Button onClick={() => handleUploadComment('rejected', "Request rejected.")} variant={'tertiary'} className="bg-alert-warning/10 text-alert-warning border-alert-warning/50 hover:bg-alert-warning hover:text-white text-[11px] font-bold h-10 shadow-none"><XCircle className="w-3.5 h-3.5 mr-1" /> Reject</Button>
                     </div>
                 )}
                 {isClarifying && actionState === 'idle' && (
-                    <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 space-y-3 w-full">
-                        <p className="text-[11px] font-bold text-primary uppercase">Clarify...</p>
+                    <div className="bg-muted-foreground/5 border border-primary-foreground-2/20 rounded-xl p-4 space-y-3 w-full">
+                        <p className="text-[11px] font-bold text-primary-foreground-2 uppercase">Clarify...</p>
                         <Input className="h-[100px] w-full bg-white pt-2 align-top text-xs" inputSize="full" placeholder="Provide details..." value={clarificationText} onChange={(e) => setClarificationText(e.target.value)} />
                         <div className="flex justify-between items-center">
                             <Button variant="ghost" onClick={() => setIsClarifying(false)} className="text-[11px] h-8 text-alert-desc p-0">Cancel</Button>
                             <div className="flex items-center gap-2">
-                                <Button disabled={!clarificationText.trim()} onClick={() => handleUploadComment('clarifying', clarificationText)} className="h-8 px-3 text-[11px] bg-primary text-white">Comment</Button>
+                                <Button 
+                                    disabled={!clarificationText.trim()} 
+                                    onClick={() => handleUploadComment('clarifying', clarificationText)} 
+                                    className="h-8 px-3 text-[11px] bg-primary text-white"
+                                >
+                                    <MessageSquare className="w-3 h-3 mr-1.5" /> Comment
+                                </Button>
                                 <Badge name="statusBadgePendingReview" className="bg-primary-foreground-2/20 text-alert-yellow-selected border-primary-foreground-2/30">Clarification</Badge>
                             </div>
                         </div>
@@ -312,8 +415,18 @@ const RightActionPane = ({
                 )}
                 {actionState !== 'idle' && (
                     <div className="bg-muted/30 border border-border rounded-xl p-4 flex flex-col items-center text-center space-y-2">
-                        <div className="flex items-center gap-3 text-left w-full"><CheckCircle2 className={cn("w-6 h-6", actionState === 'approved' ? "text-alert-info" : "text-alert-warning")} /><div><p className="text-sm font-bold text-foreground">Submitted</p><p className="text-[11px] text-alert-desc leading-none">You have responded to this request.</p></div></div>
-                        <div className="pt-2 border-t border-border w-full flex justify-center"><div className={cn("text-[10px] font-bold px-4 py-1 rounded-full border", actionState === 'approved' ? "bg-evaluated-bg text-evaluated-font-color border-evaluated-border" : "bg-alert-warning/10 text-alert-warning border-alert-warning/30")}>{actionState === 'approved' ? 'Approved' : 'Rejected'}</div></div>
+                        <div className="flex items-center gap-3 text-left w-full">
+                            <CheckCircle2 className={cn("w-6 h-6", actionState === 'clarifying' ? "text-alert-yellow-selected" : actionState === 'approved' ? "text-alert-info" : "text-alert-warning")} />
+                            <div><p className="text-sm font-bold text-foreground">Submitted</p><p className="text-[11px] text-alert-desc leading-none">You have responded to this request.</p></div>
+                        </div>
+                        <div className="pt-2 border-t border-border w-full flex justify-center">
+                            <div className={cn("text-[10px] font-bold px-4 py-1 rounded-full border",
+                                actionState === 'approved' && "bg-alert-success/10 text-alert-success border-alert-success/30",
+                                actionState === 'rejected' && "bg-alert-warning/10 text-alert-warning border-alert-warning/30",
+                                actionState === 'clarifying' && "bg-primary-foreground-2/10 text-alert-yellow-selected border-primary-foreground-2/30")}>
+                                {actionState === 'approved' ? 'Approved' : actionState === 'rejected' ? 'Rejected' : 'For Revision'}
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>
@@ -336,6 +449,7 @@ export default function ProposalReview() {
     };
 
     const handleAddComment = (id: number, text: string, status: string) => {
+        if (!text.trim()) return;
         const newComment = { id: Date.now(), author: 'Dr. Juan Cruz', date: new Date().toLocaleString(), text, status };
         setAllComments(prev => ({ ...prev, [id]: [...(prev[id] || []), newComment] }));
         setActionStates(prev => ({ ...prev, [id]: status }));
@@ -363,21 +477,126 @@ export default function ProposalReview() {
     };
 
     const changeRequests = [
-        { id: 101, title: "AI Analytics for Centralized Machine Learning Hub", type: "Methodology", date: "Jan 1", status: "Approved" },
-        { id: 102, title: "Blockchain System for Secure Transactions", type: "Scope", date: "Jan 3", status: "Pending" },
-        { id: 103, title: "Cloud Computing in Healthcare Stations", type: "Literature Review", date: "Jan 5", status: "Approved" },
-        { id: 104, title: "Data Mining on Industrial Data for Predictive Maintenance", type: "Methodology", date: "Jan 7", status: "Pending" },
-        { id: 105, title: "E-commerce Platform", type: "Objectives", date: "Jan 9", status: "Approved" },
-        { id: 106, title: "Fintech Solutions for Financial Inclusion", type: "Methodology", date: "Jan 11", status: "Pending" },
-        { id: 107, title: "Gaming Technologies for Educational Engagement", type: "Literature Review", date: "Jan 13", status: "Approved" },
-        { id: 108, title: "Healthcare IT Systems for Patient Monitoring", type: "Scope", date: "Jan 15", status: "Pending" },
-        { id: 109, title: "IoT Solutions for Smart Cities Infrastructure", type: "Objectives", date: "Jan 17", status: "Approved" },
-        { id: 110, title: "JavaScript Frameworks for Modern Web Applications", type: "Methodology", date: "Jan 19", status: "Pending" },
-        { id: 111, title: "Knowledge Management in Educational Institutions", type: "Literature Review", date: "Jan 21", status: "Approved" },
-        { id: 112, title: "Logistics Systems", type: "Scope", date: "Jan 23", status: "Pending" },
-        { id: 113, title: "Mobile Applications", type: "Objectives", date: "Jan 25", status: "Approved" },
-        { id: 114, title: "Network Security", type: "Methodology", date: "Jan 27", status: "Pending" },
-        { id: 115, title: "Open Source Software", type: "Literature Review", date: "Jan 29", status: "Approved" },
+        { 
+            id: 101, title: "AI Analytics for Centralized Machine Learning Hub", type: "Title", date: "September 1, 2025", status: "Approved",
+            adviser: "Dr. Maria Santos", block: "BSCPE 4-2",
+            current_version: "System uses localized data processing on edge devices.",
+            proposed_change: "Centralize data hub for improved machine learning accuracy.",
+            justification: "Centralization allows for better global feature extraction.",
+            recommendation: "Ensure end-to-end encryption for the centralized data."
+        },
+        { 
+            id: 102, title: "Blockchain System for Secure Transactions", type: "Scope", date: "September 3, 2025", status: "Pending",
+            adviser: "Dr. Andrei Hidalgo", block: "BSCPE 3-1",
+            current_version: "Transactions rely on a centralized SQL database.",
+            proposed_change: "Implement a Hyperledger Fabric private blockchain.",
+            justification: "SQL database lacks immutability needed for high-stakes logs.",
+            recommendation: "Review the hardware overhead for running nodes."
+        },
+        { 
+            id: 103, title: "Cloud Computing in Healthcare Stations", type: "Methodology", date: "October 5, 2025", status: "Approved",
+            adviser: "Dr. Lisa Fernandez", block: "BSCPE 3-3",
+            current_version: "Patient files are stored in physical on-site servers.",
+            proposed_change: "Migrate to AWS HIPAA-compliant cloud storage.",
+            justification: "On-site servers are prone to physical damage and high maintenance.",
+            recommendation: "Focus on latency during emergency record retrieval."
+        },
+        { 
+            id: 104, title: "Data Mining on Industrial Data", type: "Title", date: "January 7, 2025", status: "Pending",
+            adviser: "Dr. Robert Chen", block: "BSCPE 4-1",
+            current_version: "Predictive maintenance uses standard regression models.",
+            proposed_change: "Use Deep Neural Networks (LSTM) for time-series forecasting.",
+            justification: "Industrial sensors produce complex sequences that regression fails to capture.",
+            recommendation: "Compare the training time against the accuracy gain."
+        },
+        { 
+            id: 105, title: "E-commerce Platform Optimization", type: "Scope", date: "January 9, 2025", status: "Approved",
+            adviser: "Dr. Anna Reyes", block: "BSCPE 4-3",
+            current_version: "Search functionality uses simple keyword matching.",
+            proposed_change: "Integrate Elasticsearch for semantic and fuzzy searching.",
+            justification: "Keywords are too restrictive for users with typos or natural language.",
+            recommendation: "Document the mapping configurations used for fuzzy logic."
+        },
+        { 
+            id: 106, title: "Fintech Solutions for Inclusion", type: "Methodology", date: "January 11, 2025", status: "Pending",
+            adviser: "Dr. Carlos Gomez", block: "BSCPE 3-2",
+            current_version: "Verification requires manual document upload and review.",
+            proposed_change: "Automate KYC using AI-based facial recognition and OCR.",
+            justification: "Manual review takes 3-5 days, discouraging unbanked users.",
+            recommendation: "Include a manual fallback for failed AI scans."
+        },
+        { 
+            id: 107, title: "Gaming Technologies for Education", type: "Title", date: "January 13, 2025", status: "Approved",
+            adviser: "Dr. Maria Santos", block: "BSCPE 3-4",
+            current_version: "Modules consist of 2D puzzles and text quizzes.",
+            proposed_change: "Incorporate 3D VR simulation for biology labs.",
+            justification: "Immersive VR has proven higher retention rates in STEM subjects.",
+            recommendation: "Limit sessions to 20 minutes to prevent eye strain."
+        },
+        { 
+            id: 108, title: "Healthcare IT Monitoring", type: "Methodology", date: "January 15, 2025", status: "Pending",
+            adviser: "Dr. Lisa Fernandez", block: "BSCPE 4-4",
+            current_version: "Heart rate monitoring is sampled every 10 minutes.",
+            proposed_change: "Implement real-time streaming via WebSockets.",
+            justification: "Critical conditions can occur within seconds; 10 min is unsafe.",
+            recommendation: "Address battery life concerns on the monitoring devices."
+        },
+        { 
+            id: 109, title: "IoT Solutions for Smart Cities", type: "Scope", date: "January 17, 2025", status: "Approved",
+            adviser: "Dr. Andrei Hidalgo", block: "BSCPE 3-1",
+            current_version: "Traffic lights operate on fixed timers.",
+            proposed_change: "IoT sensors to adjust timers based on real-time vehicle flow.",
+            justification: "Fixed timers cause unnecessary congestion during off-peak hours.",
+            recommendation: "Verify sensor reliability in heavy rain or fog."
+        },
+        { 
+            id: 110, title: "JavaScript Frameworks for Modern Web", type: "Methodology", date: "January 19, 2025", status: "Pending",
+            adviser: "Dr. Anna Reyes", block: "BSCPE 4-2",
+            current_version: "Frontend is built using vanilla JS and JQuery.",
+            proposed_change: "Adopt Next.js for server-side rendering and SEO.",
+            justification: "Current site load times and SEO rankings are suboptimal.",
+            recommendation: "Outline the migration strategy for existing JQuery plugins."
+        },
+        { 
+            id: 111, title: "Knowledge Management in Schools", type: "Title", date: "January 21, 2025", status: "Approved",
+            adviser: "Dr. Robert Chen", block: "BSCPE 4-1",
+            current_version: "Resources are shared via email and shared folders.",
+            proposed_change: "Centralized LMS platform with indexed search.",
+            justification: "Finding specific materials takes too much time in disjointed folders.",
+            recommendation: "Ensure the platform supports mobile access."
+        },
+        { 
+            id: 112, title: "Logistics Systems Enhancement", type: "Methodology", date: "January 23, 2025", status: "Pending",
+            adviser: "Dr. Carlos Gomez", block: "BSCPE 3-2",
+            current_version: "Route planning is done manually by drivers.",
+            proposed_change: "AI-driven route optimization using Dijkstra's algorithm.",
+            justification: "Manual planning leads to 15% higher fuel costs and delays.",
+            recommendation: "Allow manual override for road closures not in GPS."
+        },
+        { 
+            id: 113, title: "Mobile Applications for Mental Health", type: "Methodology", date: "January 25, 2025", status: "Approved",
+            adviser: "Dr. Lisa Fernandez", block: "BSCPE 3-3",
+            current_version: "Communication is purely text-based.",
+            proposed_change: "Add secure audio/video calling with counselors.",
+            justification: "Non-verbal cues are vital for effective counseling.",
+            recommendation: "Ensure end-to-end encryption for all sessions."
+        },
+        { 
+            id: 114, title: "Network Security Protocols", type: "Methodology", date: "January 27, 2025", status: "Pending",
+            adviser: "Dr. Andrei Hidalgo", block: "BSCPE 3-1",
+            current_version: "Uses standard WPA2 encryption for campus Wi-Fi.",
+            proposed_change: "Switch to WPA3 and certificate-based auth.",
+            justification: "WPA2 is susceptible to KRACK attacks.",
+            recommendation: "Test device compatibility for legacy laptops."
+        },
+        { 
+            id: 115, title: "Open Source Software Adoption", type: "Methodology", date: "January 29, 2025", status: "Approved",
+            adviser: "Dr. Anna Reyes", block: "BSCPE 4-3",
+            current_version: "Uses proprietary database software with high licensing fees.",
+            proposed_change: "Migrate to PostgreSQL.",
+            justification: "PostgreSQL offers similar performance without licensing costs.",
+            recommendation: "Review indexing differences to maintain query speed."
+        },
     ];
     
     const mockEndorsed = Array(8).fill({

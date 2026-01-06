@@ -51,6 +51,7 @@ export function RowColumn1() {
 interface RowData {
   value: React.ReactNode; // Can be string, badge, or icon
   isBadge?: boolean;
+  className?: string;
   badgeVariant?: string; // Optional: to pass specific badge styles
 }
 
@@ -77,22 +78,10 @@ export function MethodologyRow({ variant, data = [] }: MethodologyRowProps) {
 
   // Variant 2: Dynamic (Loops through passed data)
   return (
-    <div className="flex items-center justify-between gap-4 rounded bg-background px-5 py-3 hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0">
+    <div className="flex items-center justify-between gap-4 rounded bg-background py-3 hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0">
       {data.map((item, index) => (
-        <div 
-          key={index} 
-          className={cn(
-            "flex-1 flex",
-            index === 0 ? "justify-start text-left" : "justify-center text-center"
-          )}
-        >
-          {typeof item.value === 'string' ? (
-            <span className="text-sm text-gray-800 leading-tight font-medium">
-                {item.value}
-            </span>
-          ) : (
-            item.value 
-          )}
+        <div key={index} className={cn("text-dm text-sm", item.className)}>
+          {item.value}
         </div>
       ))}
     </div>
