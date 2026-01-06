@@ -77,20 +77,17 @@ const coordinatorManagementItems = [
 ];
 
 const studentManagementItems = [
-    { 
-        id: 'student-root', 
+    {
+        id: 'student-root',
         title: 'Student',
         children: [
-            { title: 'Progress Tracking', href: '/student/progress', isHeader: true },
-            { title: 'Overall Progress', href: '/student/progress/overall' },
-            { title: 'Consultations', href: '/student/progress/consultations' },
-            { title: 'Status Reports', href: '/student/progress/status-reports' },
+            { title: 'Progress Tracking', href: '/student/progress' },
             { title: 'Thesis Management', href: '/student/thesis-management' },
             { title: 'Defense Management', href: '/student/defense' },
             { title: 'Compliance & IP', href: '/student/compliance', isHeader: true },
             { title: 'IP & Plagiarism', href: '/student/ip-plagiarism' },
             { title: 'Public Presentation', href: '/student/public-presentation' }
-        ] 
+        ]
     }
 ];
 
