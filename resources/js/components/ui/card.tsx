@@ -136,7 +136,7 @@
       variant: {
         default: "",
         progress: "",
-        about: "w-full max-w-[343px]",
+        about: "w-full",
       },
     },
     defaultVariants: {
@@ -328,8 +328,9 @@
           variant="metric"
           className={cn(metricCardVariants({ variant }), "border-0", className)}
           style={{
-            width: '343px',
-            height: '263px'
+            width: '100%',
+            height: '263px',
+            boxShadow: '0 0.5px 1.75px 0 rgba(0, 0, 0, 0.04), 0 1.85px 6.25px 0 rgba(0, 0, 0, 0.25)'
           }}
         >
           <CardHeader
