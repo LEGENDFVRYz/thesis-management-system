@@ -47,7 +47,7 @@ export default function ManagementLayout({ children, breadcrumbs, title, descrip
                 </header>
 
                 {/* Main Content Area */}
-                <div className="flex-1 p-6 overflow-x-auto">
+                <div className="flex-1 h-full p-6 overflow-x-auto">
                     {children}
                 </div>
             </div>

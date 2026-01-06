@@ -85,7 +85,7 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
   if (variant === 'header') {
     return (
       <div className="flex min-h-screen w-full flex-col" style={{ backgroundColor: 'var(--primary-foreground)' }}>
-        <main className="flex-1">
+        <main className="flex flex-col flex-1 h-full">
           {children}
         </main>
       </div>
