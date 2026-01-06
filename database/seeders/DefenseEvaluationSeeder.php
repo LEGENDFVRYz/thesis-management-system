@@ -6,6 +6,8 @@ use App\Models\DefenseEvaluation;
 use App\Models\DefenseMatrix;
 use App\Models\FacultyAssignment;
 use App\Models\FacultyRole;
+use App\Models\GradingRubric;
+use App\Models\RubricScore;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -16,17 +18,25 @@ class DefenseEvaluationSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Get valid Panelists for substitution logic later
+
+        // PRE-FETCH RUBRICS
+        $rubrics = GradingRubric::all();
+
+        if ($rubrics->isEmpty()) {
+            $this->command->warn('No Grading Rubrics found. Scores will not be generated.');
+        }
+
+        // Get valid Panelists for substitution logic
         $panelistRole = FacultyRole::where('role_name', 'Panelist')->first();
         $allPanelists = FacultyAssignment::where('role_id', $panelistRole->id)->get();
 
-        // 2. Loop through every scheduled defense
+        // Loop through every scheduled defense
         // Eager load 'endorsedPanels' to see who was SUPPOSED to be there
         $defenses = DefenseMatrix::with('endorsedPanels')->get();
 
         foreach ($defenses as $defense) {
 
-            // 3. Filter only the 3 CONFIRMED panelists
+            // Filter only the 3 CONFIRMED panelists
             $confirmedPanels = $defense->endorsedPanels->where('is_confirmed', true);
 
             if ($confirmedPanels->isEmpty()) {
@@ -35,7 +45,7 @@ class DefenseEvaluationSeeder extends Seeder
 
             foreach ($confirmedPanels as $panelInvitation) {
                 
-                // 4. ATTENDANCE LOGIC
+                // ATTENDANCE LOGIC
                 // 90% chance the confirmed panel attends. 10% chance they are absent.
                 $isPresent = (rand(1, 100) <= 90);
                 
@@ -45,19 +55,25 @@ class DefenseEvaluationSeeder extends Seeder
                 } else {
                     // Scenario B: SUBSTITUTION
                     // Pick a random faculty who is NOT one of the original invited panels
-                    // (To avoid duplicate evaluators in the same room)
                     $excludedIds = $confirmedPanels->pluck('panel_id')->toArray();
-                    
                     $substitute = $allPanelists->whereNotIn('id', $excludedIds)->random();
                     $evaluatorId = $substitute->id;
                 }
 
-                // 5. Create the Evaluation
-                DefenseEvaluation::factory()->create([
+                // Create the Evaluation
+                $evaluation = DefenseEvaluation::factory()->create([
                     'defense_id'   => $defense->id,
                     'evaluator_id' => $evaluatorId,
-                    // Grades/Comments are handled by the Factory's random logic
                 ]);
+
+                // Create Rubric Scores for this specific evaluation
+                foreach ($rubrics as $rubric) {
+                    RubricScore::factory()->create([
+                        'evaluation_id' => $evaluation->id,
+                        'rubric_id'     => $rubric->id,
+                        'rating'        => rand(1, 4),
+                    ]);
+                }
             }
         }
     }

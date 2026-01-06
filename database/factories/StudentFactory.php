@@ -23,9 +23,9 @@ class StudentFactory extends Factory
             'user_id' => User::factory()->state(['role' => 'student']),
 
             // Randomly assign to an existing thesis group 
-            'group_id' => ThesisGroup::inRandomOrder()->first()?->id,
+            'group_id' => ThesisGroup::factory(),
             // Randomly assign a specialization
-            'spec_id' => Specialization::inRandomOrder()->first()->id,
+            'spec_id' => fn () => Specialization::inRandomOrder()->value('id') ?? 1,
 
             // Personal Data
             'last_name'   => $this->faker->lastName(),
@@ -33,7 +33,7 @@ class StudentFactory extends Factory
             'middle_name' => $this->faker->optional()->lastName(),
             'suffix'      => $this->faker->optional()->suffix(),
             'section'     => $this->faker->numberBetween(1, 7),
-            'is_leader'   => $this->faker->boolean(20),
+            'is_leader'   => false,
         ];
     }
 }

@@ -7,6 +7,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Student;
 use App\Models\ThesisGroup;
+use App\Models\User;
 
 class StudentSeeder extends Seeder
 {
@@ -30,6 +31,34 @@ class StudentSeeder extends Seeder
             $this->command->warn('No Specializations found. Please seed specializations first.');
             return;
         }
+
+        $testUser = User::where('email', 'student@example.com')->first();
+        
+
+        // Manually Assign the "student@example.com" User to Group 1
+        if ($testUser) {
+            $firstGroup = $groups->first();
+            $realSection = $firstGroup->sectionAdviser?->section ?? 1;
+            
+            // Check if this student profile already exists to avoid duplicates
+            Student::firstOrCreate(
+                ['user_id' => $testUser->id], 
+                [
+                    'group_id'    => $firstGroup->id,
+                    'spec_id'     => $specs[0],
+                    'last_name'   => 'User',
+                    'first_name'  => 'Student',
+                    'middle_name' => 'Manual',
+                    'suffix'      => null,
+                    'section'     => $realSection,
+                    'is_leader'   => true, // Let's make the test user a leader
+                ]
+            );
+            
+            $this->command->info('Test Student (student@example.com) successfully linked to Group #'.$firstGroup->id);
+        }
+
+        // Random generation of students
 
         foreach ($groups as $group) {
             

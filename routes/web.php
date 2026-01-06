@@ -26,6 +26,9 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PdfViewerController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\Shared\ThesisArchive;
+use App\Http\Controllers\Student\EvaluationController;
+use App\Http\Controllers\Student\MatrixController;
+use App\Http\Controllers\Student\ProgressController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -101,7 +104,7 @@ Route::middleware('gues')->group(function () {
 Route::post('logout', [StudentLoginController::class, 'destroy'])->name('student.logout');
 
 // AUTHENTICATED STUDENT ROUTES
-Route::middleware(['auth', 'role:student'])->group(function () {
+Route::middleware(['auth', 'role:student'])->prefix('student')->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Student/dashboard'); // Your Student Dashboard Component
     })->name('dashboard');
@@ -110,6 +113,50 @@ Route::middleware(['auth', 'role:student'])->group(function () {
         return Inertia::render('Shared/notification');
     })->name('student.notification');
 
+    // Backend Preapered
+    Route::prefix('management')->group(function () {
+        Route::redirect('/', '/dashboard')->name('student.management.index'); 
+
+        // Thesis Management
+        Route::get('thesis', function () {
+            return Inertia::render('Student/management/thesis');
+        })->name('student.management.thesis');
+
+        // Defense Management
+        Route::get('defense_matrix', [MatrixController::class, 'index'])
+            ->name('student.management.defense_matrix');
+
+        // Compliance and IP Module
+        Route::get('compliance_ip', function () {
+            return Inertia::render('Student/management/compliance_ip');
+        })->name('student.management.compliance_ip');
+
+        // Progress Tracking
+        Route::prefix('progress_tracking')->group(function () {
+            
+            // Default Route: Redirect to Overall Progress
+            Route::get('/', function () {
+                return redirect()->route('student.management.progress_tracking.overall_progress');
+            });
+
+            // Overall Progress
+            Route::get('overall_progress', function () {
+                return Inertia::render('Student/management/progress_tracking/overall_progress');
+            })->name('student.management.progress_tracking.overall_progress');
+
+            // Status Reports
+            Route::get('status_reports', [ProgressController::class, 'statusReports'])
+                ->name('student.management.progress_tracking.status_reports');
+
+        });
+
+        // Defense Evaluation
+        Route::get('eval_n_grading', [EvaluationController::class, 'index'])
+            ->name('student.management.eval_n_grading');
+
+    });
+
+    // FRONTEND READY
     Route::get('student/thesis-management', function () {
         return Inertia::render('Student/thesis-management/thesis');
     })->name('student.thesis-management');
@@ -185,6 +232,21 @@ Route::prefix('faculty')->group(function () {
                 Route::get('endorsement', [Endorsement::class, 'index'])->name('faculty.management.adviser.endorsement');
 
                 Route::get('eval_n_grading', [EvaluationGrading::class, 'index'])->name('faculty.management.adviser.eval_n_grading');
+
+                // Evaluation and Grading's sub-pages (Document Review & Evaluation Tabs)
+                Route::prefix('eval_n_grading')->group(function () {
+                    
+                    Route::get('document_review/{id}', [EvaluationGrading::class, 'showDocumentReview'])
+                        ->name('faculty.adviser.document_review');
+
+                    Route::get('evaluation/{id}', [EvaluationGrading::class, 'showEvaluation'])
+                        ->name('faculty.adviser.evaluation');
+
+                    Route::post('store', [EvaluationGrading::class, 'store'])
+                        ->name('faculty.adviser.evaluation.store');
+                        
+                });
+
             });
 
 

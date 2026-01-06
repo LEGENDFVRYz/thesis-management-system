@@ -25,10 +25,15 @@ class DatabaseSeeder extends Seeder
             
             UserSeeder::class,
             FacultySeeder::class,
-            AvailabilitySeeder::class,
-            
             SectionAdviserSeeder::class,
             ThesisGroupSeeder::class,
+            AvailabilitySeeder::class,
+            
+            // Grading criteria seeder
+            GradingCriteriasSeeder::class,
+            GradingRubricsSeeder::class,
+            RubricLevelsSeeder::class,
+            
             ProposalSeeder::class,
             ProposalEvaluationSeeder::class,
             ThesesSeeder::class,
@@ -37,13 +42,10 @@ class DatabaseSeeder extends Seeder
             EndorsedPanelSeeder::class,
             DefenseEvaluationSeeder::class,
             ArchivedJournalSeeder::class,
-            StudentSeeder::class,
             ResourceSeeder::class,
-            
-            // grading criteria seeder
-            GradingCriteriasSeeder::class,
-            GradingRubricsSeeder::class,
-            RubricLevelsSeeder::class,
+
+            // ThesisGroupSeeder now handles Student creation
+            // StudentSeeder::class,
         ]);
 
         // Faculty::factory(10)->create();
