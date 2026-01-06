@@ -112,16 +112,24 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     })->name('student.thesis-management');
 
     Route::get('student/ip-plagiarism', function () {
-        return Inertia::render('Student/compliance-ip');
+        return Inertia::render('Student/compliance and ip/compliance-ip');
     })->name('student.compliance_ip');
 
     Route::get('student/public-presentation', function () {
-        return Inertia::render('Student/public-presentation');
+        return Inertia::render('Student/compliance and ip/public-presentation');
     })->name('student.public_presentation');
 
     Route::get('student/progress', function () {
-        return Inertia::render('Student/progress');
+        return Inertia::render('Student/progress-tracking/progress');
     })->name('student.progress');
+
+    Route::get('student/defense', function () {
+        return Inertia::render('Student/defense');
+    })->name('student.defense');
+
+    Route::get('student/profilemanagement', function () {
+        return Inertia::render('Student/profilemanagement');
+    })->name('student.profilemanagement');
 });
 
 
