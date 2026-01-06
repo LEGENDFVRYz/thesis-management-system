@@ -73,7 +73,7 @@ export function AppContent({
           </div>
         </div>
       )}
-      <div className="flex flex-1 mx-auto w-full max-w-[1440px] p-6 h-full">
+      <div className="flex flex-1 flex-col mx-auto w-full max-w-[1440px] p-6 h-full">
         {children}
       </div>
     </div>
