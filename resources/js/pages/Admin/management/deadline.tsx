@@ -59,17 +59,19 @@ export default function DeadlinePage({ allowed_stages, workflow }: DeadlineProps
             description="Set submission windows, defense periods, and grading deadlines"
         >
             <div className="flex flex-col gap-6 p-4">
-                {/* LERIGH CODE - resolve later */}
+                {/* LEIGH PAST CODE: resolve later */}
                 {/* Timeline View - Full Width */}
                 {/* <DeadlineTimelineView /> */}
 
                 {/* Three Column Grid */}
                 {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-6"> */}
-                    {/* <DeadlineSubmissionSchedule /> */}
-                    {/* <DeadlineDefenseSchedule /> */}
-                    {/* <DeadlineNotificationRules /> */}
+                    {/* <DeadlineSubmissionSchedule /> */}  
+                    {/* <DeadlineDefenseSchedule /> */}     
+                    {/* <DeadlineNotificationRules /> */}   
                 {/* </div> */}
 
+
+                {/* Initial Design for deadline management */}
                 {/* --- TABS SECTION --- */}
                 <div className="flex w-full items-center gap-2 border-b border-sidebar-border/70 pb-1">
                     {allowed_stages.map((stageId) => (
