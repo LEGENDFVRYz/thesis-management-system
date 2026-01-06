@@ -142,7 +142,7 @@ export default function Dashboard({ activeTerm, currentDate, notifications }: Da
         <>
             <AppLayout breadcrumbs={breadcrumbs}>
                 <Head title="Dashboard" />
-
+                
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-3">
                         <div className="min-h-screen bg-white p-8">
 
@@ -342,39 +342,8 @@ export default function Dashboard({ activeTerm, currentDate, notifications }: Da
                             </div>
                         </div>
                     </div>
-                    
-                    {/* TESTING PURPOSE ONLY: */}
-                    <div>
-                        <div className="flex flex-col gap-2">
-                            {notifications.map((notification) => (
-                                <NotificationListItem
-                                    key={notification.id}
-                                    type={notification.data.type ?? null}   // null for internal fallback (defaulkt: bell icon)
-                                    title={notification.data.title} 
-                                    description={notification.data.message} 
-                                    timestamp={getTimeAgo(notification.created_at)} 
-                                    isUnread={notification.read_at === null} 
-                                />
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </AppLayout>
-    );
-}
-
-// Helper for the top right info items (Date, Year, Sem)
-function HeaderInfoItem({ icon: Icon, label, valueFirst }) {
-    return (
-        <div className="flex items-start gap-3">
-            <Icon className={`h-8 w-8 text-primary`} strokeWidth={1.5} />
-            <div>
-                <p className={`text-xs font-bold uppercase tracking-wide text-primary`}>
-                    {label}
-                </p>
-                <p className="font-bold text-gray-800">{valueFirst}</p>
-            </div>
-        </div>
+            </AppLayout>
+        <NavFooter />
+        </>
     );
 }
