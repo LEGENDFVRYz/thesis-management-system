@@ -8,6 +8,7 @@ import {
 interface YearRangePickerProps {
   value?: Date;
   onChange?: (date: Date) => void;
+  range?: [number, number];   // fixed range [min, max]
   placeholder?: string;
   className?: string;
   mode?: "dropdown" | "grid";
@@ -17,6 +18,7 @@ interface YearRangePickerProps {
 export default function YearRangePicker({
   value,
   onChange,
+  range,    // fixed range (backend will give valid range)
   placeholder = "Academic Year",
   className = "",
   mode = "dropdown",
@@ -30,8 +32,8 @@ export default function YearRangePicker({
 
   // For grid mode
   const currentYear = new Date().getFullYear();
-  const MIN_YEAR = 1900; // Set a reasonable minimum year
-  const MAX_YEAR = 2026; // Set a reasonable maximum year
+  const MIN_YEAR = range?.[0] ?? 1900; // Set a reasonable minimum year
+  const MAX_YEAR = range?.[1] ?? 2026; // Set a reasonable maximum year
 
   const initialStartYear = value
     ? Math.floor(value.getFullYear() / 9) * 9
@@ -133,10 +135,10 @@ export default function YearRangePicker({
       {/* Year Range Dropdown */}
       {isOpen && mode === "dropdown" && (
         <div className="absolute z-50 mt-2 left-0 w-full bg-breadcrumb rounded-lg border border-[#d4c5a0] shadow-lg overflow-hidden">
-          {/* Header */}
-          <div style={{ fontSize: "13.33px" }} className="bg-primary text-primary-foreground-2 font-semibold px-4 py-2 text-center year-range-picker-dropdown-header">
+          {/* Header -- Remove for more visual readability */}
+          {/* <div style={{ fontSize: "13.33px" }} className="bg-primary text-primary-foreground-2 font-semibold px-4 py-2 text-center year-range-picker-dropdown-header">
             {selectedYearValue} - {selectedYearValue + 1}
-          </div>
+          </div> */}
 
           {/* Year Range List */}
           <div className="max-h-48 overflow-y-auto bg-breadcrumb">

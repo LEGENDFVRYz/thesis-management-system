@@ -22,6 +22,7 @@ import CheckIcon from '@/components/Icons/ic_check-Default.svg';
 import TimerIcon from '@/components/Icons/timer.svg';
 import ManagementIcon from '@/components/Icons/ic_pen-settings-Default.svg';
 import { RotateCw } from 'lucide-react';
+import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -72,12 +73,6 @@ type SemesterForm = {
     end_date: string | null;
 };
 
-// HELPER: Mampping Array for semester props
-const mapSemester: Record<number, string> = {
-    0: '1st Semester',
-    1: '2nd Semester',
-};
-
 
 export default function AcademicPage({ active_sy , school_year, active_sem }: AcademicPageProps) {
     // SHARED STATE
@@ -97,16 +92,21 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
         end_date: acadDate.end ? formatLocal(acadDate.end) : null,
     });
 
-    const handleSyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        // HELPER: change the datepicker value default dependent on the selected year
-        const newYearId = Number(e.target.value);
+    const handleSyChange = (date: Date) => {
+        // Convert date to year number (due to backend requirements)
+        const newYearId = date.getFullYear();
         setSelectedSy(newYearId);
 
-        // Update the record and save it to the form
+        // Get selected school year record
         const selectedRecord = school_year[newYearId];
         if (selectedRecord) {
-            const start = selectedRecord.start ? new Date(selectedRecord.start) : null;
-            const end = selectedRecord.end ? new Date(selectedRecord.end) : null;
+            const start = selectedRecord.start
+                ? new Date(selectedRecord.start)
+                : null;
+            const end = selectedRecord.end
+                ? new Date(selectedRecord.end)
+                : null;
+
             setAcadDate({ start, end });
 
             acadForm.setData({
@@ -116,14 +116,18 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
             });
         }
 
-        // UPDATE SEMESTER FORM (THE FIX)
+        // UPDATE SEMESTER FORM 
         let newSemStart: Date | null = null;
         let newSemEnd: Date | null = null;
 
-        if (selectedRecord && selectedRecord.semesters[0]) {
+        if (selectedRecord?.semesters?.[0]) {
             const semRecord = selectedRecord.semesters[0];
-            newSemStart = semRecord.start ? new Date(semRecord.start) : null;
-            newSemEnd = semRecord.end ? new Date(semRecord.end) : null;
+            newSemStart = semRecord.start
+                ? new Date(semRecord.start)
+                : null;
+            newSemEnd = semRecord.end
+                ? new Date(semRecord.end)
+                : null;
         }
 
         // Update Semester Date State
@@ -131,8 +135,8 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
 
         // Update Semester Form Data
         semForm.setData({
-            sy_year: newYearId,          // <--- Important: Syncs the year
-            sem_index: 0,  // <--- Defaults to 0
+            sy_year: newYearId,   // syncs academic year
+            sem_index: 0,         // default semester
             start_date: newSemStart ? formatLocal(newSemStart) : null,
             end_date: newSemEnd ? formatLocal(newSemEnd) : null,
         });
@@ -154,12 +158,11 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
         end_date: semDate.end ? formatLocal(semDate.end) : null,
     });
 
-    const handleSemChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        // HELPER: change the datepicker value default dependent on the selected semester
-        const newSemId = Number(e.target.value);
+    const handleSemChange = (value: number) => {
+        // HELPER: change the datepicker value default
+        const newSemId = value;
         setSelectedSem(newSemId);
 
-        // We look up the semester based on the CURRENTLY selected School Year
         const currentYearRecord = selectedSy ? school_year[selectedSy] : null;
 
         if (currentYearRecord && currentYearRecord.semesters[newSemId]) {
@@ -189,6 +192,10 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
         }
     };
 
+    // --- HELPER
+    const years = Object.keys(school_year).map(Number); 
+    const minYear = Math.min(...years);                 // dynamic valid range 
+    const maxYear = Math.max(...years);                 // dynamic valid range 
 
     return (
         <ManagementLayout 
@@ -196,47 +203,41 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
             title="Academic Settings Configuration" 
             description="Configure academic year, semester parameters, and system timeline"
         >
-            <div className="flex flex-1 flex-row gap-4"> 
-                <div className="flex flex-1 flex-col gap-4">
+            <div className="flex flex-1 h-full flex-col gap-4"> 
+                <div className="flex flex-row gap-4">
+
                     {/* Academic year settings */}
-                    <div className="flex flex-1 flex-col p-4 py-6 rounded-xl border border-sidebar-border/70 gap-5">
-                        <div className='flex flex-1 justify-between align-middle'>
-                            <h1>Academic Year Management</h1>
-                            <button 
-                                disabled={acadForm.processing}
-                                onClick={() => acadForm.put(update().url, { preserveScroll: true })}
-                                className='bg-primary text-primary-foreground py-2 px-8 text-sm rounded-md cursor-pointer'
-                            >
-                                {acadForm.processing ? 'Saving...' : 'Save'}
-                            </button>
-                        </div>
+                    <Card className="bg-[#FDFCF6] h-full border border-[#73000042] shadow-md flex-1">
+                        <CardHeader className="flex flex-row items-center gap-2 pb-2">
+                            <img src={AcademicYearIcon} className="w-6 h-6" alt="Academic year management" />
+                            <CardTitle>Academic Year Management</CardTitle>
+                        </CardHeader>
 
-                        <div>
-                            <label className="mb-2 block text-sm font-medium text-muted-foreground">
-                                Set the Active Academic Year:
-                            </label>
-                            <select 
-                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                                value={selectedSy ?? ""}
-                                onChange={handleSyChange}
-                            >
-                                <option value="" disabled>Select an option</option>
-                                {Object.keys(school_year).map((yr) => {
-                                    const year = Number(yr);
-
-                                    // dynamic sychool year options from the backend
-                                    return (
-                                        <option key={year} value={year}>
-                                            {year} – {year + 1}
-                                        </option>
-                                    );
-                                })}
-                            </select>
-                        </div>
-                        
-                        <div className='flex flex-row gap-5 flex-1'>
+                        <CardContent className="grid grid-cols-2 gap-4">
+                            {/* Current Academic Yr */}
+                            <div>
+                                <label className="text-sm font-medium">Current Academic Year</label>
+                                <div className="bg-[#95969766] border-[0.8px] rounded-sm border-[#44444433] px-3 py-2 text-sm flex items-center justify-between">
+                                    <span style={{ color: '#730000' }}>
+                                        Academic Year { active_sy ? `${active_sy}–${Number(active_sy) + 1}` : 'not yet activated!'}
+                                    </span>
+                                    <img src={CheckIcon} className="w-5 h-5" style={{ filter: 'brightness(0) saturate(100%) invert(12%) sepia(86%) saturate(2065%) hue-rotate(335deg)' }} alt="checkmark" />
+                                </div>
+                            </div>
+                            
+                            {/* Set Academic Picker */}
+                            <div>
+                                <label className="text-sm font-medium">Set New Academic Year</label>
+                                <AcademicYearRangePicker
+                                    value={selectedSy ? new Date(selectedSy, 0, 1) : undefined}
+                                    onChange={handleSyChange}
+                                    range={[minYear, maxYear]}
+                                />
+                            </div>
+                            
+                            {/* DATEPICKER SECTION */}
                             <div className='flex-1'>
-                                <Label className="text-primary">Start Date</Label>
+                                <label className="text-sm font-medium">Start Date</label>
                                 <DatePicker
                                     key={`sy-start-${selectedSy}`}  // id for changing defaults
                                     displayFormat="full"
@@ -252,7 +253,7 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
                                 )}
                             </div>
                             <div className='flex-1'>
-                                <Label className="text-primary">End Date</Label>
+                                <label className="text-sm font-medium">End Date</label>
                                 <DatePicker
                                     key={`sy-end-${selectedSy}`}    // id for changing defaults
                                     displayFormat="full"
@@ -267,88 +268,114 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
                                     <p className="text-red-500 text-xs">{acadForm.errors.end_date}</p>
                                 )}
                             </div>
-                        </div>
-                        
-                        <p className='pt-5 font-bold text-md text-center text-primary flex-1'>
-                            Current Active School Year: { active_sy ? `${active_sy}–${Number(active_sy) + 1}` : 'Not yet Activated!'}
-                        </p>
-                    </div>
-                    
+                            
+
+                            <div className="col-span-2 flex justify-end gap-2 mt-2">
+                                <Button 
+                                    disabled={acadForm.processing}
+                                    onClick={() => acadForm.put(update().url, { preserveScroll: true })}
+                                    variant="primary"
+                                >
+                                    {/* ISSUE: WRONG ICON */}
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M10.1333 2C10.485 2.00501 10.8205 2.14878 11.0667 2.4L13.6 4.93333C13.8512 5.17951 13.995 5.51497 14 5.86667V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 3.33333C2 2.97971 2.14048 2.64057 2.39052 2.39052C2.64057 2.14048 2.97971 2 3.33333 2H10.1333Z" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round" />
+                                        <path d="M11.3332 13.9998V9.33317C11.3332 9.15636 11.2629 8.98679 11.1379 8.86177C11.0129 8.73674 10.8433 8.6665 10.6665 8.6665H5.33317C5.15636 8.6665 4.98679 8.73674 4.86177 8.86177C4.73674 8.98679 4.6665 9.15636 4.6665 9.33317V13.9998" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round" />
+                                        <path d="M4.6665 2V4.66667C4.6665 4.84348 4.73674 5.01305 4.86177 5.13807C4.98679 5.2631 5.15636 5.33333 5.33317 5.33333H9.99984" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                    Save
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+
                     {/* Semestral settings */}
-                    <div className="flex flex-1 flex-col p-4 py-6 rounded-xl border border-sidebar-border/70 gap-5">
-                        <div className='flex flex-1 justify-between align-middle'>
-                            <h1>Semestral Management</h1>
-                            <button 
-                                disabled={semForm.processing}
-                                onClick={() => semForm.put(update().url, { preserveScroll: true })}
-                                className='bg-primary text-primary-foreground py-2 px-8 text-sm rounded-md cursor-pointer'>Save</button>
-                        </div>
-                        <div>
-                            <label className="mb-2 block text-sm font-medium text-muted-foreground">
-                                Set the Active Semestral:
-                            </label>
-                            <select 
-                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                                value={selectedSem !== null ? selectedSem : ""} 
-                                onChange={handleSemChange}
+                    <Card className="bg-[#FDFCF6] border border-[#73000042] shadow-md h-full flex-1">
+                        <CardHeader className="flex flex-row items-center gap-2 pb-2">
+                            <img src={SemesterIcon} className="w-6 h-6" alt="Semester configuration" />
+                            <CardTitle>Semester Configuration</CardTitle>
+                        </CardHeader>
+
+                        <CardContent className="space-y-4">
+                            <label className="text-sm font-medium">Active Semester</label>
+
+                            <Select 
+                                value={selectedSem !== null ? String(selectedSem) : ""}
+                                onValueChange={(value) => handleSemChange(Number(value))}
                             >
-                                <option value="" disabled>Select an option</option>
-                                <option value="0">1st Semester</option>
-                                <option value="1">2nd Semester</option>
-                            </select>
-                        </div>
+                                <SelectTrigger className="w-full bg-[#F3EFD0] border-1px border-[#7300001A] text-[#730000] rounded-md">
+                                    <SelectValue placeholder="Select Semester" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-[#F3EFD0] border border-[#7300001A]">
+                                    <SelectItem value="0" className="text-[#730000]">First Semester</SelectItem>
+                                    <SelectItem value="1" className="text-[#730000]">Second Semester</SelectItem>
+                                </SelectContent>
+                            </Select>
 
-                        <div className='flex flex-row gap-5 flex-1'>
-                            <div className='flex-1'>
-                                <Label className="text-primary">Start Date</Label>
-                                <DatePicker
-                                    key={`sem-start-${selectedSem}`}
-                                    value={semDate.start ?? undefined}
-                                    displayFormat="full"
-                                    placeholder="Select Start Date"
-                                    onChange={(date) => {
-                                        setSemDate((prev) => ({ ...prev, start: date })); 
-                                        semForm.setData('start_date', formatLocal(date))
-                                    }}
-                                />
-                                {semForm.errors.start_date && (
-                                    <p className="text-red-500 text-xs">{semForm.errors.start_date}</p>
-                                )}
-                            </div>
-                            <div className='flex-1'>
-                                <Label className="text-primary">End Date</Label>
-                                <DatePicker
-                                    key={`sem-end-${selectedSem}`}
-                                    displayFormat="full"
-                                    value={semDate.end ?? undefined}
-                                    placeholder="Select End Date"
-                                    onChange={(date) => {
-                                        setSemDate((prev) => ({ ...prev, end: date })); 
-                                        semForm.setData('end_date', formatLocal(date))
-                                    }}
-                                />
-                                {semForm.errors.end_date && (
-                                    <p className="text-red-500 text-xs">{semForm.errors.end_date}</p>
-                                )}
-                            </div>
-                        </div>
 
-                        <p className='pt-5 font-bold text-md text-center text-primary flex-1'>
-                            Active Semester: {active_sem !== null ? mapSemester[active_sem] ?? `Semester ${active_sem + 1}` : 'Not yet Activated!'}
-                        </p>
-                    </div>
-                    
-                </div>
-                <div className="flex-1 overflow-hidden rounded-xl border border-sidebar-border/70">
-                    <PlaceholderPattern className="size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                            {/* DATE PICKER */}
+                            <div className="grid grid-cols-2 gap-4 mb-4">
+                                <div className='flex-1'>
+                                    <label className="text-sm font-medium">Start Date</label>
+                                    <DatePicker
+                                        key={`sem-start-${selectedSem}`}
+                                        value={semDate.start ?? undefined}
+                                        displayFormat="full"
+                                        placeholder="Select Start Date"
+                                        onChange={(date) => {
+                                            setSemDate((prev) => ({ ...prev, start: date })); 
+                                            semForm.setData('start_date', formatLocal(date))
+                                        }}
+                                    />
+                                    {semForm.errors.start_date && (
+                                        <p className="text-red-500 text-xs">{semForm.errors.start_date}</p>
+                                    )}
+                                </div>
+                                <div className='flex-1'>
+                                    <label className="text-sm font-medium">End Date</label>
+                                    <DatePicker
+                                        key={`sem-end-${selectedSem}`}
+                                        displayFormat="full"
+                                        value={semDate.end ?? undefined}
+                                        placeholder="Select End Date"
+                                        onChange={(date) => {
+                                            setSemDate((prev) => ({ ...prev, end: date })); 
+                                            semForm.setData('end_date', formatLocal(date))
+                                        }}
+                                    />
+                                    {semForm.errors.end_date && (
+                                        <p className="text-red-500 text-xs">{semForm.errors.end_date}</p>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end gap-2 mt-2">
+                                {/* ISSUE: WRONG ICON */}
+                                <Button 
+                                    variant="primary"
+                                    disabled={semForm.processing}
+                                    onClick={() => semForm.put(update().url, { preserveScroll: true })}
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M10.1333 2C10.485 2.00501 10.8205 2.14878 11.0667 2.4L13.6 4.93333C13.8512 5.17951 13.995 5.51497 14 5.86667V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 3.33333C2 2.97971 2.14048 2.64057 2.39052 2.39052C2.64057 2.14048 2.97971 2 3.33333 2H10.1333Z" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M11.3332 13.9998V9.33317C11.3332 9.15636 11.2629 8.98679 11.1379 8.86177C11.0129 8.73674 10.8433 8.6665 10.6665 8.6665H5.33317C5.15636 8.6665 4.98679 8.73674 4.86177 8.86177C4.73674 8.98679 4.6665 9.15636 4.6665 9.33317V13.9998" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M4.6665 2V4.66667C4.6665 4.84348 4.73674 5.01305 4.86177 5.13807C4.98679 5.2631 5.15636 5.33333 5.33317 5.33333H9.99984" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                    Save
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
+
+            {/* OTHER FEATURES HERE ARE TEMPOPRARILY REMOVED DUE TO NEW PATCH NOTES */}
+            
         </ManagementLayout>
     );
 }
 
 
-// Chilly Past Code: Migrate Later due to vague conflict
+// Chilly Past Code: Already resolve, if there is missing piece, check it here in case
 //   return (
 //     <ManagementLayout
 //       breadcrumbs={breadcrumbs}
@@ -458,46 +485,46 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
 //         </div>
 
 //         <div className="flex flex-col gap-6">
-//         {/* SEMESTER CONFIGURATION */}
-//         <Card className="bg-[#FDFCF6] border border-[#73000042] shadow-[0_1px_16px_#00000040,0_1px_3px_#0000000A] h-fit">
-//             <CardHeader className="flex flex-row items-center gap-2 pb-2">
-//             <img src={SemesterIcon} className="w-6 h-6" alt="Semester configuration" />
-//             <CardTitle>Semester Configuration</CardTitle>
-//           </CardHeader>
-//           <CardContent className="space-y-4">
-//             <label className="text-sm font-medium">Active Semester</label>
+        // {/* SEMESTER CONFIGURATION */}
+        // <Card className="bg-[#FDFCF6] border border-[#73000042] shadow-[0_1px_16px_#00000040,0_1px_3px_#0000000A] h-fit">
+        //     <CardHeader className="flex flex-row items-center gap-2 pb-2">
+        //     <img src={SemesterIcon} className="w-6 h-6" alt="Semester configuration" />
+        //     <CardTitle>Semester Configuration</CardTitle>
+        //   </CardHeader>
+        //   <CardContent className="space-y-4">
+        //     <label className="text-sm font-medium">Active Semester</label>
 
-//             <Select 
-//               value={semester.activeSemester} 
-//               onValueChange={(value) => setSemester({...semester, activeSemester: value})}
-//             >
-//               <SelectTrigger className="w-full bg-[#F3EFD0] border-1px border-[#7300001A] text-[#730000] rounded-md">
-//                 <SelectValue placeholder="Select Semester" />
-//               </SelectTrigger>
-//               <SelectContent className="bg-[#F3EFD0] border border-[#7300001A]">
-//                 <SelectItem value="first" className="text-[#730000]">First Semester</SelectItem>
-//                 <SelectItem value="second" className="text-[#730000]">Second Semester</SelectItem>
-//               </SelectContent>
-//             </Select>
+        //     <Select 
+        //       value={semester.activeSemester} 
+        //       onValueChange={(value) => setSemester({...semester, activeSemester: value})}
+        //     >
+        //       <SelectTrigger className="w-full bg-[#F3EFD0] border-1px border-[#7300001A] text-[#730000] rounded-md">
+        //         <SelectValue placeholder="Select Semester" />
+        //       </SelectTrigger>
+        //       <SelectContent className="bg-[#F3EFD0] border border-[#7300001A]">
+        //         <SelectItem value="first" className="text-[#730000]">First Semester</SelectItem>
+        //         <SelectItem value="second" className="text-[#730000]">Second Semester</SelectItem>
+        //       </SelectContent>
+        //     </Select>
 
-//             <div className="grid grid-cols-2 gap-4">
-//               <DateField label="Semester Start" />
-//               <DateField label="Semester End" />
-//               <DateField label="Defense Period Start" />
-//               <DateField label="Defense Period End" />
-//             </div>
+        //     <div className="grid grid-cols-2 gap-4">
+        //       <DateField label="Semester Start" />
+        //       <DateField label="Semester End" />
+        //       <DateField label="Defense Period Start" />
+        //       <DateField label="Defense Period End" />
+        //     </div>
 
-//             <div className="flex justify-end gap-2 mt-2">
-//               <Button variant="primary">
-//                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-//                 <path d="M10.1333 2C10.485 2.00501 10.8205 2.14878 11.0667 2.4L13.6 4.93333C13.8512 5.17951 13.995 5.51497 14 5.86667V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 3.33333C2 2.97971 2.14048 2.64057 2.39052 2.39052C2.64057 2.14048 2.97971 2 3.33333 2H10.1333Z" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
-//                 <path d="M11.3332 13.9998V9.33317C11.3332 9.15636 11.2629 8.98679 11.1379 8.86177C11.0129 8.73674 10.8433 8.6665 10.6665 8.6665H5.33317C5.15636 8.6665 4.98679 8.73674 4.86177 8.86177C4.73674 8.98679 4.6665 9.15636 4.6665 9.33317V13.9998" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
-//                 <path d="M4.6665 2V4.66667C4.6665 4.84348 4.73674 5.01305 4.86177 5.13807C4.98679 5.2631 5.15636 5.33333 5.33317 5.33333H9.99984" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
-//               </svg>
-//               Save</Button>
-//             </div>
-//           </CardContent>
-//         </Card>
+        //     <div className="flex justify-end gap-2 mt-2">
+        //       <Button variant="primary">
+        //         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        //         <path d="M10.1333 2C10.485 2.00501 10.8205 2.14878 11.0667 2.4L13.6 4.93333C13.8512 5.17951 13.995 5.51497 14 5.86667V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 3.33333C2 2.97971 2.14048 2.64057 2.39052 2.39052C2.64057 2.14048 2.97971 2 3.33333 2H10.1333Z" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
+        //         <path d="M11.3332 13.9998V9.33317C11.3332 9.15636 11.2629 8.98679 11.1379 8.86177C11.0129 8.73674 10.8433 8.6665 10.6665 8.6665H5.33317C5.15636 8.6665 4.98679 8.73674 4.86177 8.86177C4.73674 8.98679 4.6665 9.15636 4.6665 9.33317V13.9998" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
+        //         <path d="M4.6665 2V4.66667C4.6665 4.84348 4.73674 5.01305 4.86177 5.13807C4.98679 5.2631 5.15636 5.33333 5.33317 5.33333H9.99984" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
+        //       </svg>
+        //       Save</Button>
+        //     </div>
+        //   </CardContent>
+        // </Card>
 
 
 //         {/* PROGRAM OVERVIEW */}
@@ -546,19 +573,19 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
 
 // /* HELPERS */
 // function DateField({ label }: { label: string }) {
-//   return (
-//     <div>
-//       <label className="text-sm font-medium">{label}</label>
-//       <DatePicker />
-//     </div>
-//   );
+//     return (
+//         <div>
+//             <label className="text-sm font-medium">{label}</label>
+//             <DatePicker />
+//         </div>
+//     );
 // }
 
 // function CheckboxRow({ label }: { label: string }) {
 //   return (
-//     <div className="flex items-center gap-2">
-//       <Checkbox />
-//       <span className="text-sm">{label}</span>
-//     </div>
+//         <div className="flex items-center gap-2">
+//             <Checkbox />
+//             <span className="text-sm">{label}</span>
+//         </div>
 //   );
 // }
