@@ -792,13 +792,14 @@
           
           {/* Thesis Title */}
           <div className="flex items-center gap-">
-            <CardTitle className="text-primary font-semibold text-xs sm:text-sm truncate">
+            <CardTitle className="text-primary font-semibold text-xs sm:text-sm truncate mb-[5px]">
               {thesisTitle}
             </CardTitle>
           </div>
           
           {/* Block/Section Badge */}
-          <Badge className="h-3.5 text-[8px] sm:text-[7px]">{section}</Badge>
+          
+          <Badge variant="outline" className="text-[8px] h-auto px-2 py-0.5 mb-[-5px]">{section}</Badge>
         </CardHeader>
 
         <CardContent>

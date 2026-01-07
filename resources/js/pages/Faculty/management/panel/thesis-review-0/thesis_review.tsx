@@ -15,6 +15,7 @@ import {Dialog,DialogContent,DialogHeader,DialogTitle,DialogDescription,DialogFo
 import ThesisModal from './thesis-modal';
 import { Button } from '@/components/ui/button';
 import { SearchBar } from '@/components/filter-search';
+import { TextLink } from '@/components/text-link';
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -41,7 +42,7 @@ import { SearchBar } from '@/components/filter-search';
                 id: `330${index + 1}`,
                 title: 'MOR Thesis Topic Analysis and Research',
                 proponents: 4,
-                adviser: 'Dr. Cherry D. Casuet',
+                adviser: 'Dr. Cherry D. Casuat',
                 block: 'BSCPE 3-3',
                 dateTime: 'November 28, 2025\n09:00 AM',
                 type: 'MOR Defense',
@@ -51,7 +52,7 @@ import { SearchBar } from '@/components/filter-search';
                 title: 'MOR Completed Research on Machine',
                 proponents: 3,
                 adviser: 'Dr. John Smith',
-                block: 'BSCS 4-1',
+                block: 'BSCPE 4-1',
                 dateTime: 'October 15, 2025\n02:00 PM',
                 type: 'MOR Defense',
             }))
@@ -82,7 +83,7 @@ import { SearchBar } from '@/components/filter-search';
                 title: 'DP2 Final Implementation and Testing',
                 proponents: 3,
                 adviser: 'Dr. Emily Brown',
-                block: 'BSCS 4-3',
+                block: 'BSCPE 4-3',
                 dateTime: 'January 10, 2026\n03:00 PM',
                 type: 'Defense Proper 2',
             })),
@@ -124,7 +125,7 @@ import { SearchBar } from '@/components/filter-search';
         return (
             <FacultyManagementLayout
                 breadcrumbs={breadcrumbs}
-                title="Thesis Review" 
+                title="Assigned Thesis" 
                 description="Manage and Review All Assigned Theses"
             >
                 <div className="flex flex-col gap-4">
@@ -137,21 +138,21 @@ import { SearchBar } from '@/components/filter-search';
                     </div>
 
                     {/* Filter and Search Section */}
-                    <div className="mb-6 box-border flex h-[125.6px] w-full max-w-[1360px] flex-col items-start gap-4 self-stretch rounded-[10px] border-[0.8px] border-primary/20 bg-card p-[24.8px_24.8px_0.8px_24.8px] font-dm shadow-sm transition-all duration-200">
+                    <div className="mb-6 box-border flex h-[125.6px] w-full max-w-[1360px] flex-col items-start gap-4 self-stretch rounded-[10px] border-[0.8px] border-primary/20 bg-card p-[24.8px_24.8px_0.8px_24.8px] shadow-sm transition-all duration-200">
                         {/* Header Section */}
-                        <div className="flex h-6 w-full flex-row items-center gap-2 self-stretch rounded-none font-dm">
+                        <div className="flex h-6 w-full flex-row items-center gap-2 self-stretch rounded-none">
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M3.33301 5.83333H16.6663M5.83301 10H14.1663M8.33301 14.1667H11.6663" stroke="#730000" strokeWidth="1.5" strokeLinecap="round"/>
                             </svg>
-                            <h2 className="font-dm text-base leading-6 font-normal text-primary">
+                            <h2 className="text-base leading-6 font-normal text-primary">
                                 Filters & Search
                             </h2>
                         </div>
 
                         {/* Controls Row */}
-                        <div className="flex w-full flex-row items-center justify-center gap-[10px] self-stretch font-dm">
+                        <div className="flex w-full flex-row items-center justify-center gap-[10px] self-stretch">
                             {/* Search Box */}
-                            <div className="flex-1 font-dm">
+                            <div className="flex-1">
                                 <SearchBar
                                     variant="filter-section"
                                     placeholder="Search defense ID, title, adviser, block, or type..."
@@ -161,11 +162,11 @@ import { SearchBar } from '@/components/filter-search';
                             </div>
 
                             {/* Action Buttons */}
-                            <div className="flex flex-row items-center gap-[10px] font-dm">
+                            <div className="flex flex-row items-center gap-[10px]">
                                 <Button
                                     variant="secondary"
                                     size="icon"
-                                    className="rounded-lg border-none font-dm"
+                                    className="rounded-lg border-none"
                                 >
                                     <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M3.33301 5.83333H16.6663M5.83301 10H14.1663M8.33301 14.1667H11.6663" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -174,10 +175,10 @@ import { SearchBar } from '@/components/filter-search';
 
                                 <Button
                                     variant="negative"
-                                    className="h-9 min-w-[101px] gap-2 rounded-lg px-4 py-2 font-dm"
+                                    className="h-9 min-w-[101px] gap-2 rounded-lg px-4 py-2"
                                     onClick={() => setSearchQuery('')}
                                 >
-                                    <span className="font-dm text-[13.33px] font-medium">
+                                    <span className="text-[13.33px] font-medium">
                                         Clear Filter
                                     </span>
                                 </Button>
@@ -198,7 +199,7 @@ import { SearchBar } from '@/components/filter-search';
                     </div>
 
                     {/* Table */}
-                    <div className="w-full" style={{ fontFamily: 'DM Sans, sans-serif' }}>
+                    <div className="w-full">
                         <Table className="border-separate border-spacing-0 w-full table-fixed">
                             <TableHeader>
                                 <TableRow className="bg-[#730000] border-none hover:bg-[#730000]">
@@ -279,7 +280,7 @@ import { SearchBar } from '@/components/filter-search';
                                                     </span>
                                                 ) : (
                                                     <div 
-                                                        className="inline-flex items-center justify-center px-[9px] py-[2px] rounded-[25px] font-['DM_Sans'] font-medium text-[12px] leading-[16px] text-white"
+                                                        className="inline-flex items-center justify-center px-[9px] py-[2px] rounded-[25px] font-medium text-[12px] leading-[16px] text-white"
                                                         style={{ 
                                                             backgroundColor: status.bg,
                                                             border: `1px solid ${status.bg}`
@@ -320,36 +321,31 @@ import { SearchBar } from '@/components/filter-search';
                                                         View Details
                                                     </Button>
                                                 ) : (
-                                                    <button
-                                                        className="flex items-center justify-center gap-[4px] text-[#0A0A0A] font-medium text-[13.33px] leading-[17px] underline mx-auto"
-                                                    >
-                                                        Evaluation
-                                                    </button>
+                                                    <div className="flex items-center justify-center">
+                                                        <TextLink
+                                                            variant="group"
+                                                            href="#"
+                                                            className="text-[13.33px] leading-[17px]"
+                                                        >
+                                                            Evaluation
+                                                        </TextLink>
+                                                    </div>
                                                 )}
                                             </TableCell>
                                         </TableRow>
                                     );
                                 })}
                             </TableBody>
-                            <TableCaption 
-                                className="mt-4"
-                                style={{ 
-                                    fontFamily: 'Arimo, sans-serif',
-                                    color: '#717182',
-                                    fontSize: '14px',
-                                    lineHeight: '20px'
-                                }}
-                            >
+                            <TableCaption className="mt-4 text-[#717182] text-[14px] leading-[20px]">
                                 {filteredData.length} of {currentData.length} {currentStatus === 'pending' ? 'Upcoming' : 'Completed'} Defenses
                             </TableCaption>
                         </Table>
                         <ThesisModal
-                        defense={selectedDefense}
-                        open={modalOpen}
-                        onOpenChange={setModalOpen}
-                        status={currentStatus}  // Add this line
-                    />
-
+                            defense={selectedDefense}
+                            open={modalOpen}
+                            onOpenChange={setModalOpen}
+                            status={currentStatus}
+                        />
                     </div>
                 </div>
             </FacultyManagementLayout>
