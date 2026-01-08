@@ -54,15 +54,7 @@ class DefenseController extends Controller
             ->join('tbl_faculty_assignments', 'tbl_section_advisers.faculty_assign_id', '=', 'tbl_faculty_assignments.id')
             ->leftJoin('tbl_school_years', 'tbl_faculty_assignments.sy_id', '=', 'tbl_school_years.id')
             ->join('tbl_faculties', 'tbl_faculty_assignments.faculty_id', '=', 'tbl_faculties.id')
-            ->leftJoin('tbl_students', 'tbl_thesis_groups.id', '=', 'tbl_students.group_id')
-            
-            // --- PANEL JOINS ---
-            ->leftJoin('tbl_endorsed_panels', function($join) {
-                $join->on('tbl_defense_matrices.id', '=', 'tbl_endorsed_panels.defense_matrix_id')
-                    ->where('tbl_endorsed_panels.is_confirmed', true);
-            })
-            ->leftJoin('tbl_faculty_assignments as panel_assign', 'tbl_endorsed_panels.panel_id', '=', 'panel_assign.id')
-            ->leftJoin('tbl_faculties as panel_faculty', 'panel_assign.faculty_id', '=', 'panel_faculty.id');
+            ->leftJoin('tbl_students', 'tbl_thesis_groups.id', '=', 'tbl_students.group_id');   
 
         // --- APPLY FILTERS ---
         
@@ -115,8 +107,15 @@ class DefenseController extends Controller
                 // Proponents
                 DB::raw("GROUP_CONCAT(DISTINCT CONCAT(tbl_students.first_name, ' ', tbl_students.last_name) SEPARATOR ', ') as proponent_names"),
 
-                // Panelists
-                DB::raw("GROUP_CONCAT(DISTINCT CONCAT(panel_faculty.name_prefix, ' ', panel_faculty.first_name, ' ', panel_faculty.last_name) SEPARATOR ', ') as panelist_names")
+                // Status
+                DB::raw("
+                    CASE 
+                        WHEN tbl_defense_matrices.defense_schedule < NOW() 
+                            AND (SELECT COUNT(*) FROM tbl_defense_evaluations WHERE tbl_defense_evaluations.defense_id = tbl_defense_matrices.id) >= 3
+                        THEN 'completed'
+                        ELSE 'upcoming'
+                    END as status
+                ")
             )
             ->groupBy(
                 'tbl_defense_matrices.id',
@@ -130,10 +129,47 @@ class DefenseController extends Controller
                 'tbl_faculties.last_name',
                 'tbl_defense_matrices.defense_schedule',
                 'tbl_defense_matrices.course',
-                'tbl_faculties.id'
+                'tbl_faculties.id',
             )
             ->orderBy('tbl_defense_matrices.defense_schedule', 'asc')
             ->get();
+
+        // FETCH PANELS SEPARATELY
+        $defenseIds = $defenses->pluck('id')->toArray();
+
+        if (!empty($defenseIds)) {
+            $panels = DB::table('tbl_endorsed_panels')
+                ->join('tbl_faculty_assignments', 'tbl_endorsed_panels.panel_id', '=', 'tbl_faculty_assignments.id')
+                ->join('tbl_faculties', 'tbl_faculty_assignments.faculty_id', '=', 'tbl_faculties.id')
+                ->whereIn('tbl_endorsed_panels.defense_matrix_id', $defenseIds)
+                ->where('tbl_endorsed_panels.is_confirmed', true)
+                ->select(
+                    'tbl_endorsed_panels.defense_matrix_id',
+                    'tbl_faculties.id as faculty_id',
+                    'tbl_faculties.name_prefix',
+                    'tbl_faculties.first_name',
+                    'tbl_faculties.last_name'
+                )
+                ->get();
+
+            // MERGE PANELS INTO DEFENSES
+            $defenses->transform(function ($defense) use ($panels) {
+                $defense->panelists = $panels
+                    ->where('defense_matrix_id', $defense->id)
+                    ->map(function ($panel) {
+                        $cleanPanel = clone $panel; 
+                        unset($cleanPanel->defense_matrix_id); 
+                        return $cleanPanel;
+                    })
+                    ->values();
+                return $defense;
+            });
+        } else {
+            $defenses->transform(function ($defense) {
+                $defense->panelists = [];
+                return $defense;
+            });
+        }
 
         return Inertia::render('Admin/management/defense', [
             'defenses' => $defenses,
