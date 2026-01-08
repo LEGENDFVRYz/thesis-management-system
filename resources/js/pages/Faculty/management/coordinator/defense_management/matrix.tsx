@@ -13,7 +13,6 @@ import {
     LayoutList,
     CalendarDays
 } from 'lucide-react';
-
 // Import Shared Components
 import { Button } from '@/components/ui/button'; 
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +20,7 @@ import { SidebarInset } from '@/components/ui/sidebar';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"; 
 import { DefenseCalendarWeekly, type WeeklyEventType } from '@/components/defense-calendar-weekly'; 
 import { cn } from '@/lib/utils';
+
 
 // ----------------------------------------------------------------------
 // CUSTOM TABS COMPONENT
@@ -199,33 +199,36 @@ function DefenseTableHeader() {
     );
 }
 
-function DefenseTableRow({ data }: { data: typeof DEFENSES[0] }) {
+function DefenseTableRow({ data }: { data: any }) {
     const getStatusStyle = (status: string) => {
         switch(status) {
+            case 'SCHEDULED': return 'bg-[#8EC5FF] border border-[#193CB8] text-[#193CB8] hover:bg-[#7bb9ff]';
             case 'Completed': return 'bg-green-600 border-transparent text-white';
             case 'Cancelled': return 'bg-red-500 border-transparent text-white';
             default: return 'bg-[#8EC5FF] border border-[#193CB8] text-[#193CB8] hover:bg-[#7bb9ff]';
         }
     };
 
+    const defenseDateTime = new Date(`${data.defense_date}T${data.defense_time}`);
+
     return (
         <div className={`${GRID_LAYOUT} bg-white border-b border-gray-100 hover:bg-gray-50 transition-colors`}>
-            <span className="text-sm text-gray-800 font-medium truncate" title={data.title}>
-                {data.title}
+            <span className="text-sm text-gray-800 font-medium truncate" title={data.project_title}>
+                {data.project_title}
             </span>
             <span className="text-sm text-gray-800 text-center">
-                {data.block}
+                BSCPE {data.year_level}-{data.section}
             </span>
             <span className="text-sm text-gray-800 text-center">
-                {data.room}
+                {data.defense_room}
             </span>
-            <span className="text-sm text-gray-800 truncate text-center" title={data.panel}>
-                {data.panel}
+            <span className="text-sm text-gray-800 truncate text-center" title={data.confirmed_panels || 'TBA'}>
+                {data.confirmed_panels || 'TBA'}
             </span>
             <div className="flex flex-col items-center text-sm text-gray-800">
-                <span>{data.date.toLocaleDateString()}</span>
+                <span>{defenseDateTime.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
                 <span className="text-xs text-gray-500">
-                    {data.date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                    {defenseDateTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
                 </span>
             </div>
             <div className="flex justify-center">
@@ -243,6 +246,25 @@ function DefenseTableRow({ data }: { data: typeof DEFENSES[0] }) {
 }
 
 // ----------------------------------------------------------------------
+// MOCK DATA ADD A SCHEDULE DEFENSE
+// ----------------------------------------------------------------------
+
+const dummyProjects = [
+    "Machine Learning Approach",
+    "IoT Based Monitoring System",
+    "Automated Attendance System",
+    "Network Security Analysis",
+    "FPGA Implementation"
+];
+
+const dummyGroupCodes = [
+    "BSCPE4-3A",
+    "BSCPE4-3B",
+    "BSCPE4-4A",
+    "BSCPE4-4B"
+];
+
+// ----------------------------------------------------------------------
 // MAIN DASHBOARD
 // ----------------------------------------------------------------------
 
@@ -253,9 +275,25 @@ const breadcrumb: BreadcrumbItem[] = [
     },
 ];
 
-export default function MatrixManagement() {
+export default function MatrixManagement({ defenseMatrices = [], availableProjects = [] }: { defenseMatrices: any[] , availableProjects: any[] }) {
     const [viewMode, setViewMode] = useState<'table' | 'calendar'>('calendar');
-    const [currentDate, setCurrentDate] = useState(new Date('2025-11-28')); 
+    const [currentDate, setCurrentDate] = useState(new Date('2025-11-28'));
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    // ====== Modal States ======
+    const [selectedProject, setSelectedProject] = useState('');
+    const [selectedGroupCode, setSelectedGroupCode] = useState('');
+    const [room, setRoom] = useState('');
+    const [date, setDate] = useState('');
+    const [time, setTime] = useState('');
+
+
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumb}>
@@ -291,7 +329,7 @@ export default function MatrixManagement() {
                         {/* 2. Standard Button Component */}
                         <Button 
                             variant="primary" 
-                            onClick={() => console.log("Open Schedule Modal")}
+                            onClick={openModal}
                         >
                             <Plus className="mr-2 h-4 w-4" /> 
                             Schedule a Defense
@@ -334,19 +372,146 @@ export default function MatrixManagement() {
                             <div className="rounded-xl border border-gray-200 overflow-hidden shadow-sm dark:border-sidebar-border">
                                 <DefenseTableHeader />
                                 <div>
-                                    {DEFENSES.map((defense) => (
+                                    {defenseMatrices.map(defense => (
                                         <DefenseTableRow key={defense.id} data={defense} />
                                     ))}
                                 </div>
                                 <div className="bg-gray-50 px-5 py-3 text-xs text-center text-gray-500 border-t border-gray-200">
-                                    {DEFENSES.length} of {DEFENSES.length} Upcoming Defenses
+                                    {defenseMatrices.length} of {defenseMatrices.length} Upcoming Defenses
                                 </div>
                             </div>
                         )}
                     </div>
 
                 </div>
+
             </AppContent>
+
+                {isModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                        <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-lg">
+                            <h2 className="text-xl font-bold mb-4">Schedule a Defense</h2>
+
+                            <div className="space-y-4">
+                                {/* Project Dropdown */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Project Title
+                                    </label>
+                                    <select
+                                        className="w-full border border-gray-300 rounded px-3 py-2"
+                                        value={selectedProject}
+                                        onChange={(e) => { 
+                                            const projectId = e.target.value;
+                                            setSelectedProject(projectId);
+
+                                            const matchedGroup = availableProjects.find(proj => String(proj.endorsement_id) === projectId);
+                                            setSelectedGroupCode(matchedGroup ? matchedGroup.group_code : '');
+                                        }}
+                                    >
+                                        <option value="">Select Project</option>
+                                        {availableProjects.map((proj: any) => (
+                                            <option key={proj.endorsement_id} value={proj.endorsement_id}>
+                                                {proj.project_title}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* Group Code Dropdown */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Group Code
+                                    </label>
+                                    <select
+                                        className="w-full border border-gray-300 rounded px-3 py-2"
+                                        value={selectedGroupCode}
+                                        onChange={(e) => { 
+                                            const groupCode = e.target.value;
+                                            setSelectedGroupCode(groupCode);
+
+                                            const matchedProject = availableProjects.find(proj => proj.group_code === groupCode);
+                                            setSelectedProject(matchedProject ? String(matchedProject.endorsement_id) : '');
+                                        }}
+                                    >
+                                        <option value="">Select Group</option>
+                                        {availableProjects.map((proj: any) => (
+                                            <option key={proj.group_code} value={proj.group_code}>
+                                                {proj.group_code}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* Room, Date, Time */}
+                                {/* Room, Date, Time */}
+                                <input
+                                    type="text"
+                                    placeholder="Room"
+                                    className="w-full border rounded px-3 py-2"
+                                    value={room}
+                                    maxLength={3}
+                                    onChange={(e) => {
+                                        // Only allow numbers
+                                        const value = e.target.value.replace(/\D/g, '');
+                                        setRoom(value);
+                                    }}
+                                />
+                                <input
+                                    type="date"
+                                    className="w-full border rounded px-3 py-2"
+                                    value={date}
+                                    onChange={(e) => setDate(e.target.value)}
+                                />
+                                <input
+                                    type="time"
+                                    className="w-full border rounded px-3 py-2"
+                                    value={time}
+                                    onChange={(e) => setTime(e.target.value)}
+                                />
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex justify-end gap-2 mt-6">
+                                <Button variant="secondary" onClick={closeModal}>Cancel</Button>
+                                <Button
+                                    variant="primary"
+                                    onClick={() => {
+                                        if (!selectedProject || !selectedGroupCode || !room || !date || !time) {
+                                            alert('Please fill in all fields');
+                                            return;
+                                        }
+
+                                        // ✅ Send form data to Laravel
+                                        router.post('/faculty/defense-management/matrix', {
+                                            endorsement_id: selectedProject,
+                                            group_code: selectedGroupCode,
+                                            room: room,
+                                            date: date,
+                                            time: time,
+                                        }, {
+                                            onSuccess: () => {
+                                                closeModal(); // close the modal
+                                            },
+                                            onError: (errors) => {
+                                                console.error(errors);
+                                            }
+                                        });
+                                    }}
+                                >
+                                    Save
+                                </Button>
+
+                            </div>
+                        </div>
+                    </div>
+                )}
+
         </AppLayout>
+
     );
+
+
+
+
 }
