@@ -178,27 +178,59 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
         const currentAssignments = thesisAssignments[thesis.thesis_id] || [];
         
         if (currentAssignments.length !== 3) {
-            alert("Exactly 3 panelists are required.");
+            setNotificationMessage("Exactly 3 panelists are required.");
+            setIsNotifySuccessOpen(true);
             return;
         }
-
+    
         setProcessingId(thesis.thesis_id);
-
-        // --- Mock Backend Delay & Success ---
-        setTimeout(() => {
-            setLocalTheses(prevTheses => 
-                prevTheses.map(t => 
-                    t.thesis_id === thesis.thesis_id 
-                        ? { ...t, is_complete: true } 
-                        : t
-                )
+    
+        const payload = {
+            defense_matrix_id: thesis.defense_matrix_id,
+            panel_ids: currentAssignments.map(p => p.id),
+        };
+    
+        const hasExistingPanels = thesis.panels && thesis.panels.length > 0;
+    
+        if (hasExistingPanels) {
+            // 🔁 UPDATE
+            router.put(
+                `/faculty/management/coordinator/defense_management/panel-assign/${thesis.defense_matrix_id}`,
+                payload,
+                {
+                    onSuccess: () => {
+                        setProcessingId(null);
+                        setNotificationMessage("Panel assignments updated successfully.");
+                        setIsNotifySuccessOpen(true);
+                        setOpenThesisId(null);
+                    },
+                    onError: (errors) => {
+                        setProcessingId(null);
+                        setNotificationMessage("Failed to update: " + Object.values(errors).join(', '));
+                        setIsNotifySuccessOpen(true);
+                    }
+                }
             );
-            
-            setProcessingId(null);
-            setNotificationMessage("Panel assignments saved successfully.");
-            setIsNotifySuccessOpen(true);
-            setOpenThesisId(null);
-        }, 1000); 
+        } else {
+            // ➕ STORE
+            router.post(
+                '/faculty/management/coordinator/defense_management/panel-assign',
+                payload,
+                {
+                    onSuccess: () => {
+                        setProcessingId(null);
+                        setNotificationMessage("Panel assignments saved successfully.");
+                        setIsNotifySuccessOpen(true);
+                        setOpenThesisId(null);
+                    },
+                    onError: (errors) => {
+                        setProcessingId(null);
+                        setNotificationMessage("Failed to save: " + Object.values(errors).join(', '));
+                        setIsNotifySuccessOpen(true);
+                    }
+                }
+            );
+        }
     };
 
     const handleConflictAction = (action: 'approve' | 'reject', id: number) => {

@@ -155,10 +155,11 @@ class PanelAssign extends Controller
             }
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Panel assignment requested.']);
+            return back()->with('success', 'Panel assignments saved successfully.');
+    
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            return back()->withErrors(['error' => $e->getMessage()]);
         }
     }
 
@@ -226,11 +227,11 @@ class PanelAssign extends Controller
             }
     
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Panel assignment requested.']);
+            return back()->with('success', 'Panel assignments updated successfully.');
     
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            return back()->withErrors(['error' => $e->getMessage()]);
         }
     }
 
