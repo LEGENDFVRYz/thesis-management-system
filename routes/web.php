@@ -110,6 +110,14 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('progress', function () {
         return Inertia::render('Student/progress');
     })->name('student.progress');
+
+    Route::get('resources', function () {
+        return Inertia::render('Student/resources');
+    })->name('student.resources');
+
+    Route::get('repository', function () {
+        return Inertia::render('Student/repository');
+    })->name('student.repository');
 });
 
 
