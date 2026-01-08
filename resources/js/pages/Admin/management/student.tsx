@@ -22,11 +22,24 @@ import { studentData, thesisTitles } from './student_management/student_sampleDa
 
 import { filterAndSortStudents, filterAndSortGroups, groupStudentsByCode } from './student_management/student_data_utilities';
 
+// INTERFACE
+interface RawStudent {
+  student_number: string;
+  student_name: string;
+  email: string;
+  block: string;
+  specialization: string | null;
+  thesis_adviser: string | null;
+  group_code: string | null;
+  year_level: number;
+  thesis_title: string | null;
+}
+
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Student Management', href: '/admin/management/student' },
 ];
 
-export default function StudentManagement({ students }: { students?: any[] }) {
+export default function StudentManagement({ students }: { students: RawStudent[] }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<FilterState>({ blocks: [], specializations: [] });
   const [sortOption, setSortOption] = useState("");
@@ -37,13 +50,41 @@ export default function StudentManagement({ students }: { students?: any[] }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<GroupData | null>(null);
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
-  // ADD THIS LINE - Import Modal State
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+
+  // TRANSFORM RAW DATA TO FRONTEND INTERFACE
+  const processedStudents: Student[] = useMemo(() => {
+    if (!students) return [];
+
+    return students.map(s => ({
+      studentNumber: s.student_number,
+      name: s.student_name,
+      email: s.email,
+      block: s.block,
+      specialization: s.specialization || 'N/A',
+      adviser: s.thesis_adviser || 'Unassigned',
+      groupCode: s.group_code || 'No Group',
+      yearLevel: s.year_level,
+      thesisTitle: s.thesis_title || 'Untitled Thesis'
+    }));
+  }, [students]);
+
+  const thesisTitlesMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    if (students) {
+      students.forEach(s => {
+        if (s.group_code && s.thesis_title) {
+          map[s.group_code] = s.thesis_title;
+        }
+      });
+    }
+    return map;
+  }, [students]);
 
   // Grouping students by group code for the group card view
   const groupedData = useMemo(() => {
-    return groupStudentsByCode(studentData, thesisTitles);
-  }, []);
+    return groupStudentsByCode(processedStudents, thesisTitlesMap);
+  }, [processedStudents, thesisTitlesMap]);
 
   // Apply filtering and sorting for groups (in group card view)
   const filteredAndSortedGroups = useMemo(() => {
@@ -52,7 +93,7 @@ export default function StudentManagement({ students }: { students?: any[] }) {
 
   // Apply filtering and sorting for students
   const filteredAndSortedData = useMemo(() => {
-    return filterAndSortStudents(studentData, searchQuery, filters, sortOption);
+    return filterAndSortStudents(processedStudents, searchQuery, filters, sortOption);
   }, [searchQuery, filters, sortOption]);
 
   const handleViewStudent = (student: Student) => {
@@ -149,6 +190,7 @@ export default function StudentManagement({ students }: { students?: any[] }) {
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           student={selectedStudent}
+          allStudents={processedStudents}
         />
         <GroupProfileModal 
           isOpen={isGroupModalOpen}

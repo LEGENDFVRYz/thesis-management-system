@@ -8,6 +8,7 @@ interface StudentProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
   student: Student | null;
+  allStudents: Student[];
 }
 
 // Confirmation Popup Component
@@ -96,19 +97,19 @@ function SuccessPopup({
   );
 }
 
-export function StudentProfileModal({ isOpen, onClose, student }: StudentProfileModalProps) {
+export function StudentProfileModal({ isOpen, onClose, student, allStudents }: StudentProfileModalProps) {
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
   const [showArchiveSuccess, setShowArchiveSuccess] = useState(false);
 
   if (!isOpen || !student) return null;
 
   // Get co-researchers (other members of the same group)
-  const coResearchers = studentData
+  const coResearchers = allStudents
     .filter(s => s.groupCode === student.groupCode && s.studentNumber !== student.studentNumber)
     .map(s => s.name);
 
   // Get thesis title of the group
-  const thesisTitle = thesisTitles[student.groupCode] || "Research Project in Computer Engineering";
+  const thesisTitle = student.thesisTitle || "Research Project in Computer Engineering";
 
   const handleArchiveClick = () => {
     setShowArchiveConfirm(true);
@@ -178,7 +179,7 @@ export function StudentProfileModal({ isOpen, onClose, student }: StudentProfile
                 {/* Block */}
                 <div>
                   <p className="text-gray-600 text-sm mb-1">Block</p>
-                  <p className="text-gray-900 font-medium">{student.block}</p>
+                  <p className="text-gray-900 font-medium">BSCPE {student.yearLevel}-{student.block}</p>
                 </div>
 
                 {/* Specialization */}

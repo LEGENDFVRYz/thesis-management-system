@@ -92,7 +92,7 @@ export function StudentTableView({ students, onViewStudent }: StudentTableViewPr
               {/* Block */}
               <div className="flex items-center justify-center p-2.5">
                 <span className="text-black text-center font-sans text-[13.33px] font-medium">
-                  {student.block}
+                  BSCPE {student.yearLevel}-{student.block}
                 </span>
               </div>
 

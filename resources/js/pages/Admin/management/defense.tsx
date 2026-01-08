@@ -31,13 +31,40 @@ import { Calendar, TableIcon, X } from 'lucide-react';
 import { CardContent } from '@/components/ui/card';
 import { DefenseCalendar } from '@/components/defense-calendar-monthly';
 
+// INTERFACE
+export interface Panelist {
+  faculty_id: number;
+  name_prefix: string;
+  first_name: string;
+  last_name: string;
+}
+export interface Defense {
+  id: number;
+  defense_room: string;
+  thesis_title: string;
+  block: string;
+  group_code: string;
+  defense_date: string;
+  defense_time: string;
+  defense_type: string;
+  year_level: number;
+  adviser_name: string;
+  proponents_count: number;
+  proponent_names: string;
+  panelists: Panelist[];
+  status: string;
+}
+
 /**
  * SUB-COMPONENT: DefenseDetailsModal
  * Displays an overlay with comprehensive information regarding a specific defense.
  * Utilizes the custom scrollbar and theme variables from global.css.
  */
-function DefenseDetailsModal({ open, onOpenChange, data }: { open: boolean, onOpenChange: (open: boolean) => void, data: any }) {
+function DefenseDetailsModal({ open, onOpenChange, data }: { open: boolean, onOpenChange: (open: boolean) => void, data: Defense | null }) {
     if (!data) return null;
+
+    // Helper to turn CSV strings into arrays for the UI tags
+    const proponentList = data.proponent_names ? data.proponent_names.split(', ') : [];
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -66,18 +93,22 @@ function DefenseDetailsModal({ open, onOpenChange, data }: { open: boolean, onOp
                     <div className="flex items-center justify-between">
                         <div className="flex flex-col">
                             <span className="text-base font-bold text-primary">Defense ID</span>
-                            <span className="text-base font-medium text-foreground">DEF-{data.id || "001"}</span>
+                            <span className="text-base font-medium text-foreground">DEF-{data.group_code || data.id}</span>
                         </div>
                         {/* Status Badge: Using --primary background and white text */}
-                        <div className="bg-primary text-primary-foreground px-3 py-1 rounded-lg text-xs font-medium h-[21.59px] flex items-center">
-                            Upcoming
+                        <div className={cn("px-3 py-1 rounded-lg text-xs font-medium h-[21.59px] flex items-center", 
+                            data.status === 'completed' 
+                                ? "bg-green-600 text-white" // Change this color accordingly - temporary color only
+                                : "bg-primary text-primary-foreground"
+                        )}>
+                            {data.status === 'completed' ? "Completed" : "Upcoming"}
                         </div>
                     </div>
 
                     <div className="flex flex-col gap-1">
                         <span className="text-base font-bold text-primary">Thesis Title</span>
                         <span className="text-base font-medium text-foreground leading-tight">
-                            {data.title || "Machine Learning Applications in Healthcare Diagnostics"}
+                            {data.thesis_title || "Machine Learning Applications in Healthcare Diagnostics"}
                         </span>
                     </div>
 
@@ -95,7 +126,7 @@ function DefenseDetailsModal({ open, onOpenChange, data }: { open: boolean, onOp
                         </div>
                         <div className="flex flex-col gap-1">
                             <span className="text-base font-bold text-primary">Venue</span>
-                            <span className="text-base font-medium text-foreground">{data.venue || "Room 313, CEA"}</span>
+                            <span className="text-base font-medium text-foreground">{"Room " + data.defense_room + ", CEA" || "Room 313, CEA"}</span>
                         </div>
                     </div>
 
@@ -103,11 +134,13 @@ function DefenseDetailsModal({ open, onOpenChange, data }: { open: boolean, onOp
                     <div className="flex flex-col gap-2">
                         <span className="text-base font-bold text-primary">Proponents</span>
                         <div className="flex flex-wrap gap-2">
-                            {(data.proponents || ["John Doe", "Jane Smith", "Mike Johnson"]).map((name: string, i: number) => (
+                            { proponentList.length > 0 ? proponentList.map((name, i) => (
                                 <div key={i} className="flex items-center px-4 h-8 bg-primary-foreground-2/20 border border-primary-foreground-2/30 rounded-full">
                                     <span className="font-dm text-sm text-foreground font-medium">{name}</span>
                                 </div>
-                            ))}
+                            )) : (
+                                <span className="text-sm text-muted-foreground italic">No proponents listed</span>
+                            )}
                         </div>
                     </div>
 
@@ -115,14 +148,18 @@ function DefenseDetailsModal({ open, onOpenChange, data }: { open: boolean, onOp
                     <div className="flex flex-col gap-2 pb-4">
                         <span className="text-base font-bold text-primary">Defense Panel</span>
                         <div className="flex flex-col gap-2">
-                            {[1, 2, 3].map((num) => (
-                                <div key={num} className="flex items-center gap-3 p-[10px] bg-muted/30 rounded-[4px] border border-border">
-                                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                                        <span className="text-xs font-bold text-primary">P{num}</span>
+                            { data.panelists && data.panelists.length > 0 ?
+                                data.panelists.map((panel) => (
+                                    <div key={panel.faculty_id} className="flex items-center gap-3 p-[10px] bg-muted/30 rounded-[4px] border border-border">
+                                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                            <span className="text-xs font-bold text-primary">{panel.first_name[0]}{panel.last_name[0]}</span>
+                                        </div>
+                                        <span className="text-base font-medium text-foreground">{panel.name_prefix} {panel.first_name} {panel.last_name}</span>
                                     </div>
-                                    <span className="text-base font-medium text-foreground">Dr. Robert Chen</span>
-                                </div>
-                            ))}
+                                )) : (
+                                    <span className="text-sm text-muted-foreground italic">No panelists listed</span>
+                                )
+                            }
                         </div>
                     </div>
                 </div>
@@ -136,13 +173,13 @@ function DefenseDetailsModal({ open, onOpenChange, data }: { open: boolean, onOp
  * Orchestrates the Defense Management view, handling filtering, 
  * layout switching (Table vs Calendar), and detailed data inspection.
  */
-export default function DefenseTable({ defenses }: { defenses: any[] }) {
-    const [selectedDef, setSelectedDef] = useState<any>(null);
+export default function DefenseTable({ defenses }: { defenses: Defense[] }) {
+    const [selectedDef, setSelectedDef] = useState<Defense | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [statusFilter, setStatusFilter] = useState<string>("upcoming");
     const [view, setView] = useState<string>("table");
 
-    const handleViewDetails = (def: any) => {
+    const handleViewDetails = (def: Defense) => {
         setSelectedDef(def);
         setIsModalOpen(true);
     };
@@ -244,10 +281,10 @@ export default function DefenseTable({ defenses }: { defenses: any[] }) {
                                             filteredData.map((def, index) => (
                                                 <TableRow key={index} className="hover:bg-accent/5 transition-colors group">
                                                     <TableCell className="text-center text-alert-desc font-medium">
-                                                        {'3306'}
+                                                        {def.group_code}
                                                     </TableCell>
                                                     <TableCell className="px-6 text-foreground max-w-[280px] truncate font-medium text-left">
-                                                        {def.title || 'Machine Learning Applications in Healthcare Diagnostics'}
+                                                        {def.thesis_title || 'Cannot Retrieve Title'}
                                                     </TableCell>
                                                     <TableCell className="text-center">
                                                         <div className="flex items-center justify-center gap-2 font-bold text-primary">
@@ -256,10 +293,10 @@ export default function DefenseTable({ defenses }: { defenses: any[] }) {
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className="px-6 text-alert-desc text-left">
-                                                        {def.adviser || 'Dr. Cherry D. Casuat'}
+                                                        {def.adviser_name || 'Dr. Cherry D. Casuat'}
                                                     </TableCell>
                                                     <TableCell className="text-center text-alert-desc">
-                                                        {def.block}
+                                                        BSCPE {def.year_level}-{def.block}
                                                     </TableCell>
                                                     <TableCell className="text-center leading-tight">
                                                         <div className="flex flex-col text-alert-desc">
@@ -268,7 +305,7 @@ export default function DefenseTable({ defenses }: { defenses: any[] }) {
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className="text-center text-alert-desc">
-                                                        {def.type || 'Title Defense'}
+                                                        {def.defense_type || 'Title Defense'}
                                                     </TableCell>
                                                     <TableCell className="text-center">
                                                         {/* Using custom .tertiary-btn class defined in base layer */}

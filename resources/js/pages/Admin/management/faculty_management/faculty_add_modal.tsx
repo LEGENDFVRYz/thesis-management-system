@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { X, Upload, Check } from 'lucide-react';
 import { useFacultyValidation } from './faculty_validation';
+import { router } from '@inertiajs/react';
 
 interface AddFacultyModalProps {
   isOpen: boolean;
@@ -98,12 +99,42 @@ export function AddFacultyModal({ isOpen, onClose }: AddFacultyModalProps) {
   };
 
   const onSubmit = () => {
+    // Run existing validation
     handleSubmit(formData, () => {
-      // Add faculty logic here
-      console.log("Faculty data:", formData);
-      
-      // Show success popup
-      setShowSuccessPopup(true);
+
+      // Map your Role Names
+      const dbRoles = formData.roles.map(role => {
+          if (role === "Thesis Coordinator")
+              return "Coordinator";
+          if (role === "Thesis Adviser")
+              return "Adviser";
+          if (role === "Panel Member")
+              return "Panelist";
+          return role;
+      });
+
+      // Map your State Names -> Database Column Names
+      const payload = {
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          suffix: formData.suffix,
+          faculty_id: formData.facultyId,
+          email: formData.pupWebmail,
+          name_prefix: formData.title,
+          type: formData.facultyType,
+          roles: dbRoles,
+          advisee_block: formData.adviseeBlock
+      };
+
+      // Submit manually using Inertia Router
+      router.post('/admin/management/faculty', payload, {
+          onSuccess: () => {
+              setShowSuccessPopup(true);
+          },
+          onError: (errors) => {
+              console.error("Backend errors:", errors);
+          }
+      });
     });
   };
 
@@ -299,8 +330,8 @@ export function AddFacultyModal({ isOpen, onClose }: AddFacultyModalProps) {
                     onValueChange={(value) => setFormData(prev => ({ ...prev, title: value }))}
                     className="flex gap-4"
                   >
-                    <RadioGroupItemWithLabel id="dr" value="Dr." label="Dr." />
                     <RadioGroupItemWithLabel id="engr" value="Engr." label="Engr." />
+                    <RadioGroupItemWithLabel id="dr" value="Dr." label="Dr." />
                   </RadioGroup>
                 </div>
                 <div>
@@ -318,8 +349,8 @@ export function AddFacultyModal({ isOpen, onClose }: AddFacultyModalProps) {
                     }}
                     className="flex flex-col gap-2"
                   >
-                    <RadioGroupItemWithLabel id="fullTime" value="Full-Time" label="Full-Time" />
-                    <RadioGroupItemWithLabel id="partTime" value="Part-Time" label="Part-Time" />
+                    <RadioGroupItemWithLabel id="fullTime" value="Full-time" label="Full-time" />
+                    <RadioGroupItemWithLabel id="partTime" value="Part-time" label="Part-time" />
                     <RadioGroupItemWithLabel id="external" value="External (Non-Faculty)" label="External (Non-Faculty)" />
                   </RadioGroup>
                   {errors.facultyType && touched.facultyType && isSubmitAttempted && (
@@ -374,13 +405,13 @@ export function AddFacultyModal({ isOpen, onClose }: AddFacultyModalProps) {
                       <SelectValue placeholder="Select Block..." />
                     </SelectTrigger>
                     <SelectContent className='!w-100'>
-                      <SelectItem value="BSCPE Section 1">BSCPE Section 1</SelectItem>
-                      <SelectItem value="BSCPE Section 2">BSCPE Section 2</SelectItem>
-                      <SelectItem value="BSCPE Section 3">BSCPE Section 3</SelectItem>
-                      <SelectItem value="BSCPE Section 4">BSCPE Section 4</SelectItem>
-                      <SelectItem value="BSCPE Section 5">BSCPE Section 5</SelectItem>
-                      <SelectItem value="BSCPE Section 6">BSCPE Section 6</SelectItem>
-                      <SelectItem value="BSCPE Section 7">BSCPE Section 7</SelectItem>
+                      <SelectItem value="1">BSCPE Section 1</SelectItem>
+                      <SelectItem value="2">BSCPE Section 2</SelectItem>
+                      <SelectItem value="3">BSCPE Section 3</SelectItem>
+                      <SelectItem value="4">BSCPE Section 4</SelectItem>
+                      <SelectItem value="5">BSCPE Section 5</SelectItem>
+                      <SelectItem value="6">BSCPE Section 6</SelectItem>
+                      <SelectItem value="7">BSCPE Section 7</SelectItem>
                     </SelectContent>
                   </Select>
                   {errors.adviseeBlock && touched.adviseeBlock && isSubmitAttempted && (

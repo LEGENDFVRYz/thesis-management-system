@@ -5,10 +5,6 @@ import { Head } from '@inertiajs/react';
 import ProgressTrackingLayout from './index';
 
 const breadcrumb: BreadcrumbItem[] = [
-    {
-        title: 'Progress Tracking',
-        href: '/student/management/progress_tracking/overall_progress'
-    },
     {   title: 'Overall Progress',
         href: '#'
     }

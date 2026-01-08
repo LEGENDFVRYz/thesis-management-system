@@ -85,43 +85,9 @@ export default function DefenseMatrix({ schedules, mySection, yearLevel }: Props
             description={`View defense schedules for BSCPE ${yearLevel}-${mySection}`}
         >
             <div className="space-y-6">
-                
-                {/* 1. Filters & Search */}
-                {/* <FilterSearchSection variant="DefenseManagement" /> */}
 
-                {/* 2. Toggle Groups Row */}
+                {/* 1. Toggle Groups Row */}
                 <div className="flex flex-col md:flex-row justify-end items-center gap-4">
-                    
-                    {/* Status Toggle
-                    <ToggleGroup 
-                        type="single" 
-                        value={statusFilter} 
-                        onValueChange={(val) => val && setStatusFilter(val)}
-                        className="bg-[#FDF8E7] p-1 rounded-full border border-amber-100 w-fit" 
-                    >
-                        <ToggleGroupItem 
-                            value="upcoming" 
-                            className={cn(
-                                "h-10 px-6 rounded-full transition-all font-bold text-xs uppercase whitespace-nowrap",
-                                statusFilter === 'upcoming' 
-                                    ? "bg-[#700000] text-white shadow-md" 
-                                    : "text-[#700000] hover:bg-amber-100/50"
-                            )}
-                        >
-                            Upcoming
-                        </ToggleGroupItem>
-                        <ToggleGroupItem 
-                            value="completed" 
-                            className={cn(
-                                "h-10 px-6 rounded-full transition-all font-bold text-xs uppercase whitespace-nowrap",
-                                statusFilter === 'completed' 
-                                    ? "bg-[#700000] text-white shadow-md" 
-                                    : "text-[#700000] hover:bg-amber-100/50"
-                            )}
-                        >
-                            Completed
-                        </ToggleGroupItem>
-                    </ToggleGroup> */}
 
                     {/* View Toggle */}
                     <ToggleGroup 
@@ -155,7 +121,7 @@ export default function DefenseMatrix({ schedules, mySection, yearLevel }: Props
                     </ToggleGroup>
                 </div>
 
-                {/* 3. Content Area */}
+                {/* 2. Content Area */}
                 <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                     {view === 'table' ? (
                         <div className="overflow-x-auto">
@@ -285,7 +251,7 @@ export default function DefenseMatrix({ schedules, mySection, yearLevel }: Props
                                     <div>
                                         <p className="text-xs font-medium text-gray-500 uppercase">Course / Block</p>
                                         <p className="font-semibold text-gray-900 dark:text-gray-100">
-                                            BSCPE {selectedDefense.section}
+                                            BSCPE {selectedDefense.year_level}-{selectedDefense.section}
                                         </p>
                                     </div>
                                 </div>

@@ -6,10 +6,6 @@ import ProgressTrackingLayout from './index';
 import { MessageSquare } from 'lucide-react';
 
 const breadcrumb: BreadcrumbItem[] = [
-    {
-        title: 'Progress Tracking',
-        href: '/student/management/progress_tracking/overall_progress'
-    },
     {   title: 'Status Reports',
         href: '#'
     }
