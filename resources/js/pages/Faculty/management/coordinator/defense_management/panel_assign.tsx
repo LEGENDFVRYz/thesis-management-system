@@ -125,33 +125,33 @@ export function AppContent({
 // MOCK DATA
 // ----------------------------------------------------------------------
 
-const SECTIONS = ['BSCPE 3-1', 'BSCPE 3-2', 'BSCPE 3-3', 'BSCPE 3-4'];
+// const SECTIONS = ['BSCPE 3-1', 'BSCPE 3-2', 'BSCPE 3-3', 'BSCPE 3-4'];
 
-const PANELISTS = [
-    { id: 1, name: 'Dr. Maria Santos' },
-    { id: 2, name: 'Engr. Juan Dela Cruz' },
-    { id: 3, name: 'Dr. Pedro Reyes' },
-    { id: 4, name: 'Prof. Ana Lim' },
-];
+// const PANELISTS = [
+//     { id: 1, name: 'Dr. Maria Santos' },
+//     { id: 2, name: 'Engr. Juan Dela Cruz' },
+//     { id: 3, name: 'Dr. Pedro Reyes' },
+//     { id: 4, name: 'Prof. Ana Lim' },
+// ];
 
-const THESIS_TITLES = [
-    {
-        id: 1,
-        title: 'AI-Powered Student Performance Analytics System',
-        authors: 'Juan Dela Cruz, Maria Santos, Pedro Reyes',
-        adviser: 'Dr. Maria Santos',
-        section: 'BSCPE 3-3',
-        date: 'May 3, 2025'
-    },
-    {
-        id: 2,
-        title: 'IoT Based Flood Monitoring System',
-        authors: 'Group 2 Members',
-        adviser: 'Engr. Smith',
-        section: 'BSCPE 3-3',
-        date: 'May 3, 2025'
-    }
-];
+// const THESIS_TITLES = [
+//     {
+//         id: 1,
+//         title: 'AI-Powered Student Performance Analytics System',
+//         authors: 'Juan Dela Cruz, Maria Santos, Pedro Reyes',
+//         adviser: 'Dr. Maria Santos',
+//         section: 'BSCPE 3-3',
+//         date: 'May 3, 2025'
+//     },
+//     {
+//         id: 2,
+//         title: 'IoT Based Flood Monitoring System',
+//         authors: 'Group 2 Members',
+//         adviser: 'Engr. Smith',
+//         section: 'BSCPE 3-3',
+//         date: 'May 3, 2025'
+//     }
+// ];
 
 const CONFLICT_REQUESTS = Array(6).fill({
     id: 1,
@@ -161,6 +161,39 @@ const CONFLICT_REQUESTS = Array(6).fill({
     reason: 'Boracay',
     document: 'comment'
 }).map((item, index) => ({ ...item, id: index }));
+
+// ----------------------------------------------------------------------
+// TYPE
+// ----------------------------------------------------------------------
+
+// Represents a faculty member available for a panel
+interface Panelist {
+    id: number;
+    name: string;
+  }
+  
+  interface Section {
+    section: string;
+  }
+  
+  interface Thesis {
+    id: number;
+    title: string;
+    authors: string;  // Note: Appears as a comma-separated string in your dd()
+    adviser: string;
+    section: string;  // e.g., "1" or "4"
+    date: string;     // e.g., "2026-01-03"
+  }
+  
+  /**
+   * The key in endorsed_thesis appears to be a section identifier.
+   * Based on your dd(), it is a Collection/Array of Thesis objects.
+   */
+  interface DashboardProps {
+    sections: Section[];
+    available_panel: Panelist[];
+    endorsed_thesis: Thesis[];
+  }
 
 // ----------------------------------------------------------------------
 // MAIN DASHBOARD
@@ -173,14 +206,14 @@ const breadcrumb: BreadcrumbItem[] = [
     },
 ];
 
-export default function Dashboard() {
+export default function Dashboard({sections, available_panel, endorsed_thesis}: DashboardProps) {
     // State
     const [selectedSection, setSelectedSection] = useState<string>('');
     const [activeTab, setActiveTab] = useState<'assignments' | 'conflicts'>('assignments');
     const [expandedThesis, setExpandedThesis] = useState<number | null>(1);
 
     return (
-        <AppLayout breadcrumbs={breadcrumb} title="Panel Assignment">
+        <AppLayout breadcrumbs={breadcrumb}>
             <Head title="Panel Assignment" />
 
             <AppContent
@@ -247,11 +280,20 @@ export default function Dashboard() {
                                             <ChevronDown className="h-4 w-4 opacity-50" />
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="w-[200px]">
+                                    {/* <DropdownMenuContent className="w-[200px]">
                                         <DropdownMenuRadioGroup value={selectedSection} onValueChange={setSelectedSection}>
-                                            {SECTIONS.map((sec) => (
+                                            {sections.map((sec) => (
                                                 <DropdownMenuRadioItem key={sec} value={sec}>
                                                     {sec}
+                                                </DropdownMenuRadioItem>
+                                            ))}
+                                        </DropdownMenuRadioGroup>
+                                    </DropdownMenuContent> */}
+                                    <DropdownMenuContent className="w-[200px]">
+                                        <DropdownMenuRadioGroup value={selectedSection} onValueChange={setSelectedSection}>
+                                            {sections.map((sec, index) => (
+                                                <DropdownMenuRadioItem key={index} value={sec.section}>
+                                                    {sec.section}
                                                 </DropdownMenuRadioItem>
                                             ))}
                                         </DropdownMenuRadioGroup>
@@ -279,7 +321,7 @@ export default function Dashboard() {
                                     </div>
 
                                     <div className="flex flex-col gap-3 overflow-y-auto pr-1" style={{ maxHeight: '600px' }}>
-                                        {PANELISTS.map((panelist) => (
+                                        {available_panel.map((panelist) => (
                                             <div
                                                 key={panelist.id}
                                                 className="group flex cursor-grab items-center gap-3 rounded-lg border bg-background p-3 shadow-sm transition-all hover:border-red-200 hover:shadow-md active:cursor-grabbing"
@@ -290,6 +332,16 @@ export default function Dashboard() {
                                                 </span>
                                             </div>
                                         ))}
+                                    <div className="flex flex-col gap-3 overflow-y-auto pr-1" style={{ maxHeight: '600px' }}>
+                                        {available_panel.map((panelist) => (
+                                            <div key={panelist.id} className="group flex cursor-grab items-center gap-3 rounded-lg border bg-background p-3 shadow-sm transition-all hover:border-red-200">
+                                                <GripVertical className="text-muted-foreground/50 group-hover:text-red-500" size={16} />
+                                                <span className="text-sm font-medium text-red-900/80">
+                                                    {panelist.name} {/* Changed from .name to .faculty_name */}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>                                        
                                     </div>
                                 </div>
 
@@ -306,58 +358,68 @@ export default function Dashboard() {
                                         </div>
                                     ) : (
                                         <div className="flex flex-col gap-4">
-                                            {THESIS_TITLES.map((thesis) => {
-                                                const isOpen = expandedThesis === thesis.id;
-                                                return (
-                                                    <div key={thesis.id} className="overflow-hidden rounded-xl border bg-card shadow-sm transition-all">
-                                                        <div
-                                                            onClick={() => setExpandedThesis(isOpen ? null : thesis.id)}
-                                                            className="cursor-pointer bg-white p-6 hover:bg-neutral-50/50"
-                                                        >
-                                                            <div className="flex items-start justify-between">
-                                                                <div className="space-y-1">
-                                                                    <h2 className="text-xl font-bold text-foreground">{thesis.title}</h2>
-                                                                    <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-                                                                        <div className="flex items-center gap-1.5">
-                                                                            <Users size={14} />
-                                                                            <span>{thesis.authors}</span>
+                                            {endorsed_thesis.filter((thesis) => thesis.section === selectedSection).length === 0 ? (
+                                                <div className="relative flex h-full min-h-[400px] flex-col items-center justify-center rounded-xl border border-dashed bg-muted/20">
+                                                    <div className="z-10 text-center">
+                                                        <BookOpen className="mx-auto mb-2 size-10 text-muted-foreground/50" />
+                                                        <h3 className="text-lg font-medium">No Theses Found</h3>
+                                                        <p className="text-sm text-muted-foreground">
+                                                            No theses found for section {selectedSection}.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                endorsed_thesis
+                                                    .filter((thesis) => thesis.section === selectedSection)
+                                                    .map((thesis) => {
+                                                        const isOpen = expandedThesis === thesis.id;
+                                                        return (
+                                                            <div key={thesis.id} className="overflow-hidden rounded-xl border bg-card shadow-sm transition-all">
+                                                                <div
+                                                                    onClick={() => setExpandedThesis(isOpen ? null : thesis.id)}
+                                                                    className="cursor-pointer bg-white p-6 hover:bg-neutral-50/50"
+                                                                >
+                                                                    <div className="flex items-start justify-between">
+                                                                        <div className="space-y-1">
+                                                                            <h2 className="text-xl font-bold text-foreground">{thesis.title}</h2>
+                                                                            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+                                                                                <div className="flex items-center gap-1.5">
+                                                                                    <Users size={14} />
+                                                                                    <span>{thesis.authors}</span>
+                                                                                </div>
+                                                                                <div className="flex items-center gap-1.5">
+                                                                                    <Users size={14} />
+                                                                                    <span className="font-medium text-foreground">Adviser: {thesis.adviser}</span>
+                                                                                </div>
+                                                                                <div className="flex items-center gap-1.5">
+                                                                                    <BookOpen size={14} />
+                                                                                    <span>{thesis.section}</span>
+                                                                                </div>
+                                                                                <div className="flex items-center gap-1.5">
+                                                                                    <Calendar size={14} />
+                                                                                    <span>{thesis.date}</span>
+                                                                                </div>
+                                                                            </div>
                                                                         </div>
-                                                                        <div className="flex items-center gap-1.5">
-                                                                            <Users size={14} />
-                                                                            <span className="font-medium text-foreground">Adviser: {thesis.adviser}</span>
-                                                                        </div>
-                                                                        <div className="flex items-center gap-1.5">
-                                                                            <BookOpen size={14} />
-                                                                            <span>{thesis.section}</span>
-                                                                        </div>
-                                                                        <div className="flex items-center gap-1.5">
-                                                                            <Calendar size={14} />
-                                                                            <span>{thesis.date}</span>
-                                                                        </div>
+                                                                        <button className="text-muted-foreground transition-transform duration-200">
+                                                                            {isOpen ? <ChevronUp /> : <ChevronDown />}
+                                                                        </button>
                                                                     </div>
                                                                 </div>
-                                                                <button className="text-muted-foreground transition-transform duration-200">
-                                                                    {isOpen ? <ChevronUp /> : <ChevronDown />}
-                                                                </button>
+                                                                {isOpen && (
+                                                                    <div className="grid grid-cols-1 gap-6 border-t bg-neutral-50/30 p-6 md:grid-cols-2">
+                                                                        <div className="flex h-64 flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white text-center transition-colors hover:border-red-300 hover:bg-red-50/10">
+                                                                            <span className="text-sm text-muted-foreground">Drag and drop panel members here</span>
+                                                                        </div>
+                                                                        <div className="flex h-64 flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white text-center transition-colors hover:border-red-300 hover:bg-red-50/10">
+                                                                            <span className="text-sm text-muted-foreground">Drag and drop backup panelists here</span>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
                                                             </div>
-                                                        </div>
-                                                        {isOpen && (
-                                                            <div className="grid grid-cols-1 gap-6 border-t bg-neutral-50/30 p-6 md:grid-cols-2">
-                                                                <div className="flex h-64 flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white text-center transition-colors hover:border-red-300 hover:bg-red-50/10">
-                                                                    <span className="text-sm text-muted-foreground">
-                                                                        Drag and drop panel members here
-                                                                    </span>
-                                                                </div>
-                                                                <div className="flex h-64 flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white text-center transition-colors hover:border-red-300 hover:bg-red-50/10">
-                                                                    <span className="text-sm text-muted-foreground">
-                                                                        Drag and drop backup panelists here
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                );
-                                            })}
+                                                        );
+                                                    })
+                                            )} 
                                         </div>
                                     )}
                                 </div>
