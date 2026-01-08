@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Trash2, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {Dialog,DialogContent,DialogHeader,DialogTitle,DialogDescription,DialogFooter,} from '@/components/ui/dialog';
 import InputError from '@/components/input-error';
 
@@ -16,13 +17,11 @@ interface EditGroupModalProps {
   isOpen: boolean;
   onClose: () => void;
   groupData?: {
-    block: string;
     members: Member[];
   };
 }
 
 export default function EditGroupModal({ isOpen, onClose, groupData }: EditGroupModalProps) {
-  const [selectedBlock, setSelectedBlock] = useState(groupData?.block || '');
   const [members, setMembers] = useState<Member[]>(
     groupData?.members || [
       { id: 1, name: 'Juan Dela Cruz', studentNumber: '2022-09589-MN-0', email: 'jdc@iskolangbayan.pup.edu.ph', isLeader: true },
@@ -32,7 +31,6 @@ export default function EditGroupModal({ isOpen, onClose, groupData }: EditGroup
     ]
   );
   const [errors, setErrors] = useState<{
-    block?: string;
     members?: { [key: number]: { name?: string; studentNumber?: string; email?: string } };
   }>({});
 
@@ -88,14 +86,8 @@ export default function EditGroupModal({ isOpen, onClose, groupData }: EditGroup
 
   const validateForm = () => {
     const newErrors: {
-      block?: string;
       members?: { [key: number]: { name?: string; studentNumber?: string; email?: string } };
     } = {};
-
-    // Validate block selection
-    if (!selectedBlock) {
-      newErrors.block = 'Please select a block';
-    }
 
     // Validate members
     const memberErrors: { [key: number]: { name?: string; studentNumber?: string; email?: string } } = {};
@@ -131,13 +123,12 @@ export default function EditGroupModal({ isOpen, onClose, groupData }: EditGroup
 
   const handleUpdateGroup = () => {
     if (validateForm()) {
-      console.log('Updating group:', { selectedBlock, members });
+      console.log('Updating group:', { members });
       onClose();
     }
   };
 
   const handleCancel = () => {
-    setSelectedBlock(groupData?.block || '');
     setMembers(groupData?.members || []);
     setErrors({});
     onClose();
@@ -150,35 +141,12 @@ export default function EditGroupModal({ isOpen, onClose, groupData }: EditGroup
         <DialogHeader className="bg-[#730000] px-6 py-4 text-white flex-shrink-0 text-left space-y-1">
           <DialogTitle className="text-lg font-semibold text-white text-left">Edit Group</DialogTitle>
           <DialogDescription className="text-sm text-red-200 text-left">
-            Fill in the group details and member information
+            Fill in the member information
           </DialogDescription>
         </DialogHeader>
 
         {/* Body */}
         <div className="flex-1 overflow-auto p-6 space-y-5">
-          {/* Group Information */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Group Information
-            </label>
-            <select
-              value={selectedBlock}
-              onChange={(e) => {
-                setSelectedBlock(e.target.value);
-                if (errors.block) {
-                  setErrors({ ...errors, block: undefined });
-                }
-              }}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#730000]"
-            >
-              <option value="">Select Block...</option>
-              <option value="block-a">Block A</option>
-              <option value="block-b">Block B</option>
-              <option value="block-c">Block C</option>
-            </select>
-            <InputError message={errors.block} className="mt-1" />
-          </div>
-
           {/* Members Header */}
           <div className="flex justify-between items-center">
             <span className="font-medium text-sm">Group Members ({members.length}/4)</span>
@@ -232,34 +200,37 @@ export default function EditGroupModal({ isOpen, onClose, groupData }: EditGroup
                 <div className="grid grid-cols-3 gap-3">
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">Name</label>
-                    <input
+                    <Input
                       type="text"
+                      inputSize="full"
                       placeholder="Enter Name"
                       value={member.name}
                       onChange={(e) => handleMemberChange(member.id, 'name', e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
+                      className="!bg-white border-gray-300 focus-visible:!border-[#730000]"
                     />
                     <InputError message={errors.members?.[member.id]?.name} className="mt-1" />
                   </div>
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">Student Number</label>
-                    <input
+                    <Input
                       type="text"
+                      inputSize="full"
                       placeholder="Enter Student Number"
                       value={member.studentNumber}
                       onChange={(e) => handleMemberChange(member.id, 'studentNumber', e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
+                      className="!bg-white border-gray-300 focus-visible:!border-[#730000]"
                     />
                     <InputError message={errors.members?.[member.id]?.studentNumber} className="mt-1" />
                   </div>
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">Email</label>
-                    <input
+                    <Input
                       type="email"
+                      inputSize="full"
                       placeholder="Enter PUP Webmail"
                       value={member.email}
                       onChange={(e) => handleMemberChange(member.id, 'email', e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
+                      className="!bg-white border-gray-300 focus-visible:!border-[#730000]"
                     />
                     <InputError message={errors.members?.[member.id]?.email} className="mt-1" />
                   </div>

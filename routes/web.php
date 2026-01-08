@@ -126,6 +126,10 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('student/profilemanagement', function () {
         return Inertia::render('Student/profilemanagement');
     })->name('student.profilemanagement');
+
+    Route::get('student/evaluation-and-grading', function () {
+        return Inertia::render('Student/evaluation-and-grading');
+    })->name('student.evaluation-and-grading');
 });
 
 

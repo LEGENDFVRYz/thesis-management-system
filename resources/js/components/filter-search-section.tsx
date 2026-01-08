@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Filter, Trash2, CheckCircle2, Calendar, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button'; 
 import { cn } from '@/lib/utils';
-import { SearchBar, Sort3 } from '@/components/filter-search';
+import { DefenseManagementFilter, GeneralSort, SearchBar, Sort3 } from '@/components/filter-search';
 import { RepoFilter } from '@/components/filter-search';
 import { Icon } from '@/components/icon-index';
 import {
@@ -22,10 +22,14 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
     const [query, setQuery] = useState('');
     
     // State to manage the Advanced Filter Modal visibility
-    const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+    const [isRepoFilterModalOpen, setIsRepoFilterModalOpen] = useState(false);
+
+    const [isDMFilterModalOpen, setIsDMFilterModalOpen] = useState(false);
     
     // State to manage the Sort Modal visibility
     const [isSort3ModalOpen, setIsSort3ModalOpen] = useState(false);
+
+    const [isSortModalOpen, setIsSortModalOpen] = useState(false);
 
     /**
      * Container Style Mapping
@@ -41,7 +45,7 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
     // Callback when tags are applied in RepoFilter
     const handleApplyFilters = (tags: string[]) => {
         console.log("Applied Tags:", tags);
-        setIsFilterModalOpen(false);
+        setIsRepoFilterModalOpen(false);
     };
 
     // Callback when sort options are applied in Sort3
@@ -49,6 +53,15 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
         console.log("Applied Sort By:", sortBy);
         setIsSort3ModalOpen(false);
     };
+
+    const handleApplyGeneralSort = (sortBy: string) => {
+        console.log("Applied General Sort By:", sortBy);
+        setIsSortModalOpen(false);
+    }
+
+    function setIsSortOpen(arg0: boolean): void {
+        throw new Error('Function not implemented.');
+    }
 
     return (
         <div className={cn(
@@ -148,7 +161,7 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                     (variant === 'ThesisArchive' || variant === 'Notifications') ? "mt-auto h-9" : ""
                 )}>
                     {(variant === 'StudentManagement' || variant === 'Notifications') && (
-                        <Button variant="secondary" size="icon" className="rounded-lg border-none font-dm" onClick={() => setIsSort3ModalOpen(true)}>
+                        <Button variant="secondary" size="icon" className="rounded-lg border-none font-dm" onClick={() => setIsSortModalOpen(true)}>
                             <Icon name="sortDefault" size={16} />
                         </Button>
                     )}
@@ -158,7 +171,7 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                             variant="secondary" 
                             size="icon" 
                             className="rounded-lg border-none font-dm"
-                            onClick={() => setIsFilterModalOpen(true)} // Calls the modal
+                            onClick={() => setIsDMFilterModalOpen(true)} // Calls the modal
                         >
                             <Filter className="w-4 h-4" />
                         </Button>
@@ -181,14 +194,26 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
             </div>
 
             {/* --- INTEGRATED REPO FILTER MODAL --- */}
-            <Dialog open={isFilterModalOpen} onOpenChange={setIsFilterModalOpen}>
+            <Dialog open={isRepoFilterModalOpen} onOpenChange={setIsRepoFilterModalOpen}>
                 {/* Technical Note: DialogContent has border/bg removed to let the 
                     RepoFilter's internal shadow and bg-white container show through cleanly.
                 */}
                 <DialogContent className="max-w-md p-0 border-none bg-transparent shadow-none outline-none">
                     <RepoFilter 
-                        onClose={() => setIsFilterModalOpen(false)} 
+                        onClose={() => setIsRepoFilterModalOpen(false)} 
                         onApply={handleApplyFilters}
+                    />
+                </DialogContent>
+            </Dialog>
+
+            {/* --- INTEGRATED DEFENSE MANAGEMENT FILTER MODAL --- */}
+            <Dialog open={isDMFilterModalOpen} onOpenChange={setIsDMFilterModalOpen}>
+                {/* Technical Note: DialogContent has border/bg removed to let the 
+                    RepoFilter's internal shadow and bg-white container show through cleanly.
+                */}
+                <DialogContent className="max-w-md p-0 border-none bg-transparent shadow-none outline-none [&>button]:hidden justify-center">
+                    <DefenseManagementFilter 
+                        onClose={() => setIsDMFilterModalOpen(false)} 
                     />
                 </DialogContent>
             </Dialog>
@@ -198,6 +223,17 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                 <DialogContent className="max-w-md p-0 border-none bg-transparent shadow-none outline-none">
                     {/* The call to Sort3 */}
                     <Sort3/>
+                </DialogContent>
+            </Dialog>
+
+            {/* --- INTEGRATED GENERAL SORT MODAL --- */}
+            <Dialog open={isSortModalOpen} onOpenChange={setIsSortModalOpen}>
+                <DialogContent className="max-w-md p-0 border-none bg-transparent shadow-none outline-none [&>button]:hidden justify-center">
+                    {/* The call to General Sort */}
+                    <GeneralSort 
+                        onClose={() => setIsSortOpen(false)} 
+                        onApply={handleApplySort} 
+                    />
                 </DialogContent>
             </Dialog>
 
