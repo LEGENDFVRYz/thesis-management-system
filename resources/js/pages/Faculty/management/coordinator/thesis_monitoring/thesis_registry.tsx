@@ -34,6 +34,29 @@ const breadcrumb: BreadcrumbItem[] = [
     },
 ];
 
+// Sample Data (move it here)
+const theses = [
+    { 
+        id: '3301', 
+        title: "Development of an AI-Powered Enrollment Forecasting System", 
+        adviser: "Dr. Juan Dela Cruz", 
+        block: "BSCPE 4-1", 
+        date: "Jan 02, 2026", 
+        time: "10:30 AM", 
+        status: "On-Track" 
+    },
+    { 
+        id: '3302', 
+        title: "Blockchain-Based Academic Record Verification", 
+        adviser: "Engr. Maria Santos", 
+        block: "BSCPE 4-2", 
+        date: "Jan 01, 2026", 
+        time: "02:15 PM", 
+        status: "At-Risk" 
+    },
+];
+
+
 // Helper component for Interactive SVG Icons
 const InteractiveSvgIcon = ({ defaultSrc, hoverSrc, clickedSrc, alt }: any) => {
     const [currentSrc, setCurrentSrc] = useState(defaultSrc);
@@ -52,26 +75,6 @@ const InteractiveSvgIcon = ({ defaultSrc, hoverSrc, clickedSrc, alt }: any) => {
 };
 
 export default function Dashboard() {
-    const theses = [
-        { 
-            id: '3301', 
-            title: "Development of an AI-Powered Enrollment Forecasting System", 
-            adviser: "Dr. Juan Dela Cruz", 
-            block: "BSCPE 4-1", 
-            date: "Jan 02, 2026", 
-            time: "10:30 AM", 
-            status: "On-Track" 
-        },
-        { 
-            id: '3302', 
-            title: "Blockchain-Based Academic Record Verification", 
-            adviser: "Engr. Maria Santos", 
-            block: "BSCPE 4-2", 
-            date: "Jan 01, 2026", 
-            time: "02:15 PM", 
-            status: "At-Risk" 
-        },
-    ];
 
     return (
         <AppLayout breadcrumbs={breadcrumb}>
