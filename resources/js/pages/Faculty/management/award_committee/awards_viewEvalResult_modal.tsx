@@ -41,7 +41,7 @@ export const ViewResultsModal = ({ isOpen, onClose, evaluationData }: ViewResult
 
     const handleDownload = () => {
         console.log('Downloading evaluation results...');
-        // Download logic heree
+        // Download button logic heree
     };
 
     return (
