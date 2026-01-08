@@ -6,9 +6,6 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { 
     Calendar as CalendarIcon, 
     Plus, 
-    Download, 
-    Edit2, 
-    Trash2, 
     LayoutList,
     CalendarDays,
     Clock,
@@ -32,6 +29,8 @@ import { cn } from '@/lib/utils';
 import { NavFooter } from '@/components/nav-footer'; 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import DatePicker from "@/components/date-picker";
+import TimePicker from "@/components/time-picker";
 import { 
     Select, 
     SelectContent, 
@@ -40,9 +39,20 @@ import {
     SelectValue 
 } from "@/components/ui/select";
 
-// Import your custom components
-import DatePicker from "@/components/date-picker";
-import TimePicker from "@/components/time-picker";
+// --- CUSTOM ICONS IMPORT ---
+import ic_eyeopen_Default from '@/components/Icons/ic_eyeopen-Default.svg';
+import ic_eyeopen_Hover from '@/components/Icons/ic_eyeopen-Hover.svg';
+import ic_eyeopen_Clicked from '@/components/Icons/ic_eyeopen-Clicked.svg';
+import ic_edit_Default from '@/components/Icons/ic_edit-Default.svg';
+import ic_edit_Hover from '@/components/Icons/ic_edit-Hover.svg';
+import ic_edit_Clicked from '@/components/Icons/ic_edit-Clicked.svg';
+import ic_delete_Default from '@/components/Icons/ic_delete-Default.svg';
+import ic_delete_Hover from '@/components/Icons/ic_delete-Hover.svg';
+import ic_delete_Clicked from '@/components/Icons/ic_delete-Clicked.svg';
+// --- STATUS BADGES IMPORT ---
+import scheduledBadgesScheduled from '@/components/badges/scheduled_badges-Scheduled.svg';
+import scheduledBadgesCancelled from '@/components/badges/scheduled_badges-Cancelled.svg';
+import scheduledBadgesCompleted from '@/components/badges/scheduled_badges-Completed.svg';
 
 // ----------------------------------------------------------------------
 // 1. CUSTOM INPUT COMPONENT
@@ -57,6 +67,7 @@ const inputVariants = cva(
     "placeholder:text-[#333333]/50",
     "focus:shadow-[0_0_0_2px_#73000066] focus:border-transparent", 
     "disabled:opacity-50 disabled:cursor-not-allowed",
+    "read-only:bg-gray-100 read-only:border-gray-200 read-only:text-gray-600 read-only:focus:shadow-none", // Added read-only styles
   ],
   {
     variants: {
@@ -87,7 +98,68 @@ function Input({ className, type, inputSize, ...props }: InputProps) {
 // ----------------------------------------------------------------------
 // 2. HELPER COMPONENTS & INITIAL DATA
 // ----------------------------------------------------------------------
+const StatusBadge = ({ status }: { status: string }) => {
+    let iconSrc = scheduledBadgesScheduled; // Default
 
+    switch (status) {
+        case 'Completed':
+            iconSrc = scheduledBadgesCompleted;
+            break;
+        case 'Cancelled':
+            iconSrc = scheduledBadgesCancelled;
+            break;
+        case 'Scheduled':
+        default:
+            iconSrc = scheduledBadgesScheduled;
+            break;
+    }
+
+    return (
+        <img 
+            src={iconSrc} 
+            alt={status} 
+            className="h-6 w-auto object-contain" 
+        />
+    );
+};
+
+const InteractiveIcon = ({ 
+    def,      
+    hover,    
+    clicked,  
+    onClick, 
+    title 
+}) => {
+    const [state, setState] = useState('default');
+
+    // Logic to choose which image source to show
+    const getIconSrc = () => {
+        switch (state) {
+            case 'active': return clicked;
+            case 'hover': return hover;
+            default: return def;
+        }
+    };
+
+    return (
+        <button
+            onClick={onClick}
+            title={title}
+            // Event listeners to change state
+            onMouseEnter={() => setState('hover')}
+            onMouseLeave={() => setState('default')}
+            onMouseDown={() => setState('active')}
+            onMouseUp={() => setState('hover')}
+            className="focus:outline-none transition-transform active:scale-95"
+        >
+            <img 
+                src={getIconSrc()} 
+                alt={title} 
+                className="w-5 h-5 object-contain" 
+            />
+        </button>
+    );
+};
 interface TabButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     isActive?: boolean;
 }
@@ -140,15 +212,14 @@ function DefenseTableHeader() {
     );
 }
 
-function DefenseTableRow({ data, onEdit, onDelete }: { data: typeof INITIAL_DEFENSES[0], onEdit: (data: any) => void, onDelete: (id: string) => void }) {
-    const getStatusStyle = (status: string) => {
-        switch(status) {
-            case 'Completed': return 'bg-green-600 border-transparent text-white';
-            case 'Cancelled': return 'bg-red-500 border-transparent text-white';
-            default: return 'bg-[#8EC5FF] border border-[#193CB8] text-[#193CB8] hover:bg-[#7bb9ff]';
-        }
-    };
-
+// Updated to accept onView, onEdit, onDelete callbacks
+function DefenseTableRow({ data, onView, onEdit, onDelete }: { 
+    data: typeof INITIAL_DEFENSES[0], 
+    onView: (data: any) => void,
+    onEdit: (data: any) => void, 
+    onDelete: (id: string) => void 
+}) {
+    
     return (
         <div className={`${GRID_LAYOUT} bg-white border-b border-gray-100 hover:bg-gray-50 transition-colors`}>
             <span className="text-sm text-gray-800 font-medium truncate" title={data.title}>{data.title}</span>
@@ -159,29 +230,43 @@ function DefenseTableRow({ data, onEdit, onDelete }: { data: typeof INITIAL_DEFE
                 <span>{data.date.toLocaleDateString()}</span>
                 <span className="text-xs text-gray-500">{data.date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span>
             </div>
+            
+            {/* Status Badge */}
             <div className="flex justify-center">
-                <Badge className={`${getStatusStyle(data.status)} text-center justify-center w-full text-[10px] h-6`}>
-                    {data.status}
-                </Badge>
+                <StatusBadge status={data.status} />
             </div>
-            <div className="flex items-center justify-center gap-2">
-                <Download className="h-4 w-4 cursor-pointer text-gray-600 hover:text-[#800000]" />
-                <button onClick={() => onEdit(data)}>
-                    <Edit2 className="h-4 w-4 cursor-pointer text-gray-600 hover:text-blue-600" />
-                </button>
-                <button onClick={() => onDelete(data.id)}>
-                    <Trash2 className="h-4 w-4 cursor-pointer text-gray-600 hover:text-red-600" />
-                </button>
+
+            <div className="flex items-center justify-center gap-3">
+                <InteractiveIcon 
+                    def={ic_eyeopen_Default} 
+                    hover={ic_eyeopen_Hover} 
+                    clicked={ic_eyeopen_Clicked} 
+                    onClick={() => onView(data)} 
+                    title="View Details" 
+                />
+                
+                <InteractiveIcon 
+                    def={ic_edit_Default} 
+                    hover={ic_edit_Hover} 
+                    clicked={ic_edit_Clicked} 
+                    onClick={() => onEdit(data)} 
+                    title="Edit" 
+                />
+                
+                <InteractiveIcon 
+                    def={ic_delete_Default} 
+                    hover={ic_delete_Hover} 
+                    clicked={ic_delete_Clicked} 
+                    onClick={() => onDelete(data.id)} 
+                    title="Delete" 
+                />
             </div>
         </div>
     );
 }
 
-const breadcrumb: BreadcrumbItem[] = [
-    {
-        title: 'Matrix Management',
-        href: '#',
-    },
+const breadcrumb = [
+    { title: 'Matrix Management', href: '#' },
 ];
 
 // ----------------------------------------------------------------------
@@ -195,6 +280,7 @@ export default function MatrixManagement() {
     // --- STATE: Modals ---
     const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false); 
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -213,10 +299,13 @@ export default function MatrixManagement() {
         groupCode: '',
         equipment: '',
         dateTime: new Date(), 
+        panel: '',
+        status: ''
     };
 
     const [formData, setFormData] = useState(emptyForm);
     const [editFormData, setEditFormData] = useState(emptyForm);
+    const [viewFormData, setViewFormData] = useState(emptyForm);
 
     // --- DERIVED STATE: Calendar Events ---
     const calendarEvents: WeeklyEventType[] = useMemo(() => {
@@ -258,6 +347,23 @@ export default function MatrixManagement() {
         setIsSuccessModalOpen(true);
     };
 
+    // --- HANDLERS: VIEW ---
+    const handleViewClick = (data: any) => {
+        setViewFormData({
+            id: data.id,
+            title: data.title,
+            block: data.block,
+            room: data.room,
+            adviser: data.adviser || '',
+            groupCode: data.groupCode || '',
+            equipment: data.equipment || '',
+            dateTime: data.date,
+            panel: data.panel || 'Pending',
+            status: data.status
+        });
+        setIsViewModalOpen(true);
+    };
+
     // --- HANDLERS: EDIT ---
     const handleEditClick = (data: any) => {
         setEditFormData({
@@ -269,6 +375,8 @@ export default function MatrixManagement() {
             groupCode: data.groupCode || '',
             equipment: data.equipment || '',
             dateTime: data.date,
+            panel: data.panel,
+            status: data.status
         });
         setIsEditModalOpen(true);
     };
@@ -301,7 +409,7 @@ export default function MatrixManagement() {
         }));
 
         setIsEditModalOpen(false);
-        setIsSuccessModalOpen(true);
+        setIsSuccessModalOpen(true); 
     };
 
     // --- HANDLERS: DELETE ---
@@ -355,7 +463,7 @@ export default function MatrixManagement() {
                         </TabButton>
                     </div>
 
-                    {/* 2. Controls & Filters */}
+                    {/* 2. Controls & Content - Removing the extra 'space-y-6' wrapper fixed layout */}
                     <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center pt-2">
                         <Button 
                             variant="primary" 
@@ -391,40 +499,39 @@ export default function MatrixManagement() {
                         </ToggleGroup>
                     </div>
 
-                    {/* 3. Main Content */}
-                    <div className="min-h-[600px]">
+                    <div className="min-h-[600px] flex-1">
                         {viewMode === 'calendar' ? (
                             <DefenseCalendarWeekly 
                                 events={calendarEvents}
                                 value={currentDate}
                                 onChange={setCurrentDate}
-                                className="shadow-sm border-sidebar-border/70"
+                                className="shadow-sm border-sidebar-border/70 h-full"
                             />
                         ) : (
-                            <div className="rounded-xl border border-gray-200 overflow-hidden shadow-sm dark:border-sidebar-border">
+                            <div className="rounded-xl border border-gray-200 overflow-hidden shadow-sm dark:border-sidebar-border h-full flex flex-col">
                                 <DefenseTableHeader />
-                                <div>
+                                <div className="flex-1 overflow-auto">
                                     {defensesList.map((defense) => (
                                         <DefenseTableRow 
                                             key={defense.id} 
                                             data={defense} 
+                                            onView={handleViewClick}
                                             onEdit={handleEditClick}
                                             onDelete={handleDeleteClick}
                                         />
                                     ))}
                                 </div>
-                                <div className="bg-gray-50 px-5 py-3 text-xs text-center text-gray-500 border-t border-gray-200">
+                                <div className="bg-gray-50 px-5 py-3 text-xs text-center text-gray-500 border-t border-gray-200 mt-auto">
                                     {defensesList.length} of {defensesList.length} Upcoming Defenses
                                 </div>
                             </div>
                         )}
                     </div>
                 </div>
-
-                {/* Footer - NOW INSIDE THE FLEX CONTAINER */}
                 <NavFooter />
             </div>
             
+
             {/* ================= 1. ADD SCHEDULE MODAL ================= */}
             <Dialog open={isScheduleModalOpen} onOpenChange={setIsScheduleModalOpen}>
                 <DialogContent className="max-w-[1000px] w-[95vw] h-[85vh] p-0 border-none rounded-lg bg-[#FDFCF6] shadow-2xl font-dm flex flex-col [&>button]:hidden overflow-hidden">
@@ -437,7 +544,7 @@ export default function MatrixManagement() {
                         <div className="flex items-center gap-6">
                             <div className="text-right hidden sm:block">
                                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Defense ID</span>
-                                <span className="text-lg font-bold text-gray-700 font-mono">#DEF-2025-00X</span>
+                                <span className="text-lg font-bold text-gray-700 font-mono">#DEF-NEW</span>
                             </div>
                             <button 
                                 onClick={() => setIsScheduleModalOpen(false)}
@@ -533,7 +640,105 @@ export default function MatrixManagement() {
                 </DialogContent>
             </Dialog>
 
-            {/* ================= 2. EDIT DEFENSE MODAL ================= */}
+            {/* ================= 2. VIEW DEFENSE MODAL ================= */}
+            <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
+                <DialogContent className="max-w-[1000px] w-[95vw] h-[85vh] p-0 border-none rounded-lg bg-[#FDFCF6] shadow-2xl font-dm flex flex-col [&>button]:hidden overflow-hidden">
+                    {/* Header */}
+                    <div className="flex-none flex flex-row justify-between items-center px-8 py-6 border-b border-gray-200 bg-white z-10">
+                        <div>
+                            <div className="flex items-center gap-3">
+                                <h2 className="text-2xl font-bold text-[#800000] tracking-tight">Defense Details</h2>
+                                <Badge className={viewFormData.status === 'Completed' ? 'bg-green-600' : 'bg-blue-600'}>
+                                    {viewFormData.status}
+                                </Badge>
+                            </div>
+                            <p className="text-sm text-gray-500 mt-1">Reviewing information for the selected defense.</p>
+                        </div>
+                        <div className="flex items-center gap-6">
+                            <button onClick={() => setIsViewModalOpen(false)} className="bg-gray-100 hover:bg-gray-200 text-gray-600 p-2 rounded-lg transition-colors">
+                                <Plus className="w-5 h-5 rotate-45" /> 
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Body - Read Only Inputs */}
+                    <div className="flex-1 overflow-y-auto p-8 custom-scrollbar bg-[#FAFAFA]">
+                        <div className="space-y-8">
+                            <h3 className="text-sm font-bold text-[#800000] flex items-center gap-2 mb-0 pb-2 border-b border-gray-100">
+                                <div className="w-1.5 h-4 bg-[#800000] rounded-full" /> Proposal Information
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+                                <div className="md:col-span-8 space-y-1">
+                                    <Label className={labelClass}>Thesis Title</Label>
+                                    <Input inputSize="full" value={viewFormData.title} readOnly />
+                                </div>
+                                <div className="md:col-span-4 space-y-1">
+                                    <Label className={labelClass}>Group Code</Label>
+                                    <div className="relative">
+                                        <Input inputSize="full" value={viewFormData.groupCode} readOnly className="pl-10" />
+                                        <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#333333]/50" />
+                                    </div>
+                                </div>
+                                <div className="md:col-span-6 space-y-1">
+                                    <Label className={labelClass}>Thesis Adviser</Label>
+                                    <div className="relative">
+                                        <Input inputSize="full" value={viewFormData.adviser} readOnly className="pl-10" />
+                                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#333333]/50" />
+                                    </div>
+                                </div>
+                                <div className="md:col-span-6 space-y-1">
+                                    <Label className={labelClass}>Block</Label>
+                                    <Input inputSize="full" value={viewFormData.block} readOnly />
+                                </div>
+                            </div>
+
+                            <h3 className="text-sm font-bold text-[#800000] flex items-center gap-2 mb-0 pb-2 border-b border-gray-100">
+                                <div className="w-1.5 h-4 bg-[#800000] rounded-full" /> Defense Logistics
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div className="space-y-1">
+                                    <Label className={labelClass}>Date</Label>
+                                    <Input inputSize="full" value={viewFormData.dateTime ? viewFormData.dateTime.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : ''} readOnly />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label className={labelClass}>Time</Label>
+                                    <div className="relative">
+                                        <Input inputSize="full" value={viewFormData.dateTime ? viewFormData.dateTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : ''} readOnly className="pl-10" />
+                                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1a1a1a]/50" />
+                                    </div>
+                                </div>
+                                <div className="space-y-1">
+                                    <Label className={labelClass}>Room</Label>
+                                    <div className="relative">
+                                        <Input inputSize="full" value={viewFormData.room} readOnly className="pl-10" />
+                                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1a1a1a]/50" />
+                                    </div>
+                                </div>
+                                <div className="md:col-span-3 space-y-1">
+                                    <Label className={labelClass}>Equipment</Label>
+                                    <div className="relative">
+                                        <Input inputSize="full" value={viewFormData.equipment} readOnly className="pl-10" />
+                                        <Monitor className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1a1a1a]/50" />
+                                    </div>
+                                </div>
+                                <div className="md:col-span-3 space-y-1">
+                                    <Label className={labelClass}>Assigned Panel</Label>
+                                    <div className="p-3 bg-gray-50 border border-[#d4c5a0] rounded-[4px] text-sm text-[#333333] font-medium">
+                                        {viewFormData.panel}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Footer - Close Button */}
+                    <div className="flex-none flex justify-end gap-3 px-8 py-5 border-t border-gray-200 bg-white">
+                         <Button variant="outline" onClick={() => setIsViewModalOpen(false)} className="h-9 px-6 border-transparent hover:bg-gray-100 text-gray-600 font-medium">Close</Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* ================= 3. EDIT DEFENSE MODAL ================= */}
             <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
                 <DialogContent className="max-w-[1000px] w-[95vw] h-[85vh] p-0 border-none rounded-lg bg-[#FDFCF6] shadow-2xl font-dm flex flex-col [&>button]:hidden overflow-hidden">
                     {/* Header */}
@@ -549,7 +754,7 @@ export default function MatrixManagement() {
                         </div>
                     </div>
 
-                    {/* Body - Reusing layout */}
+                    {/* Body */}
                     <div className="flex-1 overflow-y-auto p-8 custom-scrollbar bg-[#FAFAFA]">
                         <div className="space-y-8">
                             <h3 className="text-sm font-bold text-[#800000] flex items-center gap-2 mb-0 pb-2 border-b border-gray-100">
@@ -628,7 +833,7 @@ export default function MatrixManagement() {
                 </DialogContent>
             </Dialog>
 
-            {/* ================= 3. DELETE CONFIRMATION MODAL ================= */}
+            {/* ================= 4. DELETE CONFIRMATION MODAL ================= */}
             <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
                 <DialogContent className="max-w-[400px] rounded-[24px] p-8 flex flex-col items-center justify-center border-none shadow-2xl bg-white [&>button]:hidden">
                     <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
@@ -656,7 +861,7 @@ export default function MatrixManagement() {
                 </DialogContent>
             </Dialog>
 
-            {/* ================= 4. SUCCESS MODAL ================= */}
+            {/* ================= 5. SUCCESS MODAL ================= */}
             <Dialog open={isSuccessModalOpen} onOpenChange={setIsSuccessModalOpen}>
                 <DialogContent className="max-w-[320px] rounded-[24px] p-10 flex flex-col items-center justify-center border-none shadow-2xl bg-white [&>button]:hidden">
                     <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6 shadow-lg">
@@ -668,7 +873,7 @@ export default function MatrixManagement() {
                 </DialogContent>
             </Dialog>
 
-            {/* ================= 5. ERROR MODAL (Validation) ================= */}
+            {/* ================= 6. ERROR MODAL (Validation) ================= */}
             <Dialog open={isErrorModalOpen} onOpenChange={setIsErrorModalOpen}>
                 <DialogContent className="max-w-[320px] rounded-[24px] p-10 flex flex-col items-center justify-center border-none shadow-2xl bg-white [&>button]:hidden">
                     <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6 shadow-lg">
