@@ -33,6 +33,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { NavFooter } from '@/components/nav-footer';
+import DocumentPreview from '@/components/document-preview';
 
 // ----------------------------------------------------------------------
 // MOCK DATA
@@ -44,7 +45,7 @@ const CONFLICT_REQUESTS = Array(6).fill({
     title: 'AI-Powered Student...',
     date: '11/29/2025',
     reason: 'Boracay',
-    document: 'comment'
+    document: 'Letter of Request'
 }).map((item, index) => ({ ...item, id: index }));
 
 // ----------------------------------------------------------------------
@@ -69,7 +70,7 @@ interface Thesis {
     adviser: string;
     section: string;
     date: string;
-    panels: Panelist[]; 
+    panels: Panelist[];
     panel_count: number;
     is_complete: boolean;
 }
@@ -133,14 +134,18 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
     const [thesisAssignments, setThesisAssignments] = useState<Record<number, Panelist[]>>({});
     const [processingId, setProcessingId] = useState<number | null>(null);
     
-    // --- MODAL STATE ---
+    // --- MODAL STATES ---
     const [isNotifySuccessOpen, setIsNotifySuccessOpen] = useState(false);
     const [notificationMessage, setNotificationMessage] = useState('');
+    
+    const [selectedDocument, setSelectedDocument] = useState<{title: string, type: string} | null>(null);
 
+    // Sync props with local state
     useEffect(() => {
         setLocalTheses(endorsed_thesis);
     }, [endorsed_thesis]);
 
+    // Initialize assignments map
     useEffect(() => {
         const initialMap: Record<number, Panelist[]> = {};
         endorsed_thesis.forEach(thesis => {
@@ -194,28 +199,6 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
             setIsNotifySuccessOpen(true);
             setOpenThesisId(null);
         }, 1000); 
-
-        // NOTE: In a real app, use the router logic below instead of setTimeout
-        /*
-        const payload = {
-            defense_matrix_id: thesis.defense_matrix_id,
-            panel_ids: currentAssignments.map(p => p.id) 
-        };
-        const isUpdate = thesis.panels && thesis.panels.length > 0;
-        const options = {
-            onFinish: () => setProcessingId(null),
-            onSuccess: () => {
-                setNotificationMessage("Panel assignments saved successfully.");
-                setIsNotifySuccessOpen(true);
-                setOpenThesisId(null);
-            }
-        };
-        if (isUpdate) {
-            router.put(route('panel_assign.update', thesis.defense_matrix_id), payload, options);
-        } else {
-            router.post(route('panel_assign.store'), payload, options);
-        }
-        */
     };
 
     const handleConflictAction = (action: 'approve' | 'reject', id: number) => {
@@ -225,6 +208,13 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
             setNotificationMessage("The conflict request has been rejected.");
         }
         setIsNotifySuccessOpen(true);
+    };
+
+    const handleViewDocument = (req: any) => {
+        setSelectedDocument({
+            title: req.title,
+            type: req.document
+        });
     };
 
     const visibleTheses = localTheses.filter((thesis) => thesis.section === selectedSection);
@@ -413,9 +403,9 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                                                                                     const isAssigned = currentAssignments.some(p => p.id === panelist.id);
                                                                                     return (
                                                                                         <DropdownMenuItem 
-                                                                                            key={panelist.id} 
-                                                                                            disabled={isAssigned} 
-                                                                                            onClick={() => handleAssignPanelist(thesis.thesis_id, panelist)} 
+                                                                                            key={panelist.id}
+                                                                                            disabled={isAssigned}
+                                                                                            onClick={() => handleAssignPanelist(thesis.thesis_id, panelist)}
                                                                                             className="cursor-pointer"
                                                                                         >
                                                                                             <span className={isAssigned ? "text-muted-foreground line-through" : ""}>
@@ -445,7 +435,7 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                                                                                         <span className="text-sm font-medium">{panelist.name}</span>
                                                                                     </div>
                                                                                     <button 
-                                                                                        onClick={() => handleRemovePanelist(thesis.thesis_id, panelist.id)} 
+                                                                                        onClick={() => handleRemovePanelist(thesis.thesis_id, panelist.id)}
                                                                                         className="text-muted-foreground hover:text-red-600 transition-colors"
                                                                                     >
                                                                                         <X size={16} />
@@ -457,8 +447,8 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
 
                                                                     <div className="flex justify-end pt-4 border-t mt-2">
                                                                         <Button 
-                                                                            onClick={() => handleSaveChanges(thesis)} 
-                                                                            disabled={!isReadyToSave || isProcessing} 
+                                                                            onClick={() => handleSaveChanges(thesis)}
+                                                                            disabled={!isReadyToSave || isProcessing}
                                                                             className={cn("bg-[#800000] hover:bg-[#9b000a] text-white", !isReadyToSave && "opacity-50 cursor-not-allowed")}
                                                                         >
                                                                             {isProcessing ? "Saving..." : <><Save className="mr-2 h-4 w-4" /> Save Assignments</>}
@@ -499,7 +489,10 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                                                     <td className="px-6 py-4 text-neutral-600 text-center">{req.date}</td>
                                                     <td className="px-6 py-4 text-neutral-600 text-center">{req.reason}</td>
                                                     <td className="px-6 py-4 justify-items-center">
-                                                        <button className="flex items-center gap-1 font-medium text-blue-600 hover:underline">
+                                                        <button 
+                                                            onClick={() => handleViewDocument(req)}
+                                                            className="flex items-center gap-1 font-medium text-blue-600 hover:underline"
+                                                        >
                                                             <FileText size={14} />
                                                             {req.document}
                                                         </button>
@@ -536,14 +529,33 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
             {/* ================= SUCCESS NOTIFICATION MODAL ================= */}
             <Dialog open={isNotifySuccessOpen} onOpenChange={setIsNotifySuccessOpen}>
                 <DialogContent className="max-w-[320px] rounded-[24px] p-10 flex flex-col items-center justify-center border-none shadow-2xl bg-white">
-                    <div className="w-16 h-16 bg-alert-success rounded-full flex items-center justify-center mb-6 shadow-lg">
-                        <Check className="w-10 h-10 text-primary-foreground" />
+                    <div className="w-16 h-16 bg-alert-success rounded-full flex items-center justify-center mb-6 shadow-lg bg-green-100 text-green-600">
+                        <Check className="w-10 h-10" />
                     </div>
                     <p className="text-[16px] text-center text-foreground font-bold font-dm">
                         {notificationMessage}
                     </p>
                 </DialogContent>
             </Dialog>
+
+            {/* ================= DOCUMENT PREVIEW MODAL ================= */}
+            <Dialog open={!!selectedDocument} onOpenChange={(open) => !open && setSelectedDocument(null)}>
+                <DialogContent className="max-w-3xl p-0 border-none bg-transparent shadow-none overflow-hidden outline-none">
+                    <div className="relative w-full h-full">
+                        <DocumentPreview 
+                            documentTitle={`${selectedDocument?.type} - ${selectedDocument?.title}`}
+                            documentUrl="#" 
+                        />
+                        {/* Invisible overlay for the close button position in DocumentPreview */}
+                        <button 
+                            onClick={() => setSelectedDocument(null)}
+                            className="absolute top-6 right-6 w-6 h-6 opacity-0 cursor-pointer z-50"
+                            aria-label="Close Preview"
+                        />
+                    </div>
+                </DialogContent>
+            </Dialog>
+
         </AppLayout>
     );
 }
