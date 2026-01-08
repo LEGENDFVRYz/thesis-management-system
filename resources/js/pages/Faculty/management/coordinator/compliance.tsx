@@ -5,6 +5,7 @@ import AppLayout from '@/layouts/app-layout';
 import { compliance } from '@/routes/faculty/management/coordinator';
 import { type BreadcrumbItem } from '@/types';
 import DocumentPreview from '@/components/document-preview';
+import { NavFooter } from '@/components/nav-footer'; 
 import { cn } from "@/lib/utils";
 
 // Icons
@@ -716,6 +717,7 @@ export default function Dashboard() {
                     </div>
 
                 </div>
+                <NavFooter />
             </div>
         </AppLayout>
     );

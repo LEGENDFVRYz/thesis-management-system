@@ -23,6 +23,7 @@ import {
     HeaderCard 
 } from "@/components/ui/card";
 import { cn } from '@/lib/utils';
+import { NavFooter } from '@/components/nav-footer'; 
 
 // ----------------------------------------------------------------------
 // CUSTOM TABS COMPONENT
@@ -220,7 +221,7 @@ export default function MatrixManagement() {
                 />
 
                 {/* Main Content Area */}
-                <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 lg:p-8 w-full">
+                <div className="mx-auto w-full max-w-[1440px] flex flex-1 flex-col gap-6 p-4 md:p-6 lg:p-8">
                     
                     {/* 1. Page Tabs */}
                     <div className="flex items-end gap-1 mb-0 border-b border-[#800000]/10 pb-0">
@@ -300,6 +301,7 @@ export default function MatrixManagement() {
                     </div>
                 </div>
             </div>
+            <NavFooter />
         </AppLayout>
     );
 }

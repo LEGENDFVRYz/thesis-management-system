@@ -23,6 +23,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { NavFooter } from '@/components/nav-footer'; 
 
 // ----------------------------------------------------------------------
 // DATA: Audience Options
@@ -268,6 +269,8 @@ export default function Dashboard() {
                         </div>
                     </div>
                 </div>
+
+                <NavFooter />
             </div>
         </AppLayout>
     );
