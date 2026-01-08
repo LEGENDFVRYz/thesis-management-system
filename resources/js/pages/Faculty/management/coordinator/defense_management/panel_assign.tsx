@@ -12,27 +12,70 @@ import {
     Users,
     Plus,
     X,
-    UserCheck
+    UserCheck,
+    Save
 } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from '@/lib/utils';
-
-// Import UI Components
-import { 
-    HeaderCard 
-} from "@/components/ui/card";
+import { HeaderCard } from "@/components/ui/card";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuRadioGroup,
-    DropdownMenuRadioItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { Button } from '@/components/ui/button';
+
+// ----------------------------------------------------------------------
+// MOCK DATA
+// ----------------------------------------------------------------------
+
+const CONFLICT_REQUESTS = Array(6).fill({
+    id: 1,
+    adviser: 'Dr. Maria Santos',
+    title: 'AI-Powered Student...',
+    date: '11/29/2025',
+    reason: 'Boracay',
+    document: 'comment'
+}).map((item, index) => ({ ...item, id: index }));
+
+// ----------------------------------------------------------------------
+// TYPES
+// ----------------------------------------------------------------------
+
+interface Panelist {
+    id: number;
+    name: string;
+}
+
+interface Section {
+    section: string;
+}
+
+interface Thesis {
+    endorsement_id: number;
+    defense_matrix_id: number;
+    thesis_id: number;
+    title: string;
+    authors: string;
+    adviser: string;
+    section: string;
+    date: string;
+    panels: Panelist[]; 
+    panel_count: number;
+    is_complete: boolean;
+}
+
+interface DashboardProps {
+    sections: Section[];
+    available_panel: Panelist[];
+    endorsed_thesis: Thesis[];
+}
 
 // ----------------------------------------------------------------------
 // CUSTOM TABS COMPONENT
@@ -67,47 +110,6 @@ const TabButton = React.forwardRef<HTMLButtonElement, TabButtonProps>(
 TabButton.displayName = 'TabButton';
 
 // ----------------------------------------------------------------------
-// MOCK DATA FOR CONFLICTS
-// ----------------------------------------------------------------------
-
-const CONFLICT_REQUESTS = Array(6).fill({
-    id: 1,
-    adviser: 'Dr. Maria Santos',
-    title: 'AI-Powered Student...',
-    date: '11/29/2025',
-    reason: 'Boracay',
-    document: 'comment'
-}).map((item, index) => ({ ...item, id: index }));
-
-// ----------------------------------------------------------------------
-// TYPES
-// ----------------------------------------------------------------------
-
-interface Panelist {
-    id: number;
-    name: string;
-}
-
-interface Section {
-    section: string;
-}
-
-interface Thesis {
-    id: number;
-    title: string;
-    authors: string;
-    adviser: string;
-    section: string;
-    date: string;
-}
-
-interface DashboardProps {
-    sections: Section[];
-    available_panel: Panelist[];
-    endorsed_thesis: Thesis[];
-}
-
-// ----------------------------------------------------------------------
 // MAIN DASHBOARD
 // ----------------------------------------------------------------------
 
@@ -119,51 +121,78 @@ const breadcrumb: BreadcrumbItem[] = [
 ];
 
 export default function Dashboard({ sections, available_panel, endorsed_thesis }: DashboardProps) {
-    // State
     const [selectedSection, setSelectedSection] = useState<string>('');
     const [activeTab, setActiveTab] = useState<'assignments' | 'conflicts'>('assignments');
-    const [expandedThesis, setExpandedThesis] = useState<number | null>(1);
-
-    // NEW: State to track assignments per thesis
-    // Record<ThesisID, Array<Panelist>>
+    const [openThesisId, setOpenThesisId] = useState<number | null>(null);
     const [thesisAssignments, setThesisAssignments] = useState<Record<number, Panelist[]>>({});
+    const [processingId, setProcessingId] = useState<number | null>(null);
 
-    // Handler to assign a panelist
+    useEffect(() => {
+        const initialMap: Record<number, Panelist[]> = {};
+        endorsed_thesis.forEach(thesis => {
+            initialMap[thesis.thesis_id] = thesis.panels || [];
+        });
+        setThesisAssignments(initialMap);
+    }, [endorsed_thesis]);
+
+    const handleToggleThesis = (id: number) => {
+        setOpenThesisId(prevId => (prevId === id ? null : id));
+    };
+
     const handleAssignPanelist = (thesisId: number, panelist: Panelist) => {
         setThesisAssignments((prev) => {
-            const currentAssignments = prev[thesisId] || [];
-            
-            // Prevent duplicates
-            if (currentAssignments.find((p) => p.id === panelist.id)) {
-                return prev;
-            }
-
-            // Optional: Limit to a certain number (e.g., 3 or 4)
-            // if (currentAssignments.length >= 3) return prev; 
-
-            return {
-                ...prev,
-                [thesisId]: [...currentAssignments, panelist],
-            };
+            const current = prev[thesisId] || [];
+            if (current.find((p) => p.id === panelist.id)) return prev;
+            if (current.length >= 3) return prev; 
+            return { ...prev, [thesisId]: [...current, panelist] };
         });
     };
 
-    // Handler to remove a panelist
     const handleRemovePanelist = (thesisId: number, panelistId: number) => {
         setThesisAssignments((prev) => {
-            const currentAssignments = prev[thesisId] || [];
-            return {
-                ...prev,
-                [thesisId]: currentAssignments.filter((p) => p.id !== panelistId),
-            };
+            const current = prev[thesisId] || [];
+            return { ...prev, [thesisId]: current.filter((p) => p.id !== panelistId) };
         });
     };
+
+    const handleSaveChanges = (thesis: Thesis) => {
+        const currentAssignments = thesisAssignments[thesis.thesis_id] || [];
+        
+        if (currentAssignments.length !== 3) {
+            alert("Exactly 3 panelists are required.");
+            return;
+        }
+
+        setProcessingId(thesis.thesis_id);
+
+        const payload = {
+            defense_matrix_id: thesis.defense_matrix_id,
+            panel_ids: currentAssignments.map(p => p.id) 
+        };
+
+        const isUpdate = thesis.panels && thesis.panels.length > 0;
+        
+        const options = {
+            onFinish: () => setProcessingId(null),
+            onSuccess: () => {
+                setOpenThesisId(null); 
+            }
+        };
+
+        if (isUpdate) {
+            router.put(route('panel_assign.update', thesis.defense_matrix_id), payload, options);
+        } else {
+            router.post(route('panel_assign.store'), payload, options);
+        }
+    };
+
+    const visibleTheses = endorsed_thesis.filter((thesis) => thesis.section === selectedSection);
 
     return (
         <AppLayout breadcrumbs={breadcrumb}>
             <Head title="Panel Assignment" />
 
-            <div className="flex flex-col min-h-screen -mt-4 -mx-4 -mb-4 md:-mt-4 md:-mx-6 md:-mb-6 lg:-mt-6 lg:-mx-8 lg:-mb-8 bg-primary-foreground">
+            <div className="flex flex-col min-h-screen bg-primary-foreground -mt-4 -mx-4 -mb-4 md:-mt-4 md:-mx-6 md:-mb-6 lg:-mt-6 lg:-mx-8 lg:-mb-8">
                 
                 {/* Header Card */}
                 <HeaderCard
@@ -177,10 +206,9 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                     }
                 />
 
-                {/* Main Content Area */}
                 <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 lg:p-8 w-full">
 
-                    {/* 1. Page Tabs (Top Level) */}
+                    {/* 1. Page Tabs */}
                     <div className="flex items-end gap-1 mb-0 border-b border-[#800000]/10 pb-0">
                         <TabButton isActive={true}>
                             Panel Assignment
@@ -196,7 +224,7 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                     {/* 2. Controls & Filters */}
                     <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center pt-2">
 
-                        {/* Sub-Tabs (Toggle Group Style) */}
+                        {/* Sub-Tabs */}
                         <ToggleGroup
                             type="single"
                             value={activeTab}
@@ -217,7 +245,7 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                             </ToggleGroupItem>
                         </ToggleGroup>
 
-                        {/* Section Selector (Only visible in Assignments view) */}
+                        {/* Section Selector */}
                         {activeTab === 'assignments' && (
                             <div className="flex items-center gap-2">
                                 <DropdownMenu>
@@ -248,7 +276,7 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                         {activeTab === 'assignments' ? (
                             /* ================= PANEL ASSIGNMENTS VIEW ================= */
                             <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
-                                {/* Left Sidebar: Available Panelists List (Read Only / Reference) */}
+                                {/* Faculty Roster */}
                                 <div className="col-span-1 flex flex-col gap-4 rounded-xl border bg-card p-4 shadow-sm h-fit">
                                     <div className="flex items-center gap-3 border-b pb-4">
                                         <div className="flex size-10 items-center justify-center rounded-lg bg-red-100 text-red-700">
@@ -260,23 +288,17 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                                         </div>
                                     </div>
 
-                                    {/* Simplified List - No Dragging */}
                                     <div className="flex flex-col gap-2 overflow-y-auto pr-1" style={{ maxHeight: '600px' }}>
                                         {available_panel.map((panelist) => (
-                                            <div
-                                                key={panelist.id}
-                                                className="flex items-center gap-3 rounded-lg border bg-background p-3 shadow-sm"
-                                            >
+                                            <div key={panelist.id} className="flex items-center gap-3 rounded-lg border bg-background p-3 shadow-sm">
                                                 <div className="h-2 w-2 rounded-full bg-green-500" />
-                                                <span className="text-sm font-medium text-foreground/80">
-                                                    {panelist.name}
-                                                </span>
+                                                <span className="text-sm font-medium text-foreground/80">{panelist.name}</span>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
 
-                                {/* Right Content: Thesis Accordions */}
+                                {/* Main Area */}
                                 <div className="col-span-1 lg:col-span-3">
                                     {!selectedSection ? (
                                         <div className="relative flex h-full min-h-[400px] flex-col items-center justify-center rounded-xl border border-dashed bg-muted/20">
@@ -287,143 +309,132 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                                                 <p className="text-sm text-muted-foreground">Please select a section to view thesis titles.</p>
                                             </div>
                                         </div>
+                                    ) : visibleTheses.length === 0 ? (
+                                        <div className="relative flex h-full min-h-[400px] flex-col items-center justify-center rounded-xl border border-dashed bg-muted/20">
+                                            <div className="z-10 text-center">
+                                                <BookOpen className="mx-auto mb-2 size-10 text-muted-foreground/50" />
+                                                <h3 className="text-lg font-medium">No Theses Found</h3>
+                                                <p className="text-sm text-muted-foreground">No theses found for section {selectedSection}.</p>
+                                            </div>
+                                        </div>
                                     ) : (
                                         <div className="flex flex-col gap-4">
-                                            {endorsed_thesis.filter((thesis) => thesis.section === selectedSection).length === 0 ? (
-                                                <div className="relative flex h-full min-h-[400px] flex-col items-center justify-center rounded-xl border border-dashed bg-muted/20">
-                                                    <div className="z-10 text-center">
-                                                        <BookOpen className="mx-auto mb-2 size-10 text-muted-foreground/50" />
-                                                        <h3 className="text-lg font-medium">No Theses Found</h3>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            No theses found for section {selectedSection}.
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                endorsed_thesis
-                                                    .filter((thesis) => thesis.section === selectedSection)
-                                                    .map((thesis) => {
-                                                        const isOpen = expandedThesis === thesis.id;
-                                                        const currentAssignments = thesisAssignments[thesis.id] || [];
+                                            {visibleTheses.map((thesis) => {
+                                                const isOpen = openThesisId === thesis.thesis_id;
+                                                const currentAssignments = thesisAssignments[thesis.thesis_id] || [];
+                                                const isReadyToSave = currentAssignments.length === 3;
+                                                const isProcessing = processingId === thesis.thesis_id;
 
-                                                        return (
-                                                            <div key={thesis.id} className="overflow-hidden rounded-xl border bg-card shadow-sm transition-all">
-                                                                <div
-                                                                    onClick={() => setExpandedThesis(isOpen ? null : thesis.id)}
-                                                                    className="cursor-pointer bg-white p-6 hover:bg-neutral-50/50"
-                                                                >
-                                                                    <div className="flex items-start justify-between">
-                                                                        <div className="space-y-1">
-                                                                            <h2 className="text-xl font-bold text-foreground">{thesis.title}</h2>
-                                                                            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-                                                                                <div className="flex items-center gap-1.5">
-                                                                                    <Users size={14} />
-                                                                                    <span>{thesis.authors}</span>
-                                                                                </div>
-                                                                                <div className="flex items-center gap-1.5">
-                                                                                    <UserCheck size={14} />
-                                                                                    <span className="font-medium text-foreground">Adviser: {thesis.adviser}</span>
-                                                                                </div>
-                                                                                <div className="flex items-center gap-1.5">
-                                                                                    <BookOpen size={14} />
-                                                                                    <span>{thesis.section}</span>
-                                                                                </div>
-                                                                                <div className="flex items-center gap-1.5">
-                                                                                    <Calendar size={14} />
-                                                                                    <span>{thesis.date}</span>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <button className="text-muted-foreground transition-transform duration-200">
-                                                                            {isOpen ? <ChevronUp /> : <ChevronDown />}
-                                                                        </button>
+                                                return (
+                                                    <div key={thesis.thesis_id} className="overflow-hidden rounded-xl border bg-card shadow-sm transition-all">
+                                                        <div onClick={() => handleToggleThesis(thesis.thesis_id)} className="cursor-pointer bg-white p-6 hover:bg-neutral-50/50">
+                                                            <div className="flex items-start justify-between">
+                                                                <div className="space-y-1">
+                                                                    <h2 className="text-xl font-bold text-foreground">{thesis.title}</h2>
+                                                                    <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+                                                                        <div className="flex items-center gap-1.5"><Users size={14} /><span>{thesis.authors}</span></div>
+                                                                        <div className="flex items-center gap-1.5"><UserCheck size={14} /><span className="font-medium text-foreground">Adviser: {thesis.adviser}</span></div>
+                                                                        <div className="flex items-center gap-1.5"><BookOpen size={14} /><span>{thesis.section}</span></div>
+                                                                        <div className="flex items-center gap-1.5"><Calendar size={14} /><span>{thesis.date}</span></div>
                                                                     </div>
                                                                 </div>
-                                                                
-                                                                {/* EXPANDED CONTENT AREA */}
-                                                                {isOpen && (
-                                                                    <div className="border-t bg-neutral-50/30 p-6">
-                                                                        <div className="flex flex-col gap-4">
-                                                                            <div className="flex items-center justify-between">
-                                                                                <h3 className="text-sm font-semibold text-[#800000] uppercase tracking-wider">
-                                                                                    Assigned Panel Members
-                                                                                </h3>
-                                                                                
-                                                                                {/* DROPDOWN TO ADD PANELISTS */}
-                                                                                <DropdownMenu>
-                                                                                    <DropdownMenuTrigger asChild>
-                                                                                        <Button variant="outline" size="sm" className="gap-2 text-[#800000] hover:text-[#800000] hover:bg-red-50">
-                                                                                            <Plus size={16} />
-                                                                                            Add Panelist
-                                                                                        </Button>
-                                                                                    </DropdownMenuTrigger>
-                                                                                    <DropdownMenuContent align="end" className="w-56 max-h-[300px] overflow-y-auto">
-                                                                                        <DropdownMenuLabel>Available Faculty</DropdownMenuLabel>
-                                                                                        <DropdownMenuSeparator />
-                                                                                        {available_panel.map((panelist) => {
-                                                                                            const isAssigned = currentAssignments.some(p => p.id === panelist.id);
-                                                                                            return (
-                                                                                                <DropdownMenuItem 
-                                                                                                    key={panelist.id}
-                                                                                                    disabled={isAssigned}
-                                                                                                    onClick={() => handleAssignPanelist(thesis.id, panelist)}
-                                                                                                    className="cursor-pointer"
-                                                                                                >
-                                                                                                    <span className={isAssigned ? "text-muted-foreground line-through" : ""}>
-                                                                                                        {panelist.name}
-                                                                                                    </span>
-                                                                                                </DropdownMenuItem>
-                                                                                            );
-                                                                                        })}
-                                                                                    </DropdownMenuContent>
-                                                                                </DropdownMenu>
-                                                                            </div>
-
-                                                                            {/* LIST OF ASSIGNED PANELISTS */}
-                                                                            {currentAssignments.length === 0 ? (
-                                                                                <div className="rounded-lg border border-dashed border-gray-300 p-8 text-center bg-white/50">
-                                                                                    <p className="text-sm text-muted-foreground">
-                                                                                        No panelists assigned yet. Click "Add Panelist" to begin.
-                                                                                    </p>
-                                                                                </div>
-                                                                            ) : (
-                                                                                <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-                                                                                    {currentAssignments.map((panelist) => (
-                                                                                        <div 
-                                                                                            key={panelist.id} 
-                                                                                            className="flex items-center justify-between rounded-lg border bg-white p-3 shadow-sm"
-                                                                                        >
-                                                                                            <div className="flex items-center gap-3">
-                                                                                                <div className="flex size-8 items-center justify-center rounded-full bg-red-100 text-[#800000]">
-                                                                                                    <span className="text-xs font-bold">
-                                                                                                        {panelist.name.charAt(0)}
-                                                                                                    </span>
-                                                                                                </div>
-                                                                                                <span className="text-sm font-medium">{panelist.name}</span>
-                                                                                            </div>
-                                                                                            <button 
-                                                                                                onClick={() => handleRemovePanelist(thesis.id, panelist.id)}
-                                                                                                className="text-muted-foreground hover:text-red-600 transition-colors"
-                                                                                            >
-                                                                                                <X size={16} />
-                                                                                            </button>
-                                                                                        </div>
-                                                                                    ))}
-                                                                                </div>
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
-                                                                )}
+                                                                <div className="flex items-center gap-4">
+                                                                    {/* Status Pill */}
+                                                                    {thesis.is_complete ? (
+                                                                        <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">Assigned</span>
+                                                                    ) : (
+                                                                        <span className="inline-flex items-center rounded-full bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20">Pending</span>
+                                                                    )}
+                                                                    <button className="text-muted-foreground transition-transform duration-200">
+                                                                        {isOpen ? <ChevronUp /> : <ChevronDown />}
+                                                                    </button>
+                                                                </div>
                                                             </div>
-                                                        );
-                                                    })
-                                            )}
+                                                        </div>
+
+                                                        {isOpen && (
+                                                            <div className="border-t bg-neutral-50/30 p-6">
+                                                                <div className="flex flex-col gap-4">
+                                                                    <div className="flex items-center justify-between">
+                                                                        <h3 className="text-sm font-semibold text-[#800000] uppercase tracking-wider">
+                                                                            Assigned Panel Members
+                                                                        </h3>
+                                                                        <DropdownMenu>
+                                                                            <DropdownMenuTrigger asChild>
+                                                                                <Button variant="outline" size="sm" disabled={currentAssignments.length >= 3} className="gap-2 text-[#800000] hover:text-[#800000] hover:bg-red-50">
+                                                                                    <Plus size={16} /> Add Panelist
+                                                                                </Button>
+                                                                            </DropdownMenuTrigger>
+                                                                            <DropdownMenuContent align="end" className="w-56 max-h-[300px] overflow-y-auto">
+                                                                                <DropdownMenuLabel>Available Faculty</DropdownMenuLabel>
+                                                                                <DropdownMenuSeparator />
+                                                                                {available_panel.map((panelist) => {
+                                                                                    const isAssigned = currentAssignments.some(p => p.id === panelist.id);
+                                                                                    return (
+                                                                                        <DropdownMenuItem 
+                                                                                            key={panelist.id}
+                                                                                            disabled={isAssigned}
+                                                                                            onClick={() => handleAssignPanelist(thesis.thesis_id, panelist)}
+                                                                                            className="cursor-pointer"
+                                                                                        >
+                                                                                            <span className={isAssigned ? "text-muted-foreground line-through" : ""}>
+                                                                                                {panelist.name}
+                                                                                            </span>
+                                                                                        </DropdownMenuItem>
+                                                                                    );
+                                                                                })}
+                                                                            </DropdownMenuContent>
+                                                                        </DropdownMenu>
+                                                                    </div>
+
+                                                                    {currentAssignments.length === 0 ? (
+                                                                        <div className="rounded-lg border border-dashed border-gray-300 p-8 text-center bg-white/50">
+                                                                            <p className="text-sm text-muted-foreground">
+                                                                                No panelists assigned yet. Click "Add Panelist" to begin.
+                                                                            </p>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+                                                                            {currentAssignments.map((panelist) => (
+                                                                                <div key={panelist.id} className="flex items-center justify-between rounded-lg border bg-white p-3 shadow-sm">
+                                                                                    <div className="flex items-center gap-3">
+                                                                                        <div className="flex size-8 items-center justify-center rounded-full bg-red-100 text-[#800000]">
+                                                                                            <span className="text-xs font-bold">{panelist.name.charAt(0)}</span>
+                                                                                        </div>
+                                                                                        <span className="text-sm font-medium">{panelist.name}</span>
+                                                                                    </div>
+                                                                                    <button 
+                                                                                        onClick={() => handleRemovePanelist(thesis.thesis_id, panelist.id)}
+                                                                                        className="text-muted-foreground hover:text-red-600 transition-colors"
+                                                                                    >
+                                                                                        <X size={16} />
+                                                                                    </button>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    )}
+
+                                                                    <div className="flex justify-end pt-4 border-t mt-2">
+                                                                        <Button 
+                                                                            onClick={() => handleSaveChanges(thesis)}
+                                                                            disabled={!isReadyToSave || isProcessing}
+                                                                            className={cn("bg-[#800000] hover:bg-[#9b000a] text-white", !isReadyToSave && "opacity-50 cursor-not-allowed")}
+                                                                        >
+                                                                            {isProcessing ? "Saving..." : <><Save className="mr-2 h-4 w-4" /> Save Assignments</>}
+                                                                        </Button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     )}
                                 </div>
                             </div>
                         ) : (
-                            /* ================= CONFLICT APPROVALS VIEW (UNCHANGED) ================= */
+                            /* ================= CONFLICT APPROVALS VIEW (RESTORED) ================= */
                             <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left text-sm">
