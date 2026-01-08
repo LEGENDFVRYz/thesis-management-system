@@ -23,7 +23,6 @@ class PanelAssign extends Controller
             ->value('year') ?? 2025;
 
         $sections = DB::table('tbl_students as s')
-            // Join tbl_school_years to get the year for the calculation
             ->join('tbl_thesis_groups as tg', 's.group_id', '=', 'tg.id')
             ->join('tbl_section_advisers as sa', 'tg.section_adviser_id', '=', 'sa.id')
             ->join('tbl_faculty_assignments as fa', 'sa.faculty_assign_id', '=', 'fa.id')
@@ -32,9 +31,7 @@ class PanelAssign extends Controller
             ->distinct()
             ->orderBy('section', 'asc')
             ->get();
-        // dd(vars: $sections);
 
-        // Main Query 1: Query all the valid available panels that active in the academic semester  
         $available_panel = DB::table('tbl_faculties as f')
             ->join('tbl_faculty_assignments as fa', 'f.id', '=', 'fa.faculty_id')
             ->join('tbl_faculty_roles as fr', 'fa.role_id', '=', 'fr.id')
@@ -43,13 +40,9 @@ class PanelAssign extends Controller
             ->where('fr.id', 6)
             ->where('fa.is_active', 1)
             ->where('sem.is_active', 1)
-            ->select(DB::raw("
-                f.id,
-                CONCAT(f.name_prefix, ' ', f.first_name, ' ', f.last_name) as name"))
+            ->select('fa.id as id', DB::raw("CONCAT(f.name_prefix,' ',f.first_name,' ',f.last_name) as name"))
             ->get();
-        //dd(vars: $available_panel);
 
-        // Main Query 2: Query all the endorse thesis 
         $endorsed_thesis = DB::table('tbl_endorsements as e')
             ->join('tbl_theses as t', 'e.thesis_id', '=', 't.id')
             ->join('tbl_proposals as p', 't.proposal_id', '=', 'p.id')
@@ -62,7 +55,7 @@ class PanelAssign extends Controller
             ->join('tbl_school_years as sy', 'fa.sy_id', '=', 'sy.id')
             ->where('e.is_adviser_approved', 1)
             ->where('e.is_coordinator_approved', 1)
-            ->groupby('e.id', 'def.id', 't.id', 't.title', 'def.defense_schedule', 'f.name_prefix', 'f.first_name', 'f.last_name', 'section')
+            ->groupBy('e.id', 'def.id', 't.id', 't.title', 'def.defense_schedule', 'f.name_prefix', 'f.first_name', 'f.last_name', 'section')
             ->select(DB::raw("
                 e.id as endorsement_id,
                 def.id as defense_matrix_id,
@@ -71,7 +64,8 @@ class PanelAssign extends Controller
                 GROUP_CONCAT(DISTINCT CONCAT(s.first_name, ' ', s.last_name) SEPARATOR ', ') AS authors,
                 CONCAT(f.name_prefix, ' ', f.first_name, ' ', f.last_name) AS adviser,
                 CONCAT('BSCPE ', (3 + ($activeYear - sy.year)), '-', s.section) AS section,
-                DATE(def.defense_schedule) as date"))
+                DATE(def.defense_schedule) as date
+            "))
             ->get()
             ->map(function ($thesis) {
                 $panels = DB::table('tbl_endorsed_panels as ep')
@@ -79,32 +73,31 @@ class PanelAssign extends Controller
                     ->join('tbl_faculties as f', 'fa.faculty_id', '=', 'f.id')
                     ->where('ep.defense_matrix_id', $thesis->defense_matrix_id)
                     ->select(
-                        'f.id',
-                        DB::raw("CONCAT(f.name_prefix, ' ', f.first_name, ' ', f.last_name) as name")
+                        'fa.id',
+                        DB::raw("CONCAT(f.name_prefix, ' ', f.first_name, ' ', f.last_name) as name"),
+                        'ep.is_confirmed'
                     )
                     ->get();
 
-                $thesis->panels = $panels->map(function($panel) {
-                    return [
-                        'id' => $panel->id,
-                        'name' => $panel->name
-                    ];
-                })->toArray();
-                
-                $thesis->panel_count = count($thesis->panels);
-                $thesis->is_complete = $thesis->panel_count === 3;
-                
+                $thesis->panels = $panels->map(fn($p) => [
+                    'id' => $p->id,
+                    'name' => $p->name,
+                    'is_confirmed' => $p->is_confirmed 
+                ])->toArray();
+
+                $thesis->panel_count = count(array_filter($thesis->panels, fn($p) => $p['is_confirmed'] === 1));
+                $thesis->is_complete = $thesis->panel_count >= 3;
+
                 return $thesis;
             });
-        // dd(vars: $endorsed_thesis);
 
-        // Render and Props
-        return Inertia::render('Faculty/management/coordinator/defense_management/panel_assign', props: [
+        return Inertia::render('Faculty/management/coordinator/defense_management/panel_assign', [
             'sections' => $sections,
             'available_panel' => $available_panel,
             'endorsed_thesis' => $endorsed_thesis,
         ]);
     }
+        
 
     /**
      * Show the form for creating a new resource.
@@ -129,54 +122,47 @@ class PanelAssign extends Controller
 
         $request->validate([
             'defense_matrix_id' => 'required|exists:tbl_defense_matrices,id',
-            'panel_ids' => 'required|array|size:3',
-            'panel_ids.*' => [
-                'required',
-                'distinct',
-                Rule::exists('tbl_faculty_assignments', 'faculty_id')->where(function ($query) {
-                    $query->where('role_id', 6);
-                }),
-            ],
-        ], [
-            'panel_ids.size' => 'Exactly 3 panelists must be assigned.',
-            'panel_ids.*.distinct' => 'This faculty member is already assigned to this panel.',
-            'panel_ids.*.exists' => 'One or more selected faculty are not authorized panelists.',
+            'panel_ids' => 'required|array',
+            'panel_ids.*' => 'distinct|exists:tbl_faculty_assignments,id'
         ]);
-        
-        if (count($request->panel_ids) !== count(array_unique($request->panel_ids))) {
-            return redirect()->back()->with('error', 'This faculty member is already assigned to this panel.');
-        }
 
         DB::beginTransaction();
         try {
-            $existingCount = DB::table('tbl_endorse_panels')
+            $confirmedCount = DB::table('tbl_endorsed_panels')
                 ->where('defense_matrix_id', $request->defense_matrix_id)
+                ->where('is_confirmed', '!=', 0)
                 ->count();
-
-            if ($existingCount > 0) {
-                DB::rollBack();
-                return redirect()->back()->with('error', 'Panel assignments already exist.');
+    
+            $availableSlots = 3 - $confirmedCount;
+    
+            if ($availableSlots <= 0) {
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Cannot add to panel.'
+                ], 400);
             }
 
-            $records = array_map(function($faculty_id) use ($request) {
-                return [
-                    'defense_matrix_id' => $request->defense_matrix_id,
-                    'panel_id' => $faculty_id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }, $request->panel_ids);
-
-            DB::table('tbl_endorse_panels')->insert($records);
+            foreach ($request->panel_ids as $panelId) {
+                DB::table('tbl_endorsed_panels')->updateOrInsert(
+                    [
+                        'defense_matrix_id' => $request->defense_matrix_id,
+                        'panel_id' => $panelId,
+                    ],
+                    [
+                        'is_confirmed' => null,
+                    ]
+                );
+            }
 
             DB::commit();
-            return redirect()->back()->with('success', 'Panel assigned successfully (3 panelists).');
-
+            return back()->with('success', 'Panel assignments saved successfully.');
+    
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Failed to assign panel: ' . $e->getMessage());
+            return back()->withErrors(['error' => $e->getMessage()]);
         }
     }
+
 
     /**
      * Display the specified resource.
@@ -206,49 +192,49 @@ class PanelAssign extends Controller
 
         $request->validate([
             'defense_matrix_id' => 'required|exists:tbl_defense_matrices,id',
-            'panel_ids' => 'required|array|size:3',
-            'panel_ids.*' => [
-                'required',
-                'distinct',
-                Rule::exists('tbl_faculty_assignments', 'faculty_id')->where(function ($query) {
-                    $query->where('role_id', 6);
-                }),
-            ],
-        ], [
-            'panel_ids.size' => 'Exactly 3 panelists must be assigned.',
-            'panel_ids.*.distinct' => 'This faculty member is already assigned to this panel.',
-            'panel_ids.*.exists' => 'One or more selected faculty are not authorized panelists.',
+            'panel_ids' => 'required|array',
+            'panel_ids.*' => 'distinct|exists:tbl_faculty_assignments,id'
         ]);
-
-        if (count($request->panel_ids) !== count(array_unique($request->panel_ids))) {
-            return redirect()->back()->with('error', 'This faculty member is already assigned to this panel.');
-        }
-        
+    
         DB::beginTransaction();
         try {
-            DB::table('tbl_endorse_panels')
-            ->where('defense_matrix_id', $request->defense_matrix_id)
-            ->delete();
-
-            $records = array_map(function($faculty_id) use ($request) {
-                return [
-                    'defense_matrix_id' => $request->defense_matrix_id,
-                    'panel_id' => $faculty_id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }, $request->panel_ids);
-
-            DB::table('tbl_endorse_panels')->insert($records);
-
+            $confirmedCount = DB::table('tbl_endorsed_panels')
+                ->where('defense_matrix_id', $request->defense_matrix_id)
+                ->where('is_confirmed', '!=', 0)
+                ->count();
+    
+            $availableSlots = 3 - $confirmedCount;
+    
+            if ($availableSlots <= 0) {
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Cannot add to panel.'
+                ], 400);
+            }
+    
+            $panelsToAdd = array_slice($request->panel_ids, 0, $availableSlots);
+    
+            foreach ($panelsToAdd as $panelId) {
+                DB::table('tbl_endorsed_panels')->updateOrInsert(
+                    [
+                        'defense_matrix_id' => $request->defense_matrix_id,
+                        'panel_id' => $panelId,
+                    ],
+                    [
+                        'is_confirmed' => null, 
+                    ]
+                );
+            }
+    
             DB::commit();
-            return redirect()->back()->with('success', 'Panel assignments updated successfully.');
-            
+            return back()->with('success', 'Panel assignments updated successfully.');
+    
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Failed to remove panelist: ' . $e->getMessage());
+            return back()->withErrors(['error' => $e->getMessage()]);
         }
     }
+
 
     /**
      * Remove the specified resource from storage.
