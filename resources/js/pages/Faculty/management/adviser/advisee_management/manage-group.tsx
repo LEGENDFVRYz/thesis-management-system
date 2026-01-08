@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {Dialog,DialogContent,DialogHeader,DialogTitle,DialogDescription,DialogFooter,} from '@/components/ui/dialog';
-
 import InputError from '@/components/input-error';
 
 interface Member {
@@ -227,8 +227,9 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                   <label className="block text-sm font-medium text-gray-900 mb-2">
                     New Member Name*
                   </label>
-                  <input
+                  <Input
                     type="text"
+                    inputSize="full"
                     placeholder="Full Name"
                     value={newMemberName}
                     onChange={(e) => {
@@ -237,7 +238,7 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                         setErrors({ ...errors, newMemberName: undefined });
                       }
                     }}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
+                    className="!bg-white border-gray-300 focus-visible:!border-[#730000]"
                   />
                   <InputError message={errors.newMemberName} className="mt-1" />
                 </div>
@@ -246,8 +247,9 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                   <label className="block text-sm font-medium text-gray-900 mb-2">
                     Student ID*
                   </label>
-                  <input
+                  <Input
                     type="text"
+                    inputSize="full"
                     placeholder="2022-09786-MN-0"
                     value={studentId}
                     onChange={(e) => {
@@ -256,7 +258,7 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                         setErrors({ ...errors, studentId: undefined });
                       }
                     }}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
+                    className="!bg-white border-gray-300 focus-visible:!border-[#730000]"
                   />
                   <InputError message={errors.studentId} className="mt-1" />
                 </div>
@@ -265,8 +267,9 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                   <label className="block text-sm font-medium text-gray-900 mb-2">
                     Email*
                   </label>
-                  <input
+                  <Input
                     type="email"
+                    inputSize="full"
                     placeholder="jdc@iskolarngbayan.pup.edu.ph"
                     value={email}
                     onChange={(e) => {
@@ -275,7 +278,7 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                         setErrors({ ...errors, email: undefined });
                       }
                     }}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
+                    className="!bg-white border-gray-300 focus-visible:!border-[#730000]"
                   />
                   <InputError message={errors.email} className="mt-1" />
                 </div>
@@ -294,7 +297,7 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                       }
                     }}
                     rows={4}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000] resize-none"
+                    className="w-full bg-white border border-gray-300 rounded-[8px] px-3 py-2 text-sm focus:outline-none focus:border-[#730000] focus:ring-0 resize-none"
                   />
                   <InputError message={errors.reason} className="mt-1" />
                 </div>
@@ -342,7 +345,7 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                       }
                     }}
                     rows={4}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000] resize-none"
+                    className="w-full bg-white border border-gray-300 rounded-[8px] px-3 py-2 text-sm focus:outline-none focus:border-[#730000] focus:ring-0 resize-none"
                   />
                   <InputError message={errors.reason} className="mt-1" />
                 </div>
@@ -380,8 +383,9 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                   <label className="block text-sm font-medium text-gray-900 mb-2">
                     New Member Name*
                   </label>
-                  <input
+                  <Input
                     type="text"
+                    inputSize="full"
                     placeholder="Full Name"
                     value={newMemberName}
                     onChange={(e) => {
@@ -390,7 +394,7 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                         setErrors({ ...errors, newMemberName: undefined });
                       }
                     }}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
+                    className="!bg-white border-gray-300 focus-visible:!border-[#730000]"
                   />
                   <InputError message={errors.newMemberName} className="mt-1" />
                 </div>
@@ -399,8 +403,9 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                   <label className="block text-sm font-medium text-gray-900 mb-2">
                     Student ID*
                   </label>
-                  <input
+                  <Input
                     type="text"
+                    inputSize="full"
                     placeholder="2022-09786-MN-0"
                     value={studentId}
                     onChange={(e) => {
@@ -409,7 +414,7 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                         setErrors({ ...errors, studentId: undefined });
                       }
                     }}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
+                    className="!bg-white border-gray-300 focus-visible:!border-[#730000]"
                   />
                   <InputError message={errors.studentId} className="mt-1" />
                 </div>
@@ -418,8 +423,9 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                   <label className="block text-sm font-medium text-gray-900 mb-2">
                     Email*
                   </label>
-                  <input
+                  <Input
                     type="email"
+                    inputSize="full"
                     placeholder="jdc@iskolarngbayan.pup.edu.ph"
                     value={email}
                     onChange={(e) => {
@@ -428,7 +434,7 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                         setErrors({ ...errors, email: undefined });
                       }
                     }}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
+                    className="!bg-white border-gray-300 focus-visible:!border-[#730000]"
                   />
                   <InputError message={errors.email} className="mt-1" />
                 </div>
@@ -447,7 +453,7 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
                       }
                     }}
                     rows={4}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000] resize-none"
+                    className="w-full bg-white border border-gray-300 rounded-[8px] px-3 py-2 text-sm focus:outline-none focus:border-[#730000] focus:ring-0 resize-none"
                   />
                   <InputError message={errors.reason} className="mt-1" />
                 </div>
