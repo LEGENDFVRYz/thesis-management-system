@@ -12,7 +12,7 @@ import {
     GripVertical,
     Users
 } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SidebarInset } from '@/components/ui/sidebar';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from '@/lib/utils';
@@ -209,8 +209,12 @@ const breadcrumb: BreadcrumbItem[] = [
 export default function Dashboard({sections, available_panel, endorsed_thesis}: DashboardProps) {
     // State
     const [selectedSection, setSelectedSection] = useState<string>('');
+    useEffect(() => {
+        setExpandedTheses(new Set());
+    }, [selectedSection]);
+
     const [activeTab, setActiveTab] = useState<'assignments' | 'conflicts'>('assignments');
-    const [expandedThesis, setExpandedThesis] = useState<number | null>(1);
+    const [expandedTheses, setExpandedTheses] = useState<Set<number>>(new Set());
 
     return (
         <AppLayout breadcrumbs={breadcrumb}>
@@ -372,11 +376,19 @@ export default function Dashboard({sections, available_panel, endorsed_thesis}: 
                                                 endorsed_thesis
                                                     .filter((thesis) => thesis.section === selectedSection)
                                                     .map((thesis) => {
-                                                        const isOpen = expandedThesis === thesis.thesis_id;
+                                                        const isOpen = expandedTheses.has(thesis.thesis_id);
+
                                                         return (
                                                             <div key={thesis.thesis_id} className="overflow-hidden rounded-xl border bg-card shadow-sm transition-all">
                                                                 <div
-                                                                    onClick={() => setExpandedThesis(isOpen ? null : thesis.thesis_id)}
+                                                                    onClick={() => {
+                                                                        setExpandedTheses(prev => {
+                                                                            // Allow to have multiple accordion open, aslong it clicked
+                                                                            const next = new Set(prev);
+                                                                            isOpen ? next.delete(thesis.thesis_id) : next.add(thesis.thesis_id);
+                                                                            return next;
+                                                                        });
+                                                                    }}
                                                                     className="cursor-pointer bg-white p-6 hover:bg-neutral-50/50"
                                                                 >
                                                                     <div className="flex items-start justify-between">
