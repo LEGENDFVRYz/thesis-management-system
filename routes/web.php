@@ -366,6 +366,7 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
         Route::post('student/store', [StudentController::class, 'store'])->name('admin.management.student.store');
 
         Route::get('faculty', [FacultyController::class, 'index'])->name('admin.management.faculty');
+        Route::post('faculty', [FacultyController::class, 'store'])->name('admin.management.faculty.store');
 
         Route::get('academic-settings', [AcademicSettingController::class, 'index'])->name('admin.management.academic');
         Route::put('academic-settings', [AcademicSettingController::class, 'update'])->name('admin.management.academic.update');
