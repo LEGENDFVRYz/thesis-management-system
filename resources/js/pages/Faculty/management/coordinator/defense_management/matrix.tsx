@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { panel_assign } from '@/routes/faculty/management/coordinator/defense_management';
-import { router } from '@inertiajs/react';
+import { router, Head } from '@inertiajs/react';
 import { cva, type VariantProps } from "class-variance-authority";
 import { 
     Calendar as CalendarIcon, 
@@ -19,8 +19,7 @@ import {
     ChevronDown,
     Check,
     AlertCircle,
-    Trash,
-    AlertTriangle
+    Trash
 } from 'lucide-react';
 
 // --- UI COMPONENTS ---
@@ -117,7 +116,6 @@ const TabButton = React.forwardRef<HTMLButtonElement, TabButtonProps>(
 );
 TabButton.displayName = 'TabButton';
 
-// Added equipment/adviser/groupCode to mock data for edit simulation
 const INITIAL_DEFENSES = [
     { id: '1', title: 'Machine Learning Approach for...', block: 'BSCpE 4-3', room: 'Room 315', panel: 'Flores, Garcia, Mendoza', date: new Date('2025-11-28T09:00:00'), status: 'Scheduled', section: '4-3', adviser: 'Dr. Smith', groupCode: '2101', equipment: 'Projector' },
     { id: '2', title: 'IoT Based Monitoring System...', block: 'BSCpE 4-3', room: 'Room 315', panel: 'Flores, Garcia, Mendoza', date: new Date('2025-11-28T09:00:00'), status: 'Scheduled', section: '4-3', adviser: 'Engr. Doe', groupCode: '2102', equipment: 'Monitor' },
@@ -142,7 +140,6 @@ function DefenseTableHeader() {
     );
 }
 
-// Updated to accept onEdit and onDelete callbacks
 function DefenseTableRow({ data, onEdit, onDelete }: { data: typeof INITIAL_DEFENSES[0], onEdit: (data: any) => void, onDelete: (id: string) => void }) {
     const getStatusStyle = (status: string) => {
         switch(status) {
@@ -180,8 +177,11 @@ function DefenseTableRow({ data, onEdit, onDelete }: { data: typeof INITIAL_DEFE
     );
 }
 
-const breadcrumb = [
-    { title: 'Matrix Management', href: '#' },
+const breadcrumb: BreadcrumbItem[] = [
+    {
+        title: 'Matrix Management',
+        href: '#',
+    },
 ];
 
 // ----------------------------------------------------------------------
@@ -203,7 +203,7 @@ export default function MatrixManagement() {
     const [defensesList, setDefensesList] = useState(INITIAL_DEFENSES);
     const [defenseToDelete, setDefenseToDelete] = useState<string | null>(null);
 
-    // --- STATE: Form Data (Shared struct for Add & Edit) ---
+    // --- STATE: Form Data ---
     const emptyForm = {
         id: '',
         title: '',
@@ -260,7 +260,6 @@ export default function MatrixManagement() {
 
     // --- HANDLERS: EDIT ---
     const handleEditClick = (data: any) => {
-        // Pre-fill edit form state
         setEditFormData({
             id: data.id,
             title: data.title,
@@ -302,7 +301,7 @@ export default function MatrixManagement() {
         }));
 
         setIsEditModalOpen(false);
-        setIsSuccessModalOpen(true); // Reusing success modal
+        setIsSuccessModalOpen(true);
     };
 
     // --- HANDLERS: DELETE ---
@@ -325,9 +324,11 @@ export default function MatrixManagement() {
 
     return (
         <AppLayout breadcrumbs={breadcrumb}>
+            <Head title="Matrix Management" />
             
-            <div className="flex flex-col w-full min-h-screen bg-primary-foreground -mt-4 -mx-4 -mb-4 md:-mt-4 md:-mx-6 md:-mb-6 lg:-mt-6 lg:-mx-8 lg:-mb-8">
+            <div className="flex flex-col min-h-screen bg-primary-foreground -mt-4 -mx-4 -mb-4 md:-mt-4 md:-mx-6 md:-mb-6 lg:-mt-6 lg:-mx-8 lg:-mb-8">
                 
+                {/* Header Card */}
                 <HeaderCard
                     title="Matrix Management"
                     description="Monitor all defense schedule, facilities, and equipment"
@@ -341,7 +342,7 @@ export default function MatrixManagement() {
 
                 <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 lg:p-8 w-full">
                     
-                    {/* Page Tabs */}
+                    {/* 1. Page Tabs */}
                     <div className="flex items-end gap-1 mb-0 border-b border-[#800000]/10 pb-0">
                         <TabButton 
                             isActive={false} 
@@ -354,78 +355,76 @@ export default function MatrixManagement() {
                         </TabButton>
                     </div>
 
-                    <div className="space-y-6 pt-2">
-                        
-                        {/* Action Bar */}
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                            <Button 
-                                variant="primary" 
-                                onClick={() => {
-                                    setFormData(emptyForm);
-                                    setIsScheduleModalOpen(true);
-                                }}
-                            >
-                                <Plus className="mr-2 h-4 w-4" /> 
-                                Schedule a Defense
-                            </Button>
+                    {/* 2. Controls & Filters */}
+                    <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center pt-2">
+                        <Button 
+                            variant="primary" 
+                            onClick={() => {
+                                setFormData(emptyForm);
+                                setIsScheduleModalOpen(true);
+                            }}
+                        >
+                            <Plus className="mr-2 h-4 w-4" /> 
+                            Schedule a Defense
+                        </Button>
 
-                            <ToggleGroup 
-                                type="single" 
-                                value={viewMode} 
-                                onValueChange={(value) => { if(value) setViewMode(value as 'table' | 'calendar') }}
-                                className="bg-[#F3E5CA] rounded-xl p-1 gap-1 w-auto whitespace-nowrap"
+                        <ToggleGroup 
+                            type="single" 
+                            value={viewMode} 
+                            onValueChange={(value) => { if(value) setViewMode(value as 'table' | 'calendar') }}
+                            className="bg-[#F3E5CA] rounded-xl p-1 gap-1 w-auto whitespace-nowrap"
+                        >
+                            <ToggleGroupItem 
+                                value="table" 
+                                className="data-[state=on]:bg-[#800000] data-[state=on]:text-white text-[#800000] hover:bg-[#800000]/10 hover:text-[#800000] h-8 px-3 text-xs font-bold"
                             >
-                                <ToggleGroupItem 
-                                    value="table" 
-                                    className="data-[state=on]:bg-[#800000] data-[state=on]:text-white text-[#800000] hover:bg-[#800000]/10 hover:text-[#800000] h-8 px-3 text-xs font-bold"
-                                >
-                                    <LayoutList className="mr-2 h-3 w-3" /> 
-                                    Table View
-                                </ToggleGroupItem>
-                                <ToggleGroupItem 
-                                    value="calendar" 
-                                    className="data-[state=on]:bg-[#800000] data-[state=on]:text-white text-[#800000] hover:bg-[#800000]/10 hover:text-[#800000] h-8 px-3 text-xs font-bold"
-                                >
-                                    <CalendarDays className="mr-2 h-3 w-3" /> 
-                                    Calendar View
-                                </ToggleGroupItem>
-                            </ToggleGroup>
-                        </div>
+                                <LayoutList className="mr-2 h-3 w-3" /> 
+                                Table View
+                            </ToggleGroupItem>
+                            <ToggleGroupItem 
+                                value="calendar" 
+                                className="data-[state=on]:bg-[#800000] data-[state=on]:text-white text-[#800000] hover:bg-[#800000]/10 hover:text-[#800000] h-8 px-3 text-xs font-bold"
+                            >
+                                <CalendarDays className="mr-2 h-3 w-3" /> 
+                                Calendar View
+                            </ToggleGroupItem>
+                        </ToggleGroup>
+                    </div>
 
-                        {/* Content Switching */}
-                        <div className="min-h-[600px]">
-                            {viewMode === 'calendar' ? (
-                                <DefenseCalendarWeekly 
-                                    events={calendarEvents}
-                                    value={currentDate}
-                                    onChange={setCurrentDate}
-                                    className="shadow-sm border-sidebar-border/70"
-                                />
-                            ) : (
-                                <div className="rounded-xl border border-gray-200 overflow-hidden shadow-sm dark:border-sidebar-border">
-                                    <DefenseTableHeader />
-                                    <div>
-                                        {defensesList.map((defense) => (
-                                            <DefenseTableRow 
-                                                key={defense.id} 
-                                                data={defense} 
-                                                onEdit={handleEditClick}
-                                                onDelete={handleDeleteClick}
-                                            />
-                                        ))}
-                                    </div>
-                                    <div className="bg-gray-50 px-5 py-3 text-xs text-center text-gray-500 border-t border-gray-200">
-                                        {defensesList.length} of {defensesList.length} Upcoming Defenses
-                                    </div>
+                    {/* 3. Main Content */}
+                    <div className="min-h-[600px]">
+                        {viewMode === 'calendar' ? (
+                            <DefenseCalendarWeekly 
+                                events={calendarEvents}
+                                value={currentDate}
+                                onChange={setCurrentDate}
+                                className="shadow-sm border-sidebar-border/70"
+                            />
+                        ) : (
+                            <div className="rounded-xl border border-gray-200 overflow-hidden shadow-sm dark:border-sidebar-border">
+                                <DefenseTableHeader />
+                                <div>
+                                    {defensesList.map((defense) => (
+                                        <DefenseTableRow 
+                                            key={defense.id} 
+                                            data={defense} 
+                                            onEdit={handleEditClick}
+                                            onDelete={handleDeleteClick}
+                                        />
+                                    ))}
                                 </div>
-                            )}
-                        </div>
+                                <div className="bg-gray-50 px-5 py-3 text-xs text-center text-gray-500 border-t border-gray-200">
+                                    {defensesList.length} of {defensesList.length} Upcoming Defenses
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
+
+                {/* Footer - NOW INSIDE THE FLEX CONTAINER */}
+                <NavFooter />
             </div>
             
-            <NavFooter />
-
             {/* ================= 1. ADD SCHEDULE MODAL ================= */}
             <Dialog open={isScheduleModalOpen} onOpenChange={setIsScheduleModalOpen}>
                 <DialogContent className="max-w-[1000px] w-[95vw] h-[85vh] p-0 border-none rounded-lg bg-[#FDFCF6] shadow-2xl font-dm flex flex-col [&>button]:hidden overflow-hidden">
@@ -436,6 +435,10 @@ export default function MatrixManagement() {
                             <p className="text-sm text-gray-500 mt-1">Enter the details for the upcoming thesis defense.</p>
                         </div>
                         <div className="flex items-center gap-6">
+                            <div className="text-right hidden sm:block">
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Defense ID</span>
+                                <span className="text-lg font-bold text-gray-700 font-mono">#DEF-2025-00X</span>
+                            </div>
                             <button 
                                 onClick={() => setIsScheduleModalOpen(false)}
                                 className="bg-gray-100 hover:bg-gray-200 text-gray-600 p-2 rounded-lg transition-colors"
@@ -481,6 +484,8 @@ export default function MatrixManagement() {
                                             <SelectItem value="BSCpE 4-2">BSCpE 4-2</SelectItem>
                                             <SelectItem value="BSCpE 4-3">BSCpE 4-3</SelectItem>
                                             <SelectItem value="BSCpE 4-4">BSCpE 4-4</SelectItem>
+                                            <SelectItem value="BSCpE 4-5">BSCpE 4-5</SelectItem>
+                                            <SelectItem value="BSCpE 4-6">BSCpE 4-6</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -510,7 +515,7 @@ export default function MatrixManagement() {
                                 <div className="md:col-span-3 space-y-1">
                                     <Label className={labelClass}>Equipment Required</Label>
                                     <div className="relative">
-                                        <Input inputSize="full" value={formData.equipment} onChange={(e) => handleInputChange('equipment', e.target.value)} placeholder="e.g. Projector, HDMI" className="pl-10" />
+                                        <Input inputSize="full" value={formData.equipment} onChange={(e) => handleInputChange('equipment', e.target.value)} placeholder="e.g. Projector, HDMI Cable, Extension Cord" className="pl-10" />
                                         <Monitor className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1a1a1a]/50" />
                                     </div>
                                 </div>
