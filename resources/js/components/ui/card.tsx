@@ -136,7 +136,7 @@
       variant: {
         default: "",
         progress: "",
-        about: "w-full max-w-[343px]",
+        about: "w-full",
       },
     },
     defaultVariants: {
@@ -328,8 +328,9 @@
           variant="metric"
           className={cn(metricCardVariants({ variant }), "border-0", className)}
           style={{
-            width: '343px',
-            height: '263px'
+            width: '100%',
+            height: '263px',
+            boxShadow: '0 0.5px 1.75px 0 rgba(0, 0, 0, 0.04), 0 1.85px 6.25px 0 rgba(0, 0, 0, 0.25)'
           }}
         >
           <CardHeader
@@ -791,13 +792,14 @@
           
           {/* Thesis Title */}
           <div className="flex items-center gap-">
-            <CardTitle className="text-primary font-semibold text-xs sm:text-sm truncate">
+            <CardTitle className="text-primary font-semibold text-xs sm:text-sm truncate mb-[5px]">
               {thesisTitle}
             </CardTitle>
           </div>
           
           {/* Block/Section Badge */}
-          <Badge className="h-3.5 text-[8px] sm:text-[7px]">{section}</Badge>
+          
+          <Badge variant="outline" className="text-[8px] h-auto px-2 py-0.5 mb-[-5px]">{section}</Badge>
         </CardHeader>
 
         <CardContent>

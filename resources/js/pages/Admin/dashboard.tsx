@@ -1,36 +1,82 @@
+{/* React & Core Imports */}
 import React from 'react';
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import { Head } from '@inertiajs/react';
+
+{/* Layout & Routing Imports */}
 import AppLayout from '@/layouts/app-layout';
+import { NavFooter } from '@/components/nav-footer';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+
+{/* UI Components Imports */}
+import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import { MetricCard } from '@/components/ui/card';
+import { Icon } from '@/components/icon-index';
+import { IconName } from '@/components/icons-registry';
+
+{/* Icons Imports */}
 import {
     CalendarDays,
     GraduationCap,
     NotebookPen,
     Users,
     Calendar,
-    AlertCircle
+    AlertCircle,
+    LucideIcon
 } from 'lucide-react';
-import { Icon } from '@/components/icon-index';
-import { IconName } from '@/components/icons-registry';
-import { NavFooter } from '@/components/nav-footer';
 
-import { MetricCard } from '@/components/ui/card';
+{/* Visualization Imports */}
 import { ResearchAreaChart } from '@/components/research-area-distribution-pie';
 import { SubmissionStatusChart } from '@/components/submission-status-bar';
 import { PerformanceOverviewChart } from '@/components/performance-overview-ver-bar';
 import { ArchivedJournalsChart } from '@/components/archived-journals-line';
 import { SystemRepositoryStorage } from '@/components/system-repository-storage';
+
+{/* Page Components Imports */}
 import { DeadlineTimelineView } from '@/pages/Admin/management/deadline-timeline-view';
 
-// Content Components for MetricCard
+
+{/* TYPE DEFINITIONS */}
+
+{/* Active Term Interface */}
+interface ActiveTerm {
+    semester_id: number;
+    semester: number; // 0 or 1
+    year: number;     // e.g., 2025
+    display_sy: string; // e.g., "2025-2026"
+}
+
+{/* Props for the main dashboard component */}
+interface DashboardProps {
+    activeTerm: ActiveTerm;
+    currentDate: string;
+}
+{/* Props for header info items (Today, School Year, Current Sem) */}
+type HeaderInfoItemProps = {
+    icon: LucideIcon;
+    label: string;
+    valueFirst: string;
+};
+
+{/* Props for individual metric items */}
 type MetricItemProps = {
   label: string;
   value: number;
   color: string;
 };
 
+{/* Props for metric content */}
+type MetricContentProps = {
+  total: number;
+  items: Array<{
+    label: string;
+    value: number;
+    color: string;
+  }>;
+};
+
+
+{/* Individual metric row */}
 function MetricItem({ label, value, color }: MetricItemProps) {
   return (
     <div className="flex items-center justify-between">
@@ -50,15 +96,7 @@ function MetricItem({ label, value, color }: MetricItemProps) {
   );
 }
 
-type MetricContentProps = {
-  total: number;
-  items: Array<{
-    label: string;
-    value: number;
-    color: string;
-  }>;
-};
-
+{/* Metric card content */}
 function MetricContent({ total, items }: MetricContentProps) {
   return (
     <div className="flex items-center gap-3 px-2 py-5">
@@ -83,7 +121,22 @@ function MetricContent({ total, items }: MetricContentProps) {
   );
 }
 
+{/* Helper component for header info items */}
+function HeaderInfoItem({ icon: Icon, label, valueFirst }: HeaderInfoItemProps) {
+    return (
+        <div className="flex items-start gap-3">
+            <Icon className={`h-8 w-8 text-primary`} strokeWidth={1.5} />
+            <div>
+                <p className={`text-xs font-bold uppercase tracking-wide text-primary`}>
+                    {label}
+                </p>
+                <p className="font-bold text-gray-800">{valueFirst}</p>
+            </div>
+        </div>
+    );
+}
 
+{/* Breadcrumb navigation */}
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
@@ -91,6 +144,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+{/* Quick menu items for navigation shortcuts */}
 const quickMenuItems = [
   {
     label: 'People',
@@ -118,18 +172,33 @@ const quickMenuItems = [
   },
 ];
 
-interface ActiveTerm {
-    semester_id: number;
-    semester: number; // 0 or 1
-    year: number;     // e.g., 2025
-    display_sy: string; // e.g., "2025-2026"
+{/* Component for quick menu items */}
+function QuickLinkItem({ item }: { item: typeof quickMenuItems[0] }) {
+    const [isHovered, setIsHovered] = React.useState(false);
+    const linkRef = React.useRef<HTMLAnchorElement>(null);
+
+    return (
+        <a
+            href={item.href}
+            className="flex flex-col items-center gap-4 cursor-pointer transition-transform duration-200 ease-in-out hover:scale-105"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        >
+            <div className="transition-all duration-200 ease-in-out">
+                <Icon
+                    name={(isHovered ? item.iconHover : item.icon) as IconName}
+                    size={127}
+                    
+                />
+            </div>
+            <span className="font-bold text-accent-foreground pointer-events-none">
+                {item.label}
+            </span>
+        </a>
+    );
 }
 
-interface DashboardProps {
-    activeTerm: ActiveTerm;
-    currentDate: string;
-}
-
+{/* MAIN COMPONENT */}
 export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
     return (
         <>
@@ -141,6 +210,7 @@ export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
 
                             {/* HEADER SECTION */}
                             <div className="flex items-center justify-between ">
+                                {/* Left side - Welcome message */}
                                 <div>
                                     <h1 className={`text-[42px] font-bold leading-tight text-primary`}>
                                         Welcome back, Engr. Dela Cruz
@@ -150,7 +220,7 @@ export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
                                     </p>
                                 </div>
 
-                                {/* Right Side - Insiights */}
+                                {/* Right side - Current info cards */}
                                 <div className="flex gap-x-10">
 
                                     <div className="flex items-start gap-3">
@@ -165,6 +235,7 @@ export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
                                         </div>
                                     </div>
 
+                                    {/* School year */}
                                     <div className="flex items-start gap-3">
                                         <GraduationCap className="h-8 w-8 text-primary" strokeWidth={1.5} />
                                         <div>
@@ -177,6 +248,7 @@ export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
                                         </div>
                                     </div>
 
+                                    {/* Current semester */}            
                                     <div className="flex items-start gap-3">
                                         <NotebookPen className="h-8 w-8 text-primary" strokeWidth={1.5} />
                                         <div>
@@ -193,40 +265,19 @@ export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
 
                             <hr className="my-8 border-gray-200" />
 
-                            {/* BODY */}
+                            {/* BODY CONTENT */}
                             <div className="space-y-8">
-                            {/* QUICK MENU */}
+                                {/* QUICK MENU */}
                                 <div className="w-full rounded-xl border border-gray-200 shadow-sm bg-accent py-6 px-4">
                                     <div className="flex justify-evenly items-center">
-
-                                        {quickMenuItems.map((item, index) => {
-                                        const [isHovered, setIsHovered] = React.useState(false);
-
-                                        return (
-                                            <a
-                                            key={index}
-                                            href={item.href}
-                                            className="flex flex-col items-center gap-4 cursor-pointer"
-                                            onMouseEnter={() => setIsHovered(true)}
-                                            onMouseLeave={() => setIsHovered(false)}
-                                            >
-                                            {/* ICON — SWITCH ON HOVER */}
-                                            <Icon
-                                                name={(isHovered ? item.iconHover : item.icon) as IconName}
-                                                size={127}
-                                            />
-
-                                            {/* LABEL */}
-                                            <span className="font-bold text-accent-foreground">
-                                                {item.label}
-                                            </span>
-                                            </a>
-                                        );
-                                        })}
+                                        {quickMenuItems.map((item, index) => (
+                                            <QuickLinkItem key={index} item={item} />
+                                        ))}
 
                                     </div>
                                 </div>
 
+                            {/* Metrics Cards Grid */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
                                 {/* Total Active Users Card */}
                                 <MetricCard
@@ -272,7 +323,7 @@ export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
                                     />
                                 </MetricCard>
 
-                                {/* Pending Approvals Card */}
+                                {/* Faculty Requests Card */}
                                 <MetricCard
                                     icon={<AlertCircle className="text-primary-foreground-2" />}
                                     title="FACULTY REQUESTS"
@@ -294,7 +345,7 @@ export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
                                     />
                                 </MetricCard>
 
-                                {/* Pending Approvals Card */}
+                                {/* Student Requests Card */}
                                 <MetricCard
                                     icon={<AlertCircle className="text-primary-foreground-2" />}
                                     title="STUDENT REQUESTS"
@@ -326,7 +377,11 @@ export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
                             <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
                                 <ArchivedJournalsChart />
                                 <ResearchAreaChart />
-                            </div>     
+                            </div>
+
+                            <div className="w-full">
+                                <DeadlineTimelineView />
+                            </div>  
 
                             <div className="space-y-6">
                                 <SystemRepositoryStorage />
@@ -338,20 +393,5 @@ export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
             </AppLayout>
         <NavFooter />
         </>
-    );
-}
-
-// Helper for the top right info items (Date, Year, Sem)
-function HeaderInfoItem({ icon: Icon, label, valueFirst }) {
-    return (
-        <div className="flex items-start gap-3">
-            <Icon className={`h-8 w-8 text-primary`} strokeWidth={1.5} />
-            <div>
-                <p className={`text-xs font-bold uppercase tracking-wide text-primary`}>
-                    {label}
-                </p>
-                <p className="font-bold text-gray-800">{valueFirst}</p>
-            </div>
-        </div>
     );
 }

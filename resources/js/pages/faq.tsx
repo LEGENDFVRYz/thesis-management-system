@@ -138,7 +138,7 @@ export default function FAQ() {
                     <div className="space-y-3">
                         {filteredFAQs.length > 0 ? (
                             filteredFAQs.map((faq, index) => (
-                                <Collapsible key={index}>
+                                <Collapsible key={index} variant="faq">
                                     <CollapsibleTrigger>
                                         <div className="flex items-center gap-5 text-left w-full">
                                             <span className="bg-primary text-white px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap font-['DM_Sans'] group-data-[state=open]:bg-primary-foreground-2 group-data-[state=open]:text-primary transition-colors">

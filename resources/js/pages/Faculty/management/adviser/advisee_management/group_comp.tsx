@@ -124,7 +124,6 @@ export default function Dashboard() {
           setSelectedRow(null);
         }}
         groupData={selectedRow ? {
-          block: selectedRow.Block,
           members: [
             { id: 1, name: 'Juan Dela Cruz', studentNumber: '2022-09589-MN-0', email: 'jdc@iskolangbayan.pup.edu.ph', isLeader: true },
             { id: 2, name: 'Juan Dela Cruz', studentNumber: '2022-09589-MN-0', email: 'jdc@iskolangbayan.pup.edu.ph', isLeader: false },

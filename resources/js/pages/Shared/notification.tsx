@@ -20,11 +20,13 @@ export default function Notification() {
                 variant="header"
             > </AppContent>
 
-            <div className="space-y-6 px-6 pb-6 max-w-[1440px] w-full">
+            <div className="space-y-6 font-dm pb-10 flex flex-col items-center w-full">
     
-                <FilterSearchSection variant='Notifications'/>
+                <div className="w-full flex justify-center">
+                    <FilterSearchSection variant="Notifications" />
+                </div>
                 
-                <div className="w-full flex flex-col gap-[35px] rounded-lg">
+                <div className="w-full max-w-[1360px] flex flex-col gap-[35px] rounded-lg">
                     <NotificationList maxHeight="auto">
                         <NotificationListItem
                             type="schedule"

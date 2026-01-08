@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Trash2, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {Dialog,DialogContent,DialogHeader,DialogTitle,DialogDescription,DialogFooter,} from '@/components/ui/dialog';
 import InputError from '@/components/input-error';
 
@@ -167,9 +168,9 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
               className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#730000]"
             >
               <option value="">Select Block...</option>
-              <option value="block-a">Block A</option>
-              <option value="block-b">Block B</option>
-              <option value="block-c">Block C</option>
+              <option value="block-1">Block 1</option>
+              <option value="block-2">Block 2</option>
+              <option value="block-3">Block 3</option>
             </select>
             <InputError message={errors.block} className="mt-1" />
           </div>
@@ -227,34 +228,37 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
                 <div className="grid grid-cols-3 gap-3">
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">Name</label>
-                    <input
+                    <Input
                       type="text"
+                      inputSize="full"
                       placeholder="Enter Name"
                       value={member.name}
                       onChange={(e) => handleMemberChange(member.id, 'name', e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
+                      className="!bg-white border-gray-300 focus-visible:!border-[#730000]"
                     />
                     <InputError message={errors.members?.[member.id]?.name} className="mt-1" />
                   </div>
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">Student Number</label>
-                    <input
+                    <Input
                       type="text"
+                      inputSize="full"
                       placeholder="Enter Student Number"
                       value={member.studentNumber}
                       onChange={(e) => handleMemberChange(member.id, 'studentNumber', e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
+                      className="!bg-white border-gray-300 focus-visible:!border-[#730000]"
                     />
                     <InputError message={errors.members?.[member.id]?.studentNumber} className="mt-1" />
                   </div>
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">Email</label>
-                    <input
+                    <Input
                       type="email"
+                      inputSize="full"
                       placeholder="Enter PUP Webmail"
                       value={member.email}
                       onChange={(e) => handleMemberChange(member.id, 'email', e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
+                      className="!bg-white border-gray-300 focus-visible:!border-[#730000]"
                     />
                     <InputError message={errors.members?.[member.id]?.email} className="mt-1" />
                   </div>

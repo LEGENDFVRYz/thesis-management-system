@@ -87,7 +87,6 @@ class ThesisRegistry extends Controller
             ->offset($offset)
             ->get();
 
-        dd($groups);
         return Inertia::render(
             'Faculty/management/coordinator/thesis_monitoring/thesis_registry',
             [
