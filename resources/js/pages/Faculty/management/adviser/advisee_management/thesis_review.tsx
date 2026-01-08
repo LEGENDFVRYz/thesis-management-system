@@ -131,7 +131,7 @@ const mockThesisGroups = [
   }
 ];
 
-// Bage
+// Badge
 interface StatusBadgeProps {
     status: string;
 }
@@ -144,7 +144,7 @@ function StatusBadge({ status }: StatusBadgeProps) {
             className={`
                 flex flex-row justify-center items-center
                 px-2.5 py-0
-                h-4 rounded-[15px] border-[0.8px]
+                h-5 rounded-[15px] border-[0.8px]
                 ${isApproved 
                     ? 'bg-[#DBFEEB] border-[#94FF8E]' 
                     : 'bg-[#FEF9C2] border-[#FEEC71]'
@@ -153,7 +153,7 @@ function StatusBadge({ status }: StatusBadgeProps) {
         >
             <span 
                 className={`
-                    font-['Arimo'] font-normal text-[8px] leading-5
+                    font-['Arimo'] font-normal text-[12px] leading-5
                     ${isApproved ? 'text-[#39D863]' : 'text-[#C7891E]'}
                 `}
             >

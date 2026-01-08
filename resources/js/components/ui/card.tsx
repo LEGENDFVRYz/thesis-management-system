@@ -787,7 +787,7 @@
           {/* Group Code and Badge */}
           <div className="flex items-center justify-between">
             <CardTitle className="text-primary font-bold text-[12px] sm:text-[12px]">{groupCode}</CardTitle>
-            {badge && <Badge className="text-[8px] sm:text-[7px]">{badge}</Badge>}
+            {badge && <Badge className="text-[8px] sm:text-[9px]">{badge}</Badge>}
           </div>
           
           {/* Thesis Title */}
