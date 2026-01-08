@@ -18,7 +18,9 @@ import {
     User,
     ChevronDown,
     Check,
-    AlertCircle
+    AlertCircle,
+    Trash,
+    AlertTriangle
 } from 'lucide-react';
 
 // --- UI COMPONENTS ---
@@ -115,12 +117,13 @@ const TabButton = React.forwardRef<HTMLButtonElement, TabButtonProps>(
 );
 TabButton.displayName = 'TabButton';
 
+// Added equipment/adviser/groupCode to mock data for edit simulation
 const INITIAL_DEFENSES = [
-    { id: '1', title: 'Machine Learning Approach for...', block: 'BSCpE 4-3', room: 'Room 315', panel: 'Flores, Garcia, Mendoza', date: new Date('2025-11-28T09:00:00'), status: 'Scheduled', section: '4-3' },
-    { id: '2', title: 'IoT Based Monitoring System...', block: 'BSCpE 4-3', room: 'Room 315', panel: 'Flores, Garcia, Mendoza', date: new Date('2025-11-28T09:00:00'), status: 'Scheduled', section: '4-3' },
-    { id: '3', title: 'Automated Attendance System...', block: 'BSCpE 4-3', room: 'Room 315', panel: 'Flores, Garcia, Mendoza', date: new Date('2025-11-28T09:00:00'), status: 'Completed', section: '4-3' },
-    { id: '4', title: 'Network Security Analysis...', block: 'BSCpE 4-4', room: 'Room 315', panel: 'Flores, Garcia, Mendoza', date: new Date('2025-11-29T09:00:00'), status: 'Scheduled', section: '4-4' },
-    { id: '5', title: 'FPGA Implementation of...', block: 'BSCpE 4-4', room: 'Room 315', panel: 'Flores, Garcia, Mendoza', date: new Date('2025-11-29T09:00:00'), status: 'Cancelled', section: '4-4' },
+    { id: '1', title: 'Machine Learning Approach for...', block: 'BSCpE 4-3', room: 'Room 315', panel: 'Flores, Garcia, Mendoza', date: new Date('2025-11-28T09:00:00'), status: 'Scheduled', section: '4-3', adviser: 'Dr. Smith', groupCode: '2101', equipment: 'Projector' },
+    { id: '2', title: 'IoT Based Monitoring System...', block: 'BSCpE 4-3', room: 'Room 315', panel: 'Flores, Garcia, Mendoza', date: new Date('2025-11-28T09:00:00'), status: 'Scheduled', section: '4-3', adviser: 'Engr. Doe', groupCode: '2102', equipment: 'Monitor' },
+    { id: '3', title: 'Automated Attendance System...', block: 'BSCpE 4-3', room: 'Room 315', panel: 'Flores, Garcia, Mendoza', date: new Date('2025-11-28T09:00:00'), status: 'Completed', section: '4-3', adviser: 'Dr. Alan', groupCode: '2103', equipment: 'None' },
+    { id: '4', title: 'Network Security Analysis...', block: 'BSCpE 4-4', room: 'Room 315', panel: 'Flores, Garcia, Mendoza', date: new Date('2025-11-29T09:00:00'), status: 'Scheduled', section: '4-4', adviser: 'Engr. Joy', groupCode: '2104', equipment: 'HDMI' },
+    { id: '5', title: 'FPGA Implementation of...', block: 'BSCpE 4-4', room: 'Room 315', panel: 'Flores, Garcia, Mendoza', date: new Date('2025-11-29T09:00:00'), status: 'Cancelled', section: '4-4', adviser: 'Dr. Strange', groupCode: '2105', equipment: 'Board' },
 ];
 
 const GRID_LAYOUT = "grid grid-cols-[1.5fr_100px_100px_1.5fr_1.2fr_100px_100px] gap-4 items-center px-5 py-3";
@@ -139,7 +142,8 @@ function DefenseTableHeader() {
     );
 }
 
-function DefenseTableRow({ data }: { data: typeof INITIAL_DEFENSES[0] }) {
+// Updated to accept onEdit and onDelete callbacks
+function DefenseTableRow({ data, onEdit, onDelete }: { data: typeof INITIAL_DEFENSES[0], onEdit: (data: any) => void, onDelete: (id: string) => void }) {
     const getStatusStyle = (status: string) => {
         switch(status) {
             case 'Completed': return 'bg-green-600 border-transparent text-white';
@@ -165,8 +169,12 @@ function DefenseTableRow({ data }: { data: typeof INITIAL_DEFENSES[0] }) {
             </div>
             <div className="flex items-center justify-center gap-2">
                 <Download className="h-4 w-4 cursor-pointer text-gray-600 hover:text-[#800000]" />
-                <Edit2 className="h-4 w-4 cursor-pointer text-gray-600 hover:text-blue-600" />
-                <Trash2 className="h-4 w-4 cursor-pointer text-gray-600 hover:text-red-600" />
+                <button onClick={() => onEdit(data)}>
+                    <Edit2 className="h-4 w-4 cursor-pointer text-gray-600 hover:text-blue-600" />
+                </button>
+                <button onClick={() => onDelete(data.id)}>
+                    <Trash2 className="h-4 w-4 cursor-pointer text-gray-600 hover:text-red-600" />
+                </button>
             </div>
         </div>
     );
@@ -183,27 +191,34 @@ const breadcrumb = [
 export default function MatrixManagement() {
     const [viewMode, setViewMode] = useState<'table' | 'calendar'>('calendar');
     const [currentDate, setCurrentDate] = useState(new Date('2025-11-28')); 
+    
+    // --- STATE: Modals ---
     const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false); 
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     
     // --- STATE: Main Data Source ---
     const [defensesList, setDefensesList] = useState(INITIAL_DEFENSES);
+    const [defenseToDelete, setDefenseToDelete] = useState<string | null>(null);
 
-    // --- STATE: Form Data ---
-    const [formData, setFormData] = useState({
+    // --- STATE: Form Data (Shared struct for Add & Edit) ---
+    const emptyForm = {
+        id: '',
         title: '',
         block: '',
         room: '',
         adviser: '',
         groupCode: '',
         equipment: '',
-        // Initialize date/time with current datetime
         dateTime: new Date(), 
-    });
+    };
+
+    const [formData, setFormData] = useState(emptyForm);
+    const [editFormData, setEditFormData] = useState(emptyForm);
 
     // --- DERIVED STATE: Calendar Events ---
-    // Automatically updates when defensesList changes
     const calendarEvents: WeeklyEventType[] = useMemo(() => {
         return defensesList.map(d => ({
             id: d.id,
@@ -214,23 +229,16 @@ export default function MatrixManagement() {
         }));
     }, [defensesList]);
 
-    // --- HANDLERS ---
-
+    // --- HANDLERS: ADD ---
     const handleInputChange = (field: string, value: any) => {
-        setFormData(prev => ({
-            ...prev,
-            [field]: value
-        }));
+        setFormData(prev => ({ ...prev, [field]: value }));
     };
 
     const handleConfirmSchedule = () => {
-        // 1. Validation Logic
         if (!formData.title || !formData.block) {
-            setIsErrorModalOpen(true); // Open Error Modal instead of alert
+            setIsErrorModalOpen(true);
             return;
         }
-
-        // 2. Add New Data
         const newDefense = {
             id: Math.random().toString(36).substr(2, 9), 
             title: formData.title,
@@ -239,23 +247,76 @@ export default function MatrixManagement() {
             panel: 'Pending Assignment', 
             date: formData.dateTime,
             status: 'Scheduled',
-            section: formData.block.split(' ')[1] || 'N/A' 
+            section: formData.block.split(' ')[1] || 'N/A',
+            adviser: formData.adviser,
+            groupCode: formData.groupCode,
+            equipment: formData.equipment
         };
-
         setDefensesList(prev => [...prev, newDefense]);
+        setFormData(emptyForm);
+        setIsScheduleModalOpen(false);
+        setIsSuccessModalOpen(true);
+    };
 
-        // 3. Reset Form & Switch Modals
-        setFormData({
-            title: '',
-            block: '',
-            room: '',
-            adviser: '',
-            groupCode: '',
-            equipment: '',
-            dateTime: new Date(), 
+    // --- HANDLERS: EDIT ---
+    const handleEditClick = (data: any) => {
+        // Pre-fill edit form state
+        setEditFormData({
+            id: data.id,
+            title: data.title,
+            block: data.block,
+            room: data.room,
+            adviser: data.adviser || '',
+            groupCode: data.groupCode || '',
+            equipment: data.equipment || '',
+            dateTime: data.date,
         });
-        setIsScheduleModalOpen(false); // Close Form
-        setIsSuccessModalOpen(true);   // Open Success Modal
+        setIsEditModalOpen(true);
+    };
+
+    const handleEditInputChange = (field: string, value: any) => {
+        setEditFormData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleUpdateDefense = () => {
+        if (!editFormData.title || !editFormData.block) {
+            setIsErrorModalOpen(true);
+            return;
+        }
+
+        setDefensesList(prev => prev.map(item => {
+            if (item.id === editFormData.id) {
+                return {
+                    ...item,
+                    title: editFormData.title,
+                    block: editFormData.block,
+                    room: editFormData.room,
+                    adviser: editFormData.adviser,
+                    groupCode: editFormData.groupCode,
+                    equipment: editFormData.equipment,
+                    date: editFormData.dateTime,
+                    section: editFormData.block.split(' ')[1] || 'N/A'
+                };
+            }
+            return item;
+        }));
+
+        setIsEditModalOpen(false);
+        setIsSuccessModalOpen(true); // Reusing success modal
+    };
+
+    // --- HANDLERS: DELETE ---
+    const handleDeleteClick = (id: string) => {
+        setDefenseToDelete(id);
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleConfirmDelete = () => {
+        if (defenseToDelete) {
+            setDefensesList(prev => prev.filter(item => item.id !== defenseToDelete));
+            setIsDeleteModalOpen(false);
+            setDefenseToDelete(null);
+        }
     };
 
     // --- STYLES ---
@@ -299,7 +360,10 @@ export default function MatrixManagement() {
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             <Button 
                                 variant="primary" 
-                                onClick={() => setIsScheduleModalOpen(true)}
+                                onClick={() => {
+                                    setFormData(emptyForm);
+                                    setIsScheduleModalOpen(true);
+                                }}
                             >
                                 <Plus className="mr-2 h-4 w-4" /> 
                                 Schedule a Defense
@@ -342,7 +406,12 @@ export default function MatrixManagement() {
                                     <DefenseTableHeader />
                                     <div>
                                         {defensesList.map((defense) => (
-                                            <DefenseTableRow key={defense.id} data={defense} />
+                                            <DefenseTableRow 
+                                                key={defense.id} 
+                                                data={defense} 
+                                                onEdit={handleEditClick}
+                                                onDelete={handleDeleteClick}
+                                            />
                                         ))}
                                     </div>
                                     <div className="bg-gray-50 px-5 py-3 text-xs text-center text-gray-500 border-t border-gray-200">
@@ -357,22 +426,16 @@ export default function MatrixManagement() {
             
             <NavFooter />
 
-            {/* ================= SCHEDULE DEFENSE MODAL ================= */}
+            {/* ================= 1. ADD SCHEDULE MODAL ================= */}
             <Dialog open={isScheduleModalOpen} onOpenChange={setIsScheduleModalOpen}>
-                <DialogContent 
-                    className="max-w-[1000px] w-[95vw] h-[85vh] p-0 border-none rounded-lg bg-[#FDFCF6] shadow-2xl font-dm flex flex-col [&>button]:hidden overflow-hidden"
-                >
-                    {/* 1. STICKY HEADER */}
+                <DialogContent className="max-w-[1000px] w-[95vw] h-[85vh] p-0 border-none rounded-lg bg-[#FDFCF6] shadow-2xl font-dm flex flex-col [&>button]:hidden overflow-hidden">
+                    {/* Header */}
                     <div className="flex-none flex flex-row justify-between items-center px-8 py-6 border-b border-gray-200 bg-white z-10">
                         <div>
                             <h2 className="text-2xl font-bold text-[#800000] tracking-tight">Schedule Defense</h2>
                             <p className="text-sm text-gray-500 mt-1">Enter the details for the upcoming thesis defense.</p>
                         </div>
                         <div className="flex items-center gap-6">
-                            <div className="text-right hidden sm:block">
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Defense ID</span>
-                                <span className="text-lg font-bold text-gray-700 font-mono">#DEF-2025-00X</span>
-                            </div>
                             <button 
                                 onClick={() => setIsScheduleModalOpen(false)}
                                 className="bg-gray-100 hover:bg-gray-200 text-gray-600 p-2 rounded-lg transition-colors"
@@ -382,179 +445,225 @@ export default function MatrixManagement() {
                         </div>
                     </div>
 
-                   
+                    {/* Body */}
                     <div className="flex-1 overflow-y-auto p-8 custom-scrollbar bg-[#FAFAFA]">
                         <div className="space-y-8">
-                            
-                            {/* SECTION 1: PROPOSAL INFO */}
+                            {/* Proposal Info */}
                             <h3 className="text-sm font-bold text-[#800000] flex items-center gap-2 mb-0 pb-2 border-b border-gray-100">
                                 <div className="w-1.5 h-4 bg-[#800000] rounded-full" />
                                 Proposal Information
                             </h3>
-                            
                             <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
-                                {/* Title */}
                                 <div className="md:col-span-8 space-y-1">
                                     <Label className={labelClass}>Thesis Title</Label>
-                                    <Input 
-                                        inputSize="full"
-                                        value={formData.title}
-                                        onChange={(e) => handleInputChange('title', e.target.value)}
-                                        placeholder="Enter the approved thesis title..." 
-                                    />
+                                    <Input inputSize="full" value={formData.title} onChange={(e) => handleInputChange('title', e.target.value)} placeholder="Enter thesis title..." />
                                 </div>
-
-                                {/* Group Code */}
                                 <div className="md:col-span-4 space-y-1">
                                     <Label className={labelClass}>Group Code</Label>
                                     <div className="relative">
-                                        <Input 
-                                            inputSize="full"
-                                            value={formData.groupCode}
-                                            onChange={(e) => handleInputChange('groupCode', e.target.value)}
-                                            placeholder="e.g. 2101" 
-                                            className="pl-10"
-                                        />
+                                        <Input inputSize="full" value={formData.groupCode} onChange={(e) => handleInputChange('groupCode', e.target.value)} placeholder="e.g. 2101" className="pl-10" />
                                         <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#333333]/50" />
                                     </div>
                                 </div>
-
-                                {/* Adviser */}
                                 <div className="md:col-span-6 space-y-1">
                                     <Label className={labelClass}>Thesis Adviser</Label>
                                     <div className="relative">
-                                        <Input 
-                                            inputSize="full"
-                                            value={formData.adviser}
-                                            onChange={(e) => handleInputChange('adviser', e.target.value)}
-                                            placeholder="Adviser Name" 
-                                            className="pl-10"
-                                        />
+                                        <Input inputSize="full" value={formData.adviser} onChange={(e) => handleInputChange('adviser', e.target.value)} placeholder="Adviser Name" className="pl-10" />
                                         <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#333333]/50" />
                                     </div>
                                 </div>
-                                
-                                {/* Block */}
                                 <div className="md:col-span-6 space-y-1">
                                     <Label className={labelClass}>Block</Label>
-                                    <Select 
-                                        value={formData.block} 
-                                        onValueChange={(val) => handleInputChange('block', val)}
-                                    >
-                                        <SelectTrigger className={selectTriggerClass}>
-                                            <SelectValue placeholder="Select Block" />
-                                        </SelectTrigger>
+                                    <Select value={formData.block} onValueChange={(val) => handleInputChange('block', val)}>
+                                        <SelectTrigger className={selectTriggerClass}><SelectValue placeholder="Select Block" /></SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="BSCpE 4-1">BSCpE 4-1</SelectItem>
                                             <SelectItem value="BSCpE 4-2">BSCpE 4-2</SelectItem>
                                             <SelectItem value="BSCpE 4-3">BSCpE 4-3</SelectItem>
                                             <SelectItem value="BSCpE 4-4">BSCpE 4-4</SelectItem>
-                                            <SelectItem value="BSCpE 4-5">BSCpE 4-5</SelectItem>
-                                            <SelectItem value="BSCpE 4-6">BSCpE 4-6</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
                             </div>
-                            
 
-                            {/* SECTION 2: LOGISTICS */}
+                            {/* Logistics */}
                             <h3 className="text-sm font-bold text-[#800000] flex items-center gap-2 mb-0 pb-2 border-b border-gray-100">
                                 <div className="w-1.5 h-4 bg-[#800000] rounded-full" />
                                 Defense Logistics
                             </h3>
-
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                {/* Date */}
                                 <div className="space-y-1">
                                     <Label className={labelClass}>Date</Label>
-                                    <DatePicker 
-                                        placeholder="Select Date"
-                                        value={formData.dateTime}
-                                        onChange={(date) => handleInputChange('dateTime', date)}
-                                        className="w-full"
-                                        displayFormat="full"
-                                    />
+                                    <DatePicker placeholder="Select Date" value={formData.dateTime} onChange={(date) => handleInputChange('dateTime', date)} className="w-full" displayFormat="full" />
                                 </div>
-
-                                {/* Time */}
                                 <div className="space-y-1">
                                     <Label className={labelClass}>Time Slot</Label>
-                                    <TimePicker
-                                        value={formData.dateTime}
-                                        onChange={(date) => handleInputChange('dateTime', date)}
-                                        placeholder="Select Time"
-                                        className="w-full"
-                                    />
+                                    <TimePicker value={formData.dateTime} onChange={(date) => handleInputChange('dateTime', date)} placeholder="Select Time" className="w-full" />
                                 </div>
-
-                                {/* Room */}
                                 <div className="space-y-1">
                                     <Label className={labelClass}>Room</Label>
                                     <div className="relative">
-                                        <Input 
-                                            inputSize="full"
-                                            value={formData.room}
-                                            onChange={(e) => handleInputChange('room', e.target.value)}
-                                            placeholder="e.g. Room 305" 
-                                            className="pl-10"
-                                        />
+                                        <Input inputSize="full" value={formData.room} onChange={(e) => handleInputChange('room', e.target.value)} placeholder="e.g. Room 305" className="pl-10" />
                                         <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1a1a1a]/50" />
                                     </div>
                                 </div>
-
-                                {/* Equipment */}
                                 <div className="md:col-span-3 space-y-1">
                                     <Label className={labelClass}>Equipment Required</Label>
                                     <div className="relative">
-                                        <Input 
-                                            inputSize="full"
-                                            value={formData.equipment}
-                                            onChange={(e) => handleInputChange('equipment', e.target.value)}
-                                            placeholder="e.g. Projector, HDMI Cable, Extension Cord" 
-                                            className="pl-10"
-                                        />
+                                        <Input inputSize="full" value={formData.equipment} onChange={(e) => handleInputChange('equipment', e.target.value)} placeholder="e.g. Projector, HDMI" className="pl-10" />
                                         <Monitor className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1a1a1a]/50" />
                                     </div>
                                 </div>
                             </div>
-                            
-
                         </div>
                     </div>
                     
-                    {/* 3. STICKY FOOTER */}
+                    {/* Footer */}
                     <div className="flex-none flex justify-end gap-3 px-8 py-5 border-t border-gray-200 bg-white">
-                         <Button 
-                            variant="outline" 
-                            onClick={() => setIsScheduleModalOpen(false)}
-                            className="h-9 px-6 border-transparent hover:bg-gray-100 text-gray-600 font-medium"
-                        >
-                            Cancel
-                         </Button>
-                         <Button 
-                            onClick={handleConfirmSchedule}
-                            className="bg-[#800000] hover:bg-[#600000] h-9 px-8 text-sm font-bold shadow-lg shadow-red-900/10"
-                         >
-                            <Plus className="w-4 h-4 mr-2" />
-                            Confirm Schedule
+                         <Button variant="outline" onClick={() => setIsScheduleModalOpen(false)} className="h-9 px-6 border-transparent hover:bg-gray-100 text-gray-600 font-medium">Cancel</Button>
+                         <Button onClick={handleConfirmSchedule} className="bg-[#800000] hover:bg-[#600000] h-9 px-8 text-sm font-bold shadow-lg shadow-red-900/10">
+                            <Plus className="w-4 h-4 mr-2" /> Confirm Schedule
                          </Button>
                     </div>
                 </DialogContent>
             </Dialog>
 
-            {/* ================= 2. SUCCESS MODAL ================= */}
+            {/* ================= 2. EDIT DEFENSE MODAL ================= */}
+            <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+                <DialogContent className="max-w-[1000px] w-[95vw] h-[85vh] p-0 border-none rounded-lg bg-[#FDFCF6] shadow-2xl font-dm flex flex-col [&>button]:hidden overflow-hidden">
+                    {/* Header */}
+                    <div className="flex-none flex flex-row justify-between items-center px-8 py-6 border-b border-gray-200 bg-white z-10">
+                        <div>
+                            <h2 className="text-2xl font-bold text-[#800000] tracking-tight">Edit Defense Details</h2>
+                            <p className="text-sm text-gray-500 mt-1">Update information for the selected defense.</p>
+                        </div>
+                        <div className="flex items-center gap-6">
+                            <button onClick={() => setIsEditModalOpen(false)} className="bg-gray-100 hover:bg-gray-200 text-gray-600 p-2 rounded-lg transition-colors">
+                                <Plus className="w-5 h-5 rotate-45" /> 
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Body - Reusing layout */}
+                    <div className="flex-1 overflow-y-auto p-8 custom-scrollbar bg-[#FAFAFA]">
+                        <div className="space-y-8">
+                            <h3 className="text-sm font-bold text-[#800000] flex items-center gap-2 mb-0 pb-2 border-b border-gray-100">
+                                <div className="w-1.5 h-4 bg-[#800000] rounded-full" /> Proposal Information
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+                                <div className="md:col-span-8 space-y-1">
+                                    <Label className={labelClass}>Thesis Title</Label>
+                                    <Input inputSize="full" value={editFormData.title} onChange={(e) => handleEditInputChange('title', e.target.value)} />
+                                </div>
+                                <div className="md:col-span-4 space-y-1">
+                                    <Label className={labelClass}>Group Code</Label>
+                                    <div className="relative">
+                                        <Input inputSize="full" value={editFormData.groupCode} onChange={(e) => handleEditInputChange('groupCode', e.target.value)} className="pl-10" />
+                                        <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#333333]/50" />
+                                    </div>
+                                </div>
+                                <div className="md:col-span-6 space-y-1">
+                                    <Label className={labelClass}>Thesis Adviser</Label>
+                                    <div className="relative">
+                                        <Input inputSize="full" value={editFormData.adviser} onChange={(e) => handleEditInputChange('adviser', e.target.value)} className="pl-10" />
+                                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#333333]/50" />
+                                    </div>
+                                </div>
+                                <div className="md:col-span-6 space-y-1">
+                                    <Label className={labelClass}>Block</Label>
+                                    <Select value={editFormData.block} onValueChange={(val) => handleEditInputChange('block', val)}>
+                                        <SelectTrigger className={selectTriggerClass}><SelectValue placeholder="Select Block" /></SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="BSCpE 4-1">BSCpE 4-1</SelectItem>
+                                            <SelectItem value="BSCpE 4-2">BSCpE 4-2</SelectItem>
+                                            <SelectItem value="BSCpE 4-3">BSCpE 4-3</SelectItem>
+                                            <SelectItem value="BSCpE 4-4">BSCpE 4-4</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+
+                            <h3 className="text-sm font-bold text-[#800000] flex items-center gap-2 mb-0 pb-2 border-b border-gray-100">
+                                <div className="w-1.5 h-4 bg-[#800000] rounded-full" /> Defense Logistics
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div className="space-y-1">
+                                    <Label className={labelClass}>Date</Label>
+                                    <DatePicker placeholder="Select Date" value={editFormData.dateTime} onChange={(date) => handleEditInputChange('dateTime', date)} className="w-full" displayFormat="full" />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label className={labelClass}>Time Slot</Label>
+                                    <TimePicker value={editFormData.dateTime} onChange={(date) => handleEditInputChange('dateTime', date)} className="w-full" />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label className={labelClass}>Room</Label>
+                                    <div className="relative">
+                                        <Input inputSize="full" value={editFormData.room} onChange={(e) => handleEditInputChange('room', e.target.value)} className="pl-10" />
+                                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1a1a1a]/50" />
+                                    </div>
+                                </div>
+                                <div className="md:col-span-3 space-y-1">
+                                    <Label className={labelClass}>Equipment Required</Label>
+                                    <div className="relative">
+                                        <Input inputSize="full" value={editFormData.equipment} onChange={(e) => handleEditInputChange('equipment', e.target.value)} className="pl-10" />
+                                        <Monitor className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1a1a1a]/50" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Footer */}
+                    <div className="flex-none flex justify-end gap-3 px-8 py-5 border-t border-gray-200 bg-white">
+                         <Button variant="outline" onClick={() => setIsEditModalOpen(false)} className="h-9 px-6 border-transparent hover:bg-gray-100 text-gray-600 font-medium">Cancel</Button>
+                         <Button onClick={handleUpdateDefense} className="bg-[#800000] hover:bg-[#600000] h-9 px-8 text-sm font-bold shadow-lg shadow-red-900/10">
+                            Save Changes
+                         </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* ================= 3. DELETE CONFIRMATION MODAL ================= */}
+            <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+                <DialogContent className="max-w-[400px] rounded-[24px] p-8 flex flex-col items-center justify-center border-none shadow-2xl bg-white [&>button]:hidden">
+                    <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
+                        <Trash className="w-8 h-8 text-[#800000]" />
+                    </div>
+                    <h3 className="text-[20px] text-center text-gray-800 font-bold font-dm mb-2">Delete Schedule?</h3>
+                    <p className="text-sm text-center text-gray-500 mb-8 px-4">
+                        Are you sure you want to delete this schedule? This action cannot be undone.
+                    </p>
+                    <div className="flex gap-3 w-full">
+                        <Button 
+                            variant="outline" 
+                            onClick={() => setIsDeleteModalOpen(false)} 
+                            className="flex-1 h-10 border-gray-200 text-gray-600 hover:bg-gray-50"
+                        >
+                            Cancel
+                        </Button>
+                        <Button 
+                            onClick={handleConfirmDelete} 
+                            className="flex-1 h-10 bg-[#800000] hover:bg-[#600000] text-white font-bold"
+                        >
+                            Delete
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* ================= 4. SUCCESS MODAL ================= */}
             <Dialog open={isSuccessModalOpen} onOpenChange={setIsSuccessModalOpen}>
                 <DialogContent className="max-w-[320px] rounded-[24px] p-10 flex flex-col items-center justify-center border-none shadow-2xl bg-white [&>button]:hidden">
                     <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6 shadow-lg">
                         <Check className="w-10 h-10 text-green-600" />
                     </div>
                     <p className="text-[16px] text-center text-gray-800 font-bold font-dm">
-                        Schedule successfully added.
+                        Action completed successfully.
                     </p>
                 </DialogContent>
             </Dialog>
 
-            {/* ================= 3. ERROR MODAL (Validation) ================= */}
+            {/* ================= 5. ERROR MODAL (Validation) ================= */}
             <Dialog open={isErrorModalOpen} onOpenChange={setIsErrorModalOpen}>
                 <DialogContent className="max-w-[320px] rounded-[24px] p-10 flex flex-col items-center justify-center border-none shadow-2xl bg-white [&>button]:hidden">
                     <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6 shadow-lg">
