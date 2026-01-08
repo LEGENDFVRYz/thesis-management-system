@@ -222,7 +222,9 @@ const WORKFLOW_STAGES = [
 
 export default function ThesisManagement() {
   const [activeTab, setActiveTab] = useState('documents')
-  const [userRole, setUserRole] = useState<'leader' | 'member'>('leader') // Change default role as needed
+  const userRole: 'leader' | 'member' = 'leader' // Change default role as needed
+  const [documentType, setDocumentType] = useState('')
+  const [uploadedFile, setUploadedFile] = useState<{ name: string; uploaded: boolean; progress?: number } | null>(null)
   // User role 
   const TABS = userRole === 'leader' ? LEADER_TABS : MEMBER_TABS
 
@@ -296,7 +298,7 @@ export default function ThesisManagement() {
           </>
         )}
 
-        {/* UPLOAD TAB - PLACEHOLDER */}
+        {/* UPLOAD TAB */}
         {activeTab === 'upload' && (
           <>
             <h2 className="mb-4 text-xl font-medium text-[#730000]">
@@ -304,22 +306,109 @@ export default function ThesisManagement() {
             </h2>
 
             <div className="space-y-6">
-              <input
-                className="w-full rounded-md border bg-[#F3EFD0] px-4 py-2"
-                placeholder="Document Title"
-              />
+              {/* Document Title and Type in one row */}
+              <div className="grid grid-cols-2 gap-10">
+                {/* Document Title */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Document Title
+                  </label>
+                  <input
+                    className="w-full rounded-md border bg-[#F3EFD0] px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#730000]"
+                    placeholder="e.g., AI Applications"
+                  />
+                </div>
 
-              <textarea
-                rows={3}
-                className="w-full rounded-md border bg-[#F3EFD0] px-4 py-2"
-                placeholder="Description"
-              />
+                {/* Document Type Dropdown */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Type
+                  </label>
+                  <Select value={documentType} onValueChange={setDocumentType}>
+                    <SelectTrigger className="w-full bg-[#F3EFD0]">
+                      <SelectValue placeholder="Specify Document Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="thesis-proposal">Thesis Proposal</SelectItem>
+                      <SelectItem value="chapter">Chapter</SelectItem>
+                      <SelectItem value="supporting-document">Supporting Document</SelectItem>
+                      <SelectItem value="final-thesis">Final Thesis</SelectItem>
+                      <SelectItem value="others">Others</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
-              <FileUpload />
+              {/* Document Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Document Description
+                </label>
+                <textarea
+                  rows={3}
+                  className="w-[630px] rounded-md border bg-[#F3EFD0] px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#730000]"
+                  placeholder="Description"
+                />
+              </div>
 
+              {/* File Upload Area */}
+              <div>
+                <FileUpload />
+              </div>
+
+              {/* Upload Progress Card */}
+              {uploadedFile && (
+                <div
+                  className="bg-white rounded-lg border-[0.8px] border-[#730000] shadow-sm mx-auto"
+                  style={{ width: '925px', height: '55px' }}
+                >
+                  <div className="flex h-full items-center justify-between px-4">
+                    <div className="flex items-center gap-3">
+                      <FileText className="w-5 h-5 text-gray-600" />
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 leading-tight">{uploadedFile.name}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          {uploadedFile.uploaded ? 'Upload complete' : 'Uploading...'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {uploadedFile.uploaded ? (
+                        <span className="text-sm font-semibold text-green-600">Uploaded</span>
+                      ) : (
+                        <div className="w-32 h-2 bg-gray-200 rounded-[10px] overflow-hidden">
+                          <div
+                            className="h-full bg-[#730000] transition-all duration-300"
+                            style={{ width: `${uploadedFile.progress || 0}%` }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Submit Button */}
               <div className="flex justify-center">
-                <Button variant="primary">
-                  Submit
+                <Button 
+                  variant="primary"
+                  className="px-8"
+                  onClick={() => {
+                    // Simulate file upload for demo
+                    setUploadedFile({ name: 'Thesis Title Thesis Title.pdf', uploaded: false, progress: 0 })
+                    // Simulate progress
+                    const interval = setInterval(() => {
+                      setUploadedFile(prev => {
+                        if (!prev || prev.progress! >= 100) {
+                          clearInterval(interval)
+                          return { name: prev?.name || '', uploaded: true, progress: 100 }
+                        }
+                        return { ...prev, progress: prev.progress! + 10 }
+                      })
+                    }, 200)
+                  }}
+                >
+                  Save & Submit
                 </Button>
               </div>
             </div>
