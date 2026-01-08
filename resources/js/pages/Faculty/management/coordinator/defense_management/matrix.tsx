@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import React from 'react';
 import AppLayout from '@/layouts/app-layout';
-import { matrix, panel_assign } from '@/routes/faculty/management/coordinator/defense_management';
+import { panel_assign } from '@/routes/faculty/management/coordinator/defense_management';
 import { type BreadcrumbItem } from '@/types';
-import { Link, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { 
     Calendar as CalendarIcon, 
     Plus, 
@@ -17,9 +17,11 @@ import {
 // Import Shared Components
 import { Button } from '@/components/ui/button'; 
 import { Badge } from '@/components/ui/badge';
-import { SidebarInset } from '@/components/ui/sidebar';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"; 
 import { DefenseCalendarWeekly, type WeeklyEventType } from '@/components/defense-calendar-weekly'; 
+import { 
+    HeaderCard 
+} from "@/components/ui/card";
 import { cn } from '@/lib/utils';
 
 // ----------------------------------------------------------------------
@@ -55,64 +57,6 @@ const TabButton = React.forwardRef<HTMLButtonElement, TabButtonProps>(
     )
 );
 TabButton.displayName = 'TabButton';
-
-// ----------------------------------------------------------------------
-// APP CONTENT WRAPPER
-// ----------------------------------------------------------------------
-
-interface AppContentProps extends React.ComponentProps<'div'> {
-    variant?: 'header' | 'sidebar';
-    title?: string;
-    subtitle?: string;
-    icon?: React.ReactNode;
-}
-
-export function AppContent({
-    variant = 'header',
-    title,
-    subtitle,
-    icon,
-    children,
-    ...props
-}: AppContentProps) {
-    if (variant === 'sidebar') {
-        return (
-            <SidebarInset>
-                <div className="flex-1 p-6" style={{ backgroundColor: 'var(--primary-foreground)' }} {...props}>
-                    {children}
-                </div>
-            </SidebarInset>
-        )
-    }
-
-    return (
-        <div
-            className="flex h-full w-full flex-1 flex-col" style={{ backgroundColor: 'var(--primary-foreground)' }}
-            {...props}
-        >
-            {(title || subtitle) && (
-                <div className="w-full border-b border-sidebar-border">
-                    <div className="mx-auto max-w-[1440px] h-[124px] flex flex-row items-center px-6 py-8">
-                        <div className="flex flex-col gap-3">
-                            <div className="flex items-center gap-3">
-                                {icon ? icon : <div className="w-8 h-8 rounded bg-[#800000]"></div>}
-                                <h2 className="text-[30px] font-normal leading-[36px] text-[#800000] dark:text-red-400">
-                                    {title}
-                                </h2>
-                            </div>
-                            <p className="text-[18px] font-normal leading-[16px] ml-11 text-[#800000]">
-                                {subtitle}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            )}
-            <div className="mx-auto w-full max-w-[1440px] p-6">
-                {children}
-            </div>
-        </div>
-    )
-}
 
 // ----------------------------------------------------------------------
 // MOCK DATA
@@ -249,7 +193,7 @@ function DefenseTableRow({ data }: { data: typeof DEFENSES[0] }) {
 const breadcrumb: BreadcrumbItem[] = [
     {
         title: 'Matrix Management',
-        href: matrix().url,
+        href: '#', // Ensure this links correctly
     },
 ];
 
@@ -259,94 +203,103 @@ export default function MatrixManagement() {
 
     return (
         <AppLayout breadcrumbs={breadcrumb}>
-            <AppContent
-                variant="header"
-                title="Matrix Management" 
-                subtitle="Monitor all defense schedule, facilities, and equipment"
-                icon={
-                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#800000] text-white">
-                        <CalendarIcon className="h-5 w-5" />
-                    </div>
-                }
-            >
-                {/* 1. Page Tabs - UPDATED WITH TabButton */}
-                <div className="flex items-end gap-1 mb-0 border-b border-[#800000]/10 pb-0">
-                    <TabButton 
-                        isActive={false} 
-                        onClick={() => router.get(panel_assign().url)}
-                    >
-                        Panel Assignment
-                    </TabButton>
-                    <TabButton isActive={true}>
-                        Matrix Management
-                    </TabButton>
-                </div>
+            
+            {/* Full Width Wrapper with Negative Margins to touch edges */}
+            <div className="flex flex-col w-full min-h-screen bg-primary-foreground -mt-4 -mx-4 -mb-4 md:-mt-4 md:-mx-6 md:-mb-6 lg:-mt-6 lg:-mx-8 lg:-mb-8">
+                
+                {/* Header Card */}
+                <HeaderCard
+                    title="Matrix Management"
+                    description="Monitor all defense schedule, facilities, and equipment"
+                    className="w-full max-w-none rounded-none border-t-0 border-x-0"
+                    icon={
+                        <div className="flex h-full w-full items-center justify-center rounded-md bg-[#800000] text-white">
+                            <CalendarIcon className="h-5 w-5" />
+                        </div>
+                    }
+                />
 
                 {/* Main Content Area */}
-                <div className="space-y-6 pt-6">
+                <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 lg:p-8 w-full">
                     
-                    {/* Action Bar */}
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    {/* 1. Page Tabs */}
+                    <div className="flex items-end gap-1 mb-0 border-b border-[#800000]/10 pb-0">
+                        <TabButton 
+                            isActive={false} 
+                            onClick={() => router.get(panel_assign().url)}
+                        >
+                            Panel Assignment
+                        </TabButton>
+                        <TabButton isActive={true}>
+                            Matrix Management
+                        </TabButton>
+                    </div>
+
+                    {/* 2. Content */}
+                    <div className="space-y-6 pt-2">
                         
-                        {/* 2. Standard Button Component */}
-                        <Button 
-                            variant="primary" 
-                            onClick={() => console.log("Open Schedule Modal")}
-                        >
-                            <Plus className="mr-2 h-4 w-4" /> 
-                            Schedule a Defense
-                        </Button>
-
-                        {/* 3. Toggle Group */}
-                        <ToggleGroup 
-                            type="single" 
-                            value={viewMode} 
-                            onValueChange={(value) => { if(value) setViewMode(value as 'table' | 'calendar') }}
-                            className="bg-[#F3E5CA] rounded-xl p-1 gap-1 w-auto whitespace-nowrap"
-                        >
-                            <ToggleGroupItem 
-                                value="table" 
-                                className="data-[state=on]:bg-[#800000] data-[state=on]:text-white text-[#800000] hover:bg-[#800000]/10 hover:text-[#800000] h-8 px-3 text-xs font-bold"
+                        {/* Action Bar */}
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            
+                            {/* Standard Button Component */}
+                            <Button 
+                                variant="primary" 
+                                onClick={() => console.log("Open Schedule Modal")}
                             >
-                                <LayoutList className="mr-2 h-3 w-3" /> 
-                                Table View
-                            </ToggleGroupItem>
-                            <ToggleGroupItem 
-                                value="calendar" 
-                                className="data-[state=on]:bg-[#800000] data-[state=on]:text-white text-[#800000] hover:bg-[#800000]/10 hover:text-[#800000] h-8 px-3 text-xs font-bold"
+                                <Plus className="mr-2 h-4 w-4" /> 
+                                Schedule a Defense
+                            </Button>
+
+                            {/* Toggle Group */}
+                            <ToggleGroup 
+                                type="single" 
+                                value={viewMode} 
+                                onValueChange={(value) => { if(value) setViewMode(value as 'table' | 'calendar') }}
+                                className="bg-[#F3E5CA] rounded-xl p-1 gap-1 w-auto whitespace-nowrap"
                             >
-                                <CalendarDays className="mr-2 h-3 w-3" /> 
-                                Calendar View
-                            </ToggleGroupItem>
-                        </ToggleGroup>
-                    </div>
+                                <ToggleGroupItem 
+                                    value="table" 
+                                    className="data-[state=on]:bg-[#800000] data-[state=on]:text-white text-[#800000] hover:bg-[#800000]/10 hover:text-[#800000] h-8 px-3 text-xs font-bold"
+                                >
+                                    <LayoutList className="mr-2 h-3 w-3" /> 
+                                    Table View
+                                </ToggleGroupItem>
+                                <ToggleGroupItem 
+                                    value="calendar" 
+                                    className="data-[state=on]:bg-[#800000] data-[state=on]:text-white text-[#800000] hover:bg-[#800000]/10 hover:text-[#800000] h-8 px-3 text-xs font-bold"
+                                >
+                                    <CalendarDays className="mr-2 h-3 w-3" /> 
+                                    Calendar View
+                                </ToggleGroupItem>
+                            </ToggleGroup>
+                        </div>
 
-                    {/* Content Switching */}
-                    <div className="min-h-[600px]">
-                        {viewMode === 'calendar' ? (
-                            <DefenseCalendarWeekly 
-                                events={CALENDAR_EVENTS}
-                                value={currentDate}
-                                onChange={setCurrentDate}
-                                className="shadow-sm border-sidebar-border/70"
-                            />
-                        ) : (
-                            <div className="rounded-xl border border-gray-200 overflow-hidden shadow-sm dark:border-sidebar-border">
-                                <DefenseTableHeader />
-                                <div>
-                                    {DEFENSES.map((defense) => (
-                                        <DefenseTableRow key={defense.id} data={defense} />
-                                    ))}
+                        {/* Content Switching */}
+                        <div className="min-h-[600px]">
+                            {viewMode === 'calendar' ? (
+                                <DefenseCalendarWeekly 
+                                    events={CALENDAR_EVENTS}
+                                    value={currentDate}
+                                    onChange={setCurrentDate}
+                                    className="shadow-sm border-sidebar-border/70"
+                                />
+                            ) : (
+                                <div className="rounded-xl border border-gray-200 overflow-hidden shadow-sm dark:border-sidebar-border">
+                                    <DefenseTableHeader />
+                                    <div>
+                                        {DEFENSES.map((defense) => (
+                                            <DefenseTableRow key={defense.id} data={defense} />
+                                        ))}
+                                    </div>
+                                    <div className="bg-gray-50 px-5 py-3 text-xs text-center text-gray-500 border-t border-gray-200">
+                                        {DEFENSES.length} of {DEFENSES.length} Upcoming Defenses
+                                    </div>
                                 </div>
-                                <div className="bg-gray-50 px-5 py-3 text-xs text-center text-gray-500 border-t border-gray-200">
-                                    {DEFENSES.length} of {DEFENSES.length} Upcoming Defenses
-                                </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
-
                 </div>
-            </AppContent>
+            </div>
         </AppLayout>
     );
 }
