@@ -24,6 +24,10 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Checkbox } from '@/components/ui/checkbox'
+import { ConfirmDialog } from '../components/confirm-dialog';
+import { SuccessDialog } from '../components/success-dialog';
+import { DeleteDialog } from '../components/delete-dialog';
+import { DeleteSuccessDialog } from '../components/delete-success-dialog';
 
 /* TABS */
 const LEADER_TABS = [
@@ -235,6 +239,81 @@ export default function ThesisManagement() {
       href: thesisManagement().url,
     },
   ]
+  
+  // Confirmation Modal States
+  const [isSubmitUploadOpen, setIsSubmitUploadOpen] = useState(false);
+  const [isSubmitFinalOpen, setIsSubmitFinalOpen] = useState(false);
+  const [isSubmitChangeOpen, setIsSubmitChangeOpen] = useState(false);
+  const [isSubmitFeedbackOpen, setIsSubmitFeedbackOpen] = useState(false);
+
+  // Success Modal States
+  const [isSuccessOpen, setIsSuccessOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+
+  // Delete Dialog States
+  const [isDeleteDocOpen, setIsDeleteDocOpen] = useState(false);
+  const [isDeleteSuccessOpen, setIsDeleteSuccessOpen] = useState(false);
+  const [docToDelete, setDocToDelete] = useState<number | null>(null);
+
+  // Handler for Upload Tab - Save & Submit
+  const handleSubmitUpload = () => {
+    console.log('Document uploaded and submitted');
+    
+    // Close confirmation dialog first
+    setIsSubmitUploadOpen(false);
+    
+    // Simulate file upload with loading animation
+    setUploadedFile({ name: 'Thesis Title Thesis Title.pdf', uploaded: false, progress: 0 });
+    
+    const interval = setInterval(() => {
+      setUploadedFile(prev => {
+        if (!prev || prev.progress! >= 100) {
+          clearInterval(interval);
+          // Show success after upload completes
+          setSuccessMessage('Document submitted successfully!');
+          setIsSuccessOpen(true);
+          return { name: prev?.name || '', uploaded: true, progress: 100 };
+        }
+        return { ...prev, progress: prev.progress! + 10 };
+      });
+    }, 200);
+  };
+
+  // Handler for Final Submission
+  const handleSubmitFinal = () => {
+    console.log('Final submission submitted');
+    setIsSubmitFinalOpen(false);
+    setSuccessMessage('Final submission completed successfully!');
+    setIsSuccessOpen(true);
+  };
+
+  // Handler for Change Request
+  const handleSubmitChange = () => {
+    console.log('Change request submitted');
+    setIsSubmitChangeOpen(false);
+    setSuccessMessage('Change request submitted successfully!');
+    setIsSuccessOpen(true);
+  };
+
+  // Handler for Workflow Feedback
+  const handleSubmitFeedback = () => {
+    console.log('Feedback submitted');
+    setIsSubmitFeedbackOpen(false);
+    setSuccessMessage('Feedback submitted successfully!');
+    setIsSuccessOpen(true);
+  };
+
+  // Handler for Delete Document
+  const handleDeleteDoc = () => {
+    console.log('Document deleted:', docToDelete);
+    setIsDeleteDocOpen(false);
+    setIsDeleteSuccessOpen(true);
+    
+    // Auto close delete success after 2 seconds
+    setTimeout(() => {
+      setIsDeleteSuccessOpen(false);
+    }, 2000);
+  };
 
   return (
     <ThesisManagementLayout 
@@ -389,28 +468,25 @@ export default function ThesisManagement() {
               )}
 
               {/* Submit Button */}
-              <div className="flex justify-center">
-                <Button 
-                  variant="primary"
-                  className="px-8"
-                  onClick={() => {
-                    // Simulate file upload for demo
-                    setUploadedFile({ name: 'Thesis Title Thesis Title.pdf', uploaded: false, progress: 0 })
-                    // Simulate progress
-                    const interval = setInterval(() => {
-                      setUploadedFile(prev => {
-                        if (!prev || prev.progress! >= 100) {
-                          clearInterval(interval)
-                          return { name: prev?.name || '', uploaded: true, progress: 100 }
-                        }
-                        return { ...prev, progress: prev.progress! + 10 }
-                      })
-                    }, 200)
-                  }}
-                >
-                  Save & Submit
-                </Button>
-              </div>
+                <div className="flex justify-center">
+                  <Button 
+                    variant="primary"
+                    className="px-8"
+                    onClick={() => setIsSubmitUploadOpen(true)}
+                  >
+                    Save & Submit
+                  </Button>
+                </div>
+                {/* Confirmation Dialog */}
+                <ConfirmDialog
+                  open={isSubmitUploadOpen}
+                  onOpenChange={setIsSubmitUploadOpen}
+                  title="Are you sure you want to submit?"
+                  description="This action cannot be undone."
+                  confirmLabel="Confirm"
+                  cancelLabel="Cancel"
+                  onConfirm={handleSubmitUpload}
+                />
             </div>
           </>
         )}
@@ -624,7 +700,13 @@ export default function ThesisManagement() {
                               <span className="text-[11px] text-gray-500">Uploaded: {doc.uploadedFile.date}</span>
                             </div>
                           </div>
-                          <button className="flex items-center gap-1 text-red-600 hover:text-red-700 text-xs font-medium">
+                          <button 
+                            className="flex items-center gap-1 text-red-600 hover:text-red-700 text-xs font-medium"
+                            onClick={() => {
+                              setDocToDelete(doc.id);
+                              setIsDeleteDocOpen(true);
+                            }}
+                          >
                             <Trash2 className="w-3.5 h-3.5" />
                             Delete
                           </button>
@@ -683,15 +765,47 @@ export default function ThesisManagement() {
                     </div>
                   </div>
                   <div className="mt-4 pt-4 border-t border-gray-200">
-                    <Button variant="primary" className="w-full">
+                    <Button 
+                      variant="primary" 
+                      className="w-full"
+                      onClick={() => setIsSubmitFinalOpen(true)}
+                    >
                       Submit for Review
                     </Button>
                   </div>
+
+                  {/* Confirmation Dialog */}
+                  <ConfirmDialog
+                    open={isSubmitFinalOpen}
+                    onOpenChange={setIsSubmitFinalOpen}
+                    title="Are you sure you want to submit?"
+                    description="This action cannot be undone."
+                    confirmLabel="Submit"
+                    cancelLabel="Cancel"
+                    onConfirm={handleSubmitFinal}
+                  />
+                  </div>
                 </div>
               </div>
-            </div>
           </>
         )}
+
+        {/* Delete Dialogs */}
+        <DeleteDialog
+          open={isDeleteDocOpen}
+          onOpenChange={setIsDeleteDocOpen}
+          title="Delete Document?"
+          description="This action cannot be undone."
+          confirmLabel="Delete"
+          cancelLabel="Cancel"
+          onConfirm={handleDeleteDoc}
+        />
+
+        <DeleteSuccessDialog
+          open={isDeleteSuccessOpen}
+          onOpenChange={setIsDeleteSuccessOpen}
+          message="Document deleted successfully!"
+        />
 
         {/* CHANGE REQUEST TAB */}
         {activeTab === 'change_request' && (
@@ -760,12 +874,27 @@ export default function ThesisManagement() {
                 </div>
 
                 <div className="flex justify-end pt-2">
-                  <Button variant="primary" className="px-8">
-                    Submit
-                  </Button>
+                    <Button 
+                      variant="primary" 
+                      className="px-8"
+                      onClick={() => setIsSubmitChangeOpen(true)}
+                    >
+                      Submit
+                    </Button>
+                  </div>
+
+                  {/* Confirmation Dialog */}
+                  <ConfirmDialog
+                    open={isSubmitChangeOpen}
+                    onOpenChange={setIsSubmitChangeOpen}
+                    title="Are you sure you want to submit?"
+                    description="This action cannot be undone."
+                    confirmLabel="Submit"
+                    cancelLabel="Cancel"
+                    onConfirm={handleSubmitChange}
+                  />
                 </div>
               </div>
-            </div>
 
             {/* Request History & Status */}
             <div className="grid grid-cols-[1fr_280px] gap-6">
@@ -981,11 +1110,26 @@ export default function ThesisManagement() {
                 placeholder="Text field input..."
               />
               <div className="flex justify-end mt-4">
-                <Button variant="primary" className="px-8">
+                <Button 
+                  variant="primary" 
+                  className="px-8"
+                  onClick={() => setIsSubmitFeedbackOpen(true)}
+                >
                   Submit
                 </Button>
               </div>
-            </div>
+
+              {/* Confirmation Dialog */}
+              <ConfirmDialog
+                open={isSubmitFeedbackOpen}
+                onOpenChange={setIsSubmitFeedbackOpen}
+                title="Are you sure you want to submit?"
+                description="This action cannot be undone."
+                confirmLabel="Submit"
+                cancelLabel="Cancel"
+                onConfirm={handleSubmitFeedback}
+              />
+              </div>
           </>
         )}
 
@@ -998,6 +1142,14 @@ export default function ThesisManagement() {
           </div>
         )}
       </div>
+
+        {/* Success Dialog */}
+        <SuccessDialog
+          open={isSuccessOpen}
+          onOpenChange={setIsSuccessOpen}
+          message={successMessage}
+        />
+
     </ThesisManagementLayout>
   )
 }
