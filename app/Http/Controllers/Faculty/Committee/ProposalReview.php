@@ -26,7 +26,7 @@ class ProposalReview extends Controller
         // Seperate data by "pending" "under" "evaluated"
 
         // Render and send props
-    $userId = Auth::id();
+        $userId = Auth::id();
 
         // Current Academic Year
         $currentSyId = DB::table('tbl_faculty_assignments')->max('sy_id');
@@ -99,12 +99,12 @@ class ProposalReview extends Controller
         ];
 
         // ================= DEBUG (REMOVE AFTER CHECK) =================
-        dd($data);
-
+        // dd($data);
         return Inertia::render(
-            'Faculty/management/committee/proposal_review',
-            ['proposals' => $data,
-             'filters'   => $request->only('status'),
+            'Committee/proposal-review',
+            [
+                'proposals' => $data,
+                // 'filters'   => $request->only('status'),
             ]
         );
     }

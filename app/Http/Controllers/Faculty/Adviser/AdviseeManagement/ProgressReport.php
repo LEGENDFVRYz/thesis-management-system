@@ -58,7 +58,7 @@ class ProgressReport extends Controller
             ->limit(10)
             ->get();
 
-        dd($groups);
+        // dd($groups);
         return Inertia::render(
             'Faculty/management/adviser/advisee_management/progress',
             [

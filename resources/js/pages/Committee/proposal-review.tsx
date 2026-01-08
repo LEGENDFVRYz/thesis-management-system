@@ -16,7 +16,29 @@ import { MethodologyRow } from '@/components/ui/rows';
 import { Badge } from '@/components/badges-index';
 import { sign } from 'crypto';
 
-export default function ProposalReview() {
+
+// PAGE PROPS
+export interface Proposal {
+    proposal_id: number;
+    proposal_title: string;
+    proposal_filepath: string;
+    submitted_date: string;       
+    advisor_name: string;
+    block: number;
+    my_status: string | null;     
+    my_comment: string | null;    
+    proponents: string;           
+}
+
+interface ProposalReviewProps {
+    proposals: {
+        pending: Proposal[];
+        evaluated: Proposal[];
+    };
+}
+
+
+export default function ProposalReview({ proposals }: ProposalReviewProps) {
     const [activeTab, setActiveTab] = useState<'endorsed' | 'changes'>('endorsed');
 
     const changeRequests = [
@@ -52,69 +74,6 @@ export default function ProposalReview() {
         stage: 0
     }).map((item, i) => ({ ...item, id: i }));
 
-    const renderProposalSection = (title: string, headerColor: string, count: number, data: any[]) => {
-        const isRed = headerColor === "bg-primary";
-        const isGold = headerColor === "bg-primary-foreground-2";
-        const isGreen = headerColor === "bg-completed-border";
-
-        return (
-            <section className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex flex-col">
-                {/* Header: Fixed height header */}
-                <div className={cn("p-3 flex justify-between items-center px-5 shrink-0", headerColor)}>
-                    <span className={cn(
-                        "font-bold text-sm", 
-                        isGold ? "text-white" : "text-white" // Gold header gets Maroon text, others get White
-                    )}>
-                        {title}
-                    </span>
-
-                    {/* Badge: White circle with text matching the header's primary color */}
-                    <div className="bg-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center justify-center min-w-[20px]">
-                        <span className={cn(
-                            "font-bold",
-                            isRed && "text-primary",      // Maroon text for Maroon section
-                            isGold && "text-primary-foreground-2",     // Gold text for Gold section
-                            isGreen && "text-completed-border",    // Green text for Green section
-                            !isRed && !isGold && !isGreen && "text-gray" // Fallback
-                        )}>
-                            {count}
-                        </span>
-                    </div>
-                </div>
-
-                {/* Content Area */}
-                {/* CHANGE HEIGHT HERE: 
-                    h-[620px] is roughly 3 rows. 
-                    Adjust this pixel value to fit more or fewer rows based on your card height.
-                */}
-                <div className="p-4 overflow-y-auto h-[420px] bg-slate-50/10 custom-scrollbar">
-                    {data.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                            {data.map((item) => (
-                                <CommitteeCard
-                                    key={item.id}
-                                    thesisTitle={item.title}
-                                    adviserName={item.adviser}
-                                    blockSection={item.block}
-                                    currentStage={item.stage}
-                                    totalStages={6} progress={3}
-                                />
-                            ))}
-                        </div>
-                    ) : (
-                        /* --- EMPTY STATE --- */
-                        <div className="h-full flex flex-col items-center justify-center py-12 text-slate-400">
-                            <div className="bg-slate-100 p-4 rounded-full mb-3">
-                                <Icon name="docuDefault" size={32} className="opacity-40" />
-                            </div>
-                            <p className="text-sm font-semibold text-slate-500">No proposals found</p>
-                            <p className="text-xs">There are currently no items in the {title.toLowerCase()} category.</p>
-                        </div>
-                    )}
-                </div>
-            </section>
-        );
-    };
 
     return (
         <><AppLayout breadcrumbs={[{ title: 'Proposal Review', href: '/proposal-review' }, { title: activeTab === 'endorsed' ? 'Endorsed Proposals' : 'Change Requests' } as BreadcrumbItem]}>
@@ -152,9 +111,9 @@ export default function ProposalReview() {
                     <div className="flex-1 space-y-8">
                         {activeTab === 'endorsed' ? (
                             <>
-                                {renderProposalSection("Pending Evaluations", "bg-primary", mockEndorsed.length, mockEndorsed)}
-                                {renderProposalSection("Under Evaluation", "bg-primary-foreground-2", mockEvaluating.length, mockEvaluating)}
-                                {renderProposalSection("Evaluated", "bg-completed-border", 0, [])}
+                                {renderProposalSection("Pending Evaluations", "bg-primary", proposals.pending.length, proposals.pending)}
+                                {/* {renderProposalSection("Under Evaluation", "bg-primary-foreground-2", mockEvaluating.length, mockEvaluating)} */}
+                                {renderProposalSection("Evaluated", "bg-completed-border", proposals.evaluated.length, proposals.evaluated)}
                             </>
                         ) : (
                             <div className="flex flex-col space-y-4 text-left">
@@ -219,3 +178,71 @@ export default function ProposalReview() {
         </AppLayout><NavFooter /></>
     );
 }
+
+
+// COMPONENT: Redering logic of the cards
+const renderProposalSection = (title: string, headerColor: string, count: number, data: Proposal[]) => {
+    const isRed = headerColor === "bg-primary";
+    const isGold = headerColor === "bg-primary-foreground-2";
+    const isGreen = headerColor === "bg-completed-border";
+
+    return (
+        <section className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex flex-col">
+            {/* Header: Fixed height header */}
+            <div className={cn("p-3 flex justify-between items-center px-5 shrink-0", headerColor)}>
+                <span className={cn(
+                    "font-bold text-sm", 
+                    isGold ? "text-white" : "text-white" // Gold header gets Maroon text, others get White
+                )}>
+                    {title}
+                </span>
+
+                {/* Badge: White circle with text matching the header's primary color */}
+                <div className="bg-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center justify-center min-w-[20px]">
+                    <span className={cn(
+                        "font-bold",
+                        isRed && "text-primary",      // Maroon text for Maroon section
+                        isGold && "text-primary-foreground-2",     // Gold text for Gold section
+                        isGreen && "text-completed-border",    // Green text for Green section
+                        !isRed && !isGold && !isGreen && "text-gray" // Fallback
+                    )}>
+                        {count}
+                    </span>
+                </div>
+            </div>
+
+            {/* Content Area */}
+            {/* CHANGE HEIGHT HERE: 
+                h-[620px] is roughly 3 rows. 
+                Adjust this pixel value to fit more or fewer rows based on your card height.
+            */}
+            <div className="p-4 overflow-y-auto h-[420px] bg-slate-50/10 custom-scrollbar">
+                {data.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                        {data.map((item) => (
+                            <CommitteeCard
+                                key={item.proposal_id}
+                                thesisTitle={item.proposal_title}
+                                adviserName={item.advisor_name}
+                                blockSection={`BSCPE 3-${item.block}`}
+                                currentStage={0}
+
+                                // Note: currently missed by the assigned backend, will soon revised (though the logic is good)
+                                totalStages={6} progress={3}
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    /* --- EMPTY STATE --- */
+                    <div className="h-full flex flex-col items-center justify-center py-12 text-slate-400">
+                        <div className="bg-slate-100 p-4 rounded-full mb-3">
+                            <Icon name="docuDefault" size={32} className="opacity-40" />
+                        </div>
+                        <p className="text-sm font-semibold text-slate-500">No proposals found</p>
+                        <p className="text-xs">There are currently no items in the {title.toLowerCase()} category.</p>
+                    </div>
+                )}
+            </div>
+        </section>
+    );
+};
