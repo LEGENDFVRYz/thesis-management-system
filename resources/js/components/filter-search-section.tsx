@@ -11,8 +11,9 @@ import {
     DialogContent,
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import Committee from '@/actions/App/Http/Controllers/Faculty/Committee';
 
-type SectionVariant = 'StudentManagement' | 'DefenseManagement' | 'ThesisArchive' | 'Notifications';
+type SectionVariant = 'StudentManagement' | 'DefenseManagement' | 'ThesisArchive' | 'Notifications' | 'Committee';
 
 interface FilterSearchSectionProps {
     variant?: SectionVariant;
@@ -38,8 +39,9 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
     const containerVariants = {
         StudentManagement: "h-[134px] p-[24.8px_24.8px_0.8px_24.8px] gap-4 border-primary/20 shadow-sm",
         DefenseManagement: "h-[125.6px] p-[24.8px_24.8px_0.8px_24.8px] gap-4 border-primary/20 shadow-sm",
-        ThesisArchive: "h-[120px] p-[25px_19px] gap-[25px] border-border",
-        Notifications: "h-[118px] p-6 gap-6 border-border shadow-none"
+        ThesisArchive: "h-[118px] p-6 gap-6 border-border shadow-sm",
+        Notifications: "h-[118px] p-6 gap-6 border-border shadow-sm",
+        Committee: "h-[118px] p-6 gap-6 border-border shadow-sm"
     };
 
     // Callback when tags are applied in RepoFilter
@@ -72,7 +74,7 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
         )}>
             
             {/* --- HEADER SECTION --- */}
-            {variant !== 'ThesisArchive' && variant !== 'Notifications' && (
+            {variant !== 'ThesisArchive' && variant !== 'Notifications' && variant !== 'Committee' && (
                 <div className="flex flex-row items-center gap-2 self-stretch w-full h-6 rounded-none font-dm">
                     <Filter className="w-5 h-5 text-primary" />
                     <h2 className="font-dm font-normal text-base leading-6 text-primary">
@@ -84,20 +86,20 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
             {/* --- CONTROLS ROW --- */}
             <div className={cn(
                 "flex flex-row items-center gap-[10px] self-stretch w-full font-dm",
-                variant === 'Notifications' ? "justify-between" : "justify-center"
+                (variant === 'Notifications' || variant === 'Committee') ? "justify-between" : "justify-center"
             )}>
                 
                 {/* 1. SEARCH BOX */}
                 <div className={cn(
                     "flex flex-col gap-2 font-dm",
-                    (variant === 'ThesisArchive' || variant === 'Notifications') ? "w-[320px]" : "flex-1"
+                    (variant === 'ThesisArchive' || variant === 'Notifications' || variant === 'Committee') ? "w-[300px]" : "flex-1"
                 )}>
-                    {(variant === 'ThesisArchive' || variant === 'Notifications') && (
+                    {(variant === 'ThesisArchive' || variant === 'Notifications' || variant === 'Committee') && (
                         <label className="text-sm font-medium text-alert-desc font-dm">Search</label>
                     )}
                     <SearchBar 
                         variant="filter-section" 
-                        placeholder="Search thesis titles..." 
+                        placeholder="Keywords, Terms..." 
                         value={query} 
                         onChange={setQuery} 
                     />
@@ -155,18 +157,64 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                     </>
                 )}
 
+                {variant === 'Committee' && (
+                    <>
+                        <div className="flex flex-col gap-2 flex-1 font-dm">
+                            <label className="text-sm font-medium text-alert-desc font-dm">Adviser</label>
+                            <Select>
+                                <SelectTrigger className="bg-breadcrumb border-primary/10">
+                                    <SelectValue placeholder="Filter by Adviser" />
+                                </SelectTrigger>
+                                <SelectContent className="w-[var(--radix-select-trigger-width)]">
+                                    <SelectItem value="Casuat">Dr. Cherry D. Casuat</SelectItem>
+                                    <SelectItem value="Mahaguay">Engr. Rolito Mahaguay</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="flex flex-col gap-2 flex-1 font-dm">
+                            <label className="text-sm font-medium text-alert-desc font-dm">Block</label>
+                            <Select>
+                                <SelectTrigger className="bg-breadcrumb border-primary/10">
+                                    <SelectValue placeholder="Filter by Block" />
+                                </SelectTrigger>
+                                <SelectContent className="w-[var(--radix-select-trigger-width)]">
+                                    {["BSCPE 3-1", "BSCPE 3-2", "BSCPE 3-3", "BSCPE 3-4", "BSCPE 3-5", "BSCPE 3-6"].map(b => (
+                                        <SelectItem key={b} value={b}>{b}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="flex flex-col gap-2 flex-1 font-dm">
+                            <label className="text-sm font-medium text-alert-desc font-dm">Stages</label>
+                            <Select>
+                                <SelectTrigger className="bg-breadcrumb border-primary/10">
+                                    <SelectValue placeholder="Filter by Stage" />
+                                </SelectTrigger>
+                                <SelectContent className='w-[var(--radix-select-trigger-width)]'>
+                                    <SelectItem value="stage1">All Stages</SelectItem>
+                                    <SelectItem value="stage2">To Review</SelectItem>
+                                    <SelectItem value="stage3">Under Evaluation</SelectItem>
+                                    <SelectItem value="stage4">Evaluated</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </>
+                )}
+
                 {/* --- SHARED ACTION BUTTONS --- */}
                 <div className={cn(
                     "flex flex-row items-center gap-[10px] font-dm",
-                    (variant === 'ThesisArchive' || variant === 'Notifications') ? "mt-auto h-9" : ""
+                    (variant === 'ThesisArchive' || variant === 'Notifications' || variant === 'Committee') ? "mt-auto h-9" : ""
                 )}>
-                    {(variant === 'StudentManagement' || variant === 'Notifications') && (
+                    {(variant === 'StudentManagement' || variant === 'Notifications' || variant === 'Committee') && (
                         <Button variant="secondary" size="icon" className="rounded-lg border-none font-dm" onClick={() => setIsSortModalOpen(true)}>
                             <Icon name="sortDefault" size={16} />
                         </Button>
                     )}
 
-                    {variant !== 'Notifications' && (
+                    {variant !== 'Notifications' && variant !== 'Committee' && (
                         <Button 
                             variant="secondary" 
                             size="icon" 
@@ -185,9 +233,7 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                     )}
 
                     <Button variant="negative" className="px-4 py-2 gap-2 h-9 rounded-lg min-w-[101px] font-dm">
-                        {variant === 'ThesisArchive' || variant === 'Notifications' ? (
-                            <Trash2 className="w-4 h-4 text-white" />
-                        ) : null}
+                        <Trash2 className="w-4 h-4 text-white" />
                         <span className="text-[13.33px] font-medium font-dm">Clear Filter</span>
                     </Button>
                 </div>

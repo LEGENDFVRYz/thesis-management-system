@@ -17,6 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import FilePreview from '@/components/document-preview';
 
 const EndorsedProposalsSection = ({ mockEndorsed, mockEvaluating, selectedItem, setSelectedItem, renderProposalSection }: any) => (
     <div className="flex-1 space-y-8 font-dm">
@@ -119,7 +120,8 @@ const RightActionPane = ({
     onAddComment,
     onUpdateComment,
     onDeleteComment,
-    actionState 
+    actionState,
+    onViewProposal
 }: any) => {
     const [commentText, setCommentText] = useState("");
     const [clarificationText, setClarificationText] = useState("");
@@ -182,7 +184,7 @@ const RightActionPane = ({
                             <div><p className="text-[10px] uppercase font-bold text-alert-desc">Block:</p><p className="text-[11px] text-foreground font-medium">{selectedItem.block}</p></div>
                             <div><p className="text-[10px] uppercase font-bold text-alert-desc">Submitted:</p><p className="text-[11px] text-foreground font-medium">Nov 30, 2025</p></div>
                         </div>
-                        <Button variant="outline" className="tertiary-btn w-full mt-2 h-9 text-xs font-bold gap-2">
+                        <Button variant="outline" className="tertiary-btn w-full mt-2 h-9 text-xs font-bold gap-2" onClick={onViewProposal}>
                             <Eye className="w-4 h-4" /> View Proposal
                         </Button>
                     </div>
@@ -408,7 +410,6 @@ const RightActionPane = ({
                                 >
                                     <MessageSquare className="w-3 h-3 mr-1.5" /> Comment
                                 </Button>
-                                <Badge name="statusBadgePendingReview" className="bg-primary-foreground-2/20 text-alert-yellow-selected border-primary-foreground-2/30">Clarification</Badge>
                             </div>
                         </div>
                     </div>
@@ -440,6 +441,7 @@ export default function ProposalReview() {
     const [evaluations, setEvaluations] = useState<Record<number, string[]>>({});
     const [allComments, setAllComments] = useState<Record<number, any[]>>({});
     const [actionStates, setActionStates] = useState<Record<number, string>>({});
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
     const handleToggleEval = (id: number, name: string) => {
         setEvaluations(prev => {
@@ -643,19 +645,39 @@ export default function ProposalReview() {
                         <Button variant="ghost" onClick={() => {setActiveTab('endorsed'); setSelectedItem(null);}} className={cn("flex items-center gap-2 px-6 py-3 text-sm font-bold border-b-2 rounded-sm rounded-b-none", activeTab === 'endorsed' ? "border-primary text-primary" : "border-transparent text-alert-desc")}>Endorsed Proposal</Button>
                         <Button variant="ghost" onClick={() => {setActiveTab('changes'); setSelectedItem(null);}} className={cn("flex items-center gap-2 px-6 py-3 text-sm font-bold border-b-2 rounded-sm rounded-b-none", activeTab === 'changes' ? "border-primary text-primary" : "border-transparent text-alert-desc")}>Change Requests</Button>
                     </div>
-                    <FilterSearchSection variant='Notifications'/>
+                    <FilterSearchSection variant='Committee'/>
                     <div className="flex flex-row items-start gap-[30px] w-full max-w-[1360px] mx-auto">
                         {activeTab === 'endorsed' ? <EndorsedProposalsSection mockEndorsed={mockEndorsed} mockEvaluating={mockEvaluating} selectedItem={selectedItem} setSelectedItem={setSelectedItem} renderProposalSection={renderProposalSection} /> : <ChangeRequestsSection changeRequests={changeRequests} selectedItem={selectedItem} setSelectedItem={setSelectedItem} />}
                         <div className="w-[400px] shrink-0 sticky top-6">
                             <RightActionPane 
                                 selectedItem={selectedItem} activeTab={activeTab} evaluations={evaluations} 
                                 onToggleEval={handleToggleEval} comments={allComments[selectedItem?.id] || []} 
-                                onAddComment={handleAddComment} onUpdateComment={handleUpdateComment} onDeleteComment={handleDeleteComment} actionState={actionStates[selectedItem?.id] || 'idle'} 
+                                onAddComment={handleAddComment} onUpdateComment={handleUpdateComment} 
+                                onDeleteComment={handleDeleteComment} actionState={actionStates[selectedItem?.id] || 'idle'} 
+                                onViewProposal={() => setIsPreviewOpen(true)}
                             />
                         </div>
                     </div>
                 </div>
             </AppLayout>
+
+            {isPreviewOpen && (
+                <div 
+                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+                    onClick={() => setIsPreviewOpen(false)} // Clicking backdrop closes modal
+                >
+                    <div 
+                        className="relative w-full max-w-6xl h-[90vh] shadow-2xl"
+                        onClick={(e) => e.stopPropagation()} // Prevents closing when clicking document content
+                    >
+                        <FilePreview
+                            documentTitle={selectedItem?.title || "Proposal Document"}
+                            documentUrl="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+                        />
+                    </div>
+                </div>
+            )}
+
             <NavFooter />
         </>
     );

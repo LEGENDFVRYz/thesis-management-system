@@ -641,7 +641,7 @@ export function DefenseManagementFilter({ onClose }: { onClose?: () => void }) {
                                 <SelectValue placeholder="Filter by Adviser" />
                             </SelectTrigger>
                             <SelectContent className="w-[var(--radix-select-trigger-width)]">
-                                <SelectItem value="Casuat">Prof. Cherry D. Casuat</SelectItem>
+                                <SelectItem value="Casuat">Dr. Cherry D. Casuat</SelectItem>
                                 <SelectItem value="Mahaguay">Engr. Rolito Mahaguay</SelectItem>
                             </SelectContent>
                         </Select>

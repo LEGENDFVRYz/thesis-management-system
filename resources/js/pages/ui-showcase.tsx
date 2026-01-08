@@ -962,6 +962,7 @@ export default function UIShowcase() {
                         <FilterSearchSection variant="StudentManagement" />
                         <FilterSearchSection variant="ThesisArchive" />
                         <FilterSearchSection variant="Notifications" />
+                        <FilterSearchSection variant='Committee'/>
                     </section>
 
                     {/* Faculty List Dropdown Variants Section */}
