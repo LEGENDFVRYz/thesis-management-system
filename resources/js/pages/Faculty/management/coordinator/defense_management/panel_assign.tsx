@@ -177,7 +177,7 @@ interface Panelist {
   }
   
   interface Thesis {
-    id: number;
+    thesis_id: number;
     title: string;
     authors: string;  // Note: Appears as a comma-separated string in your dd()
     adviser: string;
@@ -372,11 +372,11 @@ export default function Dashboard({sections, available_panel, endorsed_thesis}: 
                                                 endorsed_thesis
                                                     .filter((thesis) => thesis.section === selectedSection)
                                                     .map((thesis) => {
-                                                        const isOpen = expandedThesis === thesis.id;
+                                                        const isOpen = expandedThesis === thesis.thesis_id;
                                                         return (
-                                                            <div key={thesis.id} className="overflow-hidden rounded-xl border bg-card shadow-sm transition-all">
+                                                            <div key={thesis.thesis_id} className="overflow-hidden rounded-xl border bg-card shadow-sm transition-all">
                                                                 <div
-                                                                    onClick={() => setExpandedThesis(isOpen ? null : thesis.id)}
+                                                                    onClick={() => setExpandedThesis(isOpen ? null : thesis.thesis_id)}
                                                                     className="cursor-pointer bg-white p-6 hover:bg-neutral-50/50"
                                                                 >
                                                                     <div className="flex items-start justify-between">
