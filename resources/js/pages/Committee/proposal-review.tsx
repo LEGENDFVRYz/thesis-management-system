@@ -643,7 +643,7 @@ export default function ProposalReview() {
                         <Button variant="ghost" onClick={() => {setActiveTab('endorsed'); setSelectedItem(null);}} className={cn("flex items-center gap-2 px-6 py-3 text-sm font-bold border-b-2 rounded-sm rounded-b-none", activeTab === 'endorsed' ? "border-primary text-primary" : "border-transparent text-alert-desc")}>Endorsed Proposal</Button>
                         <Button variant="ghost" onClick={() => {setActiveTab('changes'); setSelectedItem(null);}} className={cn("flex items-center gap-2 px-6 py-3 text-sm font-bold border-b-2 rounded-sm rounded-b-none", activeTab === 'changes' ? "border-primary text-primary" : "border-transparent text-alert-desc")}>Change Requests</Button>
                     </div>
-                    <FilterSearchSection variant='Notifications'/>
+                    <FilterSearchSection variant='Committee'/>
                     <div className="flex flex-row items-start gap-[30px] w-full max-w-[1360px] mx-auto">
                         {activeTab === 'endorsed' ? <EndorsedProposalsSection mockEndorsed={mockEndorsed} mockEvaluating={mockEvaluating} selectedItem={selectedItem} setSelectedItem={setSelectedItem} renderProposalSection={renderProposalSection} /> : <ChangeRequestsSection changeRequests={changeRequests} selectedItem={selectedItem} setSelectedItem={setSelectedItem} />}
                         <div className="w-[400px] shrink-0 sticky top-6">
