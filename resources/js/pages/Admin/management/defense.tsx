@@ -154,13 +154,13 @@ export default function DefenseTable({ defenses }: { defenses: Defense[] }) {
      * Logic: UseMemo filters data based on the statusFilter state.
      * Uses MOCK_DEFENSES if the passed 'defenses' prop is empty.
      */
-    const displayData = useMemo(() => {
-        const sourceData = (defenses?.length > 0 && defenses[0].title) ? defenses : MOCK_DEFENSES;
-        return sourceData.filter(def => {
-            const status = def.status?.toLowerCase() || "upcoming";
-            return statusFilter === "upcoming" ? (status === "upcoming") : status === "completed";
-        });
-    }, [defenses, statusFilter]);
+    // const displayData = useMemo(() => {
+    //     const sourceData = (defenses?.length > 0 && defenses[0].title) ? defenses : MOCK_DEFENSES;
+    //     return sourceData.filter(def => {
+    //         const status = def.status?.toLowerCase() || "upcoming";
+    //         return statusFilter === "upcoming" ? (status === "upcoming") : status === "completed";
+    //     });
+    // }, [defenses, statusFilter]);
 
     const handleViewDetails = (def: Defense) => {
         setSelectedDef(def);
@@ -179,25 +179,25 @@ export default function DefenseTable({ defenses }: { defenses: Defense[] }) {
      * Configuration: Columns for the table.
      * Rendering logic is centralized here for better maintainability.
      */
-    const columns = [
-        { label: "ID", render: (d: Defense) => d.id },
-        { label: "Title", className: "px-6 text-left max-w-[280px] truncate", render: (d: Defense) => d.title },
-        { label: "Proponents", render: (d: Defense) => (
-            <div className="flex items-center justify-center gap-2 font-bold text-primary">
-                <Icon name="proponentsDefault" size={18} />
-                <span>{d.proponents_count || d.proponentList?.length || '0'}</span>
-            </div>
-        )},
-        { label: "Adviser", className: "px-6", render: (d: Defense) => d.adviser },
-        { label: "Block", render: (d: Defense) => d.block },
-        { label: "Date & Time", render: (d: Defense) => (
-            <div className="flex flex-col text-alert-desc">
-                <span className="font-semibold text-alert-default">{d.defense_date}</span>
-                <span className="text-[10px] font-bold uppercase opacity-60">{d.defense_time}</span>
-            </div>
-        )},
-        { label: "Type", render: (d: Defense) => d.type || 'Title Defense' },
-    ];
+    // const columns = [
+    //     { label: "ID", render: (d: Defense) => d.id },
+    //     { label: "Title", className: "px-6 text-left max-w-[280px] truncate", render: (d: Defense) => d.title },
+    //     { label: "Proponents", render: (d: Defense) => (
+    //         <div className="flex items-center justify-center gap-2 font-bold text-primary">
+    //             <Icon name="proponentsDefault" size={18} />
+    //             <span>{d.proponents_count || d.proponentList?.length || '0'}</span>
+    //         </div>
+    //     )},
+    //     { label: "Adviser", className: "px-6", render: (d: Defense) => d.adviser },
+    //     { label: "Block", render: (d: Defense) => d.block },
+    //     { label: "Date & Time", render: (d: Defense) => (
+    //         <div className="flex flex-col text-alert-desc">
+    //             <span className="font-semibold text-alert-default">{d.defense_date}</span>
+    //             <span className="text-[10px] font-bold uppercase opacity-60">{d.defense_time}</span>
+    //         </div>
+    //     )},
+    //     { label: "Type", render: (d: Defense) => d.type || 'Title Defense' },
+    // ];
 
     return (
         <>

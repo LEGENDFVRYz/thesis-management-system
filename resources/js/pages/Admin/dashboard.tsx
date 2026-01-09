@@ -123,21 +123,6 @@ function MetricContent({ total, items }: MetricContentProps) {
   );
 }
 
-{/* Helper component for header info items */}
-function HeaderInfoItem({ icon: Icon, label, valueFirst }: HeaderInfoItemProps) {
-    return (
-        <div className="flex items-start gap-3">
-            <Icon className={`h-8 w-8 text-primary`} strokeWidth={1.5} />
-            <div>
-                <p className={`text-xs font-bold uppercase tracking-wide text-primary`}>
-                    {label}
-                </p>
-                <p className="font-bold text-gray-800">{valueFirst}</p>
-            </div>
-        </div>
-    );
-}
-
 {/* Breadcrumb navigation */}
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -216,7 +201,7 @@ interface DashboardProps {
 
 
 export default function Dashboard({ activeTerm, currentDate, notifications }: DashboardProps) {
-    console.log('Notifications:', notifications);
+    // console.log('Notifications:', notifications);
 
     return (
         <>
@@ -409,6 +394,7 @@ export default function Dashboard({ activeTerm, currentDate, notifications }: Da
                         </div>
                     </div>
                     
+
                     {/* TESTING PURPOSE ONLY: */}
                     <div>
                         <div className="flex flex-col gap-2">
@@ -424,8 +410,25 @@ export default function Dashboard({ activeTerm, currentDate, notifications }: Da
                             ))}
                         </div>
                     </div>
-                </div>
-            </div>
-        </AppLayout>
+
+            </AppLayout>
+        <NavFooter />
+        </>
     );
 }
+
+
+// Helper for the top right info items (Date, Year, Sem)
+// function HeaderInfoItem({ icon: Icon, label, valueFirst }) {
+//     return (
+//         <div className="flex items-start gap-3">
+//             <Icon className={`h-8 w-8 text-primary`} strokeWidth={1.5} />
+//             <div>
+//                 <p className={`text-xs font-bold uppercase tracking-wide text-primary`}>
+//                     {label}
+//                 </p>
+//                 <p className="font-bold text-gray-800">{valueFirst}</p>
+//             </div>
+//         </div>
+//     );
+// }
