@@ -54,6 +54,7 @@ export default function EditGroupModal({ isOpen, onClose, sectionAdvisers, stude
   }, [groupData]);
 
   const [errors, setErrors] = useState<{
+    block?: string;
     members?: { [key: number]: { name?: string; studentNumber?: string; email?: string } };
   }>({});
 
@@ -109,8 +110,14 @@ export default function EditGroupModal({ isOpen, onClose, sectionAdvisers, stude
 
   const validateForm = () => {
     const newErrors: {
+      block?: string;
       members?: { [key: number]: { name?: string; studentNumber?: string; email?: string } };
     } = {};
+
+    // Validate block selection
+    if (!selectedBlock) {
+      newErrors.block = 'Please select a block';
+    }
 
     // Validate members
     const memberErrors: { [key: number]: { name?: string; studentNumber?: string; email?: string } } = {};
@@ -191,7 +198,7 @@ export default function EditGroupModal({ isOpen, onClose, sectionAdvisers, stude
 
   const handleUpdateGroup = () => {
     if (validateForm()) {
-      console.log('Updating group:', { members });
+      console.log('Updating group:', { selectedBlock, members });
       onClose();
     }
     
@@ -231,7 +238,7 @@ export default function EditGroupModal({ isOpen, onClose, sectionAdvisers, stude
         <DialogHeader className="bg-[#730000] px-6 py-4 text-white flex-shrink-0 text-left space-y-1">
           <DialogTitle className="text-lg font-semibold text-white text-left">Edit Group</DialogTitle>
           <DialogDescription className="text-sm text-red-200 text-left">
-            Fill in the member information
+            Fill in the group details and member information
           </DialogDescription>
         </DialogHeader>
 
@@ -326,7 +333,7 @@ export default function EditGroupModal({ isOpen, onClose, sectionAdvisers, stude
                   </div>
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">Student Number</label>
-                    <Input
+                    <input
                       type="text"
                       placeholder="Auto-filled"
                       value={member.studentNumber}
@@ -337,7 +344,7 @@ export default function EditGroupModal({ isOpen, onClose, sectionAdvisers, stude
                   </div>
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">Email</label>
-                    <Input
+                    <input
                       type="email"
                       placeholder="Auto-filled"
                       value={member.email}

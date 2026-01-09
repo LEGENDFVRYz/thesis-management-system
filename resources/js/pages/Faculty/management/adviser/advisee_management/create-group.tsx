@@ -353,7 +353,7 @@ export default function CreateGroupModal({ isOpen, onClose, sectionAdvisers, stu
                   </div>
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">Student Number</label>
-                    <Input
+                    <input
                       type="text"
                       placeholder="Auto-filled"
                       value={member.studentNumber}
@@ -364,7 +364,7 @@ export default function CreateGroupModal({ isOpen, onClose, sectionAdvisers, stu
                   </div>
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">Email</label>
-                    <Input
+                    <input
                       type="email"
                       placeholder="Auto-filled"
                       value={member.email}

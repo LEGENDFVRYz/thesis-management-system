@@ -1,9 +1,9 @@
-  import React, { useState } from "react";
-  import { Users } from "lucide-react";
-  import { iconRegistry } from "@/components/icons-registry";
-  import {Table,TableBody,TableCell,TableHead,TableHeader,TableRow,
-  } from "@/components/ui/table";
-  import { Button } from "@/components/ui/button";
+import React, { useState } from "react";
+import { Users } from "lucide-react";
+import { iconRegistry } from "@/components/icons-registry";
+import {Table,TableBody,TableCell,TableHead,TableHeader,TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 
 // Columns for the table
 const columns = ["Group Number", "Title", "Proponents", "Block", "Actions"];
@@ -16,7 +16,7 @@ interface CustomTableProps {
   onApproveClick?: (row: any) => void;
 }
 
-  type IconState = "default" | "hover" | "clicked";
+type IconState = "default" | "hover" | "clicked";
 
 interface RowIconStates {
   [key: number]: {
@@ -66,29 +66,29 @@ export default function CustomTable({
     return iconStates[rowId]?.[iconType] || 'default';
   };
 
-    const getEditIcon = (rowId: number) => {
-      const state = getRowIconState(rowId, 'edit');
-      switch (state) {
-        case "hover":
-          return <EditHoverIcon className="w-6 h-6 pointer-events-none" />;
-        case "clicked":
-          return <EditClickedIcon className="w-6 h-6 pointer-events-none" />;
-        default:
-          return <EditIcon className="w-6 h-6 pointer-events-none" />;
-      }
-    };
+  const getEditIcon = (rowId: number) => {
+    const state = getRowIconState(rowId, 'edit');
+    switch (state) {
+      case "hover":
+        return <EditHoverIcon className="w-6 h-6 pointer-events-none" />;
+      case "clicked":
+        return <EditClickedIcon className="w-6 h-6 pointer-events-none" />;
+      default:
+        return <EditIcon className="w-6 h-6 pointer-events-none" />;
+    }
+  };
 
-    const getCheckIcon = (rowId: number) => {
-      const state = getRowIconState(rowId, 'check');
-      switch (state) {
-        case "hover":
-          return <CheckHoverIcon className="w-6 h-6 pointer-events-none" />;
-        case "clicked":
-          return <CheckClickedIcon className="w-6 h-6 pointer-events-none" />;
-        default:
-          return <CheckIcon className="w-6 h-6 pointer-events-none" />;
-      }
-    };
+  const getCheckIcon = (rowId: number) => {
+    const state = getRowIconState(rowId, 'check');
+    switch (state) {
+      case "hover":
+        return <CheckHoverIcon className="w-6 h-6 pointer-events-none" />;
+      case "clicked":
+        return <CheckClickedIcon className="w-6 h-6 pointer-events-none" />;
+      default:
+        return <CheckIcon className="w-6 h-6 pointer-events-none" />;
+    }
+  };
 
   const getCloseIcon = (rowId: number) => {
     const state = getRowIconState(rowId, 'close');
@@ -114,46 +114,46 @@ export default function CustomTable({
     }
   };
 
-    const handleEditClick = (row: any) => {
-      console.log('Edit icon clicked for row:', row);
-      onEditClick?.(row);
-    };
+  const handleEditClick = (row: any) => {
+    console.log('Edit icon clicked for row:', row);
+    onEditClick?.(row);
+  };
 
-    const handleApproveClick = (row: any) => {
-      console.log('Approve icon clicked for row:', row);
-      onApproveClick?.(row);
-    };
+  const handleApproveClick = (row: any) => {
+    console.log('Approve icon clicked for row:', row);
+    onApproveClick?.(row);
+  };
 
-    const handleRemoveClick = (row: any) => {
-      console.log('Remove icon clicked for row:', row);
-      onRemoveClick?.(row);
-    };
+  const handleRemoveClick = (row: any) => {
+    console.log('Remove icon clicked for row:', row);
+    onRemoveClick?.(row);
+  };
 
-    const handleManageClick = (row: any) => {
-      console.log('Manage button clicked for row:', row);
-      onManageClick?.(row);
-    };
+  const handleManageClick = (row: any) => {
+    console.log('Manage button clicked for row:', row);
+    onManageClick?.(row);
+  };
 
-    return (
-      <div className="w-full border rounded-lg overflow-hidden shadow">
-        <Table className="border-separate border-spacing-0">
-          {/* Table Header */}
-          <TableHeader>
-            <TableRow className="bg-[#730000] hover:bg-[#730000] border-none">
-              {columns.map((col, index) => (
-                <TableHead 
-                  key={col} 
-                  className={`text-center text-white font-medium px-5 py-3 ${
-                    index === 0 ? 'rounded-tl-lg' : ''
-                  } ${
-                    index === columns.length - 1 ? 'rounded-tr-lg' : ''
-                  }`}
-                >
-                  {col}
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
+  return (
+    <div className="w-full border rounded-lg overflow-hidden shadow">
+      <Table className="border-separate border-spacing-0">
+        {/* Table Header */}
+        <TableHeader>
+          <TableRow className="bg-[#730000] hover:bg-[#730000] border-none">
+            {columns.map((col, index) => (
+              <TableHead 
+                key={col} 
+                className={`text-center text-white font-medium px-5 py-3 ${
+                  index === 0 ? 'rounded-tl-lg' : ''
+                } ${
+                  index === columns.length - 1 ? 'rounded-tr-lg' : ''
+                }`}
+              >
+                {col}
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
 
         {/* Table Body */}
         <TableBody>
@@ -190,19 +190,17 @@ export default function CustomTable({
                     {getCheckIcon(row["Defense ID"])}
                   </button>
 
-                        <button
-                          onClick={() => handleRemoveClick(row)}
-                          onMouseEnter={() => setRowIconState(row["Defense ID"], 'close', 'hover')}
-                          onMouseLeave={() => setRowIconState(row["Defense ID"], 'close', 'default')}
-                          onMouseDown={() => setRowIconState(row["Defense ID"], 'close', 'clicked')}
-                          onMouseUp={() => setRowIconState(row["Defense ID"], 'close', 'default')}
-                          className="cursor-pointer transition"
-                          title="Remove"
-                        >
-                          {getCloseIcon(row["Defense ID"])}
-                        </button>
-                      </>
-                    )}
+                  <button
+                    onClick={() => handleRemoveClick(row)}
+                    onMouseEnter={() => setRowIconState(row["Defense ID"], 'close', 'hover')}
+                    onMouseLeave={() => setRowIconState(row["Defense ID"], 'close', 'default')}
+                    onMouseDown={() => setRowIconState(row["Defense ID"], 'close', 'clicked')}
+                    onMouseUp={() => setRowIconState(row["Defense ID"], 'close', 'default')}
+                    className="cursor-pointer transition"
+                    title="Remove"
+                  >
+                    {getCloseIcon(row["Defense ID"])}
+                  </button>
 
                   <button
                     onClick={() => handleEditClick(row)}
