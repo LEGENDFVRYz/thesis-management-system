@@ -9,13 +9,9 @@ use Inertia\Inertia;
 
 class PanelAssign extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        // TASK 4.1: Maryel       --part 1/3
-        // Note: Granted permission, you can add new route in routes/web.php dependent on your logic
+        // ... (Your existing index code remains exactly the same) ...
         
         $activeYear = DB::table('tbl_school_years')
             ->join('tbl_semesters', 'tbl_school_years.id', '=', 'tbl_semesters.school_year_id')
@@ -97,11 +93,7 @@ class PanelAssign extends Controller
             'endorsed_thesis' => $endorsed_thesis,
         ]);
     }
-        
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         //
@@ -112,14 +104,6 @@ class PanelAssign extends Controller
      */
     public function store(Request $request)
     {
-        // TASK 4.1: Maryel       --part 2/3
-        // Note: Granted permission, you can add new route in routes/web.php dependent on your logic
-
-        // Used the testing modal to create a group and get all need information
-        
-        // Saved all the 3 panels selected in the tbl_endorse_panels
-        // Saved it into the database
-
         $request->validate([
             'defense_matrix_id' => 'required|exists:tbl_defense_matrices,id',
             'panel_ids' => 'required|array',
@@ -149,31 +133,25 @@ class PanelAssign extends Controller
                         'panel_id' => $panelId,
                     ],
                     [
-                        'is_confirmed' => null,
+                        'is_confirmed' => 0, // CHANGED FROM null TO 0
                     ]
                 );
             }
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Panel assignment requested.']);
+            return back()->with('success', 'Panel assignments saved successfully.');
+    
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            return back()->withErrors(['error' => $e->getMessage()]);
         }
     }
 
-
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         //
@@ -184,11 +162,6 @@ class PanelAssign extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // TASK 4.1: Maryel       --part 3/3
-        // Note: Granted permission, you can add new route in routes/web.php dependent on your logic
-
-        // Same logic to create but you should update change data only
-
         $request->validate([
             'defense_matrix_id' => 'required|exists:tbl_defense_matrices,id',
             'panel_ids' => 'required|array',
@@ -220,24 +193,20 @@ class PanelAssign extends Controller
                         'panel_id' => $panelId,
                     ],
                     [
-                        'is_confirmed' => null, 
+                        'is_confirmed' => 0, // CHANGED FROM null TO 0
                     ]
                 );
             }
     
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Panel assignment requested.']);
+            return back()->with('success', 'Panel assignments updated successfully.');
     
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            return back()->withErrors(['error' => $e->getMessage()]);
         }
     }
 
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         //

@@ -4,8 +4,8 @@ import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { compliance } from '@/routes/faculty/management/coordinator';
 import { type BreadcrumbItem } from '@/types';
-import { SidebarInset } from '@/components/ui/sidebar';
 import DocumentPreview from '@/components/document-preview';
+import { NavFooter } from '@/components/nav-footer'; 
 import { cn } from "@/lib/utils";
 
 // Icons
@@ -28,8 +28,14 @@ import {
 } from 'lucide-react';
 
 // UI Components
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import StageSwitchToggle from "@/components/stage-toggle"; 
+import { 
+    Card, 
+    CardHeader, 
+    CardTitle, 
+    CardContent,
+    HeaderCard 
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RadioGroup } from "@/components/ui/radio-group";
@@ -39,7 +45,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 // Using a mock for YearRangePicker since it's an external dependency
 const YearRangePicker = ({ value, onChange, placeholder }: any) => (
-    <div className="border rounded p-2 text-sm text-gray-500 flex justify-between items-center cursor-not-allowed opacity-70">
+    <div className="rounded p-2 text-sm text-gray-500 flex justify-between items-center cursor-not-allowed opacity-70">
         {placeholder || "Year Range"} <Calendar className="w-4 h-4"/>
     </div>
 );
@@ -83,8 +89,8 @@ export function SearchBar({
         className={cn(
           "flex flex-row items-center",
           "h-9 w-full", 
-          "bg-[#F3EFD0] border-[0.8px] border-primary/30 rounded-lg", 
-          "hover:bg-[#F3EFD0]/80 focus-within:border-primary", 
+          "bg-[#F3EFD0] rounded-lg", 
+          "hover:bg-[#F3EFD0]/80", 
           "pl-5 pr-3 py-1", 
           "transition-colors duration-200"
         )}
@@ -112,7 +118,7 @@ export function SearchBar({
         onChange={handleChange}
         placeholder={placeholder}
         className={cn(
-          "flex-grow h-[44px] bg-white rounded-l-md border border-input px-3 text-foreground text-base font-medium focus:outline-none",
+          "flex-grow h-[44px] bg-white rounded-l-md px-3 text-foreground text-base font-medium focus:outline-none",
           "font-dm"
         )}
       />
@@ -154,11 +160,10 @@ export function RepoFilter({ onClose, onApply }: { onClose?: () => void; onApply
           </button>
         )}
       </div>
-      <div className="border-t mb-6" />
 
       <div className="mb-6">
         <label className="block font-medium text-gray-900 mb-2">Search Term</label>
-        <Input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Keywords, Titles..." />
+        <Input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Keywords, Titles..." className="border-none shadow-none bg-gray-100" />
       </div>
 
       <div className="mb-6">
@@ -170,12 +175,12 @@ export function RepoFilter({ onClose, onApply }: { onClose?: () => void; onApply
         <label className="block font-medium text-gray-900 mb-2">Removable Tags</label>
         <div className="flex flex-wrap gap-2">
           {removableTags.map((tag) => (
-            <span key={tag} className="inline-flex items-center gap-1 px-3 py-1 bg-white border border-primary text-primary rounded-full text-xs font-medium">
+            <span key={tag} className="inline-flex items-center gap-1 px-3 py-1 bg-white text-primary rounded-full text-xs font-medium shadow-sm">
               {tag}
               <button onClick={() => handleRemoveTag(tag)} className="hover:bg-primary/10 rounded-full p-0.5"><X className="w-3 h-3" /></button>
             </span>
           ))}
-          <button className="inline-flex items-center gap-1 px-3 py-1 bg-white border border-dashed border-gray-400 text-gray-600 rounded-full text-xs font-medium hover:border-primary hover:text-primary">
+          <button className="inline-flex items-center gap-1 px-3 py-1 bg-white text-gray-600 rounded-full text-xs font-medium hover:text-primary shadow-sm">
             <Plus className="w-3 h-3" /> Add Tag
           </button>
         </div>
@@ -188,8 +193,8 @@ export function RepoFilter({ onClose, onApply }: { onClose?: () => void; onApply
             <button
               key={spec}
               onClick={() => handleToggleSpecialization(spec)}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                selectedSpecializations.includes(spec) ? 'bg-primary text-white border border-primary' : 'bg-white text-gray-700 border border-gray-300 hover:border-primary hover:text-primary'
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors shadow-sm ${
+                selectedSpecializations.includes(spec) ? 'bg-primary text-white' : 'bg-white text-gray-700 hover:text-primary'
               }`}
             >
               {spec}
@@ -198,8 +203,8 @@ export function RepoFilter({ onClose, onApply }: { onClose?: () => void; onApply
         </div>
       </div>
 
-      <div className="flex items-center justify-end gap-3 pt-4 border-t">
-        <Button variant="outline" onClick={() => {}}>Reset</Button>
+      <div className="flex items-center justify-end gap-3 pt-4">
+        <Button variant="outline" onClick={() => {}} className="border-none shadow-none bg-gray-100 hover:bg-gray-200">Reset</Button>
         <Button variant="negative" onClick={() => { onApply?.(removableTags); onClose?.(); }}>Apply All Filters</Button>
       </div>
     </div>
@@ -214,8 +219,7 @@ export function Sort3() {
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 w-72 font-dm">
       <h2 className="text-xl font-bold mb-3 text-[#800000]">Sort By</h2>
-      <div className="border-t my-3" />
-      <div className="mb-4">
+      <div className="mb-4 mt-4">
         <label className="block text-sm font-medium text-gray-700 mb-2">Group Code</label>
         <RadioGroup value={selectedSort} onValueChange={setSelectedSort} className="flex flex-col gap-2">
           <RadioGroupItemWithLabel id="gc-asc" value="gc-asc" label="Ascending" />
@@ -238,7 +242,7 @@ export function Sort3() {
 }
 
 // ----------------------------------------------------------------------
-// 2. THE FILTER SEARCH SECTION COMPONENT (Your Code)
+// 2. THE FILTER SEARCH SECTION COMPONENT
 // ----------------------------------------------------------------------
 
 type SectionVariant = 'StudentManagement' | 'DefenseManagement' | 'ThesisArchive' | 'Notifications';
@@ -249,18 +253,14 @@ interface FilterSearchSectionProps {
 
 export function FilterSearchSection({ variant = 'DefenseManagement' }: FilterSearchSectionProps) {
     const [query, setQuery] = useState('');
-    
-    // State to manage the Advanced Filter Modal visibility
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-    
-    // State to manage the Sort Modal visibility
     const [isSort3ModalOpen, setIsSort3ModalOpen] = useState(false);
 
     const containerVariants = {
-        StudentManagement: "h-[134px] p-[24.8px_24.8px_0.8px_24.8px] gap-4 border-primary/20 shadow-sm",
-        DefenseManagement: "h-[125.6px] p-[24.8px_24.8px_0.8px_24.8px] gap-4 border-primary/20 shadow-sm",
-        ThesisArchive: "h-[120px] p-[25px_19px] gap-[25px] border-border",
-        Notifications: "h-[118px] p-6 gap-6 border-border shadow-none"
+        StudentManagement: "h-[134px] p-[24.8px_24.8px_0.8px_24.8px] gap-4 shadow-sm",
+        DefenseManagement: "h-[125.6px] p-[24.8px_24.8px_0.8px_24.8px] gap-4 shadow-sm",
+        ThesisArchive: "h-[120px] p-[25px_19px] gap-[25px]",
+        Notifications: "h-[118px] p-6 gap-6 shadow-none"
     };
 
     const handleApplyFilters = (tags: string[]) => {
@@ -271,11 +271,10 @@ export function FilterSearchSection({ variant = 'DefenseManagement' }: FilterSea
     return (
         <div className={cn(
             "flex flex-col items-start self-stretch w-full bg-card rounded-[10px] flex-none",
-            "border-[0.8px] box-border transition-all duration-200",
+            "box-border transition-all duration-200",
             "font-dm", 
             containerVariants[variant]
         )}>
-            
             {/* --- HEADER SECTION --- */}
             {variant !== 'ThesisArchive' && variant !== 'Notifications' && (
                 <div className="flex flex-row items-center gap-2 self-stretch w-full h-6 rounded-none font-dm">
@@ -313,7 +312,7 @@ export function FilterSearchSection({ variant = 'DefenseManagement' }: FilterSea
                     <>
                         <div className="flex flex-col gap-2 w-[374px] font-dm">
                             <label className="text-sm font-medium text-alert-desc font-dm">Academic Year</label>
-                            <div className="flex items-center justify-between px-3 h-9 bg-breadcrumb rounded-lg border-[0.8px] border-primary/10 cursor-pointer transition-colors hover:bg-white font-dm">
+                            <div className="flex items-center justify-between px-3 h-9 bg-breadcrumb rounded-lg cursor-pointer transition-colors hover:bg-white font-dm">
                                 <span className="text-primary text-sm font-medium font-dm">2024 - 2025</span>
                                 <Calendar className="w-5 h-5 text-primary" />
                             </div>
@@ -333,10 +332,10 @@ export function FilterSearchSection({ variant = 'DefenseManagement' }: FilterSea
                         <div className="flex flex-col gap-2 w-[320px] font-dm">
                             <label className="text-sm font-medium text-alert-desc font-dm">Notification Type</label>
                             <Select>
-                                <SelectTrigger>
+                                <SelectTrigger className="border-none bg-gray-100 shadow-sm">
                                     <SelectValue placeholder="Filter by Type" />
                                 </SelectTrigger>
-                                <SelectContent className='w-[var(--radix-select-trigger-width)]'>
+                                <SelectContent className='w-[var(--radix-select-trigger-width)] border-none shadow-lg'>
                                     <SelectItem value="Defense Management">Defense Management</SelectItem>
                                     <SelectItem value="Panel Assignment">Panel Assignment</SelectItem>
                                     <SelectItem value="Reminder">Reminder</SelectItem>
@@ -346,10 +345,10 @@ export function FilterSearchSection({ variant = 'DefenseManagement' }: FilterSea
                         <div className="flex flex-col gap-2 w-[320px] font-dm">
                             <label className="text-sm font-medium text-alert-desc font-dm">Status</label>
                             <Select>
-                                <SelectTrigger>
+                                <SelectTrigger className="border-none bg-gray-100 shadow-sm">
                                     <SelectValue placeholder="Filter by Status" />
                                 </SelectTrigger>
-                                <SelectContent className='w-[var(--radix-select-trigger-width)]'>
+                                <SelectContent className='w-[var(--radix-select-trigger-width)] border-none shadow-lg'>
                                     <SelectItem value="Read">Read Only</SelectItem>
                                     <SelectItem value="Unread">Unread Only</SelectItem>
                                 </SelectContent>
@@ -364,7 +363,7 @@ export function FilterSearchSection({ variant = 'DefenseManagement' }: FilterSea
                     (variant === 'ThesisArchive' || variant === 'Notifications') ? "mt-auto h-9" : ""
                 )}>
                     {(variant === 'StudentManagement' || variant === 'Notifications') && (
-                        <Button variant="secondary" size="icon" className="rounded-lg border-none font-dm" onClick={() => setIsSort3ModalOpen(true)}>
+                        <Button variant="secondary" size="icon" className="rounded-lg border-none shadow-sm font-dm" onClick={() => setIsSort3ModalOpen(true)}>
                             <Icon name="sortDefault" size={16} />
                         </Button>
                     )}
@@ -373,21 +372,21 @@ export function FilterSearchSection({ variant = 'DefenseManagement' }: FilterSea
                         <Button 
                             variant="secondary" 
                             size="icon" 
-                            className="rounded-lg border-none font-dm"
-                            onClick={() => setIsFilterModalOpen(true)} // Calls the modal
+                            className="rounded-lg border-none shadow-sm font-dm"
+                            onClick={() => setIsFilterModalOpen(true)} 
                         >
                             <Filter className="w-4 h-4" />
                         </Button>
                     )}
 
                     {variant === 'Notifications' && (
-                        <Button variant="ghost" className="h-9 gap-2 px-3 border border-transparent font-dm">
+                        <Button variant="ghost" className="h-9 gap-2 px-3 font-dm">
                             <CheckCircle2 className="w-4 h-4" />
                             <span className="text-[13.33px] font-medium font-dm">Mark Read</span>
                         </Button>
                     )}
 
-                    <Button variant="negative" className="px-4 py-2 gap-2 h-9 rounded-lg min-w-[101px] font-dm">
+                    <Button variant="negative" className="px-4 py-2 gap-2 h-9 rounded-lg min-w-[101px] font-dm shadow-sm">
                         {variant === 'ThesisArchive' || variant === 'Notifications' ? (
                             <Trash2 className="w-4 h-4 text-white" />
                         ) : null}
@@ -457,50 +456,6 @@ const mockProposals: Proposal[] = Array(6).fill({
     ],
 }).map((item, index) => ({ ...item, id: index.toString() }));
 
-interface AppContentProps extends React.ComponentProps<'div'> {
-  variant?: 'header' | 'sidebar';
-  title?: string;
-  subtitle?: string;
-  icon?: React.ReactNode;
-}
-
-export function AppContent({ variant = 'header', title, subtitle, icon, children, ...props }: AppContentProps) {
-  if (variant === 'sidebar') {
-    return (
-      <SidebarInset>
-        <div className="flex-1 p-6" style={{ backgroundColor: 'var(--primary-foreground)' }} {...props}>
-          {children}
-        </div>
-      </SidebarInset>
-    )
-  }
-
-  return (
-    <div className="flex h-full w-full flex-1 flex-col" style={{ backgroundColor: 'var(--primary-foreground)' }} {...props}>
-      {(title || subtitle) && (
-        <div className="w-full border-b border-sidebar-border">
-          <div className="mx-auto max-w-[1440px] h-[124px] flex flex-row items-center px-6 py-8">
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-3">
-                {icon ? icon : <div className="w-8 h-8 rounded bg-[#800000]"></div>}
-                <h2 className="text-[30px] font-normal leading-[36px] text-[#800000] dark:text-red-400">
-                  {title}
-                </h2>
-              </div>
-              <p className="text-[18px] font-normal leading-[16px] ml-11 text-[#800000]">
-                {subtitle}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-      <div className="mx-auto w-full max-w-[1440px] p-6">
-        {children}
-      </div>
-    </div>
-  )
-}
-
 const EndorsementCard = ({ data }: { data: Proposal }) => {
     const [showPreview, setShowPreview] = useState(false);
     const [showEndorseModal, setShowEndorseModal] = useState(false);
@@ -513,13 +468,13 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
 
     return (
         <>
-            <div className="bg-card dark:bg-card rounded-[var(--radius-lg)] shadow-sm border border-border p-5 flex flex-col h-full hover:shadow-md transition-shadow">
+            <div className="bg-card dark:bg-card rounded-[var(--radius-lg)] shadow-sm p-5 flex flex-col h-full hover:shadow-md transition-shadow">
                 <div className="flex justify-between items-start mb-2">
                     <div className="flex-1 pr-2">
                         <h3 className="font-bold text-foreground text-sm leading-tight mb-1">{data.title}</h3>
                         <p className="text-[10px] text-muted-foreground uppercase font-medium">{data.groupCode}</p>
                     </div>
-                    <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-[var(--endorsed-bg)] text-[var(--endorsed-font-color)] border border-[var(--endorsed-border)]">
+                    <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-[var(--endorsed-bg)] text-[var(--endorsed-font-color)]">
                         <CheckCircle className="w-3 h-3 mr-1" />
                         {data.status}
                     </span>
@@ -560,11 +515,11 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                     </div>
                 </div>
 
-                <div className="flex gap-3 mt-auto pt-4 border-t border-border">
-                    <button onClick={() => setShowPreview(true)} className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-foreground bg-transparent border border-border rounded-[var(--radius-sm)] hover:bg-[var(--breadcrumb)] transition-colors">
+                <div className="flex gap-3 mt-auto pt-4">
+                    <button onClick={() => setShowPreview(true)} className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-foreground bg-transparent rounded-[var(--radius-sm)] hover:bg-[var(--breadcrumb)] transition-colors shadow-sm">
                         <Eye size={14} /> View Manuscript
                     </button>
-                    <button onClick={() => setShowEndorseModal(true)} className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-foreground bg-transparent border border-border rounded-[var(--radius-sm)] hover:bg-[var(--breadcrumb)] transition-colors">
+                    <button onClick={() => setShowEndorseModal(true)} className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-foreground bg-transparent rounded-[var(--radius-sm)] hover:bg-[var(--breadcrumb)] transition-colors shadow-sm">
                         <CheckCircle size={14} /> Endorse
                     </button>
                 </div>
@@ -573,8 +528,8 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
             {/* Modal & Preview Logic */}
             {showPreview && (
                 <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-                    <div className="bg-background rounded-[var(--radius-lg)] max-w-4xl w-full max-h-[90vh] overflow-auto">
-                        <div className="flex items-center justify-between p-4 border-b border-border">
+                    <div className="bg-background rounded-[var(--radius-lg)] max-w-4xl w-full max-h-[90vh] overflow-auto shadow-xl">
+                        <div className="flex items-center justify-between p-4">
                             <h2 className="text-lg font-semibold text-foreground">{data.title}</h2>
                             <button onClick={() => setShowPreview(false)} className="text-muted-foreground hover:text-foreground">✕</button>
                         </div>
@@ -632,7 +587,7 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                                 <h4 className="text-sm font-medium text-foreground mb-2">Assigned Panel Members</h4>
                                 <div className="flex flex-wrap gap-2">
                                     {data.panelMembers.map((member) => (
-                                        <div key={member.id} className="flex items-center px-3 py-1 rounded-full bg-[var(--pending-bg)] border border-[var(--pending-border)] text-[var(--pending-font-color)] text-sm">
+                                        <div key={member.id} className="flex items-center px-3 py-1 rounded-full bg-[var(--pending-bg)] text-[var(--pending-font-color)] text-sm shadow-sm">
                                             {member.name}
                                         </div>
                                     ))}
@@ -640,7 +595,7 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                             </div>
 
                             {/* Warning/Confirmation Box */}
-                            <div className="bg-[var(--revision-bg)] border border-[var(--revision-border)] rounded-lg p-4 mb-6 flex gap-3">
+                            <div className="bg-[var(--revision-bg)] rounded-lg p-4 mb-6 flex gap-3 shadow-sm">
                                 <AlertCircle className="w-5 h-5 text-[var(--revision-font-color)] flex-shrink-0 mt-0.5" />
                                 <div>
                                     <h4 className="text-sm font-bold text-[var(--revision-font-color)] mb-1">Endorsement Confirmation</h4>
@@ -663,21 +618,21 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                                     value={remarks}
                                     onChange={(e) => setRemarks(e.target.value)}
                                     placeholder="Text field input..."
-                                    className="w-full min-h-[80px] p-3 rounded-md border border-input bg-background text-foreground focus:border-ring focus:ring-1 focus:ring-ring text-sm resize-none"
+                                    className="w-full min-h-[80px] p-3 rounded-md bg-background text-foreground focus:border-ring focus:ring-1 focus:ring-ring text-sm resize-none shadow-sm bg-gray-50"
                                 />
                             </div>
                         </div>
 
-                        <div className="px-6 py-4 border-t border-border flex justify-end gap-3">
+                        <div className="px-6 py-4 flex justify-end gap-3">
                             <button
                                 onClick={() => setShowEndorseModal(false)}
-                                className="px-4 py-2 text-sm font-medium text-foreground bg-transparent border border-border rounded-md hover:bg-[var(--breadcrumb)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
+                                className="px-4 py-2 text-sm font-medium text-foreground bg-transparent rounded-md hover:bg-[var(--breadcrumb)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring shadow-sm"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleEndorseSubmit}
-                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground bg-transparent border border-border rounded-md hover:bg-[var(--breadcrumb)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
+                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground bg-transparent rounded-md hover:bg-[var(--breadcrumb)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring shadow-sm"
                             >
                                 <CheckCircle size={16} />
                                 Submit Endorsement
@@ -698,46 +653,33 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Dashboard() {
-    const [activeTab, setActiveTab] = useState("MOR");
+    const [activeTab, setActiveTab] = useState<'mor' | 'dp1' | 'dp2'>('mor');
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Endorsement Management" />
             
-            <AppContent
-                variant="header"
-                title="Endorsement Management"
-                subtitle="Issue a digital signature for the Coordinator Endorsement Sheet"
-                icon={
-                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#800000] text-white">
-                        <ShieldCheck className="h-5 w-5" />
-                    </div>
-                }
-            >
-                <div className="space-y-8 pb-10">
+            <div className="flex flex-col min-h-screen -mt-4 -mx-4 -mb-4 md:-mt-4 md:-mx-6 md:-mb-6 lg:-mt-6 lg:-mx-8 lg:-mb-8 bg-primary-foreground">
+                <HeaderCard 
+                    title="Endorsement Management"
+                    description="Issue a digital signature for the Coordinator Endorsement Sheet"
+                    className="w-full rounded-none border-t-0 border-x-0"
+                    icon={<ShieldCheck className="w-8 h-8 text-primary" />}
+                />
+
+                <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 lg:p-8 w-full">
                     
                     {/* 1. TABS (Top Right) */}
                     <div className="flex justify-end">
-                        <ToggleGroup 
-                            type="single" 
-                            value={activeTab} 
-                            onValueChange={(value) => { if (value) setActiveTab(value); }}
-                        >
-                            {["MOR", "DP1", "DP2"].map((tab) => (
-                                <ToggleGroupItem 
-                                    key={tab} 
-                                    value={tab}
-                                    className="px-6 py-1.5 text-xs font-bold text-[#800000] data-[state=on]:bg-[#800000] data-[state=on]:text-white hover:bg-[#800000]/10 transition-all"
-                                >
-                                    {tab}
-                                </ToggleGroupItem>
-                            ))}
-                        </ToggleGroup>
+                        <StageSwitchToggle
+                            value={activeTab}
+                            onChange={setActiveTab}
+                        />
                     </div>
 
                     {/* 2. STATISTICS CARDS (Flex Centered) */}
                     <div className="flex flex-wrap justify-center gap-4">
-                        <Card variant="metric" className="border-0 shadow-sm rounded-xl overflow-hidden w-full max-w-[400px]">
+                        <Card variant="metric" className="border-none shadow-sm rounded-xl overflow-hidden w-full max-w-[400px]">
                             <CardHeader className="bg-[#800000] text-[#F3E5CA] flex flex-row items-center gap-2">
                                 <CheckCircle2 className="size-5" />
                                 <CardTitle className="text-xs font-bold tracking-wide text-[#F3E5CA]">COMPLIANT GROUPS</CardTitle>
@@ -748,7 +690,7 @@ export default function Dashboard() {
                             </CardContent>
                         </Card>
 
-                        <Card variant="metric" className="border-0 shadow-sm rounded-xl overflow-hidden w-full max-w-[400px]">
+                        <Card variant="metric" className="border-none shadow-sm rounded-xl overflow-hidden w-full max-w-[400px]">
                             <CardHeader className="bg-[#800000] text-[#F3E5CA] flex flex-row items-center gap-2">
                                 <Clock className="size-5" />
                                 <CardTitle className="text-xs font-bold tracking-wide text-[#F3E5CA]">PENDING REVIEW</CardTitle>
@@ -760,7 +702,7 @@ export default function Dashboard() {
                         </Card>
                     </div>
                     
-                    {/* 3. CONTROL BAR: FILTER SEARCH SECTION (Replaces manual controls) */}
+                    {/* 3. CONTROL BAR: FILTER SEARCH SECTION */}
                     <div className="flex justify-center w-full">
                          <FilterSearchSection variant="DefenseManagement" />
                     </div>
@@ -775,7 +717,8 @@ export default function Dashboard() {
                     </div>
 
                 </div>
-            </AppContent>
+                <NavFooter />
+            </div>
         </AppLayout>
     );
 }

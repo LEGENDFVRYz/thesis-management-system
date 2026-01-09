@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Head, useForm } from '@inertiajs/react';
-import { Paperclip, Clock, ListChecks, Mic2 } from 'lucide-react';
+import { Paperclip, Clock, ListChecks, Users, CloudUpload } from 'lucide-react';
 
 // --- GLOBAL COMPONENTS ---
 import { AppHeader } from '@/components/app-header';
@@ -25,7 +25,6 @@ interface PageProps {
             role_in_group: 'Leader' | 'Member';
         };
     };
-    // Backend should pass the thesis details
     thesis: {
         title: string;
         id: number;
@@ -56,12 +55,10 @@ export default function PublicPresentation({ auth, thesis, audit_trail = [], sta
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         
-        // Real Submission Logic
         post(route('public-presentation.store'), {
             preserveScroll: true,
-            forceFormData: true, // Crucial for file uploads
+            forceFormData: true, 
             onSuccess: () => {
-                // Optional: Show toast notification here
                 console.log("Submitted successfully");
             }
         });
@@ -71,7 +68,6 @@ export default function PublicPresentation({ auth, thesis, audit_trail = [], sta
     const isEventDetailsFilled = !!(data.event_name && data.venue && data.event_date);
     const isMaterialsUploaded = !!data.materials_file;
     const isProofUploaded = !!data.proof_file;
-    // This logic usually comes from the backend status, assuming false for form
     const isCertificateUploaded = status === 'verified'; 
 
     const currentStepIndex = useMemo(() => {
@@ -94,19 +90,32 @@ export default function PublicPresentation({ auth, thesis, audit_trail = [], sta
         <div className="min-h-screen bg-[#f5f5f5] font-sans text-[#333] flex flex-col">
             <Head title="Public Presentation" />
 
+            {/* Global App Header */}
             <AppHeader variant="student" />
 
-            <div className="bg-[#FFF8DC] border-b border-[#e0d0b0] px-6 md:px-[5%] py-4 flex justify-between items-center">
-                <h2 className="text-[#800000] text-xl font-bold flex items-center gap-2">
-                    <Mic2 className="w-6 h-6" />
-                    <span className="hidden md:inline">Public Presentation</span>
-                    <span className="md:hidden">Presentation</span>
-                </h2>
-                <span className="text-xs bg-[#800000] text-white px-3 py-1.5 rounded-full font-medium shadow-sm">
-                    Logged in as {auth?.user?.role_in_group}
-                </span>
+            {/* === NEW DESIGN HEADER === */}
+            <div className="w-full bg-white border-b-[3px] border-[#dca5a5] px-6 py-6 md:px-10">
+                <div className="max-w-[1440px] mx-auto">
+                    {/* Main Title Row */}
+                    <div className="flex items-center gap-3">
+                        {/* Icon Group */}
+                        <div className="text-[#6d2929]">
+                            <Users className="w-8 h-8 fill-current" />
+                        </div>
+                        {/* Yellow Title */}
+                        <h1 className="text-3xl font-bold text-[#fbbf24] tracking-tight">
+                            Public presentation
+                        </h1>
+                    </div>
+
+                    {/* Subtitle */}
+                    <p className="text-[#6d2929] mt-2 text-sm font-medium">
+                        Register and submit proof of public presentation
+                    </p>
+                </div>
             </div>
 
+            {/* === CONTENT WRAPPER === */}
             <div className="max-w-[1440px] mx-auto w-full my-8 md:my-10 px-4 md:px-10 grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-8 items-start">
 
                 {/* === LEFT ASIDE (Sticky) === */}
@@ -119,7 +128,6 @@ export default function PublicPresentation({ auth, thesis, audit_trail = [], sta
                             Approval Status
                         </div>
                         <div className="p-6">
-                            
                             <div className="relative pl-5 mt-2 space-y-0 before:absolute before:left-0 before:top-[5px] before:bottom-0 before:w-0.5 before:bg-[#eee]">
                                 {steps.map((step, index) => {
                                     let circleClass = "bg-[#e0e0e0] border-[#ddd] shadow-[#ddd]";
@@ -276,7 +284,7 @@ export default function PublicPresentation({ auth, thesis, audit_trail = [], sta
                                         />
                                         <p className="text-[0.85rem] text-[#999] mt-2 text-center">Required for Adviser review before the event</p>
 
-                                        {/* Show uploaded file if exists */}
+                                        {/* Uploaded State */}
                                         {data.materials_file && (
                                             <div className="mt-4 bg-[#f0fdf4] p-2.5 rounded border border-[#bbf7d0] flex items-center justify-between">
                                                 <div className="flex items-center gap-2.5">
@@ -305,7 +313,7 @@ export default function PublicPresentation({ auth, thesis, audit_trail = [], sta
                                         />
                                         <p className="text-[0.85rem] text-[#999] mt-2 text-center">Upload this after the event to complete the requirement</p>
 
-                                        {/* Show uploaded file if exists */}
+                                        {/* Uploaded State */}
                                         {data.proof_file && (
                                             <div className="mt-4 bg-[#f0fdf4] p-2.5 rounded border border-[#bbf7d0] flex items-center justify-between">
                                                 <div className="flex items-center gap-2.5">

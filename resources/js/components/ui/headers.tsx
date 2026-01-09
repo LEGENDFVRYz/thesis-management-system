@@ -1,4 +1,5 @@
 import React from "react";
+import { cn } from "@/lib/utils";
 
 const primaryBg = "#730000"; // Figma primary color
 
@@ -30,7 +31,7 @@ export function RowColumn1Header() {
 
 interface MethodologyHeaderProps {
   variant: 'static' | 'dynamic';
-  columns?: string[]; // Only used for dynamic variant
+  columns?: { label: string; className?: string }[]; // Only used for dynamic variant
   backgroundColor?: string;
 }
 
@@ -55,16 +56,13 @@ export function MethodologyHeader({
   // Variant 2: Dynamic (Loops through the 'columns' prop)
   return (
     <div 
-      className="flex items-center justify-between gap-4 rounded-t-xl px-5 py-3" 
+      className="flex items-center justify-between gap-4 rounded-t-xl py-3" 
       style={{ backgroundColor: primaryBg }}
     >
       {columns.map((col, index) => (
-        <span 
-          key={index} 
-          className="flex-1 text-sm text-background text-center tracking-wider"
-        >
-          {col}
-        </span>
+        <div key={index} className={cn("text-dm text-background text-sm", col.className)}>
+          {col.label}
+        </div>
       ))}
     </div>
   );
