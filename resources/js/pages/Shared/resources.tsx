@@ -204,12 +204,12 @@ export default function Resources() {
                         >
                             {/* Header */}
                             <div style={{ padding: "16px 20px", borderBottom: "1px solid #e5e7eb", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                <h2 style={{ fontSize: "20px", fontWeight: 700, color: "#800000", margin: 0 }}>Manage File Restrictions</h2>
+                                <h2 className="text-[20px] font-bold text-[#800000] m-0">Manage File Restrictions</h2>
                             </div>
 
                             {/* Content */}
                             <div style={{ padding: "16px 20px", overflowY: "auto", flex: 1 }}>
-                                <p style={{ color: "#6b7280", marginBottom: "16px", fontSize: "14px" }}>
+                                <p className="text-[#6b7280] mb-4 text-sm">
                                     Configure access permissions for different user roles in the file system.
                                 </p>
                                 <div style={{ borderRadius: "8px", overflow: "hidden", border: "1px solid #e5e7eb" }}>
@@ -217,7 +217,7 @@ export default function Resources() {
                                         <thead>
                                             <tr>
                                                 {["Access Level", "View", "Update", "Delete"].map((h) => (
-                                                    <th key={h} style={{ backgroundColor: "#800000", color: "white", padding: "10px", fontSize: "14px" }}>{h}</th>
+                                                    <th key={h} className="bg-[#800000] text-white p-2.5 text-sm">{h}</th>
                                                 ))}
                                             </tr>
                                         </thead>

@@ -106,8 +106,8 @@ export default function AcademicSettings() {
             <div>
               <label className="text-sm font-medium">Current Academic Year</label>
               <div className="bg-[#95969766] border-[0.8px] rounded-sm border-[#44444433] px-3 py-2 text-sm flex items-center justify-between">
-                <span style={{ color: '#730000' }}>Academic Year 2024 – 2025</span>
-                <img src={CheckIcon} className="w-5 h-5" style={{ filter: 'brightness(0) saturate(100%) invert(12%) sepia(86%) saturate(2065%) hue-rotate(335deg)' }} alt="checkmark" />
+                <span className="text-[#730000]">Academic Year 2024 – 2025</span>
+                <img src={CheckIcon} className="w-5 h-5 brightness-0 saturate-100 invert-[12%] sepia-[86%] saturate-[2065%] hue-rotate-[335deg]" alt="checkmark" />
               </div>
             </div>
             <div>
@@ -141,7 +141,7 @@ export default function AcademicSettings() {
             {/* NOTICE */}
             <div className="flex items-center justify-center gap-2 rounded-md bg-[#FFFFFF] border border-[#730000] px-3 py-1.5 text-xs">
               <img src={TimerIcon} className="w-5 h-5" alt="time" />
-              <span style={{ color: '#730000', fontSize: '16px' }}>Timeline must sync with the university calendar.</span>
+              <span className="text-[#730000] text-base">Timeline must sync with the university calendar.</span>
             </div>
 
             {/* DEADLINE EVENT CARDS */}
@@ -149,27 +149,21 @@ export default function AcademicSettings() {
               {DEADLINE_EVENTS.map((event) => (
                 <Card
                   key={event.id}
-                  className="relative rounded-xl overflow-hidden"
-                  style={{ padding: '14px 18px 14px 22px',
-                    backgroundColor:
-                      eventStatus === 'Past' ? '#95969766' : '#FFBD0099',
-                    border:
-                      eventStatus === 'Past'
-                        ? '0.5px solid #44444433'
-                        : '1.5px solid #FFBD00',
-                  }}
+                  className={`relative rounded-xl overflow-hidden ${
+                    eventStatus === 'Past'
+                      ? 'bg-[#95969766] border-[0.5px] border-[#44444433]'
+                      : 'bg-[#FFBD0099] border-[1.5px] border-[#FFBD00]'
+                  }`}
+                  style={{ padding: '14px 18px 14px 22px' }}
                 >
                   {/* Red side accent */}
-                  <div
-                    className="absolute left-0 top-0 h-full w-[3px] rounded-l-md"
-                    style={{ backgroundColor: '#730000' }}
-                  />
+                  <div className="absolute left-0 top-0 h-full w-[3px] rounded-l-md bg-[#730000]" />
 
                   <CardContent className="py-1.5 px-3 pl-0">
-                    <p className="font-semibold text-base leading-tight" style={{ color: '#730000' }}>
+                    <p className="font-semibold text-base leading-tight text-[#730000]">
                       {event.title}
                     </p>
-                    <p className="text-xs flex items-center gap-1 mt-0.5 leading-tight" style={{ color: '#730000' }}>
+                    <p className="text-xs flex items-center gap-1 mt-0.5 leading-tight text-[#730000]">
                       <img src={PinIcon} className="w-4 h-4" alt="pin" />
                       {event.dateRange}
                     </p>
