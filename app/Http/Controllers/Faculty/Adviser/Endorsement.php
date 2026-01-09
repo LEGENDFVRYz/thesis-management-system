@@ -18,6 +18,16 @@ class Endorsement extends Controller
         // TASK 2.2: Arnel      --part 1/2
 
         // Get the logged-in adviser's user ID
+
+        // 1. GET ACTIVE SCHOOL YEAR (Needed for the calculation)
+        $activeYear = DB::table('tbl_school_years')
+            ->join('tbl_semesters', 'tbl_school_years.id', '=', 'tbl_semesters.school_year_id')
+            ->where('tbl_semesters.is_active', true)
+            ->value('year');
+
+        // Fallback safety
+        $activeYear = $activeYear ?? date('Y');
+
         $userId = Auth::id();
 
         // Query all the valid endorsements under this adviser's section
@@ -43,7 +53,7 @@ class Endorsement extends Controller
             // Join to get Adviser's Faculty Info
             ->join('tbl_faculties as adviser_faculty', 'adviser_fa.faculty_id', '=', 'adviser_faculty.id')
 
-            // Join to Defense Matrices
+            ->join('tbl_school_years as sy', 'adviser_fa.sy_id', '=', 'sy.id')
             ->leftJoin('tbl_defense_matrices as dm', 'e.id', '=', 'dm.endorsement_id')
 
             ->select(
@@ -59,18 +69,15 @@ class Endorsement extends Controller
                 // Course
                 'dm.course',
 
-                // Group Code (course prefix + section + group_number format)
-                // MOR = 3, DP1/DP2 = 4
-                // group_number is padded to 2 digits (e.g., 1 -> 01)
+                // Group Code (New Group Code Format)
                 DB::raw("CONCAT(
-                    CASE
-                        WHEN dm.course = 'MOR' THEN '3'
-                        WHEN dm.course IN ('DP1', 'DP2') THEN '4'
-                        ELSE ''
-                    END,
-                    sa.section,
+                    (3 + ($activeYear - sy.year)), 
+                    sa.section, 
                     LPAD(g.group_number, 2, '0')
                 ) AS group_code"),
+
+                // Year Level
+                DB::raw("(3 + ($activeYear - sy.year)) as year_level"),
 
                 // Endorsement Status
                 'e.is_adviser_approved',
@@ -117,7 +124,8 @@ class Endorsement extends Controller
                 'adviser_faculty.name_prefix',
                 'adviser_faculty.first_name',
                 'adviser_faculty.middle_name',
-                'adviser_faculty.last_name'
+                'adviser_faculty.last_name',
+                'sy.year'
             )
             
             ->orderBy('e.is_adviser_approved', 'asc')
