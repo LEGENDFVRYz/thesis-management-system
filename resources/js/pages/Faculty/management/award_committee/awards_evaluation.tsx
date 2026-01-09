@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { Head } from '@inertiajs/react';
 import { awards_evaluation } from '@/routes/faculty/management/award'; 
 import { NavFooter } from '@/components/nav-footer';
+import { type BreadcrumbItem } from '@/types';
 
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
 
-// COMPONENTS
+// AWARDS COMMITTEE COMPONENTS
 import { TabNavigation } from './awards_tabNavigation';
 import { PageHeader } from './awards_pageHeader';
 import { EvaluationPage } from './awards_evaluationPage';
@@ -17,6 +18,13 @@ import { ViewResultsModal } from './awards_viewEvalResult_modal';
 import { EvaluationRow } from './awards_types';
 import { getEvaluationStatus } from './awards_utils';
 import { evaluationData, resultsData, detailedEvaluationResults } from './awards_sampleData';
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Awards Evaluation',
+        href: awards_evaluation().url,
+    },
+];
 
 export default function Dashboard() {
     const [activeTab, setActiveTab] = useState<'evaluation' | 'results'>('evaluation');
@@ -49,19 +57,16 @@ export default function Dashboard() {
             <Head title="Awards Evaluation" />
             
             <FacultyManagementLayout
+                breadcrumbs={breadcrumbs}
                 title={activeTab === 'evaluation' ? 'Evaluation Page' : 'Results Page'}
                 description={
                     activeTab === 'evaluation'
                         ? 'Page for evaluating top 10 project groups based on output, defense, and tech development'
                         : 'View summarized scores, rankings, and awards results'
                 }
-                breadcrumbs={[
-                    {
-                        title: 'Awards Evaluation',
-                        href: awards_evaluation.url(), 
-                    }
-                ]}
             >
+                <div className="border border-primary mb-4"></div>
+                
                 {/* Header Section with Tabs */}
                 <div className="mb-6">
                     <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />

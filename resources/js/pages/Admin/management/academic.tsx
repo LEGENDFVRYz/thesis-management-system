@@ -6,7 +6,7 @@ import { academic } from '@/routes/admin/management/index';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { Card, CardHeader, CardTitle, CardContent,} from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AcademicYearRangePicker from '@/components/acad-year-range-picker';
 import DatePicker from '@/components/date-picker';
@@ -19,6 +19,7 @@ import CheckIcon from '@/components/Icons/ic_check-Default.svg';
 import TimerIcon from '@/components/Icons/timer.svg';
 import ManagementIcon from '@/components/Icons/ic_pen-settings-Default.svg';
 import { RotateCw } from 'lucide-react';
+import { NavFooter } from '@/components/nav-footer';
 
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Academic Settings Configuration', href: academic().url },
@@ -34,7 +35,7 @@ const DEADLINE_EVENTS = [
 
 export default function AcademicSettings() {
   const [eventStatus, setEventStatus] = useState<'Active' | 'Past'>('Active');
-  
+
   // Academic Year state
   const [academicYear, setAcademicYear] = useState({
     startDate: null,
@@ -51,6 +52,13 @@ export default function AcademicSettings() {
     defenseEnd: null,
   });
 
+  // Program Overview state
+  const [programComponents, setProgramComponents] = useState({
+    titleProposal: false,
+    designProject1: false,
+    designProject2: false,
+  });
+
   const handleSaveAcademicYear = () => {
     // send data
     console.log('Saving academic year:', academicYear);
@@ -63,7 +71,17 @@ export default function AcademicSettings() {
     toast.success('Semester configuration saved successfully');
   };
 
+  const handleResetProgramComponents = () => {
+    setProgramComponents({
+      titleProposal: false,
+      designProject1: false,
+      designProject2: false,
+    });
+    toast.success('Program components reset successfully');
+  };
+
   return (
+    <>
     <ManagementLayout
       breadcrumbs={breadcrumbs}
       title={<div className="flex items-center gap-2 text-[#FFBD00]">
@@ -87,9 +105,9 @@ export default function AcademicSettings() {
           <CardContent className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium">Current Academic Year</label>
-              <div className="bg-[#95969766] border-[0.8px] rounded-sm border-[#44444433] px-3 py-2 text-sm flex items-center justify-between">
-                <span style={{ color: '#730000' }}>Academic Year 2024 – 2025</span>
-                <img src={CheckIcon} className="w-5 h-5" style={{ filter: 'brightness(0) saturate(100%) invert(12%) sepia(86%) saturate(2065%) hue-rotate(335deg)' }} alt="checkmark" />
+              <div className="bg-[#95969766] border rounded-sm border-[#44444433] px-3 py-2 text-sm flex items-center justify-between">
+                <span className="text-[#730000]">Academic Year 2024 – 2025</span>
+                <img src={CheckIcon} className="w-5 h-5 brightness-0 saturate-100 invert-[12%] sepia-[86%] saturate-[2065%] hue-rotate-[335deg]" alt="checkmark" />
               </div>
             </div>
             <div>
@@ -121,37 +139,30 @@ export default function AcademicSettings() {
 
           <CardContent className="space-y-3">
             {/* NOTICE */}
-            <div className="flex items-center justify-center gap-2 rounded-md bg-[#FFFFFF] border border-[#730000] px-3 py-1.5 text-xs">
+            <div className="flex items-center justify-center gap-2 rounded-md bg-white border border-[#730000] px-3 py-1.5 text-xs">
               <img src={TimerIcon} className="w-5 h-5" alt="time" />
-              <span style={{ color: '#730000', fontSize: '16px' }}>Timeline must sync with the university calendar.</span>
+              <span className="text-[#730000] text-base">Timeline must sync with the university calendar.</span>
             </div>
 
             {/* DEADLINE EVENT CARDS */}
-            <div className="space-y-2">
+            <div className="space-y-2 max-h-[250px] overflow-y-auto pr-2">
               {DEADLINE_EVENTS.map((event) => (
                 <Card
                   key={event.id}
-                  className="relative rounded-xl overflow-hidden"
-                  style={{ padding: '14px 18px 14px 22px',
-                    backgroundColor:
-                      eventStatus === 'Past' ? '#95969766' : '#FFBD0099',
-                    border:
-                      eventStatus === 'Past'
-                        ? '0.5px solid #44444433'
-                        : '1.5px solid #FFBD00',
-                  }}
+                  className={`relative rounded-xl overflow-hidden pt-3.5 pr-[18px] pb-3.5 pl-[22px] ${
+                    eventStatus === 'Past'
+                      ? 'bg-[#95969766] border border-[#44444433]'
+                      : 'bg-[#FFBD0099] border-2 border-[#FFBD00]'
+                  }`}
                 >
                   {/* Red side accent */}
-                  <div
-                    className="absolute left-0 top-0 h-full w-[3px] rounded-l-md"
-                    style={{ backgroundColor: '#730000' }}
-                  />
+                  <div className="absolute left-0 top-0 h-full w-[3px] rounded-l-md bg-[#730000]" />
 
                   <CardContent className="py-1.5 px-3 pl-0">
-                    <p className="font-semibold text-base leading-tight" style={{ color: '#730000' }}>
+                    <p className="font-semibold text-base leading-tight text-[#730000]">
                       {event.title}
                     </p>
-                    <p className="text-xs flex items-center gap-1 mt-0.5 leading-tight" style={{ color: '#730000' }}>
+                    <p className="text-xs flex items-center gap-1 mt-0.5 leading-tight text-[#730000]">
                       <img src={PinIcon} className="w-4 h-4" alt="pin" />
                       {event.dateRange}
                     </p>
@@ -159,15 +170,14 @@ export default function AcademicSettings() {
                 </Card>
               ))}
             </div>
-
-            {/* SYNC BUTTON */}
-            <div className="flex justify-end mt-4">
-              <Button variant="primary" className="gap-2">
-                <RotateCw className="w-4 h-4" />
-                Sync
-              </Button>
-            </div>
           </CardContent>
+
+          <CardFooter className="flex justify-end">
+            <Button variant="primary" className="gap-2">
+              <RotateCw className="w-4 h-4" />
+              Sync
+            </Button>
+          </CardFooter>
         </Card>
         </div>
 
@@ -181,11 +191,11 @@ export default function AcademicSettings() {
           <CardContent className="space-y-4">
             <label className="text-sm font-medium">Active Semester</label>
 
-            <Select 
-              value={semester.activeSemester} 
+            <Select
+              value={semester.activeSemester}
               onValueChange={(value) => setSemester({...semester, activeSemester: value})}
             >
-              <SelectTrigger className="w-full bg-[#F3EFD0] border-1px border-[#7300001A] text-[#730000] rounded-md">
+              <SelectTrigger className="w-full bg-[#F3EFD0] border border-[#7300001A] text-[#730000] rounded-md">
                 <SelectValue placeholder="Select Semester" />
               </SelectTrigger>
               <SelectContent className="bg-[#F3EFD0] border border-[#7300001A]">
@@ -222,26 +232,48 @@ export default function AcademicSettings() {
           </CardHeader>
 
           <CardContent className="space-y-4">
-            <label className="text-sm font-medium">Program Type</label>
+            <div>
+              <label className="text-sm font-medium">Program Type</label>
+              <Select defaultValue="mor">
+                <SelectTrigger className="w-full bg-[#F3EFD0] border border-[#7300001A] text-[#730000] rounded-md mt-2">
+                  <SelectValue placeholder="Select Program Type" />
+                </SelectTrigger>
+                <SelectContent className="bg-[#F3EFD0] border border-[#7300001A]">
+                  <SelectItem value="mor" className="text-[#730000]">Methods of Research</SelectItem>
+                  <SelectItem value="dp" className="text-[#730000]">Design Project</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-            <Select defaultValue="mor">
-              <SelectTrigger className="w-full bg-[#F3EFD0] border border-[#7300001A] text-[#730000] rounded-md">
-                <SelectValue placeholder="Select Program Type" />
-              </SelectTrigger>
-              <SelectContent className="bg-[#F3EFD0] border border-[#7300001A]">
-                <SelectItem value="mor" className="text-[#730000]">Methods of Research</SelectItem>
-                <SelectItem value="dp" className="text-[#730000]">Design Project</SelectItem>
-              </SelectContent>
-            </Select>
+            <div>
+              <label className="text-sm font-medium">Required Components</label>
+              <div className="flex flex-col gap-3 mt-3">
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    checked={programComponents.titleProposal}
+                    onCheckedChange={(checked) => setProgramComponents({...programComponents, titleProposal: checked as boolean})}
+                  />
+                  <span className="text-sm">Title Proposal Defense</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    checked={programComponents.designProject1}
+                    onCheckedChange={(checked) => setProgramComponents({...programComponents, designProject1: checked as boolean})}
+                  />
+                  <span className="text-sm">Design Project 1 Defense</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    checked={programComponents.designProject2}
+                    onCheckedChange={(checked) => setProgramComponents({...programComponents, designProject2: checked as boolean})}
+                  />
+                  <span className="text-sm">Design Project 2 Defense</span>
+                </div>
+              </div>
+            </div>
 
-            <label className="text-sm font-medium">Required Components</label>
-
-            <CheckboxRow label="Title Proposal Defense" />
-            <CheckboxRow label="Design Project 1 Defense" />
-            <CheckboxRow label="Design Project 2 Defense" />
-
-            <div className="flex justify-end gap-2 mt-2">
-              <Button variant="outline">Reset</Button>
+            <div className="flex justify-end gap-2 mt-4">
+              <Button variant="outline" onClick={handleResetProgramComponents}>Reset</Button>
               <Button variant="primary">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M10.1333 2C10.485 2.00501 10.8205 2.14878 11.0667 2.4L13.6 4.93333C13.8512 5.17951 13.995 5.51497 14 5.86667V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 3.33333C2 2.97971 2.14048 2.64057 2.39052 2.39052C2.64057 2.14048 2.97971 2 3.33333 2H10.1333Z" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
@@ -255,6 +287,9 @@ export default function AcademicSettings() {
         </div>
       </div>
     </ManagementLayout>
+
+    <NavFooter />
+    </>
   );
 }
 
@@ -264,15 +299,6 @@ function DateField({ label }: { label: string }) {
     <div>
       <label className="text-sm font-medium">{label}</label>
       <DatePicker />
-    </div>
-  );
-}
-
-function CheckboxRow({ label }: { label: string }) {
-  return (
-    <div className="flex items-center gap-2">
-      <Checkbox />
-      <span className="text-sm">{label}</span>
     </div>
   );
 }

@@ -62,10 +62,6 @@ Route::get('/faq', function () {
 
 // GUEST ROUTES
 Route::prefix('guest')->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('Guest/landing');
-    })->name('guest.landing');
-
     Route::get('/repository', function () {
         return Inertia::render('Guest/repository');
     })->name('guest.repository');
@@ -130,6 +126,18 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('student/profilemanagement', function () {
         return Inertia::render('Student/profilemanagement');
     })->name('student.profilemanagement');
+
+    Route::get('student/evaluation-and-grading', function () {
+        return Inertia::render('Student/evaluation-and-grading');
+    })->name('student.evaluation-and-grading');
+
+    Route::get('resources', function () {
+        return Inertia::render('Student/resources');
+    })->name('student.resources');
+
+    Route::get('repository', function () {
+        return Inertia::render('Student/repository');
+    })->name('student.repository');
 });
 
 

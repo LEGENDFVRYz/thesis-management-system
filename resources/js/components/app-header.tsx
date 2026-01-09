@@ -13,6 +13,7 @@ import { UserMenuContent } from '@/components/user-menu-content';
 import { Icon } from '@/components/icon-index';
 import { IconName } from '@/components/icons-registry';
 import { GlobalNavDropdown } from '@/components/app-header-management'; 
+import NotificationModal from './modal/notification-modal';
 
 // Management Data Constants
 const adminManagementItems = [
@@ -21,13 +22,13 @@ const adminManagementItems = [
         title: 'Root', 
         children: [
             { title: 'User Management', href: '#', isHeader: true },
-            { title: 'Faculty', href: '/admin/faculty' },
-            { title: 'Student', href: '/admin/student' },
+            { title: 'Faculty', href: '/admin/management/faculty' },
+            { title: 'Student', href: '/admin/management/student' },
             { title: 'System Configuration', href: '#', isHeader: true },
-            { title: 'Academic Settings', href: '/admin/academic' },
-            { title: 'Deadline', href: '/admin/deadline' },
-            { title: 'Department Policies', href: '/admin/policies' },
-            { title: 'Defense Management', href: '/admin/defense' },
+            { title: 'Academic Settings', href: '/admin/management/academic-settings' },
+            { title: 'Deadline', href: '/admin/management/deadline' },
+            { title: 'Department Policies', href: '/admin/management/dept-policies' },
+            { title: 'Defense Management', href: '/admin/management/defenses' },
         ] 
     }
 ];
@@ -38,21 +39,21 @@ const facultyManagementItems = [
         title: 'Adviser', 
         children: [
             { title: 'Advisee Management', href: '#', isHeader: true },
-            { title: 'My Advisees', href: '/adviser/my-advisees' },
-            { title: 'Group Composition', href: '/adviser/groups' },
-            { title: 'Thesis Review', href: '/adviser/review' },
-            { title: 'Progress Monitoring', href: '/adviser/monitoring' },
-            { title: 'Defense Management', href: '/adviser/defense' },
-            { title: 'Panel Endorsement', href: '/adviser/endorsement' },
+            { title: 'My Advisees', href: '/faculty/management/adviser/advisee_management/my_advisees' },
+            { title: 'Group Composition', href: '/faculty/management/adviser/advisee_management/group_comp' },
+            { title: 'Thesis Review', href: '/faculty/management/adviser/advisee_management/thesis_review' },
+            { title: 'Progress Monitoring', href: '/faculty/management/adviser/advisee_management/progress' },
+            { title: 'Defense Management', href: '/faculty/management/defense_management' },
+            { title: 'Panel Endorsement', href: '/faculty/management/adviser/endorsement' },
             { title: 'Evaluation and Grading', href: '#', isHeader: true },
-            { title: 'Grade Input', href: '/adviser/grades' },
+            { title: 'Grade Input', href: '/faculty/management/adviser/eval_n_grading' },
             { title: 'Rubrics and Guidelines', href: '/adviser/rubrics' }
         ] 
     },
-    { id: 'committee', title: 'Committee', children: [{ title: 'Proposal Review', href: '/committee/proposals' }] },
+    { id: 'committee', title: 'Committee', children: [{ title: 'Proposal Review', href: '/committee/proposal-review' }] },
     { id: 'panel', title: 'Panel', children: [
-        { title: 'Panel Thesis Review', href: '/panel/review' },
-        { title: 'Defense Management', href: '/panel/defense' }
+        { title: 'Panel Thesis Review', href: '/faculty/management/panel/thesis-review-0/thesis_review' },
+        { title: 'Defense Management', href: '/faculty/management/defense_management' }
     ]}
 ];
 
@@ -77,26 +78,23 @@ const coordinatorManagementItems = [
 ];
 
 const studentManagementItems = [
-    { 
-        id: 'student-root', 
+    {
+        id: 'student-root',
         title: 'Student',
         children: [
-            { title: 'Progress Tracking', href: '/student/progress', isHeader: true },
-            { title: 'Overall Progress', href: '/student/progress/overall' },
-            { title: 'Consultations', href: '/student/progress/consultations' },
-            { title: 'Status Reports', href: '/student/progress/status-reports' },
+            { title: 'Progress Tracking', href: '/student/progress' },
             { title: 'Thesis Management', href: '/student/thesis-management' },
             { title: 'Defense Management', href: '/student/defense' },
             { title: 'Compliance & IP', href: '/student/compliance', isHeader: true },
             { title: 'IP & Plagiarism', href: '/student/ip-plagiarism' },
             { title: 'Public Presentation', href: '/student/public-presentation' }
-        ] 
+        ]
     }
 ];
 
 interface AppHeaderProps {
     breadcrumbs?: any[];
-    variant?: 'admin' | 'faculty' | 'coordinator' | 'committee' | 'student';
+    variant?: 'admin' | 'faculty' | 'coordinator' | 'committee' | 'student' | 'guest';
 }
 
 export function AppHeader({ breadcrumbs = [], variant }: AppHeaderProps) {
@@ -114,10 +112,10 @@ export function AppHeader({ breadcrumbs = [], variant }: AppHeaderProps) {
     const SharedLinks = () => (
         <>
             <Button variant="primary" asChild className="mx-1 border-none shadow-none">
-                <Link href="/repository" className='hover:text-primary-foreground-2'>Repository</Link>
+                <Link href="/faculty/repository" className='hover:text-primary-foreground-2'>Repository</Link>
             </Button>
             <Button variant="primary" asChild className="mx-1 border-none shadow-none">
-                <Link href="/resources" className='hover:text-primary-foreground-2'>Resources</Link>
+                <Link href="/faculty/resources" className='hover:text-primary-foreground-2'>Resources</Link>
             </Button>
         </>
     );
@@ -156,10 +154,15 @@ export function AppHeader({ breadcrumbs = [], variant }: AppHeaderProps) {
                         {activeRole === 'admin' && (
                             <>
                                 <Button variant="primary" asChild className="mx-1 border-none shadow-none">
-                                    <Link href="/admin/dashboard" className='hover:text-primary-foreground-2'>Home</Link>
+                                    <Link href="/admin" className='hover:text-primary-foreground-2'>Home</Link>
                                 </Button>
                                 <GlobalNavDropdown label="Management" variant="admin" items={adminManagementItems} />
-                                <SharedLinks />
+                                <Button variant="primary" asChild className="mx-1 border-none shadow-none">
+                                    <Link href="/admin/repository/resources" className='hover:text-primary-foreground-2'>Repository</Link>
+                                </Button>
+                                <Button variant="primary" asChild className="mx-1 border-none shadow-none">
+                                    <Link href="/admin/resources" className='hover:text-primary-foreground-2'>Resources</Link>
+                                </Button>
                             </>
                         )}
 
@@ -186,8 +189,9 @@ export function AppHeader({ breadcrumbs = [], variant }: AppHeaderProps) {
                         {activeRole === 'committee' && (
                             <>
                                 <Button variant="primary" asChild className="mx-1 border-none shadow-none">
-                                    <Link href="/committee/proposals" className='hover:text-primary-foreground-2'>Proposal Review</Link>
+                                    <Link href="/committee/proposal-review" className='hover:text-primary-foreground-2'>Proposal Review</Link>
                                 </Button>
+                                <GlobalNavDropdown label="Management" variant="faculty" items={facultyManagementItems} />
                                 <Button variant="primary" asChild className="mx-1 border-none shadow-none">
                                     <Link href="/repository" className='hover:text-primary-foreground-2'>Repository</Link>
                                 </Button>
@@ -197,71 +201,124 @@ export function AppHeader({ breadcrumbs = [], variant }: AppHeaderProps) {
                         {activeRole === 'student' && (
                             <>
                                 <Button variant="primary" asChild className="mx-1 border-none shadow-none">
-                                    <Link href="/student/dashboard" className='hover:text-primary-foreground-2'>Home</Link>
+                                    <Link href="/dashboard" className='hover:text-primary-foreground-2'>Home</Link>
                                 </Button>
                                 <GlobalNavDropdown label="Management" variant="student" items={studentManagementItems} />
                                 <SharedLinks />
+                            </>
+                        )}
+
+                        {activeRole === 'guest' && (
+                            <>
+                                <Button variant="primary" asChild className="mx-1 border-none shadow-none">
+                                    <Link href="/" className='hover:text-primary-foreground-2'>Home</Link>
+                                </Button>
+                                <Button variant="primary" asChild className="mx-1 border-none shadow-none">
+                                    <Link href="/guest/repository" className='hover:text-primary-foreground-2'>Repository</Link>
+                                </Button>
                             </>
                         )}
                     </nav>
 
                     {/* RIGHT: Action Icons */}
                     <div className="flex items-center gap-4 text-white">
-                        
-                        {/* Profile Icon */}
-                        <Link 
-                            href="/profile" // To change pa
-                            className="cursor-pointer transition-transform hover:scale-110"
-                            onMouseEnter={() => setHoveredIcon('profile')}
-                            onMouseLeave={() => {
-                                setHoveredIcon(null);
-                                setClickedIcon(null);
-                            }}
-                            onMouseDown={() => setClickedIcon('profile')}
-                            onMouseUp={() => setClickedIcon(null)}
-                        >
-                            <Icon name={getIconName('profile')} size={24} />
-                        </Link>
-                        
-                        {/* Notifications Icon */}
-                        <Link 
-                            href="/notifications" // To change pa
-                            className="cursor-pointer transition-transform hover:scale-110"
-                            onMouseEnter={() => setHoveredIcon('notification')}
-                            onMouseLeave={() => {
-                                setHoveredIcon(null);
-                                setClickedIcon(null);
-                            }}
-                            onMouseDown={() => setClickedIcon('notification')}
-                            onMouseUp={() => setClickedIcon(null)}
-                        >
-                            <Icon name={getIconName('notification')} size={24} />
-                        </Link>
-                        
-                        {/* FAQ Icon */}
-                        <Link 
-                            href="/faq" // To change pa
-                            className="cursor-pointer transition-transform hover:scale-110"
-                            onMouseEnter={() => setHoveredIcon('faq')}
-                            onMouseLeave={() => {
-                                setHoveredIcon(null);
-                                setClickedIcon(null);
-                            }}
-                            onMouseDown={() => setClickedIcon('faq')}
-                            onMouseUp={() => setClickedIcon(null)}
-                        >
-                            <Icon name={getIconName('faq')} size={24} />
-                        </Link>
 
-                        {/* Avatar Dropdown */}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <button className="size-9 bg-primary-foreground-2 rounded-full border-2 border-white/10 hover:border-white/30 transition-all cursor-pointer outline-white" />
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <UserMenuContent user={auth.user} />
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        {/* Profile Icon */}
+                        {activeRole === 'guest' && (
+                            <a
+                                href="/login"
+                                className="cursor-pointer transition-transform hover:scale-110 block group"
+                            >
+                                <div className="group-hover:hidden">
+                                    <Icon name="profileDefault" size={24} />
+                                </div>
+                                <div className="hidden group-hover:block">
+                                    <Icon name="profileHover" size={24} />
+                                </div>
+                            </a>
+                        )}  
+                        
+                        {activeRole === 'admin' && (
+                            <a
+                                href="/admin/profilemanagement"
+                                className="cursor-pointer transition-transform hover:scale-110 block group"
+                            >
+                                <div className="group-hover:hidden">
+                                    <Icon name="profileDefault" size={24} />
+                                </div>
+                                <div className="hidden group-hover:block">
+                                    <Icon name="profileHover" size={24} />
+                                </div>
+                            </a>
+                        )}
+
+                        {activeRole === 'faculty' && (
+                            <a
+                                href="/faculty/profilemanagement"
+                                className="cursor-pointer transition-transform hover:scale-110 block group"
+                            >
+                                <div className="group-hover:hidden">
+                                    <Icon name="profileDefault" size={24} />
+                                </div>
+                                <div className="hidden group-hover:block">
+                                    <Icon name="profileHover" size={24} />
+                                </div>
+                            </a>
+                        )}
+
+                        {activeRole === 'student' && (
+                            <a
+                                href="/student/profilemanagement"
+                                className="cursor-pointer transition-transform hover:scale-110 block group"
+                            >
+                                <div className="group-hover:hidden">
+                                    <Icon name="profileDefault" size={24} />
+                                </div>
+                                <div className="hidden group-hover:block">
+                                    <Icon name="profileHover" size={24} />
+                                </div>
+                            </a>
+                        )}
+
+                        {/* Notifications Icon - Hidden for guest variant */}
+                        {activeRole !== 'guest' && (
+                            <a
+                                href="/faculty/notification"
+                                className="cursor-pointer transition-transform hover:scale-110 block group"
+                            >
+                                <div className="group-hover:hidden">
+                                    <Icon name="notificationDefault" size={24} />
+                                </div>
+                                <div className="hidden group-hover:block">
+                                    <Icon name="notificationHover" size={24} />
+                                </div>
+                            </a>
+                        )}
+
+                        {/* FAQ Icon */}
+                        <a
+                            href="/faq"
+                            className="cursor-pointer transition-transform hover:scale-110 block group"
+                        >
+                            <div className="group-hover:hidden">
+                                <Icon name="faqDefault" size={24} />
+                            </div>
+                            <div className="hidden group-hover:block">
+                                <Icon name="faqHover" size={24} />
+                            </div>
+                        </a>
+
+                        {/* Avatar Dropdown - Hidden for guest variant */}
+                        {activeRole !== 'guest' && (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button className="size-9 bg-primary-foreground-2 rounded-full border-2 border-white/10 hover:border-white/30 transition-all cursor-pointer outline-white" />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <UserMenuContent user={auth.user} />
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        )}
                     </div>
                 </div>
             </div>

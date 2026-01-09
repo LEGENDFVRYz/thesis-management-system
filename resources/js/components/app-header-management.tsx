@@ -69,8 +69,8 @@ export function GlobalNavDropdown({
                         /* --- ADMIN/COORDINATOR/STUDENT VARIANT --- */
                         <div className="w-full rounded-b-xl bg-primary borderbackdrop-blur-sm">
                             {items[0]?.children?.map((sub, idx) => {
-                                const isCategory = sub.isHeader || 
-                                    ["User Management", "System Configuration", "Defense Management", "Panel Endorsement", "Grading Management", "Thesis Management", "Defense Management"].includes(sub.title);
+                                const isCategory = sub.isHeader ||
+                                    ["User Management", "System Configuration", "Defense Management", "Panel Endorsement", "Grading Management", "Thesis Management", "Progress Tracking"].includes(sub.title);
 
                                 return (
                                     <div key={idx} className={cn(
