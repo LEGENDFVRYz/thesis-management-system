@@ -105,7 +105,7 @@ export default function AcademicSettings() {
           <CardContent className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium">Current Academic Year</label>
-              <div className="bg-[#95969766] border-[0.8px] rounded-sm border-[#44444433] px-3 py-2 text-sm flex items-center justify-between">
+              <div className="bg-[#95969766] border rounded-sm border-[#44444433] px-3 py-2 text-sm flex items-center justify-between">
                 <span className="text-[#730000]">Academic Year 2024 – 2025</span>
                 <img src={CheckIcon} className="w-5 h-5 brightness-0 saturate-100 invert-[12%] sepia-[86%] saturate-[2065%] hue-rotate-[335deg]" alt="checkmark" />
               </div>
@@ -139,7 +139,7 @@ export default function AcademicSettings() {
 
           <CardContent className="space-y-3">
             {/* NOTICE */}
-            <div className="flex items-center justify-center gap-2 rounded-md bg-[#FFFFFF] border border-[#730000] px-3 py-1.5 text-xs">
+            <div className="flex items-center justify-center gap-2 rounded-md bg-white border border-[#730000] px-3 py-1.5 text-xs">
               <img src={TimerIcon} className="w-5 h-5" alt="time" />
               <span className="text-[#730000] text-base">Timeline must sync with the university calendar.</span>
             </div>
@@ -149,12 +149,11 @@ export default function AcademicSettings() {
               {DEADLINE_EVENTS.map((event) => (
                 <Card
                   key={event.id}
-                  className={`relative rounded-xl overflow-hidden ${
+                  className={`relative rounded-xl overflow-hidden pt-3.5 pr-[18px] pb-3.5 pl-[22px] ${
                     eventStatus === 'Past'
-                      ? 'bg-[#95969766] border-[0.5px] border-[#44444433]'
-                      : 'bg-[#FFBD0099] border-[1.5px] border-[#FFBD00]'
+                      ? 'bg-[#95969766] border border-[#44444433]'
+                      : 'bg-[#FFBD0099] border-2 border-[#FFBD00]'
                   }`}
-                  style={{ padding: '14px 18px 14px 22px' }}
                 >
                   {/* Red side accent */}
                   <div className="absolute left-0 top-0 h-full w-[3px] rounded-l-md bg-[#730000]" />
@@ -192,11 +191,11 @@ export default function AcademicSettings() {
           <CardContent className="space-y-4">
             <label className="text-sm font-medium">Active Semester</label>
 
-            <Select 
-              value={semester.activeSemester} 
+            <Select
+              value={semester.activeSemester}
               onValueChange={(value) => setSemester({...semester, activeSemester: value})}
             >
-              <SelectTrigger className="w-full bg-[#F3EFD0] border-1px border-[#7300001A] text-[#730000] rounded-md">
+              <SelectTrigger className="w-full bg-[#F3EFD0] border border-[#7300001A] text-[#730000] rounded-md">
                 <SelectValue placeholder="Select Semester" />
               </SelectTrigger>
               <SelectContent className="bg-[#F3EFD0] border border-[#7300001A]">
