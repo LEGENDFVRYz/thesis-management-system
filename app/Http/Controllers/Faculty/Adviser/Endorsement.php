@@ -123,7 +123,7 @@ class Endorsement extends Controller
             ->orderBy('e.is_adviser_approved', 'asc')
             ->get();
             
-       dd(vars: $validEndorsements);
+    //    dd(vars: $validEndorsements);
         return Inertia::render('Faculty/management/adviser/endorsements', [
             'endorsements' => $validEndorsements
         ]);

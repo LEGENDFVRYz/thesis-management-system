@@ -130,6 +130,9 @@ class GroupComp extends Controller
                 's.section',
             ])
             ->get();
+    
+        // dd($students, $sectionAdvisers, $studentsWithoutGroup);
+
         return Inertia::render('Faculty/management/adviser/advisee_management/group_comp', [
             'students' => $students,
             'sectionAdvisers' => $sectionAdvisers,
