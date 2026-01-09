@@ -437,36 +437,38 @@
     )
   }
 
-  {/* ================= Archive Card ================= */}
-  interface ArchiveCardProps {
-    title: string
-    members: string[]
-    date: string
-    badges: string[]
-    onViewAbstract?: () => void
-    variant?: 'default' | 'with-link'
-    href?: string
-    className?: string
-  }
+{/* ================= Archive Card ================= */}
+interface ArchiveCardProps {
+  id?: number
+  title: string
+  members: string[]
+  date: string
+  badges: string[]
+  onViewAbstract?: () => void
+  variant?: 'default' | 'with-link'
+  href?: string
+  className?: string
+}
 
-  function ArchiveCard({
-    title,
-    members,
-    date,
-    badges,
-    onViewAbstract,
-    variant = 'default',
-    href = '/guest/preview',
-    className
-  }: ArchiveCardProps) {
-    return (
-      <Card variant="archive" className={className}>
-        <div className="px-3 sm:px-5 w-full h-auto sm:h-50 overflow-hidden relative">
-          <CardHeader>
-            <div className="w-full h-auto sm:h-15 overflow-hidden relative">
-              <CardTitle>{title}</CardTitle>
-            </div>
-          </CardHeader>
+function ArchiveCard({
+  id,
+  title,
+  members,
+  date,
+  badges,
+  onViewAbstract,
+  variant = 'default',
+  href = '/guest/preview',
+  className
+}: ArchiveCardProps) {
+  return (
+    <Card variant="archive" className={className}>
+      <div className="px-3 sm:px-5 w-full h-auto sm:h-50 overflow-hidden relative">
+        <CardHeader>
+          <div className="w-full h-auto sm:h-15 overflow-hidden relative">
+            <CardTitle>{title}</CardTitle>
+          </div>
+        </CardHeader>
 
           <CardContent>
             <div className="w-full h-auto sm:h-21 overflow-hidden relative">
@@ -497,25 +499,25 @@
           </CardContent>
         </div>
 
-        <CardFooter className="px-3 sm:px-5 py-0.5">
-          <div className="w-full sm:h-9 relative">
-            {variant === 'with-link' ? (
-              <Link
-                href={href}
-                className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full sm:w-auto text-xs sm:text-sm"
-              >
-                View Abstract
-              </Link>
-            ) : (
-              <Button onClick={onViewAbstract} className="w-full sm:w-auto text-xs sm:text-sm">
-                View Abstract
-              </Button>
-            )}
-          </div>
-        </CardFooter>
-      </Card>
-    )
-  }
+      <CardFooter className="px-3 sm:px-5 py-0.5">
+        <div className="w-full sm:h-9 relative">
+          {variant === 'with-link' ? (
+            <Link
+              href={`/guest/repository/preview/${id}`}
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full sm:w-auto text-xs sm:text-sm"
+            >
+              View Abstract
+            </Link>
+          ) : (
+            <Button onClick={onViewAbstract} className="w-full sm:w-auto text-xs sm:text-sm">
+              View Abstract
+            </Button>
+          )}
+        </div>
+      </CardFooter>
+    </Card>
+  )
+}
 
   {/* ================= Committee Card ================= */}
   interface CommitteeCardProps {

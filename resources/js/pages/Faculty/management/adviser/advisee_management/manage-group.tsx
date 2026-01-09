@@ -1,7 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import {Dialog,DialogContent,DialogHeader,DialogTitle,DialogDescription,DialogFooter,} from '@/components/ui/dialog';
-
+import { router } from '@inertiajs/react';
+import { update } from '@/routes/faculty/management/adviser/advisee_management/group_comp';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import InputError from '@/components/input-error';
 
 interface Member {
@@ -9,34 +17,80 @@ interface Member {
   name: string;
   studentNumber: string;
   initials: string;
+  isLeader?: boolean;
+}
+
+interface SectionAdviser {
+  section_adviser_id: number;
+  section: number;
+}
+
+interface StudentWithoutGroup {
+  id: number;
+  student_name: string;
+  student_number: string;
+  email: string;
+  section: string;
 }
 
 interface ManageGroupModalProps {
   isOpen: boolean;
   onClose: () => void;
+  sectionAdvisers: SectionAdviser[];
+  studentsWithoutGroup: StudentWithoutGroup[];
   groupData?: {
+    groupId: number;
+    sectionAdviserId: number;
     members: Member[];
   };
 }
 
-export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageGroupModalProps) {
-  const [members] = useState<Member[]>(
-    groupData?.members || [
-      { id: 1, name: 'Juan Dela Cruz', studentNumber: '2022-09265-MN-0', initials: 'JDC' },
-      { id: 2, name: 'John Doe', studentNumber: '2022-09265-MN-0', initials: 'JD' },
-      { id: 3, name: '', studentNumber: '2022-09265-MN-0', initials: 'PK' },
-    ]
-  );
+export default function ManageGroupModal({ isOpen, onClose, sectionAdvisers, studentsWithoutGroup, groupData }: ManageGroupModalProps) {
+  const [members, setMembers] = useState<Member[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Update members when groupData changes
+  useEffect(() => {
+    if (groupData?.members) {
+      setMembers(groupData.members);
+    }
+  }, [groupData]);
 
   const [selectedAction, setSelectedAction] = useState<'add' | 'remove' | 'replace'>('add');
   const [selectedMember, setSelectedMember] = useState('');
-  const [newMemberName, setNewMemberName] = useState('');
-  const [studentId, setStudentId] = useState('');
-  const [email, setEmail] = useState('');
+  const [selectedNewStudent, setSelectedNewStudent] = useState('');
   const [reason, setReason] = useState('');
+
+  // Get available students for adding (filtered by block section and not already in group)
+  const getAvailableStudents = () => {
+    // Find the section adviser to get the section number
+    const sectionAdviser = sectionAdvisers.find(
+      sa => sa.section_adviser_id === groupData?.sectionAdviserId
+    );
+
+    // Filter students by block section if available
+    let filteredStudents = studentsWithoutGroup;
+    if (sectionAdviser) {
+      filteredStudents = studentsWithoutGroup.filter(
+        s => s.section === String(sectionAdviser.section)
+      );
+    }
+
+    // Filter out students already in the group
+    const currentStudentNumbers = members.map(m => m.studentNumber);
+    return filteredStudents.filter(s => !currentStudentNumbers.includes(s.student_number));
+  };
+
+  // Get initials from student name
+  const getInitials = (studentName: string): string => {
+    const nameParts = studentName.split(',').map(p => p.trim());
+    const lastName = nameParts[0] || '';
+    const firstAndMiddle = nameParts[1] || '';
+    return (firstAndMiddle.charAt(0) + lastName.charAt(0)).toUpperCase();
+  };
+  
   const [errors, setErrors] = useState<{
     selectedMember?: string;
-    newMemberName?: string;
     studentId?: string;
     email?: string;
     reason?: string;
@@ -45,51 +99,32 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
   const validateForm = () => {
     const newErrors: {
       selectedMember?: string;
-      newMemberName?: string;
       studentId?: string;
-      email?: string;
       reason?: string;
     } = {};
 
+    // Reason is required for ALL actions
+    if (!reason.trim()) {
+      newErrors.reason = 'Reason is required';
+    }
+
+    // Check specific fields based on action
     if (selectedAction === 'add') {
-      if (!newMemberName.trim()) {
-        newErrors.newMemberName = 'Name is required';
+      if (!selectedNewStudent) {
+        newErrors.studentId = 'Please select a student';
       }
-      if (!studentId.trim()) {
-        newErrors.studentId = 'Student ID is required';
-      }
-      if (!email.trim()) {
-        newErrors.email = 'Email is required';
-      } else if (!email.includes('@')) {
-        newErrors.email = 'Please enter a valid email';
-      }
-      if (!reason.trim()) {
-        newErrors.reason = 'Reason is required';
-      }
-    } else if (selectedAction === 'remove') {
+    } 
+    else if (selectedAction === 'remove') {
       if (!selectedMember) {
         newErrors.selectedMember = 'Please select a member';
       }
-      if (!reason.trim()) {
-        newErrors.reason = 'Reason is required';
-      }
-    } else if (selectedAction === 'replace') {
+    } 
+    else if (selectedAction === 'replace') {
       if (!selectedMember) {
-        newErrors.selectedMember = 'Please select a member';
+        newErrors.selectedMember = 'Please select a member to replace';
       }
-      if (!newMemberName.trim()) {
-        newErrors.newMemberName = 'Name is required';
-      }
-      if (!studentId.trim()) {
-        newErrors.studentId = 'Student ID is required';
-      }
-      if (!email.trim()) {
-        newErrors.email = 'Email is required';
-      } else if (!email.includes('@')) {
-        newErrors.email = 'Please enter a valid email';
-      }
-      if (!reason.trim()) {
-        newErrors.reason = 'Reason is required';
+      if (!selectedNewStudent) {
+        newErrors.studentId = 'Please select a replacement student';
       }
     }
 
@@ -98,28 +133,99 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
   };
 
   const handleUpdate = () => {
-    if (validateForm()) {
-      console.log('Updating group:', {
-        action: selectedAction,
-        selectedMember,
-        newMemberName,
-        studentId,
-        email,
-        reason,
-      });
-      onClose();
+    if (!validateForm()) {
+      return;
     }
+    
+    if (!groupData?.groupId || !groupData?.sectionAdviserId) {
+      return;
+    }
+
+    let updatedMembers = [...members];
+
+    if (selectedAction === 'add') {
+      // Add new member
+      const newStudent = studentsWithoutGroup.find(s => s.student_number === selectedNewStudent);
+      if (!newStudent || members.length >= 4) {
+        return;
+      }
+      updatedMembers.push({
+        id: Math.max(...members.map(m => m.id), 0) + 1,
+        name: newStudent.student_name,
+        studentNumber: newStudent.student_number,
+        initials: getInitials(newStudent.student_name),
+        isLeader: false,
+      });
+    } else if (selectedAction === 'remove') {
+      // Remove selected member
+      if (!selectedMember || members.length <= 2) {
+        return;
+      }
+      updatedMembers = members.filter(m => String(m.id) !== selectedMember);
+    } else if (selectedAction === 'replace') {
+      // Replace selected member with new student
+      const newStudent = studentsWithoutGroup.find(s => s.student_number === selectedNewStudent);
+      if (!selectedMember || !newStudent) {
+        return;
+      }
+      const memberToReplace = members.find(m => String(m.id) === selectedMember);
+      updatedMembers = members.map(m => {
+        if (String(m.id) === selectedMember) {
+          return {
+            ...m,
+            name: newStudent.student_name,
+            studentNumber: newStudent.student_number,
+            initials: getInitials(newStudent.student_name),
+            isLeader: memberToReplace?.isLeader || false,
+          };
+        }
+        return m;
+      });
+    }
+
+    // Ensure at least one leader exists
+    const hasLeader = updatedMembers.some(m => m.isLeader);
+    if (!hasLeader && updatedMembers.length > 0) {
+      updatedMembers[0].isLeader = true;
+    }
+
+    setIsSubmitting(true);
+
+    router.put(update.url({ id: groupData.groupId }), {
+      section_adviser_id: groupData.sectionAdviserId,
+      members: updatedMembers.map(m => ({
+        studentNumber: m.studentNumber,
+        isLeader: m.isLeader || false,
+      })),
+    }, {
+      onSuccess: () => {
+        handleCancel();
+      },
+      onFinish: () => {
+        setIsSubmitting(false);
+      },
+    });
   };
 
   const handleCancel = () => {
     setSelectedMember('');
-    setNewMemberName('');
-    setStudentId('');
-    setEmail('');
+    setSelectedNewStudent('');
     setReason('');
     setSelectedAction('add');
     setErrors({});
     onClose();
+  };
+
+  // Check if the form is valid for submission
+  const isFormValid = () => {
+    if (selectedAction === 'add') {
+      return selectedNewStudent && members.length < 4;
+    } else if (selectedAction === 'remove') {
+      return selectedMember && members.length > 2;
+    } else if (selectedAction === 'replace') {
+      return selectedMember && selectedNewStudent;
+    }
+    return false;
   };
 
   return (
@@ -223,62 +329,32 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
             {/* Add Member Form */}
             {selectedAction === 'add' && (
               <>
-                <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">
-                    New Member Name*
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Full Name"
-                    value={newMemberName}
-                    onChange={(e) => {
-                      setNewMemberName(e.target.value);
-                      if (errors.newMemberName) {
-                        setErrors({ ...errors, newMemberName: undefined });
-                      }
-                    }}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
-                  />
-                  <InputError message={errors.newMemberName} className="mt-1" />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">
-                    Student ID*
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="2022-09786-MN-0"
-                    value={studentId}
-                    onChange={(e) => {
-                      setStudentId(e.target.value);
-                      if (errors.studentId) {
-                        setErrors({ ...errors, studentId: undefined });
-                      }
-                    }}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
-                  />
-                  <InputError message={errors.studentId} className="mt-1" />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">
-                    Email*
-                  </label>
-                  <input
-                    type="email"
-                    placeholder="jdc@iskolarngbayan.pup.edu.ph"
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                      if (errors.email) {
-                        setErrors({ ...errors, email: undefined });
-                      }
-                    }}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
-                  />
-                  <InputError message={errors.email} className="mt-1" />
-                </div>
+                {members.length >= 4 ? (
+                  <div className="bg-yellow-100 text-yellow-800 text-sm px-4 py-3 rounded border border-yellow-200">
+                    This group already has the maximum of 4 members. Remove a member first to add a new one.
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-900 mb-2">
+                      Select New Member*
+                    </label>
+                    <select
+                      value={selectedNewStudent}
+                      onChange={(e) => setSelectedNewStudent(e.target.value)}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#730000]"
+                    >
+                      <option value="">Select Student...</option>
+                      {getAvailableStudents().map((student) => (
+                        <option key={student.id} value={student.student_number}>
+                          {student.student_name} - {student.student_number}
+                        </option>
+                      ))}
+                    </select>
+                    {getAvailableStudents().length === 0 && (
+                      <p className="text-xs text-gray-500 mt-1">No available students in this block section.</p>
+                    )}
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-2">
@@ -304,29 +380,34 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
             {/* Remove Member Form */}
             {selectedAction === 'remove' && (
               <>
-                <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">
-                    Select Member*
-                  </label>
-                  <select
-                    value={selectedMember}
-                    onChange={(e) => {
-                      setSelectedMember(e.target.value);
-                      if (errors.selectedMember) {
-                        setErrors({ ...errors, selectedMember: undefined });
-                      }
-                    }}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#730000]"
-                  >
-                    <option value="">Select Member</option>
-                    {members.map((member) => (
-                      <option key={member.id} value={member.id}>
-                        {member.name || member.initials} - {member.studentNumber}
-                      </option>
-                    ))}
-                  </select>
-                  <InputError message={errors.selectedMember} className="mt-1" />
-                </div>
+                {members.length <= 2 ? (
+                  <div className="bg-yellow-100 text-yellow-800 text-sm px-4 py-3 rounded border border-yellow-200">
+                    This group has the minimum of 2 members. Add a member first before removing one.
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-900 mb-2">
+                      Select Member to Remove*
+                    </label>
+                    <select
+                      value={selectedMember}
+                      onChange={(e) => {
+                        setSelectedMember(e.target.value)
+                        if (errors.selectedMember) {
+                          setErrors({ ...errors, selectedMember: undefined });
+                        }
+                      }}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#730000]"
+                    >
+                      <option value="">Select Member</option>
+                      {members.map((member) => (
+                        <option key={member.id} value={member.id}>
+                          {member.name || member.initials} - {member.studentNumber}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-2">
@@ -354,7 +435,7 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
               <>
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-2">
-                    Select Member*
+                    Select Member to Replace*
                   </label>
                   <select
                     value={selectedMember}
@@ -378,59 +459,29 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
 
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-2">
-                    New Member Name*
+                    Select Replacement Member*
                   </label>
-                  <input
-                    type="text"
-                    placeholder="Full Name"
-                    value={newMemberName}
+                  <select
+                    value={selectedNewStudent}
                     onChange={(e) => {
-                      setNewMemberName(e.target.value);
-                      if (errors.newMemberName) {
-                        setErrors({ ...errors, newMemberName: undefined });
-                      }
-                    }}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
-                  />
-                  <InputError message={errors.newMemberName} className="mt-1" />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">
-                    Student ID*
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="2022-09786-MN-0"
-                    value={studentId}
-                    onChange={(e) => {
-                      setStudentId(e.target.value);
+                      setSelectedNewStudent(e.target.value);
                       if (errors.studentId) {
                         setErrors({ ...errors, studentId: undefined });
                       }
                     }}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
-                  />
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#730000]"
+                  >
+                    <option value="">Select Student...</option>
+                    {getAvailableStudents().map((student) => (
+                      <option key={student.id} value={student.student_number}>
+                        {student.student_name} - {student.student_number}
+                      </option>
+                    ))}
+                  </select>
+                  {getAvailableStudents().length === 0 && (
+                    <p className="text-xs text-gray-500 mt-1">No available students in this block section.</p>
+                  )}
                   <InputError message={errors.studentId} className="mt-1" />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">
-                    Email*
-                  </label>
-                  <input
-                    type="email"
-                    placeholder="jdc@iskolarngbayan.pup.edu.ph"
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                      if (errors.email) {
-                        setErrors({ ...errors, email: undefined });
-                      }
-                    }}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
-                  />
-                  <InputError message={errors.email} className="mt-1" />
                 </div>
 
                 <div>
@@ -461,15 +512,17 @@ export default function ManageGroupModal({ isOpen, onClose, groupData }: ManageG
           <Button
             variant="outline"
             onClick={handleCancel}
+            disabled={isSubmitting}
             className="px-6 py-2 border-[#730000] text-[#730000] hover:bg-red-50"
           >
             Cancel
           </Button>
           <Button
             onClick={handleUpdate}
-            className="px-6 py-2 bg-[#730000] text-white hover:bg-red-800"
+            disabled={isSubmitting || !isFormValid()}
+            className="px-6 py-2 bg-[#730000] text-white hover:bg-red-800 disabled:bg-gray-400"
           >
-            Update
+            {isSubmitting ? 'Updating...' : 'Update'}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -6,16 +6,14 @@ import {Table,TableBody,TableCell,TableHead,TableHeader,TableRow,
 import { Button } from "@/components/ui/button";
 
 // Columns for the table
-const columns = ["Defense ID", "Title", "Proponents", "Block", "Actions"];
+const columns = ["Group Number", "Title", "Proponents", "Block", "Actions"];
 
 interface CustomTableProps {
-  status: "pending" | "approved";
-  pendingRows: any[];
-  approvedRows: any[];
+  rows: any[];
   onEditClick?: (row: any) => void;
   onManageClick?: (row: any) => void;
-  onApproveClick?: (row: any) => void;
   onRemoveClick?: (row: any) => void;
+  onApproveClick?: (row: any) => void;
 }
 
 type IconState = "default" | "hover" | "clicked";
@@ -23,49 +21,48 @@ type IconState = "default" | "hover" | "clicked";
 interface RowIconStates {
   [key: number]: {
     edit: IconState;
-    check: IconState;
     close: IconState;
+    manage: IconState;
+    check: IconState;
   };
 }
 
-export default function CustomTable({ 
-  status, 
-  pendingRows,
-  approvedRows,
-  onEditClick, 
-  onManageClick, 
+export default function CustomTable({
+  rows,
+  onEditClick,
+  onManageClick,
+  onRemoveClick,
   onApproveClick, 
-  onRemoveClick 
 }: CustomTableProps) {
-  const rows = status === "pending" ? pendingRows : approvedRows;
   const [iconStates, setIconStates] = useState<RowIconStates>({});
 
   const EditIcon = iconRegistry.editDefault;
   const EditHoverIcon = iconRegistry.editHover;
   const EditClickedIcon = iconRegistry.editClicked;
 
-  const CheckIcon = iconRegistry.checkDefault;
-  const CheckHoverIcon = iconRegistry.checkHover;
-  const CheckClickedIcon = iconRegistry.checkClicked;
-
   const CloseIcon = iconRegistry.closeDefault;
   const CloseHoverIcon = iconRegistry.closeHover;
   const CloseClickedIcon = iconRegistry.closeClicked;
+
+  const CheckIcon = iconRegistry.checkDefault;
+  const CheckHoverIcon = iconRegistry.checkHover;
+  const CheckClickedIcon = iconRegistry.checkClicked;
   
 
-  const setRowIconState = (rowId: number, iconType: 'edit' | 'check' | 'close', state: IconState) => {
+  const setRowIconState = (rowId: number, iconType: 'edit' | 'close' | 'manage' | 'check', state: IconState) => {
     setIconStates(prev => ({
       ...prev,
       [rowId]: {
         ...prev[rowId],
         edit: iconType === 'edit' ? state : (prev[rowId]?.edit || 'default'),
-        check: iconType === 'check' ? state : (prev[rowId]?.check || 'default'),
         close: iconType === 'close' ? state : (prev[rowId]?.close || 'default'),
+        manage: iconType === 'manage' ? state : (prev[rowId]?.manage || 'default'),
+        check: iconType === 'check' ? state : (prev[rowId]?.check || 'default'),
       }
     }));
   };
 
-  const getRowIconState = (rowId: number, iconType: 'edit' | 'check' | 'close'): IconState => {
+  const getRowIconState = (rowId: number, iconType: 'edit' | 'close' | 'manage' | 'check'): IconState => {
     return iconStates[rowId]?.[iconType] || 'default';
   };
 
@@ -102,6 +99,18 @@ export default function CustomTable({
         return <CloseClickedIcon className="w-6 h-6 pointer-events-none" />;
       default:
         return <CloseIcon className="w-6 h-6 pointer-events-none" />;
+    }
+  };
+
+  const getManageButtonClass = (rowId: number) => {
+    const state = getRowIconState(rowId, 'manage');
+    switch (state) {
+      case "hover":
+        return "px-4 py-1 border-2 border-yellow-500 rounded-md bg-yellow-400 text-black transition text-sm font-medium";
+      case "clicked":
+        return "px-4 py-1 border-2 border-red-600 rounded-md bg-red-500 text-white transition text-sm font-medium";
+      default:
+        return "px-4 py-1 border border-[#730000] rounded-md text-[#730000] bg-white transition text-sm font-medium";
     }
   };
 
@@ -150,11 +159,11 @@ export default function CustomTable({
         <TableBody>
           {rows.map((row) => (
             <TableRow 
-              key={row["Defense ID"]} 
+              key={row.group_id} 
               className="border-b last:border-b-0 hover:bg-gray-50"
             >
               <TableCell className="text-center px-5 py-3">
-                {row["Defense ID"]}
+                {row["Group Number"]}
               </TableCell>
               <TableCell className="text-center px-5 py-3">
                 {row.Title}
@@ -195,17 +204,29 @@ export default function CustomTable({
 
                   <button
                     onClick={() => handleEditClick(row)}
-                    onMouseEnter={() => setRowIconState(row["Defense ID"], 'edit', 'hover')}
-                    onMouseLeave={() => setRowIconState(row["Defense ID"], 'edit', 'default')}
-                    onMouseDown={() => setRowIconState(row["Defense ID"], 'edit', 'clicked')}
-                    onMouseUp={() => setRowIconState(row["Defense ID"], 'edit', 'default')}
+                    onMouseEnter={() => setRowIconState(row.group_id, 'edit', 'hover')}
+                    onMouseLeave={() => setRowIconState(row.group_id, 'edit', 'default')}
+                    onMouseDown={() => setRowIconState(row.group_id, 'edit', 'clicked')}
+                    onMouseUp={() => setRowIconState(row.group_id, 'edit', 'default')}
                     className="cursor-pointer transition"
                     title="Edit"
                   >
-                    {getEditIcon(row["Defense ID"])}
+                    {getEditIcon(row.group_id)}
                   </button>
 
-                  <Button
+                  <button
+                    onClick={() => handleManageClick(row)}
+                    onMouseEnter={() => setRowIconState(row.group_id, 'manage', 'hover')}
+                    onMouseLeave={() => setRowIconState(row.group_id, 'manage', 'default')}
+                    onMouseDown={() => setRowIconState(row.group_id, 'manage', 'clicked')}
+                    onMouseUp={() => setRowIconState(row.group_id, 'manage', 'hover')}
+                    className={getManageButtonClass(row.group_id)}
+                    title="Manage"
+                  >
+                    Manage
+                  </button>
+
+                  {/* <Button
                     onClick={() => handleManageClick(row)}
                     variant="tertiary"
                     size="sm"
@@ -213,7 +234,7 @@ export default function CustomTable({
                     title="Manage"
                   >
                     Manage
-                  </Button>
+                  </Button> */}
                 </div>
               </TableCell>
             </TableRow>

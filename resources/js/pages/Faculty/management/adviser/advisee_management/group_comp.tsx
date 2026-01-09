@@ -1,15 +1,48 @@
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { useState } from 'react';
-import { group_comp } from '@/routes/faculty/management/adviser/advisee_management';
 import { type BreadcrumbItem } from '@/types';
 import AdviseeManagementLayout from '.';
-import OptionToggle from './option-toggle';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import CustomTable from './group_table';
 import CreateGroupModal from './create-group';
 import EditGroupModal from './edit-group';
 import ManageGroupModal from './manage-group';
+import { destroy } from '@/routes/faculty/management/adviser/advisee_management/group_comp';
+
+// Types for data from GroupComp.php controller
+interface SectionAdviser {
+  section_adviser_id: number;
+  section: number;
+}
+
+interface StudentWithoutGroup {
+  id: number;
+  student_name: string;
+  student_number: string;
+  email: string;
+  section: string;
+}
+
+interface Student {
+  student_name: string;
+  student_number: string;
+  email: string;
+  is_leader: boolean;
+  section: string;
+  group_id: number;
+  section_adviser_id: number;
+  formatted_group_number: string;
+  course: string;
+  block: string;
+  faculty_id: number;
+  thesis_title: string | null;
+}
+
+interface PageProps {
+  students: Student[];
+  sectionAdvisers: SectionAdviser[];
+  studentsWithoutGroup: StudentWithoutGroup[];
+}
 
 const breadcrumb: BreadcrumbItem[] = [
   {
@@ -18,25 +51,68 @@ const breadcrumb: BreadcrumbItem[] = [
   },
 ];
 
-// Initial data
-const initialPendingRows = [
-  { "Defense ID": 4103, Title: "Machine Learning 1", Proponents: 4, Block: "BSCPE 4-1" },
-  { "Defense ID": 4104, Title: "Machine Learning 2", Proponents: 2, Block: "BSCPE 4-2" },
-  { "Defense ID": 4106, Title: "Machine Learning 3", Proponents: 2, Block: "BSCPE 4-3" },
-  { "Defense ID": 4105, Title: "Machine Learning 4", Proponents: 4, Block: "BSCPE 4-3" },
-  { "Defense ID": 4107, Title: "Machine Learning 5", Proponents: 2, Block: "BSCPE 4-3" },
-];
+export default function GroupComposition({ students = [], sectionAdvisers = [], studentsWithoutGroup = [] }: PageProps) {
+  // Helper function to get year from course
+  const getYearFromCourse = (course: string): string => {
+    if (course === 'MOR') return '3';
+    if (course === 'DP1' || course === 'DP2') return '4';
+    return '';
+  };
 
-const initialApprovedRows = [
-  { "Defense ID": 3201, Title: "Data Analytics ", Proponents: 4, Block: "BSCPE 3-1" },
-  { "Defense ID": 3102, Title: "Cybersecurity ", Proponents: 2, Block: "BSCPE 3-2" },
-  { "Defense ID": 303, Title: "AI Project 3", Proponents: 4, Block: "BSCPE 3-3" },
-];
+  // Derive groups from students data
+  const groupsMap = new Map<string, {
+    groupId: number;
+    sectionAdviserId: number;
+    groupNumber: string;
+    title: string | null;
+    block: string;
+    course: string;
+    proponents: number
+  }>();
 
-export default function Dashboard() {
-  const [status, setStatus] = useState<'pending' | 'approved'>('pending');
-  const [pendingRows, setPendingRows] = useState(initialPendingRows);
-  const [approvedRows, setApprovedRows] = useState(initialApprovedRows);
+  students.forEach(student => {
+    const groupKey = student.formatted_group_number;
+    if (!groupsMap.has(groupKey)) {
+      groupsMap.set(groupKey, {
+        groupId: student.group_id,
+        sectionAdviserId: student.section_adviser_id,
+        groupNumber: student.formatted_group_number,
+        title: student.thesis_title,
+        block: student.block,
+        course: student.course,
+        proponents: 0,
+      });
+    }
+    const group = groupsMap.get(groupKey)!;
+    group.proponents += 1;
+  });
+
+  // Transform groups data to match table format
+  const rows = Array.from(groupsMap.values()).map((group) => ({
+    group_id: group.groupId,
+    section_adviser_id: group.sectionAdviserId,
+    "Group Number": group.groupNumber,
+    Title: group.title ?? 'No Title Yet',
+    Proponents: group.proponents,
+    Block: `BSCPE ${getYearFromCourse(group.course)}-${group.block}`,
+  }));
+
+  // Helper function to get members for a specific group
+  const getMembersForGroup = (groupNumber: string | number) => {
+    const groupNumberStr = String(groupNumber);
+    const filteredStudents = students.filter(student => student.formatted_group_number === groupNumberStr);
+    console.log('Raw students for group', groupNumberStr, filteredStudents);
+    return filteredStudents.map((student, index) => {
+      console.log('Student is_leader value:', student.student_name, student.is_leader, typeof student.is_leader);
+      return {
+        id: index + 1,
+        name: student.student_name,
+        studentNumber: student.student_number,
+        email: student.email,
+        isLeader: Boolean(student.is_leader),
+      };
+    });
+  };
   
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -57,18 +133,11 @@ export default function Dashboard() {
 
   const handleApproveClick = (row: any) => {
     console.log('Approve clicked for:', row);
-    // Remove from pending and add to approved
-    setPendingRows(prev => prev.filter(r => r["Defense ID"] !== row["Defense ID"]));
-    setApprovedRows(prev => [...prev, row]);
   };
 
   const handleRemoveClick = (row: any) => {
-    console.log('Remove clicked for:', row);
-    // Remove from current table
-    if (status === 'pending') {
-      setPendingRows(prev => prev.filter(r => r["Defense ID"] !== row["Defense ID"]));
-    } else {
-      setApprovedRows(prev => prev.filter(r => r["Defense ID"] !== row["Defense ID"]));
+    if (confirm(`Are you sure you want to remove group ${row["Group Number"]}? This will unassign all students from this group.`)) {
+      router.delete(destroy.url({ id: row.group_id }));
     }
   };
 
@@ -80,15 +149,8 @@ export default function Dashboard() {
     >
       <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 p-6">
 
-        {/* Option Toggle + Dialog Button */}
-        <div className="flex items-center justify-between mb-4">
-          <OptionToggle
-            currentStatus={status}
-            onStatusChange={setStatus}
-            pendingCount={pendingRows.length}
-            approvedCount={approvedRows.length}
-          />
-
+        {/* Create New Group Button */}
+        <div className="flex items-center justify-end mb-4">
           <button
             onClick={() => setIsGroupModalOpen(true)}
             className="flex items-center gap-2 w-[190px] h-[36px] bg-[#730000] rounded-[8px] px-4 py-2 text-white font-medium hover:bg-red-800 transition"
@@ -98,13 +160,10 @@ export default function Dashboard() {
         </div>
 
         {/* Table */}
-        <CustomTable 
-          status={status}
-          pendingRows={pendingRows}
-          approvedRows={approvedRows}
+        <CustomTable
+          rows={rows}
           onEditClick={handleEditClick}
           onManageClick={handleManageClick}
-          onApproveClick={handleApproveClick}
           onRemoveClick={handleRemoveClick}
         />
 
@@ -114,6 +173,8 @@ export default function Dashboard() {
       <CreateGroupModal
         isOpen={isGroupModalOpen}
         onClose={() => setIsGroupModalOpen(false)}
+        sectionAdvisers={sectionAdvisers}
+        studentsWithoutGroup={studentsWithoutGroup}
       />
 
       {/* Edit Group Modal */}
@@ -123,14 +184,13 @@ export default function Dashboard() {
           setIsEditModalOpen(false);
           setSelectedRow(null);
         }}
+        sectionAdvisers={sectionAdvisers}
+        studentsWithoutGroup={studentsWithoutGroup}
         groupData={selectedRow ? {
+          groupId: selectedRow.group_id,
+          sectionAdviserId: selectedRow.section_adviser_id,
           block: selectedRow.Block,
-          members: [
-            { id: 1, name: 'Juan Dela Cruz', studentNumber: '2022-09589-MN-0', email: 'jdc@iskolangbayan.pup.edu.ph', isLeader: true },
-            { id: 2, name: 'Juan Dela Cruz', studentNumber: '2022-09589-MN-0', email: 'jdc@iskolangbayan.pup.edu.ph', isLeader: false },
-            { id: 3, name: 'Juan Dela Cruz', studentNumber: '2022-09589-MN-0', email: 'jdc@iskolangbayan.pup.edu.ph', isLeader: false },
-            { id: 4, name: 'Juan Dela Cruz', studentNumber: '2022-09589-MN-0', email: 'jdc@iskolangbayan.pup.edu.ph', isLeader: false },
-          ]
+          members: getMembersForGroup(selectedRow["Group Number"]),
         } : undefined}
       />
 
@@ -141,12 +201,27 @@ export default function Dashboard() {
           setIsManageModalOpen(false);
           setSelectedRow(null);
         }}
+        sectionAdvisers={sectionAdvisers}
+        studentsWithoutGroup={studentsWithoutGroup}
         groupData={selectedRow ? {
-          members: [
-            { id: 1, name: 'Juan Dela Cruz', studentNumber: '2022-09265-MN-0', initials: 'JDC' },
-            { id: 2, name: 'John Doe', studentNumber: '2022-09265-MN-0', initials: 'JD' },
-            { id: 3, name: '', studentNumber: '2022-09265-MN-0', initials: 'PK' },
-          ]
+          groupId: selectedRow.group_id,
+          sectionAdviserId: selectedRow.section_adviser_id,
+          members: students
+            .filter(student => student.formatted_group_number === String(selectedRow["Group Number"]))
+            .map((student, index) => {
+              // Generate initials from student name
+              const nameParts = student.student_name.split(',').map(p => p.trim());
+              const lastName = nameParts[0] || '';
+              const firstAndMiddle = nameParts[1] || '';
+              const initials = (firstAndMiddle.charAt(0) + lastName.charAt(0)).toUpperCase();
+              return {
+                id: index + 1,
+                name: student.student_name,
+                studentNumber: student.student_number,
+                initials,
+                isLeader: student.is_leader,
+              };
+            }),
         } : undefined}
       />
     </AdviseeManagementLayout>

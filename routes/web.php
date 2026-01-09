@@ -74,9 +74,8 @@ Route::prefix('guest')->group(function () {
         return Inertia::render('Guest/landing');
     })->name('guest.landing');
 
-    Route::get('/repository', function () {
-        return Inertia::render('Guest/repository');
-    })->name('guest.repository');
+    Route::get('/repository', [ThesisArchive::class, 'index'])->name('guest.repository');
+    Route::get('/repository/preview/{id}', [ThesisArchive::class, 'show'])->name('guest.repository.preview');
 
     Route::get('/search', function () {
         return Inertia::render('Guest/filter-search');
@@ -220,6 +219,9 @@ Route::prefix('faculty')->group(function () {
                     Route::get('/my_advisees', [MyAdvisees::class, 'index'])->name('faculty.management.adviser.advisee_management.my_advisees');
 
                     Route::get('/group_comp', [GroupComp::class, 'index'])->name('faculty.management.adviser.advisee_management.group_comp');
+                    Route::post('/group_comp', [GroupComp::class, 'store'])->name('faculty.management.adviser.advisee_management.group_comp.store');
+                    Route::put('/group_comp/{id}', [GroupComp::class, 'update'])->name('faculty.management.adviser.advisee_management.group_comp.update');
+                    Route::delete('/group_comp/{id}', [GroupComp::class, 'destroy'])->name('faculty.management.adviser.advisee_management.group_comp.destroy');
 
                     Route::get('/thesis_review', [ThesisReview::class, 'index'])->name('faculty.management.adviser.advisee_management.thesis_review');
 
@@ -230,6 +232,7 @@ Route::prefix('faculty')->group(function () {
                 // CHECK THE SPECIAL ROUTES FOR THIS SCENARIO... 
 
                 Route::get('endorsement', [Endorsement::class, 'index'])->name('faculty.management.adviser.endorsement');
+                Route::put('endorsement/{id}', [Endorsement::class, 'update'])->name('faculty.management.adviser.endorsement.update');
 
                 Route::get('eval_n_grading', [EvaluationGrading::class, 'index'])->name('faculty.management.adviser.eval_n_grading');
 
