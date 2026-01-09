@@ -2,11 +2,27 @@ import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { endorsement } from '@/routes/faculty/management/adviser';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, useForm} from '@inertiajs/react';
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
 import { Eye, CheckCircle, Layers, X, AlertCircle, Send } from 'lucide-react';
 import { useState } from 'react';
 import DocumentPreview from '@/components/document-preview';
+
+
+// This matches the structure of the object returned by your Laravel Controller
+interface BackendEndorsement {
+    endorsement_id: number;
+    thesis_title: string;
+    manuscript_filepath: string | null;
+    course: string;
+    group_code: string;
+    year_level: number;
+    is_adviser_approved: number; 
+    endorsement_updated_at: string;
+    block: string;
+    adviser_name: string;
+    student_names: string; 
+}
 
 interface PanelMember {
     id: string;
@@ -20,10 +36,11 @@ interface Proposal {
     groupCode: string;
     proponents: string[];
     block: string;
+    year_level: string;
     adviser: string;
     approvalDate: string;
     panelMembers: PanelMember[];
-    status: 'Endorsed';
+    status: 'Endorsed' | 'Pending';
     manuscriptUrl?: string;
 }
 
@@ -49,9 +66,16 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
     const [showEndorseModal, setShowEndorseModal] = useState(false);
     const [remarks, setRemarks] = useState('');
 
+    const { put, processing } = useForm({});
+
     const handleEndorseSubmit = () => {
-        console.log("Endorsing:", data.id, "Remarks:", remarks);
-        setShowEndorseModal(false);
+        put(`/faculty/management/adviser/endorsement/${data.id}`, {
+            onSuccess: () => {
+                setShowEndorseModal(false);
+                setRemarks('');
+            },
+            onError: (err:any) => console.error(err)
+        });
     };
 
     return (
@@ -64,7 +88,7 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                             {data.title}
                         </h3>
                         <p className="text-[10px] text-muted-foreground uppercase font-medium">
-                            {data.groupCode}
+                            Group {data.groupCode}
                         </p>
                     </div>
                     
@@ -85,7 +109,7 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                 <div className="grid grid-cols-3 gap-2 mb-4">
                     <div>
                         <p className="text-[10px] text-muted-foreground">Block</p>
-                        <p className="text-xs font-semibold text-foreground">{data.block}</p>
+                        <p className="text-xs font-semibold text-foreground">BSCPE {data.year_level}-{data.block}</p>
                     </div>
                     <div>
                         <p className="text-[10px] text-muted-foreground">Adviser</p>
@@ -96,28 +120,27 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                         <p className="text-xs font-semibold text-foreground">{data.approvalDate}</p>
                     </div>
                 </div>
-
+                
+                
+                {/*  Removed Panel Members Section
                 <div className="mb-6 flex-1">
                     <p className="text-[10px] text-muted-foreground mb-2">Panel Members</p>
                     <div className="space-y-2">
                         {data.panelMembers.map((member) => (
                             <div key={member.id} className="flex items-center gap-2">
-                                {/* Using Chart colors for roles to match theme variables */}
-                                <div className={`
-                                    w-6 h-6 rounded-full flex items-center justify-center text-[10px] text-white font-bold
-                                `}
-                                style={{
-                                    backgroundColor: member.role === 'P1' ? 'var(--chart-1)' : 
-                                                     member.role === 'P2' ? 'var(--chart-2)' : 
-                                                     'var(--chart-3)' 
-                                }}>
+                                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] text-white font-bold`}
+                                    style={{
+                                        backgroundColor: member.role === 'P1' ? 'var(--chart-1)' : 
+                                                         member.role === 'P2' ? 'var(--chart-2)' : 
+                                                        'var(--chart-3)' 
+                                    }}>
                                     {member.role}
                                 </div>
                                 <span className="text-xs text-foreground font-medium">{member.name}</span>
                             </div>
                         ))}
                     </div>
-                </div>
+                </div> */}
 
                 <div className="flex gap-3 mt-auto pt-4 border-t border-border">
                     <button 
@@ -127,12 +150,20 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                         View Manuscript
                     </button>
                     {/* Reverted Endorse Button to Outline/White style */}
-                    <button 
-                        onClick={() => setShowEndorseModal(true)}
-                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-foreground bg-transparent border border-border rounded-[var(--radius-sm)] hover:bg-[var(--breadcrumb)] transition-colors">
-                        <CheckCircle size={14} />
-                        Endorse
-                    </button>
+                    {data.status !== 'Endorsed' ? (
+                        <button 
+                            onClick={() => setShowEndorseModal(true)}
+                            disabled={processing}
+                            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-foreground bg-transparent border border-border rounded-[var(--radius-sm)] hover:bg-[var(--breadcrumb)] transition-colors disabled:opacity-50">
+                            <CheckCircle size={14} />
+                            {processing ? 'Processing...' : 'Endorse'}
+                        </button>
+                    ) : (
+                        <button disabled className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-gray-400 bg-gray-50 border border-gray-100 rounded-[var(--radius-sm)] cursor-not-allowed">
+                            <CheckCircle size={14} />
+                            Endorsed
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -196,7 +227,7 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                                 </div>
                                 <div className="flex">
                                     <span className="w-24">Block:</span>
-                                    <span className="font-medium text-foreground">{data.block}</span>
+                                    <span className="font-medium text-foreground">BSCPE {data.year_level}-{data.block}</span>
                                 </div>
                                 <div className="flex justify-end">
                                     <span className="w-20">Approval Date:</span>
@@ -204,6 +235,7 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                                 </div>
                             </div>
 
+                            {/* Removed Assigned Panel Members Section
                             <div className="mb-6">
                                 <h4 className="text-sm font-medium text-foreground mb-2">Assigned Panel Members</h4>
                                 <div className="flex flex-wrap gap-2">
@@ -213,7 +245,7 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                                         </div>
                                     ))}
                                 </div>
-                            </div>
+                            </div> */}
 
                             {/* Warning/Confirmation Box using 'revision' colors (Yellow theme) */}
                             <div className="bg-[var(--revision-bg)] border border-[var(--revision-border)] rounded-lg p-4 mb-6 flex gap-3">
@@ -257,7 +289,7 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground bg-transparent border border-border rounded-md hover:bg-[var(--breadcrumb)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
                             >
                                 <CheckCircle size={16} />
-                                Submit Endorsement
+                                {processing ? 'Submitting...' : 'Submit Endorsement'}
                             </button>
                         </div>
                     </div>
@@ -274,7 +306,22 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Dashboard() {
+export default function Endorsement({ endorsements }: { endorsements: BackendEndorsement[] }) {
+
+    const mappedProposals: Proposal[] = endorsements ? endorsements.map(item => ({
+        id: item.endorsement_id.toString(),
+        title: item.thesis_title,
+        groupCode: item.group_code,
+        proponents: item.student_names ? item.student_names.split(', ') : [],
+        block: item.block,
+        year_level: item.year_level.toString(),
+        adviser: item.adviser_name,
+        approvalDate: new Date(item.endorsement_updated_at).toLocaleDateString(),
+        status: item.is_adviser_approved ? 'Endorsed' : 'Pending',
+        manuscriptUrl: item.manuscript_filepath ? `/storage/${item.manuscript_filepath}` : undefined,
+        panelMembers: [] 
+    })) : [];
+
     return (
         <FacultyManagementLayout 
             breadcrumbs={breadcrumbs}
@@ -285,11 +332,17 @@ export default function Dashboard() {
             <div className="border-t-2 border-primary my-4"></div>
 
             <div className="p-4 font-dm">
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {mockProposals.map((proposal) => (
-                        <EndorsementCard key={proposal.id} data={proposal} />
-                    ))}
-                </div>
+                {mappedProposals.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        {mappedProposals.map((proposal) => (
+                            <EndorsementCard key={proposal.id} data={proposal} />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-10 text-muted-foreground">
+                        <p>No endorsements found for your section.</p>
+                    </div>
+                )}
             </div>
 
         </FacultyManagementLayout>

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Trash2, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { router } from '@inertiajs/react';
+import { update } from '@/routes/faculty/management/adviser/advisee_management/group_comp';
 import {Dialog,DialogContent,DialogHeader,DialogTitle,DialogDescription,DialogFooter,} from '@/components/ui/dialog';
 import InputError from '@/components/input-error';
 
@@ -13,23 +14,45 @@ interface Member {
   isLeader: boolean;
 }
 
+interface SectionAdviser {
+  section_adviser_id: number;
+  section: number;
+}
+
+interface StudentWithoutGroup {
+  id: number;
+  student_name: string;
+  student_number: string;
+  email: string;
+  section: string;
+}
+
 interface EditGroupModalProps {
   isOpen: boolean;
   onClose: () => void;
+  sectionAdvisers: SectionAdviser[];
+  studentsWithoutGroup: StudentWithoutGroup[];
   groupData?: {
+    groupId: number;
+    sectionAdviserId: number;
+    block: string;
     members: Member[];
   };
 }
 
-export default function EditGroupModal({ isOpen, onClose, groupData }: EditGroupModalProps) {
-  const [members, setMembers] = useState<Member[]>(
-    groupData?.members || [
-      { id: 1, name: 'Juan Dela Cruz', studentNumber: '2022-09589-MN-0', email: 'jdc@iskolangbayan.pup.edu.ph', isLeader: true },
-      { id: 2, name: 'Juan Dela Cruz', studentNumber: '2022-09589-MN-0', email: 'jdc@iskolangbayan.pup.edu.ph', isLeader: false },
-      { id: 3, name: 'Juan Dela Cruz', studentNumber: '2022-09589-MN-0', email: 'jdc@iskolangbayan.pup.edu.ph', isLeader: false },
-      { id: 4, name: 'Juan Dela Cruz', studentNumber: '2022-09589-MN-0', email: 'jdc@iskolangbayan.pup.edu.ph', isLeader: false },
-    ]
-  );
+export default function EditGroupModal({ isOpen, onClose, sectionAdvisers, studentsWithoutGroup, groupData }: EditGroupModalProps) {
+  const [selectedBlock, setSelectedBlock] = useState(groupData?.sectionAdviserId?.toString() || '');
+  const [members, setMembers] = useState<Member[]>(groupData?.members || []);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Sync state when groupData changes (e.g., when a different group is selected)
+  useEffect(() => {
+    if (groupData) {
+      setSelectedBlock(groupData.sectionAdviserId?.toString() || '');
+      setMembers(groupData.members || []);
+    }
+  }, [groupData]);
+
   const [errors, setErrors] = useState<{
     members?: { [key: number]: { name?: string; studentNumber?: string; email?: string } };
   }>({});
@@ -121,14 +144,81 @@ export default function EditGroupModal({ isOpen, onClose, groupData }: EditGroup
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleStudentSelect = (memberId: number, studentNumber: string) => {
+    const selectedStudent = studentsWithoutGroup.find(s => s.student_number === studentNumber);
+    if (selectedStudent) {
+      setMembers(members.map(m =>
+        m.id === memberId
+          ? {
+              ...m,
+              name: selectedStudent.student_name,
+              studentNumber: selectedStudent.student_number,
+              email: selectedStudent.email,
+            }
+          : m
+      ));
+    } else {
+      // Clear fields if no student selected
+      setMembers(members.map(m =>
+        m.id === memberId
+          ? { ...m, name: '', studentNumber: '', email: '' }
+          : m
+      ));
+    }
+  };
+
+  // Get available students (filtered by selected block and not already selected by other members)
+  const getAvailableStudents = (currentMemberId: number) => {
+    // Find the selected section adviser to get the section number
+    const selectedSectionAdviser = sectionAdvisers.find(
+      sa => sa.section_adviser_id === parseInt(selectedBlock)
+    );
+
+    // Filter students by block section if a block is selected
+    let filteredStudents = studentsWithoutGroup;
+    if (selectedSectionAdviser) {
+      filteredStudents = studentsWithoutGroup.filter(
+        s => s.section === String(selectedSectionAdviser.section)
+      );
+    }
+
+    // Filter out students already selected by other members
+    const selectedStudentNumbers = members
+      .filter(m => m.id !== currentMemberId && m.studentNumber)
+      .map(m => m.studentNumber);
+    return filteredStudents.filter(s => !selectedStudentNumbers.includes(s.student_number));
+  };
+
   const handleUpdateGroup = () => {
     if (validateForm()) {
       console.log('Updating group:', { members });
       onClose();
     }
+    
+    if (!groupData?.groupId || !selectedBlock || members.length < 2) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    router.put(update.url({ id: groupData.groupId }), {
+      section_adviser_id: parseInt(selectedBlock),
+      members: members.map(m => ({
+        studentNumber: m.studentNumber,
+        isLeader: m.isLeader,
+      })),
+    }, {
+      onSuccess: () => {
+        handleCancel();
+      },
+      onFinish: () => {
+        setIsSubmitting(false);
+      },
+    });
   };
 
   const handleCancel = () => {
+    setSelectedBlock(groupData?.sectionAdviserId?.toString() || '');
     setMembers(groupData?.members || []);
     setErrors({});
     onClose();
@@ -147,6 +237,20 @@ export default function EditGroupModal({ isOpen, onClose, groupData }: EditGroup
 
         {/* Body */}
         <div className="flex-1 overflow-auto p-6 space-y-5">
+          {/* Group Information */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Group Information
+            </label>
+            <input
+              type="text"
+              value={groupData?.block ? `${groupData.block}` : ''}
+              readOnly
+              disabled
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-gray-100 text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#730000] cursor-not-allowed"
+            />
+          </div>
+
           {/* Members Header */}
           <div className="flex justify-between items-center">
             <span className="font-medium text-sm">Group Members ({members.length}/4)</span>
@@ -200,25 +304,34 @@ export default function EditGroupModal({ isOpen, onClose, groupData }: EditGroup
                 <div className="grid grid-cols-3 gap-3">
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">Name</label>
-                    <Input
-                      type="text"
-                      inputSize="full"
-                      placeholder="Enter Name"
-                      value={member.name}
-                      onChange={(e) => handleMemberChange(member.id, 'name', e.target.value)}
-                      className="!bg-white border-gray-300 focus-visible:!border-[#730000]"
-                    />
+                    <select
+                      value={member.studentNumber}
+                      onChange={(e) => handleStudentSelect(member.id, e.target.value)}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000]"
+                    >
+                      <option value="">Select Student...</option>
+                      {getAvailableStudents(member.id).map((student) => (
+                        <option key={student.id} value={student.student_number}>
+                          {student.student_name}
+                        </option>
+                      ))}
+                      {/* Keep current selection visible if already selected */}
+                      {member.studentNumber && !getAvailableStudents(member.id).find(s => s.student_number === member.studentNumber) && (
+                        <option value={member.studentNumber}>
+                          {member.name}
+                        </option>
+                      )}
+                    </select>
                     <InputError message={errors.members?.[member.id]?.name} className="mt-1" />
                   </div>
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">Student Number</label>
                     <Input
                       type="text"
-                      inputSize="full"
-                      placeholder="Enter Student Number"
+                      placeholder="Auto-filled"
                       value={member.studentNumber}
-                      onChange={(e) => handleMemberChange(member.id, 'studentNumber', e.target.value)}
-                      className="!bg-white border-gray-300 focus-visible:!border-[#730000]"
+                      readOnly
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-gray-100 text-gray-600 cursor-not-allowed"
                     />
                     <InputError message={errors.members?.[member.id]?.studentNumber} className="mt-1" />
                   </div>
@@ -226,11 +339,10 @@ export default function EditGroupModal({ isOpen, onClose, groupData }: EditGroup
                     <label className="block text-xs text-gray-600 mb-1">Email</label>
                     <Input
                       type="email"
-                      inputSize="full"
-                      placeholder="Enter PUP Webmail"
+                      placeholder="Auto-filled"
                       value={member.email}
-                      onChange={(e) => handleMemberChange(member.id, 'email', e.target.value)}
-                      className="!bg-white border-gray-300 focus-visible:!border-[#730000]"
+                      readOnly
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-gray-100 text-gray-600 cursor-not-allowed"
                     />
                     <InputError message={errors.members?.[member.id]?.email} className="mt-1" />
                   </div>
@@ -251,9 +363,10 @@ export default function EditGroupModal({ isOpen, onClose, groupData }: EditGroup
           </Button>
           <Button
             onClick={handleUpdateGroup}
-            className="bg-[#730000] text-white hover:bg-red-800"
+            disabled={isSubmitting || !selectedBlock || members.length < 2}
+            className="bg-[#730000] text-white hover:bg-red-800 disabled:bg-gray-400"
           >
-            Update
+            {isSubmitting ? 'Updating...' : 'Update'}
           </Button>
         </DialogFooter>
       </DialogContent>

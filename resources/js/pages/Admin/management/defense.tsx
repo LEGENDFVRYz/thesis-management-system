@@ -15,19 +15,29 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Calendar, TableIcon, X } from 'lucide-react';
 import { CardContent } from '@/components/ui/card';
 import { DefenseCalendar } from '@/components/defense-calendar-monthly';
-interface Defense {
-    id: number;
-    title?: string;
-    proponents?: string[];
-    proponents_count?: number;
-    adviser?: string;
-    block?: string | number;
-    defense_date: string;
-    defense_time: string;
-    venue?: string;
-    type?: string;
-    status?: string;
-    panel?: string[];
+
+// INTERFACE
+export interface Panelist {
+  faculty_id: number;
+  name_prefix: string;
+  first_name: string;
+  last_name: string;
+}
+export interface Defense {
+  id: number;
+  defense_room: string;
+  thesis_title: string;
+  block: string;
+  group_code: string;
+  defense_date: string;
+  defense_time: string;
+  defense_type: string;
+  year_level: number;
+  adviser_name: string;
+  proponents_count: number;
+  proponent_names: string;
+  panelists: Panelist[];
+  status: string;
 }
 
 /* SUB-COMPONENT: InfoField */
@@ -43,9 +53,17 @@ const InfoField = ({ label, value, icon, className = "" }: { label: string, valu
     </div>
 );
 
-/* SUB-COMPONENT: DefenseDetailsModal */
+
+/**
+ * SUB-COMPONENT: DefenseDetailsModal
+ * Displays an overlay with comprehensive information regarding a specific defense.
+ * Utilizes the custom scrollbar and theme variables from global.css.
+ */
 function DefenseDetailsModal({ open, onOpenChange, data }: { open: boolean, onOpenChange: (open: boolean) => void, data: Defense | null }) {
     if (!data) return null;
+
+    // Helper to turn CSV strings into arrays for the UI tags
+    const proponentList = data.proponent_names ? data.proponent_names.split(', ') : [];
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -62,28 +80,36 @@ function DefenseDetailsModal({ open, onOpenChange, data }: { open: boolean, onOp
                 {/* Modal Body: Scrollable content area */}
                 <div className="p-6 flex flex-col gap-5 overflow-y-auto h-[calc(605px-85px)] custom-scrollbar">
                     <div className="flex items-center justify-between">
-                        <InfoField label="Defense ID" value={`DEF-${data.id}`} />
+                        <InfoField label="Defense ID" value={`DEF-${data.group_code || data.id}`} />
                         {/* Status Badge */}
-                        <div className="bg-primary text-primary-foreground px-3 py-1 rounded-lg text-xs font-medium h-[21.59px] flex items-center capitalize">{data.status}</div>
+                        <div className={cn("bg-primary text-primary-foreground px-3 py-1 rounded-lg text-xs font-medium h-[21.59px] flex items-center capitalize", 
+                            data.status === 'completed' 
+                                ? "bg-green-600 text-white" // Change this color accordingly - temporary color only
+                                : "bg-primary text-primary-foreground"
+                        )}>
+                            {data.status === 'completed' ? "Completed" : "Upcoming"}
+                        </div>
                     </div>
 
-                    <InfoField label="Thesis Title" value={data.title} className="leading-tight" />
+                    <InfoField label="Thesis Title" value={data.thesis_title} className="leading-tight" />
 
                     <div className="grid grid-cols-3 gap-6">
-                        <InfoField label="Date" value={data.defense_date} icon="calendarDefault" />
-                        <InfoField label="Time" value={data.defense_time} />
-                        <InfoField label="Venue" value={data.venue} />
+                        <InfoField label="Date" value={data.defense_date || "TBA"} icon="calendarDefault" />
+                        <InfoField label="Time" value={data.defense_time || "TBA"} />
+                        <InfoField label="Venue" value={"Room " + data.defense_room + ", CEA" || "TBA"} />
                     </div>
 
                     {/* Proponents Section: Maps proponent names into rounded badges */}
                     <div className="flex flex-col gap-2">
                         <span className="text-base font-bold text-primary">Proponents</span>
                         <div className="flex flex-wrap gap-2">
-                            {data.proponents?.map((name, i) => (
+                            { proponentList.length > 0 ? proponentList.map((name, i) => (
                                 <div key={i} className="px-4 h-8 flex items-center bg-primary-foreground-2/20 border border-primary-foreground-2/30 rounded-full">
                                     <span className="text-sm font-medium">{name}</span>
                                 </div>
-                            )) || <span className="text-sm italic text-muted-foreground">No proponents listed</span>}
+                            )) : (
+                                <span className="text-sm italic text-muted-foreground">No proponents listed</span>
+                            )}
                         </div>
                     </div>
 
@@ -91,16 +117,18 @@ function DefenseDetailsModal({ open, onOpenChange, data }: { open: boolean, onOp
                     <div className="flex flex-col gap-2 pb-4">
                         <span className="text-base font-bold text-primary">Defense Panel</span>
                         <div className="flex flex-col gap-2">
-                            {(data.panel && data.panel.length > 0) ? data.panel.map((member, i) => (
-                                <div key={i} className="flex items-center gap-3 p-[10px] bg-muted/30 rounded-[4px] border border-border">
-                                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                                        <span className="text-xs font-bold text-primary">P{i + 1}</span>
+                            { data.panelists && data.panelists.length > 0 ?
+                                data.panelists.map((panel) => (
+                                    <div key={panel.faculty_id} className="flex items-center gap-3 p-[10px] bg-muted/30 rounded-[4px] border border-border">
+                                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                            <span className="text-xs font-bold text-primary">{panel.first_name[0]}{panel.last_name[0]}</span>
+                                        </div>
+                                        <span className="text-base font-medium text-foreground">{panel.name_prefix} {panel.first_name} {panel.last_name}</span>
                                     </div>
-                                    <span className="text-base font-medium text-foreground">{member}</span>
-                                </div>
-                            )) : (
-                                <span className="text-sm italic text-muted-foreground">No panel members assigned</span>
-                            )}
+                                )) : (
+                                    <span className="text-sm italic text-muted-foreground">No panelists listed</span>
+                                )
+                            }
                         </div>
                     </div>
                 </div>
@@ -109,9 +137,12 @@ function DefenseDetailsModal({ open, onOpenChange, data }: { open: boolean, onOp
     );
 }
 
-/* MAIN COMPONENT: DefenseTable */
-export default function DefenseTable({ defenses = [] }: { defenses?: Defense[] }) {
-    // State for managing the Modal and selection
+/**
+ * MAIN COMPONENT: DefenseTable
+ * Orchestrates the Defense Management view, handling filtering, 
+ * layout switching (Table vs Calendar), and detailed data inspection.
+ */
+export default function DefenseTable({ defenses }: { defenses: Defense[] }) {
     const [selectedDef, setSelectedDef] = useState<Defense | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     
@@ -131,6 +162,19 @@ export default function DefenseTable({ defenses = [] }: { defenses?: Defense[] }
         });
     }, [defenses, statusFilter]);
 
+    const handleViewDetails = (def: Defense) => {
+        setSelectedDef(def);
+        setIsModalOpen(true);
+    };
+
+     /**
+     * Logic: Filtering data based on status toggle
+     */
+    const filteredData = defenses?.filter((def) => {
+        const status = def.status?.toLowerCase();
+        return statusFilter === "upcoming" ? (status === "upcoming" || !status) : status === "completed";
+    }) || [];
+
     /**
      * Configuration: Columns for the table.
      * Rendering logic is centralized here for better maintainability.
@@ -141,7 +185,7 @@ export default function DefenseTable({ defenses = [] }: { defenses?: Defense[] }
         { label: "Proponents", render: (d: Defense) => (
             <div className="flex items-center justify-center gap-2 font-bold text-primary">
                 <Icon name="proponentsDefault" size={18} />
-                <span>{d.proponents_count || d.proponents?.length || '0'}</span>
+                <span>{d.proponents_count || d.proponentList?.length || '0'}</span>
             </div>
         )},
         { label: "Adviser", className: "px-6", render: (d: Defense) => d.adviser },
@@ -184,53 +228,69 @@ export default function DefenseTable({ defenses = [] }: { defenses?: Defense[] }
                         {/* Data Visualization Container */}
                         <div className="w-full max-w-[1360px] mx-auto rounded-xl border border-border bg-card shadow-sm overflow-hidden">
                             {view === 'table' ? (
-                                <div className="flex flex-col h-[550px]">
-                                    {/* FIXED HEADER */}
-                                    <div className="bg-primary w-full shrink-0">
-                                        <Table>
-                                            <TableHeader className="bg-primary">
-                                                <TableRow className="hover:bg-transparent border-none">
-                                                    {columns.map(col => (
-                                                        <TableHead key={col.label} className={cn("text-primary-foreground text-center font-bold", col.className)}>
-                                                            {col.label}
-                                                        </TableHead>
-                                                    ))}
-                                                    <TableHead className="text-primary-foreground text-center font-bold">Action</TableHead>
+                                <Table>
+                                    <TableCaption className="pb-4 font-dm text-alert-desc">End of defense records.</TableCaption>
+                                    <TableHeader className="bg-primary">
+                                        <TableRow className="hover:bg-transparent border-none">
+                                            {["ID", "Title", "Proponents", "Adviser", "Block", "Date & Time", "Type", "Action"].map((head) => (
+                                                <TableHead key={head} className="text-primary-foreground text-center text-[13px] font-bold">
+                                                    {head}
+                                                </TableHead>
+                                            ))}
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody className="divide-y divide-border">
+                                        {filteredData.length > 0 ? (
+                                            filteredData.map((def, index) => (
+                                                <TableRow key={index} className="hover:bg-accent/5 transition-colors group">
+                                                    <TableCell className="text-center text-alert-desc font-medium">
+                                                        {def.group_code}
+                                                    </TableCell>
+                                                    <TableCell className="px-6 text-foreground max-w-[280px] truncate font-medium text-left">
+                                                        {def.thesis_title || 'Cannot Retrieve Title'}
+                                                    </TableCell>
+                                                    <TableCell className="text-center">
+                                                        <div className="flex items-center justify-center gap-2 font-bold text-primary">
+                                                            <Icon name="proponentsDefault" size={18} />
+                                                            <span>{def.proponents_count || '0'}</span>
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="px-6 text-alert-desc text-left">
+                                                        {def.adviser_name || 'Dr. Cherry D. Casuat'}
+                                                    </TableCell>
+                                                    <TableCell className="text-center text-alert-desc">
+                                                        BSCPE {def.year_level}-{def.block}
+                                                    </TableCell>
+                                                    <TableCell className="text-center leading-tight">
+                                                        <div className="flex flex-col text-alert-desc">
+                                                            <span className="font-semibold text-alert-default">{def.defense_date}</span>
+                                                            <span className="text-[10px] font-bold uppercase text-alert-desc/70">{def.defense_time}</span>
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="text-center text-alert-desc">
+                                                        {def.defense_type || 'Title Defense'}
+                                                    </TableCell>
+                                                    <TableCell className="text-center">
+                                                        {/* Using custom .tertiary-btn class defined in base layer */}
+                                                        <Button 
+                                                            variant="tertiary" 
+                                                            className="tertiary-btn h-8 px-5 text-[11px] font-bold uppercase" 
+                                                            onClick={() => handleViewDetails(def)}
+                                                        >
+                                                            View Details
+                                                        </Button>
+                                                    </TableCell>
                                                 </TableRow>
-                                            </TableHeader>
-                                        </Table>
-                                    </div>
-
-                                    {/* SCROLLABLE BODY */}
-                                    <div className="flex-1 overflow-y-auto custom-scrollbar">
-                                        <Table>
-                                            <TableBody className="divide-y divide-border">
-                                                {displayData.length > 0 ? (
-                                                    displayData.map((def) => (
-                                                        <TableRow key={def.id} className="hover:bg-accent/5 transition-colors group">
-                                                            {columns.map((col) => (
-                                                                <TableCell key={col.label} className={cn("text-center text-alert-desc font-medium", col.className)}>
-                                                                    {col.render(def)}
-                                                                </TableCell>
-                                                            ))}
-                                                            <TableCell className="text-center">
-                                                                <Button variant="tertiary" className="tertiary-btn h-8 px-5 text-[11px] font-bold uppercase" onClick={() => { setSelectedDef(def); setIsModalOpen(true); }}>View Details</Button>
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    )) 
-                                                ) : ( 
-                                                    /* Empty State logic */
-                                                    <TableRow>
-                                                        <TableCell colSpan={columns.length + 1} className="py-20 text-center font-dm text-alert-desc font-medium">No {statusFilter} defenses found in records.</TableCell>
-                                                    </TableRow>
-                                                )}
-                                            </TableBody>
-                                        </Table>
-                                        <div className="py-4 text-center">
-                                            <span className="text-sm text-alert-desc opacity-70">End of {statusFilter} defenses.</span>
-                                        </div>
-                                    </div>
-                                </div>
+                                            ))
+                                        ) : (
+                                            <TableRow>
+                                                <TableCell colSpan={8} className="py-20 text-center text-alert-desc font-medium">
+                                                    No {statusFilter} defenses found in records.
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
                             ) : (
                                 /* CALENDAR VIEW: Shows defense events in a monthly calendar layout */
                                 <CardContent className='w-full px-0'><DefenseCalendar value={new Date()} /></CardContent>

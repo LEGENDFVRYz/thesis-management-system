@@ -6,7 +6,7 @@ import { my_advisees, group_comp, thesis_review, progress } from '@/routes/facul
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { type ReactNode } from 'react';
-import FacultyManagementLayout from '@/pages/Faculty/management/index';
+import StudentManagementLayout from '@/pages/Student/management/index';
 
 
 interface ProgressTrackingLayoutProps {
@@ -38,7 +38,7 @@ export default function ProgressTrackingLayout({ children, breadcrumbs, title, d
     const { url } = usePage();
 
     return (
-        <FacultyManagementLayout 
+        <StudentManagementLayout 
             breadcrumbs={[...breadcrumb, ...(breadcrumbs ?? [])]}
             title={title} 
             description={description}
@@ -70,7 +70,7 @@ export default function ProgressTrackingLayout({ children, breadcrumbs, title, d
             {/* CONTENT */}
             {children}
 
-        </FacultyManagementLayout>
+        </StudentManagementLayout>
     );
 }
 

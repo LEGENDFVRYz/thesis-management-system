@@ -19,160 +19,48 @@ import { ViewEditFacultyModal } from './faculty_management/faculty_viewandedit_m
 import { FacultyTable } from './faculty_management/faculty_table';
 import { Faculty, FilterState } from './faculty_management/faculty_types';
 
-// SAMPLE DATA
-const facultyData: Faculty[] = [
-  {
-    id: "FAC - 001",
-    name: "Angelo Dela Cruz",
-    email: "aadelacruz@pup.edu.ph",
-    roles: ["Thesis Adviser"],
-    type: "Full-Time",
-    dateAdded: "December 1, 2025",
-    initials: "AD",
-  },
-  {
-    id: "FAC - 002",
-    name: "Carlo A. Dela Cruz",
-    email: "radelacruz@pup.edu.ph",
-    roles: ["Thesis Coordinator"],
-    type: "Full-Time",
-    dateAdded: "December 1, 2025",
-    hasPhoto: true,
-  },
-  {
-    id: "FAC - 003",
-    name: "Benedict A. Dela Cruz",
-    email: "badelacruz@pup.edu.ph",
-    roles: ["Thesis Adviser", "Panel Member"],
-    type: "Full-Time",
-    dateAdded: "December 1, 2025",
-    initials: "BD",
-  },
-  {
-    id: "FAC - 004",
-    name: "Robert A. Dela Cruz",
-    email: "radelacruz@pup.edu.ph",
-    roles: ["Thesis Adviser", "Panel Member"],
-    type: "Full-Time",
-    dateAdded: "December 1, 2025",
-    hasPhoto: true,
-  },
-  {
-    id: "FAC - 005",
-    name: "Robert A. Dela Cruz",
-    email: "radelacruz@pup.edu.ph",
-    roles: ["Thesis Adviser"],
-    type: "Full-Time",
-    dateAdded: "December 1, 2025",
-    initials: "RD",
-  },
-  {
-    id: "FAC - 006",
-    name: "Robert A. Dela Cruz",
-    email: "radelacruz@pup.edu.ph",
-    roles: ["Thesis Adviser"],
-    type: "Full-Time",
-    dateAdded: "December 1, 2025",
-    hasPhoto: true,
-  },
-  {
-    id: "FAC - 007",
-    name: "Robert A. Dela Cruz",
-    email: "radelacruz@pup.edu.ph",
-    roles: ["Thesis Adviser"],
-    type: "Full-Time",
-    dateAdded: "December 1, 2025",
-    initials: "RD",
-  },
-  {
-    id: "FAC - 008",
-    name: "Robert A. Dela Cruz",
-    email: "radelacruz@pup.edu.ph",
-    roles: ["Thesis Adviser"],
-    type: "Full-Time",
-    dateAdded: "December 1, 2025",
-    initials: "RD",
-  },
-  {
-    id: "FAC - 009",
-    name: "Robert A. Dela Cruz",
-    email: "radelacruz@pup.edu.ph",
-    roles: ["Panel Member"],
-    type: "Full-Time",
-    dateAdded: "December 1, 2025",
-    initials: "RD",
-  },
-  {
-    id: "FAC - 010",
-    name: "Robert A. Dela Cruz",
-    email: "radelacruz@pup.edu.ph",
-    roles: ["Panel Member"],
-    type: "Part-Time",
-    dateAdded: "December 1, 2025",
-    initials: "RD",
-  },
-  {
-    id: "FAC - 011",
-    name: "Robert A. Dela Cruz",
-    email: "radelacruz@pup.edu.ph",
-    roles: ["Panel Member"],
-    type: "Part-Time",
-    dateAdded: "December 1, 2025",
-    initials: "RD",
-  },
-  {
-    id: "FAC - 012",
-    name: "Robert A. Dela Cruz",
-    email: "radelacruz@pup.edu.ph",
-    roles: ["Panel Member"],
-    type: "Part-Time",
-    dateAdded: "December 1, 2025",
-    initials: "RD",
-  },
-  {
-    id: "FAC - 013",
-    name: "Robert A. Dela Cruz",
-    email: "radelacruz@pup.edu.ph",
-    roles: ["Panel Member"],
-    type: "Part-Time",
-    dateAdded: "December 1, 2025",
-    initials: "RD",
-  },
-  {
-    id: "FAC - 014",
-    name: "Robert A. Dela Cruz",
-    email: "radelacruz@pup.edu.ph",
-    roles: ["Panel Member"],
-    type: "Part-Time",
-    dateAdded: "December 1, 2025",
-    initials: "RD",
-  },
-  {
-    id: "FAC - 015",
-    name: "Robert A. Dela Cruz",
-    email: "radelacruz@pup.edu.ph",
-    roles: ["Panel Member"],
-    type: "Part-Time",
-    dateAdded: "December 1, 2025",
-    initials: "RD",
-  },
-  {
-    id: "FAC - 016",
-    name: "Joseph De Guzman",
-    email: "radelacruz@pup.edu.ph",
-    roles: ["Panel Member"],
-    type: "External (Non-Faculty)",
-    dateAdded: "December 1, 2025",
-    initials: "JD",
-  },
-];
+// INTERFACE
+interface RawFaculty {
+    faculty_id: string;
+    email: string;
+    name_prefix: string;
+    first_name: string;
+    last_name: string;
+    suffix: string | null;
+    is_regular: number;
+    date_added: string;
+    roles: string | null;
+}
 
 // Update this with your actual route
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Faculty Management', href: '/admin/management/faculty' },
 ];
 
-export default function FacultyManagement({ faculties }: { faculties?: any[] }) {
+export default function FacultyManagement({ faculties }: { faculties: RawFaculty[] }) {
+
+    // TRANSFORM DATA: Map Laravel props to Frontend Interface
+    const processedData: Faculty[] = useMemo(() => {
+        return faculties.map((fac) => {
+            // Construct full name for display purposes
+            const fullName = `${fac.name_prefix} ${fac.first_name} ${fac.last_name} ${fac.suffix || ''}`.trim();
+
+            return {
+                id: fac.faculty_id,
+                name: fullName, 
+                firstName: fac.first_name,
+                lastName: fac.last_name,
+                prefix: fac.name_prefix,
+                suffix: fac.suffix || '',
+                email: fac.email,
+                roles: fac.roles ? fac.roles.split(', ') : [], 
+                type: fac.is_regular ? "Full-time" : "Part-time",
+                dateAdded: fac.date_added,
+                initials: (fac.first_name[0] + fac.last_name[0]).toUpperCase()
+            };
+        });
+    }, [faculties]);
+    
     const [searchQuery, setSearchQuery] = useState("");
     const [filters, setFilters] = useState<FilterState>({ roles: [], facultyType: "" });
     const [sortOption, setSortOption] = useState("");
@@ -187,7 +75,7 @@ export default function FacultyManagement({ faculties }: { faculties?: any[] }) 
 
     // Apply filtering and sorting
     const filteredAndSortedData = useMemo(() => {
-        let result = [...facultyData];
+        let result = [...processedData];
 
         // Apply search
         if (searchQuery) {
@@ -226,7 +114,7 @@ export default function FacultyManagement({ faculties }: { faculties?: any[] }) 
         }
 
         return result;
-    }, [searchQuery, filters, sortOption]);
+    }, [processedData, searchQuery, filters, sortOption]);
 
     const handleClearFilters = () => {
         setSearchQuery("");

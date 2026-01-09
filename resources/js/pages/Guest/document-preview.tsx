@@ -6,11 +6,22 @@ import PdfViewer from '@/components/pdf-viewer';
 
 
 
-export default function DocumentPreview({ url }: { url: string }) {
-    // FORCE TESTING
-    const targetId = 1; 
-    const pdfUrl = `/manuscripts/${targetId}/stream`;
+interface Journal {
+    id: number;
+    file_path: string | null;
+    title: string;
+}
 
+interface DocumentPreviewProps {
+    journal?: Journal;
+}
+
+export default function DocumentPreview({ journal }: DocumentPreviewProps) {
+    
+    // FORCE TESTING
+    // const targetId = 1; 
+    // const pdfUrl = `/manuscripts/${targetId}/stream`;
+    
     return (
         <>
             <Head title="Document Review" />
@@ -49,7 +60,7 @@ export default function DocumentPreview({ url }: { url: string }) {
 
                         {/* Document Title */}
                         <h3 className="text-base font-medium text-gray-900 mb-6 font-['DM_Sans']">
-                            Machine Learning Applications in Healthcare Diagnostics
+                            {journal?.title || 'Untitled Document'}
                         </h3>
 
                         {/* Document Preview Area */}
@@ -61,12 +72,25 @@ export default function DocumentPreview({ url }: { url: string }) {
                                 borderRadius: '4px'
                             }}
                         >
-                            {/* <FileText className="w-16 h-16 text-gray-400 mb-4" />
-                            <p className="text-gray-600 font-['DM_Sans']">Document Preview Area</p> */}
-                            <PdfViewer 
+                            {journal?.file_path ? (
+                                <iframe
+                                    src={`/storage/${journal.file_path}`}
+                                    className="w-full h-full"
+                                    style={{ minHeight: '600px' }}
+                                    title={journal.title}
+                                />
+                            ) : (
+                                <>
+                                    <FileText className="w-16 h-16 text-gray-400 mb-4" />
+                                    <p className="text-gray-600 font-['DM_Sans']">No document available</p>
+                                </>
+                            )}
+
+                            {/* <PdfViewer 
                                 fileUrl={pdfUrl} 
                                 className="shadow-lg bg-accent-foreground"
-                            />
+                            /> */}
+                            
                         </div>
                     </div>
                 </div>

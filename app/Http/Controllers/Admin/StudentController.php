@@ -34,27 +34,15 @@ class StudentController extends Controller
         $activeYear = $activeYear ?? 2025;
 
         $students = DB::table('tbl_students')
-            // 1. Join Users (For Student Number & Email)
             ->leftJoin('users', 'tbl_students.user_id', '=', 'users.id')
-            
-            // 2. Join Specializations (For Spec Name)
             ->leftJoin('tbl_specializations', 'tbl_students.spec_id', '=', 'tbl_specializations.id')
-            
-            // 3. Join Thesis Groups (For Group Number)
             ->leftJoin('tbl_thesis_groups', 'tbl_students.group_id', '=', 'tbl_thesis_groups.id')
-            
-            // 4. Join Adviser Assignments (For Section)
-            // Note: We use the correct table name 'tbl_section_advisers'
             ->leftJoin('tbl_section_advisers', 'tbl_thesis_groups.section_adviser_id', '=', 'tbl_section_advisers.id')
-            
-            // 5. Join Faculty Assignments (For School Year)
             ->leftJoin('tbl_faculty_assignments', 'tbl_section_advisers.faculty_assign_id', '=', 'tbl_faculty_assignments.id')
-
-            // 6. Join School Years (To get the actual Year string e.g., 2025)
             ->leftJoin('tbl_school_years', 'tbl_faculty_assignments.sy_id', '=', 'tbl_school_years.id')
-
-            // 7. Join Faculties (For Adviser Name)
             ->leftJoin('tbl_faculties', 'tbl_faculty_assignments.faculty_id', '=', 'tbl_faculties.id')
+            ->leftJoin('tbl_proposals', 'tbl_thesis_groups.id', '=', 'tbl_proposals.group_id')
+            ->leftJoin('tbl_theses', 'tbl_proposals.id', '=', 'tbl_theses.proposal_id')
             
             ->select(
                 // --- Simple Columns ---
@@ -69,9 +57,7 @@ class StudentController extends Controller
                 // --- Concatenated Adviser Name ---
                 DB::raw("CONCAT(tbl_faculties.name_prefix, ' ', tbl_faculties.first_name, ' ', tbl_faculties.last_name) as thesis_adviser"),
 
-                // --- Complex Group Code Logic ---
-                // Logic: IF year=2025 THEN Prefix '3' + Section + Padded Group Number (09)
-                // ELSE: Section + Padded Group Number (09)
+                // --- Group Code Logic ---
                 DB::raw("
                     CONCAT(
                         (3 + ($activeYear - tbl_school_years.year)), 
@@ -81,9 +67,25 @@ class StudentController extends Controller
                 "),
 
                 DB::raw("(3 + ($activeYear - tbl_school_years.year)) as year_level"),
+                DB::raw("MAX(tbl_theses.title) as thesis_title")
+            )
+            ->groupBy(
+                'tbl_students.id',
+                'users.identity_no',
+                'users.email',
+                'tbl_students.section',
+                'tbl_students.first_name',
+                'tbl_students.last_name',
+                'tbl_specializations.spec_name',
+                'tbl_faculties.name_prefix',
+                'tbl_faculties.first_name',
+                'tbl_faculties.last_name',
+                'tbl_school_years.year',
+                'tbl_section_advisers.section',
+                'tbl_thesis_groups.group_number'
             )
             ->orderBy('tbl_students.id', 'asc')
-            ->get(); // Use ->paginate(10) if you want pagination
+            ->get();
         
         // dd($students);
 

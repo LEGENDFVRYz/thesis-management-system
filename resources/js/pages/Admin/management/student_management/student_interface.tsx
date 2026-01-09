@@ -5,7 +5,9 @@ export interface Student {
   groupCode: string;
   block: string;
   specialization: string;
+  yearLevel: number;
   adviser: string;
+  thesisTitle: string;
   hasPhoto?: boolean;
 }
 

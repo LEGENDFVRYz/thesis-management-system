@@ -1,8 +1,16 @@
 import { useState } from 'react';
 import { Trash2, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {Dialog,DialogContent,DialogHeader,DialogTitle,DialogDescription,DialogFooter,} from '@/components/ui/dialog';
+import { router } from '@inertiajs/react';
+import { store } from '@/routes/faculty/management/adviser/advisee_management/group_comp';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import InputError from '@/components/input-error';
 
 interface Member {
@@ -13,17 +21,33 @@ interface Member {
   isLeader: boolean;
 }
 
+interface SectionAdviser {
+  section_adviser_id: number;
+  section: number;
+}
+
+interface StudentWithoutGroup {
+  id: number;
+  student_name: string;
+  student_number: string;
+  email: string;
+  section: string;
+}
+
 interface CreateGroupModalProps {
   isOpen: boolean;
   onClose: () => void;
+  sectionAdvisers: SectionAdviser[];
+  studentsWithoutGroup: StudentWithoutGroup[];
 }
 
-export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
+export default function CreateGroupModal({ isOpen, onClose, sectionAdvisers, studentsWithoutGroup }: CreateGroupModalProps) {
   const [selectedBlock, setSelectedBlock] = useState('');
   const [members, setMembers] = useState<Member[]>([
     { id: 1, name: '', studentNumber: '', email: '', isLeader: true },
     { id: 2, name: '', studentNumber: '', email: '', isLeader: false },
   ]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<{
     block?: string;
     members?: { [key: number]: { name?: string; studentNumber?: string; email?: string } };
@@ -122,11 +146,93 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleBlockChange = (newBlock: string) => {
+    setSelectedBlock(newBlock);
+
+    if (errors.block) {
+      setErrors((prev) => ({ ...prev, block: undefined }));
+    }
+    
+    // Clear all member selections when block changes (since students are filtered by block)
+    setMembers(members.map(m => ({
+      ...m,
+      name: '',
+      studentNumber: '',
+      email: '',
+    })));
+  };
+
+  const handleStudentSelect = (memberId: number, studentNumber: string) => {
+    const selectedStudent = studentsWithoutGroup.find(s => s.student_number === studentNumber);
+    if (selectedStudent) {
+      setMembers(members.map(m =>
+        m.id === memberId
+          ? {
+              ...m,
+              name: selectedStudent.student_name,
+              studentNumber: selectedStudent.student_number,
+              email: selectedStudent.email,
+            }
+          : m
+      ));
+    } else {
+      // Clear fields if no student selected
+      setMembers(members.map(m =>
+        m.id === memberId
+          ? { ...m, name: '', studentNumber: '', email: '' }
+          : m
+      ));
+    }
+  };
+
+  // Get available students (filtered by selected block and not already selected by other members)
+  const getAvailableStudents = (currentMemberId: number) => {
+    // Find the selected section adviser to get the section number
+    const selectedSectionAdviser = sectionAdvisers.find(
+      sa => sa.section_adviser_id === parseInt(selectedBlock)
+    );
+
+    // Filter students by block section if a block is selected
+    let filteredStudents = studentsWithoutGroup;
+    if (selectedSectionAdviser) {
+      filteredStudents = studentsWithoutGroup.filter(
+        s => s.section === String(selectedSectionAdviser.section)
+      );
+    }
+
+    // Filter out students already selected by other members
+    const selectedStudentNumbers = members
+      .filter(m => m.id !== currentMemberId && m.studentNumber)
+      .map(m => m.studentNumber);
+    return filteredStudents.filter(s => !selectedStudentNumbers.includes(s.student_number));
+  };
+
   const handleCreateGroup = () => {
     if (validateForm()) {
       console.log('Creating group:', { selectedBlock, members });
       onClose();
     }
+    
+    if (!selectedBlock || members.length < 2) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    router.post(store.url(), {
+      section_adviser_id: parseInt(selectedBlock),
+      members: members.map(m => ({
+        studentNumber: m.studentNumber,
+        isLeader: m.isLeader,
+      })),
+    }, {
+      onSuccess: () => {
+        handleCancel();
+      },
+      onFinish: () => {
+        setIsSubmitting(false);
+      },
+    });
   };
 
   const handleCancel = () => {
@@ -159,18 +265,15 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
             </label>
             <select
               value={selectedBlock}
-              onChange={(e) => {
-                setSelectedBlock(e.target.value);
-                if (errors.block) {
-                  setErrors({ ...errors, block: undefined });
-                }
-              }}
+              onChange={(e) => handleBlockChange(e.target.value)}
               className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#730000]"
             >
               <option value="">Select Block...</option>
-              <option value="block-1">Block 1</option>
-              <option value="block-2">Block 2</option>
-              <option value="block-3">Block 3</option>
+              {sectionAdvisers.map((sa) => (
+                <option key={sa.section_adviser_id} value={sa.section_adviser_id}>
+                  Block {sa.section}
+                </option>
+              ))}
             </select>
             <InputError message={errors.block} className="mt-1" />
           </div>
@@ -228,25 +331,34 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
                 <div className="grid grid-cols-3 gap-3">
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">Name</label>
-                    <Input
-                      type="text"
-                      inputSize="full"
-                      placeholder="Enter Name"
-                      value={member.name}
-                      onChange={(e) => handleMemberChange(member.id, 'name', e.target.value)}
-                      className="!bg-white border-gray-300 focus-visible:!border-[#730000]"
-                    />
-                    <InputError message={errors.members?.[member.id]?.name} className="mt-1" />
+                    <select
+                      value={member.studentNumber}
+                      onChange={(e) => handleStudentSelect(member.id, e.target.value)}
+                      disabled={!selectedBlock}
+                      className={`w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#730000] ${!selectedBlock ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : ''}`}
+                    >
+                      <option value="">{selectedBlock ? 'Select Student...' : 'Select a block first...'}</option>
+                      {getAvailableStudents(member.id).map((student) => (
+                        <option key={student.id} value={student.student_number}>
+                          {student.student_name}
+                        </option>
+                      ))}
+                      {/* Keep current selection visible if already selected */}
+                      {member.studentNumber && !getAvailableStudents(member.id).find(s => s.student_number === member.studentNumber) && (
+                        <option value={member.studentNumber}>
+                          {member.name}
+                        </option>
+                      )}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">Student Number</label>
                     <Input
                       type="text"
-                      inputSize="full"
-                      placeholder="Enter Student Number"
+                      placeholder="Auto-filled"
                       value={member.studentNumber}
-                      onChange={(e) => handleMemberChange(member.id, 'studentNumber', e.target.value)}
-                      className="!bg-white border-gray-300 focus-visible:!border-[#730000]"
+                      readOnly
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-gray-100 text-gray-600 cursor-not-allowed"
                     />
                     <InputError message={errors.members?.[member.id]?.studentNumber} className="mt-1" />
                   </div>
@@ -254,11 +366,10 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
                     <label className="block text-xs text-gray-600 mb-1">Email</label>
                     <Input
                       type="email"
-                      inputSize="full"
-                      placeholder="Enter PUP Webmail"
+                      placeholder="Auto-filled"
                       value={member.email}
-                      onChange={(e) => handleMemberChange(member.id, 'email', e.target.value)}
-                      className="!bg-white border-gray-300 focus-visible:!border-[#730000]"
+                      readOnly
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-gray-100 text-gray-600 cursor-not-allowed"
                     />
                     <InputError message={errors.members?.[member.id]?.email} className="mt-1" />
                   </div>
@@ -279,9 +390,10 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
           </Button>
           <Button
             onClick={handleCreateGroup}
-            className="px-6 py-2 bg-[#730000] text-white hover:bg-red-800"
+            disabled={isSubmitting || !selectedBlock || members.length < 2}
+            className="px-6 py-2 bg-[#730000] text-white hover:bg-red-800 disabled:bg-gray-400"
           >
-            Create Group
+            {isSubmitting ? 'Creating...' : 'Create Group'}
           </Button>
         </DialogFooter>
       </DialogContent>
