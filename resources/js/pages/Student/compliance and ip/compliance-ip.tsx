@@ -36,7 +36,7 @@ export default function IpPlagiarism({ auth }: PageProps) {
         compliance_checked_2: false,
         compliance_checked_3: false,
         plagiarism_report: null as File | null,
-        detected_score: null as number | null, // The real score from server
+        detected_score: null as number | null,  
     });
 
     // --- LOGIC: HANDLE FILE SCANNING (Real Axios) ---
@@ -58,7 +58,6 @@ export default function IpPlagiarism({ auth }: PageProps) {
             });
 
             if (response.data.success) {
-                // 3. Update form with REAL score
                 setData(prev => ({ 
                     ...prev, 
                     plagiarism_report: file,
@@ -137,7 +136,6 @@ export default function IpPlagiarism({ auth }: PageProps) {
                         </p>
                     </div>
 
-                    {/* Optional: Show Download button ONLY if previously submitted/archived (Logic depends on backend prop, using placeholder for now) */}
                     {isPassing && (
                          <div className="hidden md:block">
                             <div className="flex items-center gap-2 text-green-700 font-bold bg-green-100 px-4 py-2 rounded-full">

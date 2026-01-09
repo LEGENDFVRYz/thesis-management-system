@@ -42,14 +42,13 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
             }}
         >
             {/* Header with title "Document Preview" and close button */}
-            <div 
-                className="flex items-center justify-between pb-4 mb-4"
-                style={{ borderBottom: '1px solid rgba(115, 0, 0, 0.1)' }}
+            <div
+                className="flex items-center justify-between pb-4 mb-4 border-b border-[#73000019]"
             >
-                <h2 className="text-base font-semibold" style={{ color: '#730000' }}>
+                <h2 className="text-base font-semibold text-[#730000]">
                     Document Preview
                 </h2>
-                <button 
+                <button
                     className="text-gray-600 hover:text-gray-900"
                     onClick={onClose}
                 >
@@ -58,14 +57,12 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
             </div>
 
             {/* Document title and download button row */}
-            <div 
-                className="flex items-center justify-between pb-4 mb-4"
-                style={{ borderBottom: '1px solid rgba(115, 0, 0, 0.1)' }}
+            <div
+                className="flex items-center justify-between pb-4 mb-4 border-b border-[#73000019]"
             >
-                <span 
-                    className="text-sm font-normal truncate max-w-[500px]" 
+                <span
+                    className="text-sm font-normal truncate max-w-[500px] text-[#1a1a1a]"
                     title={documentTitle}
-                    style={{ color: '#1a1a1a' }}
                 >
                     {documentTitle}
                 </span>
@@ -74,11 +71,7 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
                     <button
                         onClick={handleDownloadClick}
                         disabled={!documentUrl}
-                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90"
-                        style={{ 
-                            backgroundColor: '#F3EFD0',
-                            color: '#730000',
-                        }}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 bg-[#F3EFD0] text-[#730000]"
                     >
                         <Download className="w-4 h-4" />
                         Download Full Document
@@ -87,20 +80,19 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
             </div>
 
             {/* Preview area */}
-            <div 
-                className="flex-1 relative rounded-md overflow-hidden"
-                style={{ background: '#F5F5F7' }}
+            <div
+                className="flex-1 relative rounded-md overflow-hidden bg-[#F5F5F7]"
             >
                 {documentUrl ? (
-                    <iframe 
+                    <iframe
                         src={`${documentUrl}#toolbar=0`}
                         className="w-full h-full absolute inset-0"
                         title={documentTitle}
                     />
                 ) : (
                     <div className="flex flex-col items-center justify-center h-full p-10">
-                        <FileText className="w-16 h-16 mb-3" style={{ color: '#D1D1D6' }} />
-                        <p className="text-sm" style={{ color: '#6B6B6B' }}>Document Preview Area</p>
+                        <FileText className="w-16 h-16 mb-3 text-[#D1D1D6]" />
+                        <p className="text-sm text-[#6B6B6B]">Document Preview Area</p>
                     </div>
                 )}
             </div>

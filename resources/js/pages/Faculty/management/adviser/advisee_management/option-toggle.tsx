@@ -15,8 +15,8 @@ export default function OptionToggle({
   onStatusChange,
   pendingCount = 0,
   approvedCount = 0,
-  pendingLabel = 'Pending',
-  approvedLabel = 'Approved',
+  pendingLabel = 'Pending Groups',
+  approvedLabel = 'Approved Groups',
   className = '',
 }: OptionToggleProps) {
   return (

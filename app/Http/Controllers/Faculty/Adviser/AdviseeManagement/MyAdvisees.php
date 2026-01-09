@@ -71,7 +71,6 @@ class MyAdvisees extends Controller
             ->paginate(25)
             ->withQueryString();
 
-        dd($students);
         return Inertia::render(
             'Faculty/management/adviser/advisee_management/my_advisees',
             [

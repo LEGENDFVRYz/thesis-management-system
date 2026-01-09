@@ -70,10 +70,6 @@ Route::get('/faq', function () {
 
 // GUEST ROUTES
 Route::prefix('guest')->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('Guest/landing');
-    })->name('guest.landing');
-
     Route::get('/repository', function () {
         return Inertia::render('Guest/repository');
     })->name('guest.repository');
@@ -180,6 +176,18 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->group(function (
     Route::get('student/profilemanagement', function () {
         return Inertia::render('Student/profilemanagement');
     })->name('student.profilemanagement');
+
+    Route::get('student/evaluation-and-grading', function () {
+        return Inertia::render('Student/evaluation-and-grading');
+    })->name('student.evaluation-and-grading');
+
+    Route::get('resources', function () {
+        return Inertia::render('Student/resources');
+    })->name('student.resources');
+
+    Route::get('repository', function () {
+        return Inertia::render('Student/repository');
+    })->name('student.repository');
 });
 
 
@@ -271,7 +279,9 @@ Route::prefix('faculty')->group(function () {
 
             // --- SPECIAL ROUTES (ADVISER AND PANEL JOINT) ---
             Route::middleware('faculty.role:Panelist,Adviser')->group(function () {
-                Route::get('defense_management', [DefenseManagement::class, 'index'])->name('faculty.management.joint.defense_management'); 
+                Route::get('defense_management', [DefenseManagement::class, 'index'])->name('faculty.management.joint.defense_management');
+                Route::patch('defense_management/{id}', [DefenseManagement::class, 'update'])
+                    ->name('faculty.management.joint.defense_management.update');
             });
 
 
@@ -304,6 +314,8 @@ Route::prefix('faculty')->group(function () {
                     Route::get('/matrix', [Matrix::class, 'index'])->name('faculty.management.coordinator.defense_management.matrix');
 
                     Route::get('/panel_assign', [PanelAssign::class, 'index'])->name('faculty.management.coordinator.defense_management.panel_assign');
+                    Route::post('/panel-assign', [PanelAssign::class, 'store'])->name('panel_assign.store');
+                    Route::put('/panel-assign/{id}', [PanelAssign::class, 'update'])->name('panel_assign.update'); 
                 });
 
                 // Grouped "Thesis Monitoring" tab

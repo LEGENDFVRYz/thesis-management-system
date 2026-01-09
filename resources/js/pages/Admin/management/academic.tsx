@@ -9,7 +9,7 @@ import { formatLocal } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { Card, CardHeader, CardTitle, CardContent,} from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AcademicYearRangePicker from '@/components/acad-year-range-picker';
 import DatePicker from '@/components/date-picker';
@@ -22,6 +22,7 @@ import CheckIcon from '@/components/Icons/ic_check-Default.svg';
 import TimerIcon from '@/components/Icons/timer.svg';
 import ManagementIcon from '@/components/Icons/ic_pen-settings-Default.svg';
 import { RotateCw } from 'lucide-react';
+import { NavFooter } from '@/components/nav-footer';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -217,11 +218,11 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
                             {/* Current Academic Yr */}
                             <div>
                                 <label className="text-sm font-medium">Current Academic Year</label>
-                                <div className="bg-[#95969766] border-[0.8px] rounded-sm border-[#44444433] px-3 py-2 text-sm flex items-center justify-between">
-                                    <span style={{ color: '#730000' }}>
+                                <div className="bg-[#95969766] border rounded-sm border-[#44444433] px-3 py-2 text-sm flex items-center justify-between">
+                                    <span className="text-[#730000]">
                                         Academic Year { active_sy ? `${active_sy}–${Number(active_sy) + 1}` : 'not yet activated!'}
                                     </span>
-                                    <img src={CheckIcon} className="w-5 h-5" style={{ filter: 'brightness(0) saturate(100%) invert(12%) sepia(86%) saturate(2065%) hue-rotate(335deg)' }} alt="checkmark" />
+                                    <img src={CheckIcon} className="w-5 h-5 brightness-0 saturate-100 invert-[12%] sepia-[86%] saturate-[2065%] hue-rotate-[335deg]" alt="checkmark" />
                                 </div>
                             </div>
                             
@@ -302,7 +303,7 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
                                 value={selectedSem !== null ? String(selectedSem) : ""}
                                 onValueChange={(value) => handleSemChange(Number(value))}
                             >
-                                <SelectTrigger className="w-full bg-[#F3EFD0] border-1px border-[#7300001A] text-[#730000] rounded-md">
+                                <SelectTrigger className="w-full bg-[#F3EFD0] border border-[#7300001A] text-[#730000] rounded-md">
                                     <SelectValue placeholder="Select Semester" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-[#F3EFD0] border border-[#7300001A]">

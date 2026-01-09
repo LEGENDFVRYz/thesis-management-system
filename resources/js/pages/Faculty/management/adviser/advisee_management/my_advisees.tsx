@@ -26,15 +26,13 @@ const breadcrumb: BreadcrumbItem[] = [
     },
 ];
 
-
-
 interface Advisee {
     student_id: string;
     student_name: string;
     pup_webmail: string;
     group_code: string;
     block: string;
-    thesis_stage: string; // ADDED: thesis stage field
+    thesis_stage: string;
 }
 
 interface MyAdviseesProps {
@@ -68,10 +66,8 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedBlock, setSelectedBlock] = useState('');
 
-    // FIX: Start with empty array so all data shows initially
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-    // FIX: Corrected filter logic
     const filteredAdvisees = displayAdvisees.filter((advisee) => {
         const matchesSearch =
             advisee.student_name
@@ -86,7 +82,6 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
 
         const matchesBlock = !selectedBlock || advisee.block === selectedBlock;
 
-        // FIX: Check thesis_stage instead of student_name
         const matchesTags =
             selectedTags.length === 0 ||
             selectedTags.includes(advisee.thesis_stage);

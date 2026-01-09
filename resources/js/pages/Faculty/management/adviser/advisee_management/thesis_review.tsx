@@ -32,7 +32,7 @@ const mockThesisGroups = [
   },
   {
     groupCode: "4309",
-    badge: "Completed",
+    badge: "Approved",
     thesisTitle: "Blockchain-Based Supply Chain Management System",
     section: "BSCPE 4-2",
     numberofMembers: "3 Members",
@@ -50,7 +50,7 @@ const mockThesisGroups = [
   },
   {
     groupCode: "4311",
-    badge: "Completed",
+    badge: "Approved",
     thesisTitle: "IoT-Based Smart Home Automation with AI Integration",
     section: "BSCPE 4-3",
     numberofMembers: "3 Members",
@@ -68,7 +68,7 @@ const mockThesisGroups = [
   },
   {
     groupCode: "4313",
-    badge: "Completed",
+    badge: "Approved",
     thesisTitle: "Computer Vision System for Automated Quality Control",
     section: "BSCPE 4-1",
     numberofMembers: "3 Members",
@@ -77,7 +77,7 @@ const mockThesisGroups = [
   },
   {
     groupCode: "4314",
-    badge: "Completed",
+    badge: "Approved",
     thesisTitle: "Augmented Reality Application for Educational Purposes",
     section: "BSCPE 4-2",
     numberofMembers: "4 Members",
@@ -95,7 +95,7 @@ const mockThesisGroups = [
   },
   {
     groupCode: "4316",
-    badge: "Completed",
+    badge: "Approved",
     thesisTitle: "Cloud-Based Inventory Management System for Retail",
     section: "BSCPE 4-1",
     numberofMembers: "4 Members",
@@ -122,7 +122,7 @@ const mockThesisGroups = [
   },
   {
     groupCode: "4319",
-    badge: "Completed",
+    badge: "Approved",
     thesisTitle: "E-Learning Platform with Adaptive Learning Technologies",
     section: "BSCPE 4-1",
     numberofMembers: "3 Members",
@@ -130,6 +130,38 @@ const mockThesisGroups = [
     lastSubmissionDate: "December 26, 2024"
   }
 ];
+
+// Badge
+interface StatusBadgeProps {
+    status: string;
+}
+
+function StatusBadge({ status }: StatusBadgeProps) {
+    const isApproved = status === "Approved";
+    
+    return (
+        <div 
+            className={`
+                flex flex-row justify-center items-center
+                px-2.5 py-0
+                h-5 rounded-[15px] border-[0.8px]
+                ${isApproved 
+                    ? 'bg-[#DBFEEB] border-[#94FF8E]' 
+                    : 'bg-[#FEF9C2] border-[#FEEC71]'
+                }
+            `}
+        >
+            <span 
+                className={`
+                    font-['Arimo'] font-normal text-[12px] leading-5
+                    ${isApproved ? 'text-[#39D863]' : 'text-[#C7891E]'}
+                `}
+            >
+                {status}
+            </span>
+        </div>
+    );
+}
 
 // Mock submission data
 const getSubmissionsForGroup = (groupCode: string) => {
@@ -211,8 +243,6 @@ function SubmissionCard({
     badgeKey,
     onClick
 }: SubmissionCardProps) {
-    const BadgeComponent = badgeKey ? badgesRegistry[badgeKey] : null;
-
     return (
         <div 
             className="relative bg-white border border-[#7A7A8A] rounded-[10px] p-[18px_17px] shadow-[0px_4px_4px_rgba(0,0,0,0.25)] hover:shadow-lg transition-all duration-300 cursor-pointer"
@@ -245,11 +275,9 @@ function SubmissionCard({
             </div>
 
             {/* Badge */}
-            {BadgeComponent && (
-                <div className="absolute right-[17px] top-[18px]">
-                    <BadgeComponent className="h-6 w-auto" />
-                </div>
-            )}
+            <div className="absolute right-[17px] top-[18px]">
+                <StatusBadge status={status} />
+            </div>
         </div>
     );
 }
@@ -274,9 +302,6 @@ function CommentItem({ author, date, text, avatar }: CommentItemProps) {
                     <span className="text-xs text-gray-500">{date}</span>
                 </div>
                 <p className="text-sm text-gray-700 mb-2">{text}</p>
-                <button className="text-xs text-primary p-0 h-auto hover:underline bg-transparent border-none cursor-pointer">
-                
-                </button>
             </div>
         </div>
     );
@@ -317,7 +342,6 @@ export default function ThesisReview() {
 
     const handleAddComment = () => {
         console.log('Adding comment:', commentText, 'Page:', pageNumber);
-        // Handle comment submission
         setCommentText('');
         setPageNumber('');
     };
@@ -339,7 +363,6 @@ export default function ThesisReview() {
                 description="Review, comment on, and approve/request revisions for submitted thesis documents"
             >
                 <div className="space-y-6">
-                    {/* Back Button */}
                     <Button
                         variant="ghost"
                         onClick={handleBackToSubmissions}
@@ -349,7 +372,6 @@ export default function ThesisReview() {
                         Back to Documents
                     </Button>
 
-                    {/* Document Header */}
                     <div className="bg-primary text-white rounded-lg p-6">
                         <h1 className="text-2xl font-bold mb-2">{selectedSubmission.title}</h1>
                         <p className="text-sm text-white/90 mb-1">{selectedGroup.thesisTitle}</p>
@@ -360,9 +382,7 @@ export default function ThesisReview() {
                         </div>
                     </div>
 
-                    {/* Two Column Layout */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Left: Document Preview */}
                         <div className="bg-white border border-gray-200 rounded-lg p-6">
                             <div className="flex items-center gap-2 mb-4">
                                 <FileText className="w-5 h-5 text-primary" />
@@ -382,7 +402,7 @@ export default function ThesisReview() {
                                     <Button 
                                         variant="outline" 
                                         onClick={handlePreview}
-                                        className="flex items-center gap-2"
+                                        className="px-6 py-2 border-[#730000] text-[#730000] hover:bg-red-50"
                                     >
                                         <Eye className="w-4 h-4" />
                                         Preview
@@ -398,9 +418,7 @@ export default function ThesisReview() {
                                 </div>
                             </div>
                             
-                            {/* Defense Information Container */}
                             <div className="relative bg-[#F3EFD0] border border-[#730000] rounded-[15px] p-[18px_21px] mt-6 space-y-2">
-                                {/* Defense ID */}
                                 <div className="flex items-center justify-between">
                                     <p className="text-[13px] leading-[17px] font-bold text-[#8E948D]">
                                         Defense ID:
@@ -410,7 +428,6 @@ export default function ThesisReview() {
                                     </p>
                                 </div>
 
-                                {/* Submitted by */}
                                 <div className="flex items-center justify-between">
                                     <p className="text-[13px] leading-[17px] font-bold text-[#8E948D]">
                                         Submitted by:
@@ -420,7 +437,6 @@ export default function ThesisReview() {
                                     </p>
                                 </div>
 
-                                {/* Submitted Date */}
                                 <div className="flex items-center justify-between">
                                     <p className="text-[13px] leading-[17px] font-bold text-[#8E948D]">
                                         Submitted Date:
@@ -431,25 +447,23 @@ export default function ThesisReview() {
                                 </div>
                             </div>
                             
-                            {/* Action Buttons */}
-                            <div className="flex justify-center gap-3 pt-4 border-t mt-4">
-                                <Button variant="outline">
+                            <div className="flex justify-center gap-4 pt-4 border-t mt-4">
+                                <Button variant="outline" className="w-70 px-6 py-2 border-[#730000] text-[#730000] hover:bg-red-50" >
+                
                                     Request Revisions
                                 </Button>
-                                <Button variant="negative">
+                                <Button variant="negative"className="w-70">
                                     Approve Document
                                 </Button>
                             </div>
                         </div>
 
-                         {/* Right: Comments & Feedback */}
                         <div className="bg-white border border-gray-200 rounded-lg p-6">
                             <div className="flex items-center gap-2 mb-4">
                                 <MessageSquare className="w-5 h-5 text-primary" />
                                 <h2 className="text-lg font-semibold text-gray-900">Comments & Feedback</h2>
                             </div>
 
-                            {/* Comment Input */}
                             <div className="bg-[#F3EFD0] border-[0.8px] border-[#730000] rounded-[15px] p-[18px] mb-6">
                                 <textarea
                                     placeholder="Enter your comment or feedback..."
@@ -475,7 +489,6 @@ export default function ThesisReview() {
                                 </div>
                             </div>
 
-                            {/* Comments List */}
                             <div>
                                 <h3 className="font-semibold text-sm text-gray-900 mb-3">Comment/s</h3>
                                 <div className="space-y-3 max-h-[500px] overflow-y-auto">
@@ -517,21 +530,16 @@ export default function ThesisReview() {
                         Back to Groups
                     </Button>
 
-                    {/* Title Card with Figma Design */}
                     <div className="relative bg-white border border-[#7A7A8A] rounded-[10px] p-[18px_17px] shadow-[0px_4px_4px_rgba(0,0,0,0.25)]">
-                        {/* Group Code and Badge */}
                         <div className="flex items-center justify-between mb-[3px]">
                             <h2 className="text-base leading-[21px] font-semibold text-primary">
                                 {selectedGroup.groupCode}
                             </h2>
                             {selectedGroup.badge && (
-                                <Badge className="text-[8px] h-auto px-2 py-0.5">
-                                    {selectedGroup.badge}
-                                </Badge>
+                                <StatusBadge status={selectedGroup.badge} />
                             )}
                         </div>
                         
-                        {/* Pin icon + Thesis Title */}
                         <div className="flex items-center gap-[6px] mb-[3px]">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" className="flex-shrink-0">
                                 <path d="M16 12V4H17V2H7V4H8V12L6 14V16H11V22H13V16H18V14L16 12Z" fill="#730000"/>
@@ -541,12 +549,10 @@ export default function ThesisReview() {
                             </span>
                         </div>
 
-                        {/* Section Badge */}
                         <Badge variant="outline" className="text-[8px] h-auto px-2 py-0.5 mb-[3px]">
                             {selectedGroup.section}
                         </Badge>
 
-                        {/* Members Info */}
                         <div className="flex items-center gap-[6px] mt-[3px] pt-[3px] border-t border-gray-200">
                             <User className="w-[10px] h-[10px] text-[#8B8B98]" />
                             <span className="text-[8px] leading-[10px] font-medium text-[#7A7A8A]">
@@ -594,9 +600,7 @@ export default function ThesisReview() {
             description="Review, comment on, and approve/request revisions for submitted thesis documents"
         >
             <div className="space-y-6">
-                {/* Filter & Search Section */}
                 <div className="mb-6 box-border flex h-[125.6px] w-full max-w-[1360px] flex-col items-start gap-4 self-stretch rounded-[10px] border-[0.8px] border-primary/20 bg-card p-[24.8px_24.8px_0.8px_24.8px] font-dm shadow-sm transition-all duration-200">
-                    {/* Header Section */}
                     <div className="flex h-6 w-full flex-row items-center gap-2 self-stretch rounded-none font-dm">
                         <Filter className="h-5 w-5 text-primary" />
                         <h2 className="font-dm text-base leading-6 font-normal text-primary">
@@ -604,9 +608,7 @@ export default function ThesisReview() {
                         </h2>
                     </div>
 
-                    {/* Controls Row */}
                     <div className="flex w-full flex-row items-center justify-center gap-[10px] self-stretch font-dm">
-                        {/* Search Box */}
                         <div className="flex-1 font-dm">
                             <SearchBar
                                 variant="filter-section"
@@ -616,7 +618,6 @@ export default function ThesisReview() {
                             />
                         </div>
 
-                        {/* Action Buttons */}
                         <div className="flex flex-row items-center gap-[10px] font-dm">
                             <Button
                                 variant="secondary"
@@ -637,6 +638,15 @@ export default function ThesisReview() {
                             </Button>
                         </div>
                     </div>
+                </div>
+
+                <div className="space-y-2">
+                    <h2 className="text-primary font-semibold text-xs sm:text-sm truncate">
+                        My Advisee Groups
+                    </h2>
+                    <p className="text-[12px] text-gray-600">
+                        Select a group to view their thesis submissions
+                    </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
