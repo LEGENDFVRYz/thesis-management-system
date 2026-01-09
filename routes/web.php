@@ -130,6 +130,14 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('student/evaluation-and-grading', function () {
         return Inertia::render('Student/evaluation-and-grading');
     })->name('student.evaluation-and-grading');
+
+    Route::get('resources', function () {
+        return Inertia::render('Student/resources');
+    })->name('student.resources');
+
+    Route::get('repository', function () {
+        return Inertia::render('Student/repository');
+    })->name('student.repository');
 });
 
 
