@@ -177,6 +177,7 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
     const handleSaveChanges = (thesis: Thesis) => {
         const currentAssignments = thesisAssignments[thesis.thesis_id] || [];
         
+        // Strict check for exactly 3 panelists
         if (currentAssignments.length !== 3) {
             setNotificationMessage("Exactly 3 panelists are required.");
             setIsNotifySuccessOpen(true);
@@ -190,45 +191,42 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
             panel_ids: currentAssignments.map(p => p.id),
         };
     
+        const onSuccess = () => {
+            // Update local state: Set is_complete to true AND update the panels array
+            // This ensures the badge updates immediately
+            setLocalTheses(prevTheses => 
+                prevTheses.map(t => 
+                    t.thesis_id === thesis.thesis_id 
+                        ? { ...t, is_complete: true, panels: currentAssignments } 
+                        : t
+                )
+            );
+
+            setProcessingId(null);
+            setNotificationMessage("Panel assignments saved successfully.");
+            setIsNotifySuccessOpen(true);
+            setOpenThesisId(null);
+        };
+    
+        const onError = (errors: any) => {
+            setProcessingId(null);
+            setNotificationMessage("Failed to save: " + Object.values(errors).join(', '));
+            setIsNotifySuccessOpen(true);
+        };
+    
         const hasExistingPanels = thesis.panels && thesis.panels.length > 0;
     
         if (hasExistingPanels) {
-            // 🔁 UPDATE
             router.put(
                 `/faculty/management/coordinator/defense_management/panel-assign/${thesis.defense_matrix_id}`,
                 payload,
-                {
-                    onSuccess: () => {
-                        setProcessingId(null);
-                        setNotificationMessage("Panel assignments updated successfully.");
-                        setIsNotifySuccessOpen(true);
-                        setOpenThesisId(null);
-                    },
-                    onError: (errors) => {
-                        setProcessingId(null);
-                        setNotificationMessage("Failed to update: " + Object.values(errors).join(', '));
-                        setIsNotifySuccessOpen(true);
-                    }
-                }
+                { onSuccess, onError }
             );
         } else {
-            // ➕ STORE
             router.post(
                 '/faculty/management/coordinator/defense_management/panel-assign',
                 payload,
-                {
-                    onSuccess: () => {
-                        setProcessingId(null);
-                        setNotificationMessage("Panel assignments saved successfully.");
-                        setIsNotifySuccessOpen(true);
-                        setOpenThesisId(null);
-                    },
-                    onError: (errors) => {
-                        setProcessingId(null);
-                        setNotificationMessage("Failed to save: " + Object.values(errors).join(', '));
-                        setIsNotifySuccessOpen(true);
-                    }
-                }
+                { onSuccess, onError }
             );
         }
     };
@@ -402,11 +400,15 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                                                                     </div>
                                                                 </div>
                                                                 <div className="flex items-center gap-4">
-                                                                    {/* Status Pill */}
-                                                                    {thesis.is_complete ? (
-                                                                        <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">Assigned</span>
+                                                                    {/* Status Pill - Updated to check if exactly 3 panels are saved */}
+                                                                    {thesis.panels.length === 3 ? (
+                                                                        <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                                                                            Assigned
+                                                                        </span>
                                                                     ) : (
-                                                                        <span className="inline-flex items-center rounded-full bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20">Pending</span>
+                                                                        <span className="inline-flex items-center rounded-full bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20">
+                                                                            Pending
+                                                                        </span>
                                                                     )}
                                                                     <button className="text-muted-foreground transition-transform duration-200">
                                                                         {isOpen ? <ChevronUp /> : <ChevronDown />}
