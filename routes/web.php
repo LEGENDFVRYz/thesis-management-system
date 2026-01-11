@@ -389,16 +389,26 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
         Route::get('deadline', [DeadlineController::class, 'index'])->name('admin.management.deadline');
         Route::put('deadline/{id}', [DeadlineController::class, 'update'])->name('admin.management.deadline.update');
 
+        // Department Policies Routes
+        Route::prefix('policies')->group(function () {
+            Route::redirect('/', 'policies/system')->name('admin.management.policies.index');
 
-        // FULL CRUD OPERATIONS EXAMPLES
-        Route::get('policies', [DepartmentPoliciesController::class, 'index'])->name('admin.management.dep-policies');
-        // Route::get('policies/grading-criteria/{id}/edit', [DepartmentPoliciesController::class, 'edit'])->name('admin.management.dep-policies.edit');
-        Route::put('policies/grading-criteria/{id}', [DepartmentPoliciesController::class, 'update'])->name('admin.management.dep-policies.update');
-        Route::delete('policies/grading-criteria/{id}', [DepartmentPoliciesController::class, 'destroy'])->name('admin.management.dep-policies.destroy');
-        Route::post('policies/grading-criteria', [DepartmentPoliciesController::class, 'store'])->name('admin.management.dep-policies.store');
+            // Route::get('policies', [DepartmentPoliciesController::class, 'index'])->name('admin.management.policies');
 
-        Route::get('policies/guidelines', [DepartmentPoliciesController::class, 'index2'])->name('admin.management.dep-policies.guidelines');
-        Route::post('policies/update-guidelines', [DepartmentPoliciesController::class, 'updateGuidelines'])->name('admin.management.dep-policies.update-guidelines');
+            Route::get('/system', [DepartmentPoliciesController::class, 'system'])->name('admin.management.policies.system');
+
+            Route::get('/workflow', [DepartmentPoliciesController::class, 'workflow'])->name('admin.management.policies.workflow');
+
+            Route::get('/documents', [DepartmentPoliciesController::class, 'documents'])->name('admin.management.policies.documents');
+
+            Route::get('/grading', [DepartmentPoliciesController::class, 'grading'])->name('admin.management.policies.grading');
+            // Route::post('/grading', [DepartmentPoliciesController::class, 'storeGrading'])->name('admin.management.policies.store');
+            // Route::put('/grading/{id}', [DepartmentPoliciesController::class, 'updateGrading'])->name('admin.management.policies.update');
+            // Route::delete('/grading/{id}', [DepartmentPoliciesController::class, 'destroyGrading'])->name('admin.management.policies.destroy');
+
+            Route::get('/guidelines', [DepartmentPoliciesController::class, 'guidelines'])->name('admin.management.policies.guidelines');
+            Route::post('/guidelines', [DepartmentPoliciesController::class, 'updateGuidelines'])->name('admin.management.policies.guidelines.update');
+        });
 
         Route::get('defense-monitoring', [DefenseController::class, 'index'])->name('admin.management.defenses');
     });
