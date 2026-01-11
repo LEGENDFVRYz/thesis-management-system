@@ -72,3 +72,11 @@ export interface NotificationItem {
     read_at: string | null;
     created_at: string;
 }
+
+
+// Page Header type
+export interface PageHeaderProps {
+    title: string;
+    subtitle?: string;
+    icon?: React.ReactNode;
+}
