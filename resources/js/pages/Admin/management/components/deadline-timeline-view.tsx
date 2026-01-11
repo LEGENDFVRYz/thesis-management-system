@@ -2,7 +2,7 @@ import { Calendar, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Timeline from '@/components/timeline';
 import { useState } from 'react';
-import NewDeadlineModal from './new-deadline-modal';
+import NewDeadlineModal from './deadline-new-modal';
 
 export function DeadlineTimelineView() {
     const [modalOpen, setModalOpen] = useState(false);

@@ -3,7 +3,7 @@ import { useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Alert } from '@/components/ui/alert';
 import AddIcon from '@/components/Icons/ic_add-Default.svg';
-import { PoliciesHeader, PoliciesRow } from '../policies-tables';
+import { PoliciesHeader, PoliciesRow } from './components/policies-tables';
 
 // type
 export type DocumentRequirement = {

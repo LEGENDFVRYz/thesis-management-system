@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Alert } from '@/components/ui/alert';
 import AddIcon from '@/components/Icons/ic_add-Default.svg';
 // Adjust import path to where your table components are located
-import { PoliciesHeader, PoliciesRow } from '../policies-tables'; 
+import { PoliciesHeader, PoliciesRow } from './components/policies-tables'; 
 
 // --- LOCAL TYPES ---
 type SystemRule = {

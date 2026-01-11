@@ -1,7 +1,7 @@
 import { Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
-import SubmissionPeriodModal from './submission-period-modal';
+import SubmissionPeriodModal from '././deadline-submission-period-modal';
 
 interface ScheduleItem {
     id: number;

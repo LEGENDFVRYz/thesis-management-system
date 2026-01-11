@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
 import EditIcon from '@/components/Icons/ic_edit-Default.svg';
-import DefensePoliciesRubrics from '@/pages/Admin/management/dep-policies-rubrics';
+import DefensePoliciesRubrics from '@/pages/Admin/management/dept-policies/components/rubrics';
 
 export type Rubric = {
     category: string;

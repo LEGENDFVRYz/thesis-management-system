@@ -35,7 +35,7 @@ import { ArchivedJournalsChart } from '@/components/archived-journals-line';
 import { SystemRepositoryStorage } from '@/components/system-repository-storage';
 
 {/* Page Components Imports */}
-import { DeadlineTimelineView } from '@/pages/Admin/management/deadline-timeline-view';
+import { DeadlineTimelineView } from '@/pages/Admin/management/components/deadline-timeline-view';
 
 
 {/* TYPE DEFINITIONS */}

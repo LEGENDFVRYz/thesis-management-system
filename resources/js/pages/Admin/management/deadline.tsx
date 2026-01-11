@@ -7,10 +7,10 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
 import { Calendar } from '@/components/calendar';
-import { DeadlineTimelineView } from './deadline-timeline-view';
-import { DeadlineSubmissionSchedule } from './deadline-submission-schedule';
-import { DeadlineDefenseSchedule } from './deadline-defense-schedule';
-import { DeadlineNotificationRules } from './deadline-notification-rules';
+import { DeadlineTimelineView } from './components/deadline-timeline-view';
+import { DeadlineSubmissionSchedule } from './components/deadline-submission-schedule';
+import { DeadlineDefenseSchedule } from './components/deadline-defense-schedule';
+import { DeadlineNotificationRules } from './components/deadline-notification-rules';
 import { Icon } from '@/components/icon-index';
 
 // Page Setup
@@ -73,8 +73,6 @@ export default function DeadlinePage({ allowed_stages, workflow }: DeadlineProps
         >
             <div className="flex flex-col gap-6 p-4">
                 {/* LEIGH PAST CODE: resolve later */}
-                {/* Timeline View - Full Width */}
-                {/* <DeadlineTimelineView /> */}
 
                 {/* Three Column Grid */}
                 {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-6"> */}
@@ -82,7 +80,6 @@ export default function DeadlinePage({ allowed_stages, workflow }: DeadlineProps
                     {/* <DeadlineDefenseSchedule /> */}     
                     {/* <DeadlineNotificationRules /> */}   
                 {/* </div> */}
-
 
                 {/* Initial Design for deadline management */}
                 {/* --- TABS SECTION --- */}
@@ -105,6 +102,7 @@ export default function DeadlinePage({ allowed_stages, workflow }: DeadlineProps
                 </div>
 
                 {/* --- WORKFLOW SECTION --- */}
+                {/* Note: Sample Frontend for testing the deadline edit (update) operations */}
                 <div className="relative min-h-[50vh] flex-1 rounded-xl">
                     
                     {currentSteps.length === 0 ? (
@@ -127,6 +125,10 @@ export default function DeadlinePage({ allowed_stages, workflow }: DeadlineProps
                     )}
 
                 </div>
+
+                {/* Timeline View - Full Width */}
+                {/* Note: currently view method lang yung component, nead a way to update the set date in the deadline */}
+                <DeadlineTimelineView />
             </div>
 
             {/* --- TESTING MODAL --- */}
