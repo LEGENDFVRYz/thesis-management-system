@@ -8,19 +8,19 @@ import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { NavFooter } from '@/components/nav-footer';
 
 // STUDENT MNGMT COMPONENTS
-import { FilterSection } from './student_management/student_filter_section';
-import { StudentTableView } from './student_management/student_table_view';
-import { GroupCardView } from './student_management/student_groupcard_view';
-import { ViewToggle } from './student_management/student_view_toggle';
-import { StudentProfileModal } from './student_management/student_viewStudprofile_modal';
-import { GroupProfileModal } from './student_management/student_viewgroup_modal';
-import { StudentImportModal } from './student_management/student_import_modal';
+import { FilterSection } from '../../../components/temp/student_management/student_filter_section';
+import { StudentTableView } from '../../../components/temp/student_management/student_table_view';
+import { GroupCardView } from '../../../components/temp/student_management/student_groupcard_view';
+import { ViewToggle } from '../../../components/temp/student_management/student_view_toggle';
+import { StudentProfileModal } from '../../../components/temp/student_management/student_viewStudprofile_modal';
+import { GroupProfileModal } from '../../../components/temp/student_management/student_viewgroup_modal';
+import { StudentImportModal } from '../../../components/temp/student_management/student_import_modal';
 
 // TYPES AND SAMPLE DATA
-import { Student, GroupData, FilterState } from './student_management/student_interface';
-import { studentData, thesisTitles } from './student_management/student_sampleData';
+import { Student, GroupData, FilterState } from '../../../components/temp/student_management/student_interface';
+import { studentData, thesisTitles } from '../../../components/temp/student_management/student_sampleData';
 
-import { filterAndSortStudents, filterAndSortGroups, groupStudentsByCode } from './student_management/student_data_utilities';
+import { filterAndSortStudents, filterAndSortGroups, groupStudentsByCode } from '../../../components/temp/student_management/student_data_utilities';
 import { Icon } from '@/components/icon-index';
 
 

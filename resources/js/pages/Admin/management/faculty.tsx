@@ -11,13 +11,13 @@ import { Icon } from '@/components/icon-index';
 import { SearchBar } from '@/components/filter-search';
 
 // FACULTY COMPONENTS
-import { Dropdown } from './faculty_management/faculty_dropdown';
-import { FacultyFilterDropdown } from './faculty_management/faculty_filter_dropdown';
-import { FacultySortDropdown } from './faculty_management/faculty_sort_dropdown';
-import { AddFacultyModal } from './faculty_management/faculty_add_modal';
-import { ViewEditFacultyModal } from './faculty_management/faculty_viewandedit_modal';
-import { FacultyTable } from './faculty_management/faculty_table';
-import { Faculty, FilterState } from './faculty_management/faculty_types';
+import { Dropdown } from '../../../components/temp/faculty_management/faculty_dropdown';
+import { FacultyFilterDropdown } from '../../../components/temp/faculty_management/faculty_filter_dropdown';
+import { FacultySortDropdown } from '../../../components/temp/faculty_management/faculty_sort_dropdown';
+import { AddFacultyModal } from '../../../components/temp/faculty_management/faculty_add_modal';
+import { ViewEditFacultyModal } from '../../../components/temp/faculty_management/faculty_viewandedit_modal';
+import { FacultyTable } from '../../../components/temp/faculty_management/faculty_table';
+import { Faculty, FilterState } from '../../../components/temp/faculty_management/faculty_types';
 
 
 // Page Setup
