@@ -364,17 +364,12 @@ Route::prefix('faculty')->group(function () {
 
 /*
 ==================================================================================
-FACULTY ROUTES      (ADMIN SIDE)
+ADMIN ROUTES      
 
-Note: Temporary Routes only for frontend, but soon will have own controller dependent on the purpose
+Note: Pages of admin side are still in the faculty by default (switch is in the navigation) 
 ==================================================================================
 */
 Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->group(function () {
-
-    // Old Dashboard Route
-    // Route::get('/', function () {
-    //     return Inertia::render('Admin/dashboard');
-    // })->name('admin.dashboard');
 
     Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
 
@@ -396,25 +391,22 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
 
 
         // FULL CRUD OPERATIONS EXAMPLES
-        Route::get('dept-policies', [DepartmentPoliciesController::class, 'index'])->name('admin.management.dep-policies');
-        // Route::get('dept-policies/grading-criteria/{id}/edit', [DepartmentPoliciesController::class, 'edit'])->name('admin.management.dep-policies.edit');
-        Route::put('dept-policies/grading-criteria/{id}', [DepartmentPoliciesController::class, 'update'])->name('admin.management.dep-policies.update');
-        Route::delete('dept-policies/grading-criteria/{id}', [DepartmentPoliciesController::class, 'destroy'])->name('admin.management.dep-policies.destroy');
-        Route::post('dept-policies/grading-criteria', [DepartmentPoliciesController::class, 'store'])->name('admin.management.dep-policies.store');
+        Route::get('policies', [DepartmentPoliciesController::class, 'index'])->name('admin.management.dep-policies');
+        // Route::get('policies/grading-criteria/{id}/edit', [DepartmentPoliciesController::class, 'edit'])->name('admin.management.dep-policies.edit');
+        Route::put('policies/grading-criteria/{id}', [DepartmentPoliciesController::class, 'update'])->name('admin.management.dep-policies.update');
+        Route::delete('policies/grading-criteria/{id}', [DepartmentPoliciesController::class, 'destroy'])->name('admin.management.dep-policies.destroy');
+        Route::post('policies/grading-criteria', [DepartmentPoliciesController::class, 'store'])->name('admin.management.dep-policies.store');
 
-        Route::get('dept-policies/guidelines', [DepartmentPoliciesController::class, 'index2'])->name('admin.management.dep-policies.guidelines');
-        Route::post('dept-policies/update-guidelines', [DepartmentPoliciesController::class, 'updateGuidelines'])->name('admin.management.dep-policies.update-guidelines');
+        Route::get('policies/guidelines', [DepartmentPoliciesController::class, 'index2'])->name('admin.management.dep-policies.guidelines');
+        Route::post('policies/update-guidelines', [DepartmentPoliciesController::class, 'updateGuidelines'])->name('admin.management.dep-policies.update-guidelines');
 
-        Route::get('defenses', [DefenseController::class, 'index'])->name('admin.management.defenses');
+        Route::get('defense-monitoring', [DefenseController::class, 'index'])->name('admin.management.defenses');
     });
+
 
     // Repository Routes
     Route::prefix('repository')->group(function () {
         Route::redirect('/', 'repository/thesis')->name('admin.repository.index');
-
-        // Route::get('thesis', function () {
-        //     return Inertia::render('Shared/repository/thesis');
-        // })->name('admin.repository.theses');
 
         Route::get('resources', function () {
             return Inertia::render('Admin/repository/system');
@@ -425,16 +417,29 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
         })->name('admin.repository.system-expanded');
     });
 
+
+    // Resources Routes
     Route::get('resources', [ResourceController::class, 'index'])->name('admin.resources');
     Route::post('resources', [ResourceController::class, 'store'])->name('admin.resources.store');
     Route::delete('resources/{resource}', [ResourceController::class, 'destroy'])->name('admin.resources.remove');
     Route::patch('resources/{resource}/toggle', [ResourceController::class, 'toggle'])->name('admin.resources.toggle');
-    // Note: Download routes for resources is in public
+});
 
-    Route::get('notification', function () {
+
+
+/*
+==================================================================================
+SHARED AUTH ROUTES      
+==================================================================================
+*/
+Route::middleware(['auth'])->group(function() {
+
+    // Notification Routes
+    Route::get('notifications', function () {
         return Inertia::render('Shared/notification');
-    })->name('admin.notification');
+    })->name('notifications');
 
+    // Profile (Settings) Management Routes
     Route::get('profilemanagement', function () {
         return Inertia::render('Shared/profilemanagement'); 
     })->name('admin.profilemanagement');
@@ -451,7 +456,7 @@ Route::post('file-import', [FileImportController::class, 'store'])->name('file.i
 Route::get('/resources/{filekey}/download', [ResourceController::class, 'download'])->name('resources.download');
 Route::get('/manuscripts/{id}/stream', [PdfViewerController::class, 'streamPdf'])->name('manuscripts.stream');
 
-Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+Route::get('/notification-test', [NotificationController::class, 'index'])->name('notifications.index');
 Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 
 // TEMPORARY: view shared thesis page without affecting guest/admin routes

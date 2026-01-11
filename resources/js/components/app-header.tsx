@@ -24,13 +24,11 @@ const adminManagementItems = [
             { title: 'User Management', href: '#', isHeader: true },
             { title: 'Faculty', href: '/admin/management/faculty' },
             { title: 'Student', href: '/admin/management/student' },
-            { title: 'Faculty', href: '/admin/management/faculty' },
-            { title: 'Student', href: '/admin/management/student' },
             { title: 'System Configuration', href: '#', isHeader: true },
             { title: 'Academic Settings', href: '/admin/management/academic-settings' },
             { title: 'Deadline', href: '/admin/management/deadline' },
             { title: 'Department Policies', href: '/admin/management/policies' },
-            { title: 'Defense Management', href: '/admin/management/defense' },
+            { title: 'Defense Management', href: '/admin/management/defense-monitoring' },
         ] 
     }
 ];
