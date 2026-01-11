@@ -251,7 +251,7 @@ export default function FacultyManagement({ faculties }: { faculties: RawFaculty
             />
         </ManagementLayout>
         
-        <NavFooter />
+        {/* <NavFooter /> */}
     </>
     );
 }

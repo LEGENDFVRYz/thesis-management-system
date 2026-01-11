@@ -193,8 +193,6 @@ export default function Welcome() {
                 </div>
             </div>
 
-            <NavFooter />
-
             {/* Filter Modal */}
             {isFilterOpen && (
                 <div

@@ -511,10 +511,10 @@ export default function SystemRepositoryExpanded() {
 
       <RepositoryLayout breadcrumbs={breadcrumbs}>
 
-      <AppContent
+      {/* <AppContent
         title="System Archive"
         subtitle="Browse and explore student thesis projects"
-      >
+      > */}
 
         {/* Storage Card */}
         <div className="mb-8">
@@ -1060,10 +1060,10 @@ export default function SystemRepositoryExpanded() {
               </div>
             </div>
           )}
-        </AppContent>
+        
+        {/* </AppContent> */}
       </RepositoryLayout>
 
-      <NavFooter />
     </>
   );
 }

@@ -299,10 +299,10 @@ export default function SystemRepository() {
 
       <RepositoryLayout breadcrumbs={breadcrumbs}>
 
-      <AppContent
+      {/* <AppContent
         title="System Archive"
         subtitle="Browse and explore student thesis projects"
-      >
+      > */}
 
         {/* Storage Card */}
         <div className="mb-8">
@@ -684,10 +684,9 @@ export default function SystemRepository() {
           </div>
         )}
 
-      </AppContent>
+      {/* </AppContent> */}
     </RepositoryLayout>
     
-    <NavFooter />
     </>
   );
 }

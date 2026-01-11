@@ -225,7 +225,7 @@ export function DocumentReviewModal({
           </div>
         </div>
       </AppContent>
-      <NavFooter />
+      {/* <NavFooter /> */}
     </AppLayout>
   );
 }

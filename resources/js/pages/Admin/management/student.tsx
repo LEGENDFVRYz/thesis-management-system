@@ -206,7 +206,7 @@ export default function StudentManagement({ students }: { students: RawStudent[]
           }}
         />
       </ManagementLayout>
-      <NavFooter />
+      {/* <NavFooter /> */}
     </>
   );
 }

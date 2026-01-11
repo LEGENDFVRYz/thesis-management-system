@@ -412,7 +412,6 @@ export default function Dashboard({ activeTerm, currentDate, notifications }: Da
                     </div>
 
             </AppLayout>
-        <NavFooter />
         </>
     );
 }

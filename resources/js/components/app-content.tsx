@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { SidebarInset } from '@/components/ui/sidebar';
+import { NavFooter } from './nav-footer';
 
 interface HeaderCardProps {
   title?: string;
@@ -73,9 +74,13 @@ export function AppContent({
           </div>
         </div>
       )}
-      <div className="flex flex-1 flex-col mx-auto w-full max-w-[1440px] p-6 h-full">
+
+      {/* Note: min-h-screen is only temporary soln to resolve navfooter problems */}
+      <div className="flex flex-1 flex-col mx-auto w-full max-w-[1440px] min-h-screen p-6 h-full">  
         {children}
       </div>
+
+      <NavFooter />
     </div>
   )
 }
