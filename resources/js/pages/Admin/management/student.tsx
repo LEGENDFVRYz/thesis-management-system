@@ -2,7 +2,7 @@
 import { useState, useMemo } from 'react';
 import { Head } from '@inertiajs/react';
 import ManagementLayout from '@/pages/Admin/management/index';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 
 // SHARED COMPONENTS 
 import { NavFooter } from '@/components/nav-footer';
@@ -21,6 +21,28 @@ import { Student, GroupData, FilterState } from './student_management/student_in
 import { studentData, thesisTitles } from './student_management/student_sampleData';
 
 import { filterAndSortStudents, filterAndSortGroups, groupStudentsByCode } from './student_management/student_data_utilities';
+import { Icon } from '@/components/icon-index';
+
+
+// Page Setup
+const breadcrumbs: BreadcrumbItem[] = [
+    { 
+        title: 'Student Management', 
+        href: '/admin/management/student' 
+    },
+];
+
+const pageHeader: PageHeaderProps = {
+    title: "Student Management",
+    subtitle: "View and Manage Student Accounts and Thesis Group Assignments",
+    icon: (
+        // paki coprrect nalang ng icon
+        <Icon
+            name="calendarDefault"
+            className="w-8 h-8 text-primary"
+        />
+    ),
+};
 
 // INTERFACE
 interface RawStudent {
@@ -35,9 +57,7 @@ interface RawStudent {
   thesis_title: string | null;
 }
 
-const breadcrumbs: BreadcrumbItem[] = [
-  { title: 'Student Management', href: '/admin/management/student' },
-];
+
 
 export default function StudentManagement({ students }: { students: RawStudent[] }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -137,8 +157,7 @@ export default function StudentManagement({ students }: { students: RawStudent[]
     <>
       <ManagementLayout
         breadcrumbs={breadcrumbs}
-        title="Student Management"
-        description="View and Manage Student Accounts and Thesis Group Assignments"
+        pageHeader={pageHeader}
       >
         {/* Filter & Search Section */}
         <FilterSection

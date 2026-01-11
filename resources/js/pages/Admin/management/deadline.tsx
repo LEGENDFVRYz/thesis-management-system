@@ -1,5 +1,5 @@
 import ManagementLayout from '@/pages/Admin/management/index';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { deadline } from '@/routes/admin/management/index';
 import { update } from '@/routes/admin/management/deadline/index';
@@ -11,13 +11,27 @@ import { DeadlineTimelineView } from './deadline-timeline-view';
 import { DeadlineSubmissionSchedule } from './deadline-submission-schedule';
 import { DeadlineDefenseSchedule } from './deadline-defense-schedule';
 import { DeadlineNotificationRules } from './deadline-notification-rules';
+import { Icon } from '@/components/icon-index';
 
+// Page Setup
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Deadlines',
         href: deadline().url,
     },
 ];
+
+const pageHeader: PageHeaderProps = {
+    title: "Deadline Management",
+    subtitle: "Set submission windows, defense periods, and grading deadlines",
+    icon: (
+        <Icon
+            name="calendarDefault"
+            className="w-8 h-8 text-primary"
+        />
+    ),
+};
+
 
 // Page Props
 interface WorkflowStep {
@@ -55,8 +69,7 @@ export default function DeadlinePage({ allowed_stages, workflow }: DeadlineProps
     return (
         <ManagementLayout
             breadcrumbs={breadcrumbs}
-            title="Deadline Management"
-            description="Set submission windows, defense periods, and grading deadlines"
+            pageHeader={pageHeader}
         >
             <div className="flex flex-col gap-6 p-4">
                 {/* LEIGH PAST CODE: resolve later */}

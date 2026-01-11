@@ -9,8 +9,7 @@ import { cn } from '@/lib/utils';
 interface ManagementLayoutProps {
     children: ReactNode;
     breadcrumbs?: BreadcrumbItem[];
-    title: string;
-    description: string;
+    pageHeader: PageHeaderProps;
 }
 
 const breadcrumb: BreadcrumbItem[] = [
@@ -20,18 +19,17 @@ const breadcrumb: BreadcrumbItem[] = [
     },
 ];
 
-const pageHeader: PageHeaderProps = {
-    title: 'SAMPPOL Management',
-    subtitle: 'Monitor schedules and assignments',
-};
-
-export default function ManagementLayout({ children, breadcrumbs, title, description }: ManagementLayoutProps) {
+export default function ManagementLayout({ children, breadcrumbs, pageHeader }: ManagementLayoutProps) {
     return (
         <AppLayout 
             breadcrumbs={[...breadcrumb, ...(breadcrumbs ?? [])]}
             pageHeader={pageHeader}
         >
             <div className="flex flex-col flex-1">
+                {/* Header Card implementation based on figma CSS:
+                   height: 124px, padding: 32px 24px, border-bottom: #9B000A 
+                */}
+
 
                 {/* Main Content Area */}
                 <div className="flex-1 h-full p-6 overflow-x-auto">

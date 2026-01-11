@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef } from 'react';
 import { Head } from '@inertiajs/react';
 import ManagementLayout from '@/pages/Admin/management/index';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 
 // SHARED COMPONENTS 
 import { NavFooter } from '@/components/nav-footer';
@@ -19,6 +19,27 @@ import { ViewEditFacultyModal } from './faculty_management/faculty_viewandedit_m
 import { FacultyTable } from './faculty_management/faculty_table';
 import { Faculty, FilterState } from './faculty_management/faculty_types';
 
+
+// Page Setup
+const breadcrumbs: BreadcrumbItem[] = [
+    { 
+        title: 'Faculty Management', 
+        href: '/admin/management/faculty'
+    },
+];
+
+const pageHeader: PageHeaderProps = {
+    title: "Faculty Management",
+    subtitle: "Manage Faculty Accounts and Assign Roles",
+    icon: (
+        // paki coprrect nalang ng icon
+        <Icon
+            name="calendarDefault"
+            className="w-8 h-8 text-primary"
+        />
+    ),
+};
+
 // INTERFACE
 interface RawFaculty {
     faculty_id: string;
@@ -32,10 +53,6 @@ interface RawFaculty {
     roles: string | null;
 }
 
-// Update this with your actual route
-const breadcrumbs: BreadcrumbItem[] = [
-  { title: 'Faculty Management', href: '/admin/management/faculty' },
-];
 
 export default function FacultyManagement({ faculties }: { faculties: RawFaculty[] }) {
 
@@ -131,8 +148,7 @@ export default function FacultyManagement({ faculties }: { faculties: RawFaculty
         <>
             <ManagementLayout
                 breadcrumbs={breadcrumbs}
-                title="Faculty Management"
-                description="Manage Faculty Accounts and Assign Roles"
+                pageHeader={pageHeader}
             >
                 {/* Filter & Search Section */}
             <div className="mb-4">

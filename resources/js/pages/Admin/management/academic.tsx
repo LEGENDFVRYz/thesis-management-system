@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import ManagementLayout from '@/pages/Admin/management/index';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { academic } from '@/routes/admin/management/index';
 import { update } from '@/routes/admin/management/academic';
@@ -24,13 +24,26 @@ import ManagementIcon from '@/components/Icons/ic_pen-settings-Default.svg';
 import { RotateCw } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import { Icon } from '@/components/icon-index';
 
+// Page Setup
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Academic Settings Configuration',
         href: academic().url,
     },
 ];
+
+const pageHeader: PageHeaderProps = {
+    title: "Academic Settings Configuration",
+    subtitle: "Configure academic year, semester parameters, and system timeline",
+    icon: (
+        <Icon
+            name="calendarDefault"
+            className="w-8 h-8 text-primary"
+        />
+    ),
+};
 
 // Deadline events sample data
 const DEADLINE_EVENTS = [
@@ -201,8 +214,7 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
     return (
         <ManagementLayout 
             breadcrumbs={breadcrumbs}
-            title="Academic Settings Configuration" 
-            description="Configure academic year, semester parameters, and system timeline"
+            pageHeader={pageHeader}
         >
             <div className="flex flex-1 h-full flex-col gap-4"> 
                 <div className="flex flex-row gap-4">

@@ -15,6 +15,28 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Calendar, TableIcon, X } from 'lucide-react';
 import { CardContent } from '@/components/ui/card';
 import { DefenseCalendar } from '@/components/defense-calendar-monthly';
+import ManagementLayout from '.';
+import { BreadcrumbItem, PageHeaderProps } from '@/types';
+
+// Page Setup
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Defense', 
+        href: defensesRoute().url 
+    },
+];
+
+const pageHeader: PageHeaderProps = {
+    title: "Defense Management",
+    subtitle: "Monitor schedules and assignments",
+    icon: (
+        <Icon
+            name="calendarDefault"
+            className="w-8 h-8 text-primary"
+        />
+    ),
+};
+
 
 // INTERFACE
 export interface Panelist {
@@ -200,10 +222,12 @@ export default function DefenseTable({ defenses }: { defenses: Defense[] }) {
     // ];
 
     return (
-        <>
+        <ManagementLayout
+            breadcrumbs={breadcrumbs}
+            pageHeader={pageHeader}
+        >
             <Head title="Defense Management" />
-            <AppLayout breadcrumbs={[{ title: 'Management', href: '/admin/management' }, { title: 'Defense', href: defensesRoute().url }]}>
-                <AppContent title="Defense Management" subtitle="Monitor schedules and assignments" icon={<Icon name="calendarDefault" className="w-8 h-8 text-primary" />} variant="header">
+
                     <div className="space-y-6 font-dm pb-10 flex flex-col items-center w-full">
                         
                         {/* Search and Advanced Filter Section */}
@@ -297,14 +321,17 @@ export default function DefenseTable({ defenses }: { defenses: Defense[] }) {
                             )}
                         </div>
                     </div>
-                </AppContent>
-            </AppLayout>
-            <NavFooter />
+
+            {/* <NavFooter /> */}
+            
             {/* Modal portal for viewing full defense details */}
             <DefenseDetailsModal open={isModalOpen} onOpenChange={setIsModalOpen} data={selectedDef} />
-        </>
+        </ManagementLayout>
+
     );
 }
+
+
 
 
 // PAST CODE: (soon to be resolved by kuru)
