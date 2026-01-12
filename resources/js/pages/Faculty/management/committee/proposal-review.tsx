@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { AppContent } from '@/components/app-content';
 import { FileText, Search, Edit3, ArrowRight, CheckCircle2, MessageSquare, XCircle, Eye, Trash } from 'lucide-react';
+import { index, store } from '@/routes/faculty/committee/proposal_review/index';
 import { NavFooter } from '@/components/nav-footer';
 import { Icon } from '@/components/icon-index';
 import { CommitteeCard } from '@/components/ui/card';
@@ -18,6 +19,25 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import FilePreview from '@/components/document-preview';
+import FacultyManagementLayout from '..';
+
+// SET UP
+const breadcrumbs: BreadcrumbItem[] = [
+  { title: 'Proposal Review', href: index().url },
+];
+
+const pageHeader: PageHeaderProps = {
+    title: "Proposal Review",
+    subtitle: "Review and evaluate thesis proposals submitted for committee approval",
+    icon: (
+        // pa correct nalang
+        <Icon
+            name="calendarDefault"
+            className="w-8 h-8 text-primary"
+        />
+    ),
+};
+
 
 const EndorsedProposalsSection = ({ mockEndorsed, mockEvaluating, selectedItem, setSelectedItem, renderProposalSection }: any) => (
     <div className="flex-1 space-y-8 font-dm">
@@ -702,16 +722,11 @@ export default function ProposalReview({ proposals }: ProposalReviewProps) {
     };
 
     return (
-        <><AppLayout breadcrumbs={[{ title: 'Proposal Review', href: '/proposal-review' }, { title: activeTab === 'endorsed' ? 'Endorsed Proposals' : 'Change Requests' } as BreadcrumbItem]}>
+        <FacultyManagementLayout
+            breadcrumbs={breadcrumbs}
+            pageHeader={pageHeader}
+        >
             <Head title="Proposal Review" />
-
-            <AppContent
-                title="Proposal Review"
-                subtitle="Review and evaluate thesis proposals submitted for committee approval"
-                icon={<FileText className="w-8 h-8 text-[#FFBD00]" />}
-                variant="header"
-                className='w-screen relative left-[50%] right-[50%] -ml-[50vw] -mr-[50vw]'
-            />
 
             <div className="px-6 max-w-[1440px] mx-auto w-full space-y-6">
                 
@@ -728,66 +743,16 @@ export default function ProposalReview({ proposals }: ProposalReviewProps) {
                 </div>
 
                 {/* 2. FILTER & SEARCH */}
-                <FilterSearchSection variant='Notifications'/>
+                {/* <FilterSearchSection variant='Notifications'/> */}
+                <FilterSearchSection variant='Committee'/>
 
                 {/* 3. MAIN CONTENT CONTAINER */}
-                <div className="flex flex-row items-stretch gap-[30px] mb-10 w-full max-w-[1360px] mx-auto self-stretch grow-0 z-0">
+                <div className="flex flex-col items-stretch gap-[30px] mb-10 w-full max-w-[1360px] mx-auto self-stretch grow-0 z-0">
                     
-                    {/* LEFT: Lists */}
-                    <div className="flex-1 space-y-8">
-                        {activeTab === 'endorsed' ? (
-                            <>
-                                {renderProposalSection("Pending Evaluations", "bg-primary", mockEndorsed.length, mockEndorsed)}
-                                {renderProposalSection("Under Evaluation", "bg-primary-foreground-2", mockEvaluating.length, mockEvaluating)}
-                                {renderProposalSection("Evaluated", "bg-completed-border", 0, [])}
-                            </>
-                        ) : (
-                            <div className="flex flex-col space-y-4 text-left">
-                                
-                                {/* Scrollable Container with Fixed Header */}
-                                <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm h-[620px] flex flex-col">
-                                    
-                                    {/* RESTORED: Header is outside the scrollable div to stay fixed */}
-                                    <MethodologyHeader 
-                                        variant='dynamic' 
-                                        columns={['Title', 'Type of Changes', 'Submitted', 'Status']} 
-                                    />
-
-                                    {/* SCROLLABLE BODY: Wraps the row mapping */}
-                                    <div className="flex-1 overflow-y-auto custom-scrollbar bg-slate-50/5">
-                                        {changeRequests.length > 0 ? (
-                                            changeRequests.map((req) => (
-                                                <MethodologyRow
-                                                    key={req.id}
-                                                    variant="dynamic"
-                                                    data={[
-                                                        { value: req.title },
-                                                        { value: (
-                                                            <Badge name={'changesBadgesMethodologyChange'}/>
-                                                        )},
-                                                        { value: req.date },
-                                                        { value: (
-                                                            <Badge name={
-                                                                req.status === 'Approved' ? 'statusBadgeApproved' : 
-                                                                req.status === 'Denied' ? 'statusBadgeDenied' : 
-                                                                'statusBadgePendingReview'
-                                                            } />
-                                                        )}
-                                                    ]}
-                                                />
-                                            ))
-                                        ) : (
-                                            <div className="h-full flex flex-col items-center justify-center text-slate-400 py-20">
-                                                <Icon name="docuDefault" size={48} className="opacity-20 mb-4" />
-                                                <p className="text-sm font-bold uppercase tracking-tight">No change requests</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                    <FilterSearchSection variant='Committee'/>
+                    {/* {THERE IS MISSING SCRIPT HERE: CHECK IT AT THE BOTTOM} */}
+                    {/* {Kindly restore it, since there is conflict between old and the latest version.. we make a mistake here} */}
+                    
+                    {/* <FilterSearchSection variant='Committee'/> */}
                     <div className="flex flex-row items-start gap-[30px] w-full max-w-[1360px] mx-auto">
                         {activeTab === 'endorsed' ? <EndorsedProposalsSection mockEndorsed={mockEndorsed} mockEvaluating={mockEvaluating} selectedItem={selectedItem} setSelectedItem={setSelectedItem} renderProposalSection={renderProposalSection} /> : <ChangeRequestsSection changeRequests={changeRequests} selectedItem={selectedItem} setSelectedItem={setSelectedItem} />}
                         <div className="w-[400px] shrink-0 sticky top-6">
@@ -801,7 +766,7 @@ export default function ProposalReview({ proposals }: ProposalReviewProps) {
                         </div>
                     </div>
                 </div>
-            </AppLayout>
+            </div>
 
             {isPreviewOpen && (
                 <div 
@@ -820,10 +785,12 @@ export default function ProposalReview({ proposals }: ProposalReviewProps) {
                 </div>
             )}
 
-            <NavFooter />
-        </>
+            {/* <NavFooter /> */}
+
+        </FacultyManagementLayout>
     );
 }
+
 
 
 // COMPONENT: Redering logic of the cards
@@ -892,3 +859,62 @@ const renderProposalSection = (title: string, headerColor: string, count: number
         </section>
     );
 };
+
+
+
+
+// LEFT CODE COMMENETED OUT TEMPORARY
+        // {/* LEFT: Lists */}
+        // <div className="flex-1 space-y-8">
+        //     {activeTab === 'endorsed' ? (
+        //         <>
+        //             {renderProposalSection("Pending Evaluations", "bg-primary", mockEndorsed.length, mockEndorsed)}
+        //             {renderProposalSection("Under Evaluation", "bg-primary-foreground-2", mockEvaluating.length, mockEvaluating)}
+        //             {renderProposalSection("Evaluated", "bg-completed-border", 0, [])}
+        //         </>
+        //     ) : (
+        //         <div className="flex flex-col space-y-4 text-left">
+                    
+        //             {/* Scrollable Container with Fixed Header */}
+        //             <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm h-[620px] flex flex-col">
+                        
+        //                 {/* RESTORED: Header is outside the scrollable div to stay fixed */}
+        //                 <MethodologyHeader 
+        //                     variant='dynamic' 
+        //                     columns={['Title', 'Type of Changes', 'Submitted', 'Status']} 
+        //                 />
+
+        //                 {/* SCROLLABLE BODY: Wraps the row mapping */}
+        //                 <div className="flex-1 overflow-y-auto custom-scrollbar bg-slate-50/5">
+        //                     {changeRequests.length > 0 ? (
+        //                         changeRequests.map((req) => (
+        //                             <MethodologyRow
+        //                                 key={req.id}
+        //                                 variant="dynamic"
+        //                                 data={[
+        //                                     { value: req.title },
+        //                                     { value: (
+        //                                         <Badge name={'changesBadgesMethodologyChange'}/>
+        //                                     )},
+        //                                     { value: req.date },
+        //                                     { value: (
+        //                                         <Badge name={
+        //                                             req.status === 'Approved' ? 'statusBadgeApproved' : 
+        //                                             req.status === 'Denied' ? 'statusBadgeDenied' : 
+        //                                             'statusBadgePendingReview'
+        //                                         } />
+        //                                     )}
+        //                                 ]}
+        //                             />
+        //                         ))
+        //                     ) : (
+        //                         <div className="h-full flex flex-col items-center justify-center text-slate-400 py-20">
+        //                             <Icon name="docuDefault" size={48} className="opacity-20 mb-4" />
+        //                             <p className="text-sm font-bold uppercase tracking-tight">No change requests</p>
+        //                         </div>
+        //                     )}
+        //                 </div>
+        //             </div>
+        //         </div>
+        //     )}
+        // </div>

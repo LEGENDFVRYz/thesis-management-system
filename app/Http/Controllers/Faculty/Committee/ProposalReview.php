@@ -100,9 +100,7 @@ class ProposalReview extends Controller
 
         // ================= DEBUG (REMOVE AFTER CHECK) =================
         // dd($data);
-        return Inertia::render(
-            'Committee/proposal-review',
-            [
+        return Inertia::render('Faculty/management/committee/proposal-review', [
                 'proposals' => $data,
                 // 'filters'   => $request->only('status'),
             ]

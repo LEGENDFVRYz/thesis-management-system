@@ -1,8 +1,26 @@
 import { useForm } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
-import { index } from '@/routes/faculty/committee/proposal_review/index';
-import { type BreadcrumbItem } from '@/types';
+import { index, store } from '@/routes/faculty/committee/proposal_review/index';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
+import { Icon } from '@/components/icon-index';
+
+// Setup
+const breadcrumbs: BreadcrumbItem[] = [
+  { title: 'Proposal Review', href: index().url },
+];
+
+const pageHeader: PageHeaderProps = {
+    title: "Proposal Review",
+    subtitle: "Review and evaluate thesis proposals submitted for committee approval",
+    icon: (
+        // pa correct nalang
+        <Icon
+            name="calendarDefault"
+            className="w-8 h-8 text-primary"
+        />
+    ),
+};
 
 type Proposal = {
   proposal_id: number;
@@ -15,10 +33,6 @@ type Proposal = {
   my_comment: string | null;
   proponents: string;
 };
-
-const breadcrumbs: BreadcrumbItem[] = [
-  { title: 'Proposal Review', href: index().url },
-];
 
 export default function ProposalReview({
   proposals,
@@ -51,7 +65,7 @@ export default function ProposalReview({
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              post(index().url, {   // dunno why, we resolve later
+              post(store().url, {   // dunno why, we resolve
                 onSuccess: () => alert('Evaluation submitted/updated!'),
               });
             }}
@@ -87,8 +101,7 @@ export default function ProposalReview({
   return (
     <FacultyManagementLayout
       breadcrumbs={breadcrumbs}
-      title="Proposal Review"
-      description="Review and evaluate thesis proposals submitted for committee approval"
+      pageHeader={pageHeader}
     >
       <Head title="Proposal Review" />
 
