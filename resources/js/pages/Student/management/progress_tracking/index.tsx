@@ -1,7 +1,10 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
-import { index } from '@/routes/faculty/management/adviser/advisee_management';
-import { my_advisees, group_comp, thesis_review, progress } from '@/routes/faculty/management/adviser/advisee_management';
+import { index } from '@/routes/faculty/adviser/progress/index';
+import { index as my_advisees } from '@/routes/faculty/adviser/my_advisees';
+import { index as group_comp } from '@/routes/faculty/adviser/group_comp';
+import { index as progress } from '@/routes/faculty/adviser/thesis_review';
+import { index as thesis_review } from '@/routes/faculty/adviser/progress';
 
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';

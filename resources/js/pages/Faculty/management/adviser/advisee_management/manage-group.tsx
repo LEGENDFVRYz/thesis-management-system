@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { router } from '@inertiajs/react';
-import { update } from '@/routes/faculty/management/adviser/advisee_management/group_comp';
+import { update } from '@/routes/faculty/adviser/group_comp/index';
 import {
   Dialog,
   DialogContent,

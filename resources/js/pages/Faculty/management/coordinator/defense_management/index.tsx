@@ -1,11 +1,13 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
-import { index } from '@/routes/faculty/management/coordinator/defense_management/index';
+import { index } from '@/routes/faculty/coordinator/defense_management/index';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import ManagementLayout from '@/pages/Faculty/management/index';
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
-import { matrix, panel_assign } from '@/routes/faculty/management/coordinator/defense_management';
+import { index as matrix } from '@/routes/faculty/coordinator/defense_management/matrix';
+import { index as panel_assign } from '@/routes/faculty/coordinator/defense_management/panel_assign';
+
 
 import { type ReactNode } from 'react';
 

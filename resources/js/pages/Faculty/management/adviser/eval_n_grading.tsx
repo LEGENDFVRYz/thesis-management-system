@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
-import { eval_n_grading } from '@/routes/faculty/management/adviser';
+import { index } from '@/routes/faculty/adviser/evaluation/index';
 import StageSwitchToggle from '@/components/stage-toggle';
 import { NavFooter } from '@/components/nav-footer';
 import { 
@@ -57,7 +57,7 @@ const rubricFiles = [
 ];
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Evaluation and Grading', href: eval_n_grading().url },
+    { title: 'Evaluation and Grading', href: index().url },
     { title: 'Grade Input', href: '#' },
 ];
 

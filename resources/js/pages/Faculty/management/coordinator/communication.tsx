@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import * as React from 'react';
 import AppLayout from '@/layouts/app-layout';
-import { communication } from '@/routes/faculty/management/coordinator';
+import { communication } from '@/routes/faculty/coordinator/index';
 import { type BreadcrumbItem } from '@/types';
 
 import { 

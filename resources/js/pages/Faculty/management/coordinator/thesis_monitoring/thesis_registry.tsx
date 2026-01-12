@@ -17,7 +17,7 @@ import {
     DialogContent,
 } from "@/components/ui/dialog"; 
 import AppLayout from '@/layouts/app-layout';
-import { thesis_registry } from '@/routes/faculty/management/coordinator/thesis_monitoring';
+import { registry } from '@/routes/faculty/coordinator/thesis/index';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { FolderOpen, Calendar, Clock, Check, User } from 'lucide-react';
@@ -34,7 +34,7 @@ import notifyClicked from '@/components/icons/ic_notify-Clicked.svg';
 const breadcrumb: BreadcrumbItem[] = [
     {
         title: 'Thesis Registry',
-        href: thesis_registry().url,
+        href: registry().url,
     },
 ];
 

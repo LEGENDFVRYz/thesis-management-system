@@ -1,10 +1,7 @@
-import {
-    group_comp,
-    index,
-    my_advisees,
-    progress,
-    thesis_review,
-} from '@/routes/faculty/management/adviser/advisee_management';
+import { index as my_advisees } from '@/routes/faculty/adviser/my_advisees';
+import { index as group_comp } from '@/routes/faculty/adviser/group_comp';
+import { index as progress } from '@/routes/faculty/adviser/thesis_review';
+import { index as thesis_review } from '@/routes/faculty/adviser/progress';
 
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
 import { type BreadcrumbItem } from '@/types';
@@ -23,7 +20,7 @@ interface AdviseeManagementLayoutProps {
 const breadcrumb: BreadcrumbItem[] = [
     {
         title: 'Advisee Management',
-        href: index().url,
+        href: '#',      // temporary, since this file is just a wrapper
     },
 ];
 

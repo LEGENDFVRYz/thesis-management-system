@@ -1,6 +1,6 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
-import { endorsement } from '@/routes/faculty/management/adviser';
+import { index } from '@/routes/faculty/adviser/endorsement/index';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm} from '@inertiajs/react';
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
@@ -302,7 +302,7 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Endorsements',
-        href: endorsement().url,
+        href: index().url,
     },
 ];
 

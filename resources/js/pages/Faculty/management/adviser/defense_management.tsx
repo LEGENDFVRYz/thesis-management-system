@@ -1,6 +1,6 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
-import { defense_management } from '@/routes/faculty/management/joint';
+import { index } from '@/routes/faculty/joint/defense_management';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
@@ -8,7 +8,7 @@ import FacultyManagementLayout from '@/pages/Faculty/management/index';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Defense Management',
-        href: defense_management().url,
+        href: index().url,
     },
 ];
 

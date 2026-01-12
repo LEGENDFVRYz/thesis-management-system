@@ -288,8 +288,9 @@ Route::prefix('faculty')->group(function () {
             // --- SPECIAL ROUTES (ADVISER AND PANEL JOINT) ---
             // ====================================================================================================
             Route::middleware('faculty.role:Panelist,Adviser')->group(function () {
-                Route::get('defense-management', [DefenseManagement::class, 'index'])->name('joint.defense_management.index');
-                Route::patch('defense-management/{id}', [DefenseManagement::class, 'update'])->name('joint.defense_management.update');
+                # TEMPORARY NOT YET FINALIZED (might be transferred in shared soon)
+                Route::get('defense-management', [DefenseManagement::class, 'index'])->name('faculty.joint.defense_management.index');
+                Route::patch('defense-management/{id}', [DefenseManagement::class, 'update'])->name('faculty.joint.defense_management.update');
             });
 
 
@@ -310,7 +311,7 @@ Route::prefix('faculty')->group(function () {
 
 
                 # DEFENSE MAANGEMENT
-                Route::prefix('defense-management')->as('defense_management')->group(function () {
+                Route::prefix('defense-management')->as('defense_management.')->group(function () {
                     Route::redirect('/', 'defense_management/matrix')->name('index');   // temporary
 
                     # Matrix
@@ -323,7 +324,7 @@ Route::prefix('faculty')->group(function () {
                 });
 
                 # THESIS MONITORING
-                Route::prefix('thesis')->as('thesis')->group(function () {
+                Route::prefix('thesis')->as('thesis.')->group(function () {
                     Route::redirect('/', 'thesis_monitoring/thesis_registry')->name('index');     // temporary
 
                     Route::get('registry', [ThesisRegistry::class, 'index'])->name('registry');

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import * as React from 'react';
 import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import { compliance } from '@/routes/faculty/management/coordinator';
+import { compliance } from '@/routes/faculty/coordinator/index';
 import { type BreadcrumbItem } from '@/types';
 import DocumentPreview from '@/components/document-preview';
 import { NavFooter } from '@/components/nav-footer'; 

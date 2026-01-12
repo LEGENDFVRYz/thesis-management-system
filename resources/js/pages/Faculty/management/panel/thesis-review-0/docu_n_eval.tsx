@@ -4,7 +4,7 @@ import { iconRegistry } from '@/components/icons-registry';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
-import { docu_n_eval } from '@/routes/faculty/management/panel/thesis_review_0';
+import { grading } from '@/routes/faculty/panel/evaluation';
 import { type BreadcrumbItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { Calendar, Users } from 'lucide-react';
@@ -18,7 +18,7 @@ import { SuccessDialog } from './success-dialog';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Document Review and Evaluation',
-        href: docu_n_eval().url,
+        href: grading().url,
     },
 ];
 

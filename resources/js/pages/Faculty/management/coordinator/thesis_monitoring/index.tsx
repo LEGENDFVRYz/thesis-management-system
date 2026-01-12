@@ -1,11 +1,11 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
-import { index } from '@/routes/faculty/management/coordinator/thesis_monitoring/index';
+import { index } from '@/routes/faculty/coordinator/thesis/index';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import ManagementLayout from '@/pages/Faculty/management/index';
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
-import { thesis_registry, progress } from '@/routes/faculty/management/coordinator/thesis_monitoring';
+import { registry, progress } from '@/routes/faculty/coordinator/thesis/index';
 import { type ReactNode } from 'react';
 
 
@@ -24,7 +24,7 @@ const breadcrumb: BreadcrumbItem[] = [
 ];
 
 const tabs = [
-    { title: 'Thesis Registry',     href: thesis_registry() },
+    { title: 'Thesis Registry',     href: registry() },
     { title: 'Progress Reports',    href: progress() },
 ];
 

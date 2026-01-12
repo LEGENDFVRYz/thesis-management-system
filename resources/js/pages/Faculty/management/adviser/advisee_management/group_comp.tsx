@@ -7,7 +7,7 @@ import CustomTable from './group_table';
 import CreateGroupModal from './create-group';
 import EditGroupModal from './edit-group';
 import ManageGroupModal from './manage-group';
-import { destroy } from '@/routes/faculty/management/adviser/advisee_management/group_comp';
+import { destroy } from '@/routes/faculty/adviser/group_comp/index';
 
 // Types for data from GroupComp.php controller
 interface SectionAdviser {

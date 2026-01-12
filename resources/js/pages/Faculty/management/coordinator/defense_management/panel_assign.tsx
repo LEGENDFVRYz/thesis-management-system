@@ -1,6 +1,7 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
-import { matrix, panel_assign } from '@/routes/faculty/management/coordinator/defense_management';
+import { index as matrix } from '@/routes/faculty/coordinator/defense_management/matrix';
+import { index as panel_assign } from '@/routes/faculty/coordinator/defense_management/panel_assign';
 import { BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import {
@@ -16,8 +17,7 @@ import {
     Save,
     Check
 } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
-import { SidebarInset } from '@/components/ui/sidebar';
+import React, { useState, useEffect } from 'react';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from '@/lib/utils';
 import { HeaderCard } from "@/components/ui/card";
@@ -115,138 +115,6 @@ const TabButton = React.forwardRef<HTMLButtonElement, TabButtonProps>(
 TabButton.displayName = 'TabButton';
 
 // ----------------------------------------------------------------------
-// APP CONTENT WRAPPER
-// ----------------------------------------------------------------------
-
-interface AppContentProps extends React.ComponentProps<'div'> {
-    variant?: 'header' | 'sidebar';
-    title?: string;
-    subtitle?: string;
-    icon?: React.ReactNode;
-}
-
-export function AppContent({
-    variant = 'header',
-    title,
-    subtitle,
-    icon,
-    children,
-    ...props
-}: AppContentProps) {
-    if (variant === 'sidebar') {
-        return (
-            <SidebarInset>
-                <div className="flex-1 p-6" style={{ backgroundColor: 'var(--primary-foreground)' }} {...props}>
-                    {children}
-                </div>
-            </SidebarInset>
-        )
-    }
-
-    return (
-        <div
-            className="flex h-full w-full flex-1 flex-col" style={{ backgroundColor: 'var(--primary-foreground)' }}
-            {...props}
-        >
-            {(title || subtitle) && (
-                <div className="w-full border-b border-sidebar-border">
-                    <div className="mx-auto max-w-[1440px] h-[124px] flex flex-row items-center px-6 py-8">
-                        <div className="flex flex-col gap-3">
-                            <div className="flex items-center gap-3">
-                                {icon ? icon : <div className="w-8 h-8 rounded bg-[#800000]"></div>}
-                                <h2 className="text-[30px] font-normal leading-[36px] text-[#800000] dark:text-red-400">
-                                    {title}
-                                </h2>
-                            </div>
-                            <p className="text-[18px] font-normal leading-[16px] ml-11 text-[#800000]">
-                                {subtitle}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            )}
-            <div className="mx-auto w-full max-w-[1440px] p-6">
-                {children}
-            </div>
-        </div>
-    )
-}
-
-// ----------------------------------------------------------------------
-// MOCK DATA
-// ----------------------------------------------------------------------
-
-// const SECTIONS = ['BSCPE 3-1', 'BSCPE 3-2', 'BSCPE 3-3', 'BSCPE 3-4'];
-
-// const PANELISTS = [
-//     { id: 1, name: 'Dr. Maria Santos' },
-//     { id: 2, name: 'Engr. Juan Dela Cruz' },
-//     { id: 3, name: 'Dr. Pedro Reyes' },
-//     { id: 4, name: 'Prof. Ana Lim' },
-// ];
-
-// const THESIS_TITLES = [
-//     {
-//         id: 1,
-//         title: 'AI-Powered Student Performance Analytics System',
-//         authors: 'Juan Dela Cruz, Maria Santos, Pedro Reyes',
-//         adviser: 'Dr. Maria Santos',
-//         section: 'BSCPE 3-3',
-//         date: 'May 3, 2025'
-//     },
-//     {
-//         id: 2,
-//         title: 'IoT Based Flood Monitoring System',
-//         authors: 'Group 2 Members',
-//         adviser: 'Engr. Smith',
-//         section: 'BSCPE 3-3',
-//         date: 'May 3, 2025'
-//     }
-// ];
-
-const CONFLICT_REQUESTS = Array(6).fill({
-    id: 1,
-    adviser: 'Dr. Maria Santos',
-    title: 'AI-Powered Student...',
-    date: '11/29/2025',
-    reason: 'Boracay',
-    document: 'comment'
-}).map((item, index) => ({ ...item, id: index }));
-
-// ----------------------------------------------------------------------
-// TYPE
-// ----------------------------------------------------------------------
-
-// Represents a faculty member available for a panel
-interface Panelist {
-    id: number;
-    name: string;
-  }
-  
-  interface Section {
-    section: string;
-  }
-  
-  interface Thesis {
-    thesis_id: number;
-    title: string;
-    authors: string;  // Note: Appears as a comma-separated string in your dd()
-    adviser: string;
-    section: string;  // e.g., "1" or "4"
-    date: string;     // e.g., "2026-01-03"
-  }
-  
-  /**
-   * The key in endorsed_thesis appears to be a section identifier.
-   * Based on your dd(), it is a Collection/Array of Thesis objects.
-   */
-  interface DashboardProps {
-    sections: Section[];
-    available_panel: Panelist[];
-    endorsed_thesis: Thesis[];
-  }
-
-// ----------------------------------------------------------------------
 // MAIN DASHBOARD
 // ----------------------------------------------------------------------
 
@@ -259,10 +127,6 @@ const breadcrumb: BreadcrumbItem[] = [
 
 export default function Dashboard({ sections, available_panel, endorsed_thesis }: DashboardProps) {
     const [selectedSection, setSelectedSection] = useState<string>('');
-    useEffect(() => {
-        setExpandedTheses(new Set());
-    }, [selectedSection]);
-
     const [activeTab, setActiveTab] = useState<'assignments' | 'conflicts'>('assignments');
     
     // --- STATE MANAGEMENT ---

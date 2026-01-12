@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import AppLayout from '@/layouts/app-layout';
-import { panel_assign } from '@/routes/faculty/management/coordinator/defense_management';
+import { index } from '@/routes/faculty/coordinator/defense_management/index';
 import { router, Head } from '@inertiajs/react';
 import { cva, type VariantProps } from "class-variance-authority";
 import { 
@@ -490,7 +490,7 @@ export default function MatrixManagement({ defenseMatrices = [], availableProjec
                     <div className="flex items-end gap-1 mb-0 border-b border-[#800000]/10 pb-0">
                         <TabButton 
                             isActive={false} 
-                            onClick={() => router.get(panel_assign().url)}
+                            onClick={() => router.get(index().url)}
                         >
                             Panel Assignment
                         </TabButton>

@@ -1,6 +1,6 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
-import { eval_n_grading } from '@/routes/faculty/management/adviser';
+import { index } from '@/routes/faculty/adviser/evaluation/index';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import ManagementLayout from '@/pages/Faculty/management/index';
@@ -11,7 +11,7 @@ import { Link } from '@inertiajs/react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Evaluation and Grading',
-        href: eval_n_grading().url,
+        href: index().url,
     },
 ];
 

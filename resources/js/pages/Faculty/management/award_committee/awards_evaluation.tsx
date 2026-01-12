@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Head } from '@inertiajs/react';
-import { awards_evaluation } from '@/routes/faculty/management/award'; 
+import { evaluation } from '@/routes/faculty/award/index'; 
 import { NavFooter } from '@/components/nav-footer';
 import { type BreadcrumbItem } from '@/types';
 
@@ -22,7 +22,7 @@ import { evaluationData, resultsData, detailedEvaluationResults } from './awards
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Awards Evaluation',
-        href: awards_evaluation().url,
+        href: evaluation().url,
     },
 ];
 

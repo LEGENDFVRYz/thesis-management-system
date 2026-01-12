@@ -16,7 +16,7 @@ import {
     AlertCircleIcon, 
     Check 
 } from 'lucide-react';
-import { grading_management } from '@/routes/faculty/management/coordinator';
+import { grading_management } from '@/routes/faculty/coordinator/index';
 
 import {
     Dialog,

@@ -1,6 +1,6 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
-import { thesis_review } from '@/routes/faculty/management/panel';
+import { index } from '@/routes/faculty/panel/evaluation/index';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import ManagementLayout from '@/pages/Faculty/management/index';
@@ -10,7 +10,7 @@ import FacultyManagementLayout from '@/pages/Faculty/management/index';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Thesis Review',
-        href: thesis_review().url,
+        href: index().url,
     },
 ];
 

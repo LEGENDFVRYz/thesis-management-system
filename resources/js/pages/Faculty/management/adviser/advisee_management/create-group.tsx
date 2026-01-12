@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Trash2, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { router } from '@inertiajs/react';
-import { store } from '@/routes/faculty/management/adviser/advisee_management/group_comp';
+import { store } from '@/routes/faculty/adviser/group_comp/index';
 import {
   Dialog,
   DialogContent,

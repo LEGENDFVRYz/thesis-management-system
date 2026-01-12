@@ -1,7 +1,7 @@
 import { useForm } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
-import { proposal_review } from '@/routes/faculty/management/committee';
+import { index } from '@/routes/faculty/committee/proposal_review/index';
 import { type BreadcrumbItem } from '@/types';
 
 type Proposal = {
@@ -17,7 +17,7 @@ type Proposal = {
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
-  { title: 'Proposal Review', href: proposal_review().url },
+  { title: 'Proposal Review', href: index().url },
 ];
 
 export default function ProposalReview({
@@ -51,7 +51,7 @@ export default function ProposalReview({
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              post(proposal_review().url, {
+              post(index().url, {   // dunno why, we resolve later
                 onSuccess: () => alert('Evaluation submitted/updated!'),
               });
             }}

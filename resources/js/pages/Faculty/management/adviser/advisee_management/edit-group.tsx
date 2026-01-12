@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Trash2, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { router } from '@inertiajs/react';
-import { update } from '@/routes/faculty/management/adviser/advisee_management/group_comp';
+import { update } from '@/routes/faculty/adviser/group_comp/index';
 import {Dialog,DialogContent,DialogHeader,DialogTitle,DialogDescription,DialogFooter,} from '@/components/ui/dialog';
 import InputError from '@/components/input-error';
 

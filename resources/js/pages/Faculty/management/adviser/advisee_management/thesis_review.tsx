@@ -1,6 +1,6 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
-import { thesis_review } from '@/routes/faculty/management/adviser/advisee_management';
+import { index } from '@/routes/faculty/adviser/thesis_review';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import AdviseeManagementLayout from '.';
@@ -16,7 +16,7 @@ import { badgesRegistry } from '@/components/badges-registry';
 const breadcrumb: BreadcrumbItem[] = [
     {
         title: 'Thesis Document Review',
-        href: thesis_review().url,
+        href: index().url,
     },
 ];
 

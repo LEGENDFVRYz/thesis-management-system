@@ -16,7 +16,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { FolderOpen, Filter, Download, Calendar, Check } from 'lucide-react';
-import { progress } from '@/routes/faculty/management/coordinator/thesis_monitoring';
+import { progress } from '@/routes/faculty/coordinator/thesis/index';
 
 import {
     Select,

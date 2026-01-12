@@ -13,7 +13,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { TimelineState } from '@/components/ui/wizard-timeline';
-import { group_comp } from '@/routes/faculty/management/adviser/advisee_management';
+import { index } from '@/routes/faculty/adviser/group_comp/index';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Filter, Users } from 'lucide-react';
@@ -24,7 +24,7 @@ import { BlockAndTagsFilter } from './progress-filter-search';
 const breadcrumb: BreadcrumbItem[] = [
     {
         title: 'Progress Monitoring',
-        href: group_comp().url,
+        href: index().url,
     },
 ];
 

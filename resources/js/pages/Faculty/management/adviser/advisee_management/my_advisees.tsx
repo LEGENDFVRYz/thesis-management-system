@@ -11,7 +11,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { my_advisees } from '@/routes/faculty/management/adviser/advisee_management';
+import { index } from '@/routes/faculty/adviser/my_advisees/index';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Filter, Users } from 'lucide-react';
@@ -22,7 +22,7 @@ import { BlockAndTagsFilter } from './advisee-filter-search';
 const breadcrumb: BreadcrumbItem[] = [
     {
         title: 'My Advisees',
-        href: my_advisees().url,
+        href: index().url,
     },
 ];
 
