@@ -3,7 +3,7 @@ import AppLayout from '@/layouts/app-layout';
 import { NavFooter } from '@/components/nav-footer';
 import { HeaderCard } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { 
     Calendar, 
@@ -16,7 +16,7 @@ import {
     AlertCircleIcon, 
     Check 
 } from 'lucide-react';
-import { grading_management } from '@/routes/faculty/coordinator/index';
+import { grade_management } from '@/routes/faculty/coordinator/index';
 
 import {
     Dialog,
@@ -35,10 +35,23 @@ import {
     TableRow,
     TableCaption,
 } from "@/components/ui/table";
+import FacultyManagementLayout from '..';
 
-const breadcrumb: BreadcrumbItem[] = [
-    { title: 'Grade Management', href: grading_management().url },
+
+// Setup
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'Grade Management', href: grade_management().url },
 ];
+
+const pageHeader: PageHeaderProps = {
+    title: "Grade Management",
+    subtitle: "Monitor student academic performance and oversee final evaluations.",
+    icon: (
+        // pa correct nalang
+        <Calendar className="w-8 h-8 text-primary" />
+    ),
+};
+
 
 export default function GradingManagement() {
     const [isReviewOpen, setIsReviewOpen] = useState(false);
@@ -115,18 +128,21 @@ export default function GradingManagement() {
     );
 
     return (
-        <AppLayout breadcrumbs={breadcrumb}>
+        <FacultyManagementLayout
+            breadcrumbs={breadcrumbs}
+            pageHeader={pageHeader}
+        >
             <Head title="Grade Management" />
             
-            <div className="flex flex-col min-h-screen -mt-4 -mx-4 -mb-4 md:-mt-4 md:-mx-6 md:-mb-6 lg:-mt-6 lg:-mx-8 lg:-mb-8 bg-primary-foreground">
-                <HeaderCard 
+            <div className="flex flex-col min-h-screen -mt-4 -mx-4 -mb-4 md:-mt-4 bg-primary-foreground">
+                {/* <HeaderCard 
                     title="Grade Management"
                     description="Monitor student academic performance and oversee final evaluations."
                     icon={<Calendar className="w-8 h-8 text-primary" />}
                     className="w-full lg:w-full rounded-none border-t-0 border-x-0 border-b-sidebar-gradient-mid" 
-                />
+                /> */}
 
-                <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 lg:p-8 w-full">
+                <div className="flex flex-1 flex-col gap-6 p-4 pt-0 w-full">
                     {/* Status Overview */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         {stats.map((stat, index) => (
@@ -301,10 +317,10 @@ export default function GradingManagement() {
                     </DialogContent>
                 </Dialog>
 
-                <div className="w-full mt-[120px]">
+                {/* <div className="w-full mt-[120px]">
                     <NavFooter />
-                </div>
+                </div> */}
             </div>
-        </AppLayout>
+        </FacultyManagementLayout>
     );
 }

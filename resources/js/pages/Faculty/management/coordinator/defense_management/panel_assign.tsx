@@ -2,7 +2,7 @@ import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { index as matrix } from '@/routes/faculty/coordinator/defense_management/matrix';
 import { index as panel_assign } from '@/routes/faculty/coordinator/defense_management/panel_assign';
-import { BreadcrumbItem } from '@/types';
+import { BreadcrumbItem, PageHeaderProps } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import {
     BookOpen,
@@ -35,6 +35,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { NavFooter } from '@/components/nav-footer';
 import DocumentPreview from '@/components/document-preview';
+import DefenseManagementLayout from '.';
 
 // ----------------------------------------------------------------------
 // MOCK DATA
@@ -118,12 +119,24 @@ TabButton.displayName = 'TabButton';
 // MAIN DASHBOARD
 // ----------------------------------------------------------------------
 
-const breadcrumb: BreadcrumbItem[] = [
+const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Panel Assignment',
         href: panel_assign().url,
     },
 ];
+
+const pageHeader: PageHeaderProps = {
+    title: "Panel Assignment",
+    subtitle: "Assign and manage panel members",
+    icon: (
+        // pa correct nalang
+        <div className="flex h-full w-full items-center justify-center rounded-md bg-[#800000] text-white">
+            <Users className="h-5 w-5" />
+        </div>
+    ),
+};
+
 
 export default function Dashboard({ sections, available_panel, endorsed_thesis }: DashboardProps) {
     const [selectedSection, setSelectedSection] = useState<string>('');
@@ -251,13 +264,16 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
     const visibleTheses = localTheses.filter((thesis) => thesis.section === selectedSection);
 
     return (
-        <AppLayout breadcrumbs={breadcrumb}>
+        <DefenseManagementLayout
+            breadcrumbs={breadcrumbs}
+            pageHeader={pageHeader}
+        >
             <Head title="Panel Assignment" />
 
-            <div className="flex flex-col min-h-screen bg-primary-foreground -mt-4 -mx-4 -mb-4 md:-mt-4 md:-mx-6 md:-mb-6 lg:-mt-6 lg:-mx-8 lg:-mb-8">
+            <div className="flex flex-col min-h-screen bg-primary-foreground -mt-4 -mx-4 -mb-4 ">
                 
                 {/* Header Card */}
-                <HeaderCard
+                {/* <HeaderCard
                     title="Panel Assignment"
                     description="Assign and manage panel members"
                     className="w-full max-w-none rounded-none border-t-0 border-x-0"
@@ -266,9 +282,9 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                             <Users className="h-5 w-5" />
                         </div>
                     }
-                />
+                /> */}
 
-                <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 lg:p-8 w-full">
+                <div className="flex flex-1 flex-col gap-6 p-4 pt-0 w-full">
 
                     {/* 1. Page Tabs */}
                     <div className="flex items-end gap-1 mb-0 border-b border-[#800000]/10 pb-0">
@@ -558,7 +574,7 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                     </div>
                 </div>
 
-                <NavFooter />
+                {/* <NavFooter /> */}
             </div>
 
             {/* ================= SUCCESS NOTIFICATION MODAL ================= */}
@@ -591,6 +607,6 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                 </DialogContent>
             </Dialog>
 
-        </AppLayout>
+        </DefenseManagementLayout>
     );
 }

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import AppLayout from '@/layouts/app-layout';
-import { index } from '@/routes/faculty/coordinator/defense_management/index';
+import { index  } from '@/routes/faculty/coordinator/defense_management/index';
+import { index as panel_assign  } from '@/routes/faculty/coordinator/defense_management/panel_assign/index';
 import { router, Head } from '@inertiajs/react';
 import { cva, type VariantProps } from "class-variance-authority";
 import { 
@@ -53,6 +54,8 @@ import ic_delete_Clicked from '@/components/Icons/ic_delete-Clicked.svg';
 import scheduledBadgesScheduled from '@/components/badges/scheduled_badges-Scheduled.svg';
 import scheduledBadgesCancelled from '@/components/badges/scheduled_badges-Cancelled.svg';
 import scheduledBadgesCompleted from '@/components/badges/scheduled_badges-Completed.svg';
+import DefenseManagementLayout from '.';
+import { PageHeaderProps } from '@/types';
 
 
 // ----------------------------------------------------------------------
@@ -266,9 +269,22 @@ function DefenseTableRow({ data, onView, onEdit, onDelete }: {
     );
 }
 
-const breadcrumb = [
+// Setup
+const breadcrumbs = [
     { title: 'Matrix Management', href: '#' },
 ];
+
+const pageHeader: PageHeaderProps = {
+    title: "Matrix Management",
+    subtitle: "Monitor all defense schedule, facilities, and equipment",
+    icon: (
+        // pa correct nalang
+        <div className="flex h-full w-full items-center justify-center rounded-md bg-[#800000] text-white">
+            <CalendarIcon className="h-5 w-5" />
+        </div>
+    ),
+};
+
 
 // ----------------------------------------------------------------------
 // MOCK DATA ADD A SCHEDULE DEFENSE
@@ -467,13 +483,16 @@ export default function MatrixManagement({ defenseMatrices = [], availableProjec
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumb}>
+        <DefenseManagementLayout 
+            breadcrumbs={breadcrumbs}
+            pageHeader={pageHeader}
+        >
             <Head title="Matrix Management" />
             
-            <div className="flex flex-col min-h-screen bg-primary-foreground -mt-4 -mx-4 -mb-4 md:-mt-4 md:-mx-6 md:-mb-6 lg:-mt-6 lg:-mx-8 lg:-mb-8">
+            <div className="flex flex-col min-h-screen bg-primary-foreground -mt-4 -mx-4 -mb-4 md:-mt-4">
                 
                 {/* Header Card */}
-                <HeaderCard
+                {/* <HeaderCard
                     title="Matrix Management"
                     description="Monitor all defense schedule, facilities, and equipment"
                     className="w-full max-w-none rounded-none border-t-0 border-x-0"
@@ -482,15 +501,15 @@ export default function MatrixManagement({ defenseMatrices = [], availableProjec
                             <CalendarIcon className="h-5 w-5" />
                         </div>
                     }
-                />
+                /> */}
 
-                <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 lg:p-8 w-full">
+                <div className="flex flex-1 flex-col gap-6 p-4 pt-0 w-full">
                     
                     {/* 1. Page Tabs */}
                     <div className="flex items-end gap-1 mb-0 border-b border-[#800000]/10 pb-0">
                         <TabButton 
                             isActive={false} 
-                            onClick={() => router.get(index().url)}
+                            onClick={() => router.get(panel_assign().url)}
                         >
                             Panel Assignment
                         </TabButton>
@@ -564,7 +583,7 @@ export default function MatrixManagement({ defenseMatrices = [], availableProjec
                         )}
                     </div>
                 </div>
-                <NavFooter />
+                {/* <NavFooter /> */}
             </div>
             
 
@@ -925,7 +944,7 @@ export default function MatrixManagement({ defenseMatrices = [], availableProjec
                 </DialogContent>
             </Dialog>
 
-        </AppLayout>
+        </DefenseManagementLayout>
 
     );
 

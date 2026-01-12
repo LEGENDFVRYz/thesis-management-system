@@ -2,7 +2,7 @@ import { useState } from 'react';
 import * as React from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { communication } from '@/routes/faculty/coordinator/index';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 
 import { 
     Megaphone, 
@@ -24,6 +24,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { NavFooter } from '@/components/nav-footer'; 
+import { Icon } from '@/components/icon-index';
+import FacultyManagementLayout from '..';
 
 // ----------------------------------------------------------------------
 // DATA: Audience Options
@@ -46,6 +48,17 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+const pageHeader: PageHeaderProps = {
+    title: "Communication & Announcements",
+    subtitle: "Conduct meetings with audience or send announcements",
+    icon: (
+        // pa correct nalang
+        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#800000] text-white">
+            <Megaphone className="h-5 w-5" />
+        </div>
+    ),
+};
+
 export default function Dashboard() {
     // State to track the selected priority
     const [priority, setPriority] = useState<string>("");
@@ -66,13 +79,15 @@ export default function Dashboard() {
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            
+        <FacultyManagementLayout
+            breadcrumbs={breadcrumbs}
+            pageHeader={pageHeader}
+        >
             {/* Full Width Wrapper with Negative Margins */}
             <div className="flex flex-col min-h-screen -mt-4 -mx-4 -mb-4 md:-mt-4 md:-mx-6 md:-mb-6 lg:-mt-6 lg:-mx-8 lg:-mb-8 bg-primary-foreground">
                 
                 {/* Header Card: Flush Top, Full Width */}
-                <HeaderCard
+                {/* <HeaderCard
                     title="Communication & Announcements"
                     description="Conduct meetings with audience or send announcements"
                     className="w-full max-w-none rounded-none border-t-0 border-x-0 shadow-sm"
@@ -81,7 +96,7 @@ export default function Dashboard() {
                             <Megaphone className="h-5 w-5" />
                         </div>
                     }
-                />
+                /> */}
 
                 {/* Main Content Container */}
                 <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 lg:p-8 w-full">
@@ -270,8 +285,8 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                <NavFooter />
+                {/* <NavFooter /> */}
             </div>
-        </AppLayout>
+        </FacultyManagementLayout>
     );
 }

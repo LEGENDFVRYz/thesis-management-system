@@ -13,7 +13,7 @@ import { NavFooter } from '@/components/nav-footer';
 import { HeaderCard } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { FolderOpen, Filter, Download, Calendar, Check } from 'lucide-react';
 import { progress } from '@/routes/faculty/coordinator/thesis/index';
@@ -30,14 +30,28 @@ import {
     Dialog,
     DialogContent,
 } from "@/components/ui/dialog";
+import ThesisMonitoringLayout from '.';
 
+
+// Setup
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Progress Reports', href: progress().url }];
+
+const pageHeader: PageHeaderProps = {
+    title: "Progress Reports",
+    subtitle: "Generate and export reports on thesis submissions, completions and guidelines",
+    icon: (
+        // pa correct nalang
+        <FolderOpen className="w-8 h-8 text-primary" />
+    ),
+};
+
+// Sample data
 const DEFAULT_DATA = [
     { year: 2017, count: 100 }, { year: 2018, count: 125 }, { year: 2019, count: 180 },
     { year: 2020, count: 150 }, { year: 2021, count: 200 }, { year: 2022, count: 250 },
     { year: 2023, count: 300 }, { year: 2024, count: 320 }, { year: 2025, count: 360 },
 ];
 
-const breadcrumb: BreadcrumbItem[] = [{ title: 'Progress Reports', href: progress().url }];
 
 export default function ProgressReports() {
     const [selectedYear, setSelectedYear] = useState("2024 - 2025");
@@ -56,7 +70,10 @@ export default function ProgressReports() {
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumb}>
+        <ThesisMonitoringLayout 
+            breadcrumbs={breadcrumbs}
+            pageHeader={pageHeader}
+        >
             <Head title="Progress Reports" />
             
             <style dangerouslySetInnerHTML={{ __html: `
@@ -92,15 +109,15 @@ export default function ProgressReports() {
                 }
             `}} />
 
-            <div className="flex flex-col min-h-screen -mt-4 -mx-4 -mb-4 md:-mt-4 md:-mx-6 md:-mb-6 lg:-mt-6 lg:-mx-8 lg:-mb-8 bg-primary-foreground">
-                <HeaderCard 
+            <div className="flex flex-col min-h-screen -mt-4 -mx-4 -mb-4 md:-mt-4 bg-primary-foreground">
+                {/* <HeaderCard 
                     title="Progress Reports"
                     description="Generate and export reports on thesis submissions, completions and guidelines"
                     icon={<FolderOpen className="w-8 h-8 text-primary" />}
                     className="w-full lg:w-full rounded-none border-t-0 border-x-0 border-b-sidebar-gradient-mid" 
-                />
+                /> */}
 
-                <div className="flex flex-1 flex-col gap-8 p-4 md:p-6 lg:p-8 w-full">
+                <div className="flex flex-1 flex-col gap-8 p-4 w-full">
                     <div className="flex justify-end w-full">
                         <StageSwitchToggle />
                     </div>
@@ -173,9 +190,9 @@ export default function ProgressReports() {
                     </div>
                 </div>
 
-                <div className="w-full mt-[120px]">
+                {/* <div className="w-full mt-[120px]">
                     <NavFooter />
-                </div>
+                </div> */}
             </div>
 
             <Dialog open={isExportSuccessOpen} onOpenChange={setIsExportSuccessOpen}>
@@ -186,7 +203,7 @@ export default function ProgressReports() {
                     <p className="text-[16px] text-center text-foreground font-dm font-bold">File exported successfully.</p>
                 </DialogContent>
             </Dialog>
-        </AppLayout>
+        </ThesisMonitoringLayout>
     );
 }
 

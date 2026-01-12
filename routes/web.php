@@ -335,9 +335,9 @@ Route::prefix('faculty')->group(function () {
                 });
 
                 # GRADING MANAGEMENT
-                Route::get('grading-management', function () {
+                Route::get('grade-management', function () {
                     return Inertia::render('Faculty/management/coordinator/grading_management');
-                })->name('grading_management');
+                })->name('grade_management');
             });
 
 

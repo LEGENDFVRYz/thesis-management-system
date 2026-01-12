@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dialog"; 
 import AppLayout from '@/layouts/app-layout';
 import { registry } from '@/routes/faculty/coordinator/thesis/index';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { FolderOpen, Calendar, Clock, Check, User } from 'lucide-react';
 
@@ -30,13 +30,25 @@ import eyeClicked from '@/components/icons/ic_eyeopen-Clicked.svg';
 import notifyDefault from '@/components/icons/ic_notify-Default.svg';
 import notifyHover from '@/components/icons/ic_notify-Hover.svg';
 import notifyClicked from '@/components/icons/ic_notify-Clicked.svg';
+import ThesisMonitoringLayout from '.';
 
-const breadcrumb: BreadcrumbItem[] = [
+// Setup
+const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Thesis Registry',
         href: registry().url,
     },
 ];
+
+const pageHeader: PageHeaderProps = {
+    title: "Thesis Registry",
+    subtitle: "View all ongoing and completed theses across all stages and batches",
+    icon: (
+        // pa correct nalang
+        <FolderOpen className="w-8 h-8 text-primary" />
+    ),
+};
+
 
 // Helper component for Interactive SVG Icons
 const InteractiveSvgIcon = ({ defaultSrc, hoverSrc, clickedSrc, alt, onClick }: any) => {
@@ -99,18 +111,21 @@ export default function Dashboard() {
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumb}>
+        <ThesisMonitoringLayout 
+            breadcrumbs={breadcrumbs}
+            pageHeader={pageHeader}
+        >
             <Head title="Thesis Registry" />
             
-            <div className="flex flex-col min-h-screen -mt-4 -mx-4 -mb-4 md:-mt-4 md:-mx-6 md:-mb-6 lg:-mt-6 lg:-mx-8 lg:-mb-8 bg-primary-foreground">
-                <HeaderCard 
+            <div className="flex flex-col min-h-screen -mt-4 -mx-4 -mb-4 bg-primary-foreground">
+                {/* <HeaderCard 
                     title="Thesis Registry" 
                     description="View all ongoing and completed theses across all stages and batches"
                     icon={<FolderOpen className="w-8 h-8 text-primary" />}
                     className="w-full rounded-none border-t-0 border-x-0" 
-                />
+                /> */}
 
-                <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 lg:p-8 w-full">
+                <div className="flex flex-1 flex-col gap-6 p-4 pt-0 w-full">
                     <div className="flex justify-end w-full">
                         <StageSwitchToggle />
                     </div>
@@ -193,9 +208,9 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                <div className="w-full mt-[120px]">
+                {/* <div className="w-full mt-[120px]">
                     <NavFooter />
-                </div>
+                </div> */}
             </div>
 
             {/* Modal: View Thesis Details */}
@@ -269,6 +284,6 @@ export default function Dashboard() {
                     <p className="text-[16px] text-center text-foreground font-bold font-dm">The reminder has been sent.</p>
                 </DialogContent>
             </Dialog>
-        </AppLayout>
+        </ThesisMonitoringLayout>
     );
 }

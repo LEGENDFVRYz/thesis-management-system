@@ -1,7 +1,7 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/faculty/coordinator/thesis/index';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import ManagementLayout from '@/pages/Faculty/management/index';
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
@@ -12,8 +12,7 @@ import { type ReactNode } from 'react';
 interface ThesisMonitoringLayoutProps {
     children: ReactNode;
     breadcrumbs?: BreadcrumbItem[];
-    title: string;
-    description: string;
+    pageHeader: PageHeaderProps;
 }
 
 const breadcrumb: BreadcrumbItem[] = [
@@ -28,14 +27,13 @@ const tabs = [
     { title: 'Progress Reports',    href: progress() },
 ];
 
-export default function ThesisMonitoringLayout({ children, breadcrumbs, title, description }: ThesisMonitoringLayoutProps) {
+export default function ThesisMonitoringLayout({ children, breadcrumbs, pageHeader }: ThesisMonitoringLayoutProps) {
     const { url } = usePage();
 
     return (
         <FacultyManagementLayout 
             breadcrumbs={[...breadcrumb, ...(breadcrumbs ?? [])]}
-            title={title} 
-            description={description}
+            pageHeader={pageHeader}
         >
             {/* PAGE TABS */}
             <div className="mb-6 border-b border-gray-200 dark:border-gray-700">

@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { compliance } from '@/routes/faculty/coordinator/index';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import DocumentPreview from '@/components/document-preview';
 import { NavFooter } from '@/components/nav-footer'; 
 import { cn } from "@/lib/utils";
@@ -42,6 +42,7 @@ import { RadioGroup } from "@/components/ui/radio-group";
 import { RadioGroupItemWithLabel } from "@/components/ui/radio-group-with-label";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import FacultyManagementLayout from '..';
 
 // Using a mock for YearRangePicker since it's an external dependency
 const YearRangePicker = ({ value, onChange, placeholder }: any) => (
@@ -618,7 +619,7 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                                     value={remarks}
                                     onChange={(e) => setRemarks(e.target.value)}
                                     placeholder="Text field input..."
-                                    className="w-full min-h-[80px] p-3 rounded-md bg-background text-foreground focus:border-ring focus:ring-1 focus:ring-ring text-sm resize-none shadow-sm bg-gray-50"
+                                    className="w-full min-h-[80px] p-3 rounded-md text-foreground focus:border-ring focus:ring-1 focus:ring-ring text-sm resize-none shadow-sm bg-gray-50"
                                 />
                             </div>
                         </div>
@@ -652,22 +653,34 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+const pageHeader: PageHeaderProps = {
+    title: "Endorsement Management",
+    subtitle: "Issue a digital signature for the Coordinator Endorsement Sheet",
+    icon: (
+        // pa correct nalang
+        <ShieldCheck className="w-8 h-8 text-primary" />
+    ),
+};
+
 export default function Dashboard() {
     const [activeTab, setActiveTab] = useState<'mor' | 'dp1' | 'dp2'>('mor');
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <FacultyManagementLayout
+            breadcrumbs={breadcrumbs}
+            pageHeader={pageHeader}
+        >
             <Head title="Endorsement Management" />
             
-            <div className="flex flex-col min-h-screen -mt-4 -mx-4 -mb-4 md:-mt-4 md:-mx-6 md:-mb-6 lg:-mt-6 lg:-mx-8 lg:-mb-8 bg-primary-foreground">
-                <HeaderCard 
-                    title="Endorsement Management"
-                    description="Issue a digital signature for the Coordinator Endorsement Sheet"
+            <div className="flex flex-col min-h-full -mt-4 -mx-4 -mb-4 md:-mt-4 bg-primary-foreground">
+                {/* <HeaderCard 
+                    title=
+                    description=
                     className="w-full rounded-none border-t-0 border-x-0"
-                    icon={<ShieldCheck className="w-8 h-8 text-primary" />}
-                />
+                    icon={}
+                /> */}
 
-                <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 lg:p-8 w-full">
+                <div className="flex flex-1 flex-col gap-6 p-4 pt-0 w-full">
                     
                     {/* 1. TABS (Top Right) */}
                     <div className="flex justify-end">
@@ -717,8 +730,8 @@ export default function Dashboard() {
                     </div>
 
                 </div>
-                <NavFooter />
+                {/* <NavFooter /> */}
             </div>
-        </AppLayout>
+        </FacultyManagementLayout>
     );
 }
