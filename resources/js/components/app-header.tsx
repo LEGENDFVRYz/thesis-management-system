@@ -108,11 +108,20 @@ export function AppHeader({ breadcrumbs = [], variant }: AppHeaderProps) {
     const { auth, user_info } = props;
 
     // Determine the active role: Force by variant prop or detect via URL
-    const activeRole = variant || (
-        url.startsWith('/admin') ? 'admin' :
-        url.startsWith('/faculty') ? 'faculty' : 'student'
-    );
-
+    const activeRole =
+        variant ||
+        (url.startsWith('/admin') && 'admin') ||
+        (url.startsWith('/faculty') && 'faculty') ||
+        (user_info?.is_admin && 'admin') ||
+        (
+            // fallback: if url-scope is non-existing, utilize the roles to verify the variant
+            user_info?.user_role === 'faculty'
+                ? 'faculty'
+                : user_info?.user_role === 'student'
+                    ? 'student'
+                    : 'guest'
+        );
+    
     // Determine the faculty subroles in the backend props
     const facultyRoles = user_info.faculty_roles ?? [];
 
@@ -237,7 +246,7 @@ export function AppHeader({ breadcrumbs = [], variant }: AppHeaderProps) {
                                     <Icon name="profileHover" size={24} />
                                 </div>
                             </a>
-                        )}  
+                        )}
                         
                         {activeRole === 'admin' && (
                             <a
@@ -284,7 +293,7 @@ export function AppHeader({ breadcrumbs = [], variant }: AppHeaderProps) {
                         {/* Notifications Icon - Hidden for guest variant */}
                         {activeRole !== 'guest' && (
                             <a
-                                href="/faculty/notification"
+                                href="/notifications"
                                 className="cursor-pointer transition-transform hover:scale-110 block group"
                             >
                                 <div className="group-hover:hidden">
