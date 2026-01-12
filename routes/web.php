@@ -234,7 +234,7 @@ Route::prefix('faculty')->group(function () {
                 Route::delete('group-composition/{id}', [GroupComp::class, 'destroy'])->name('group_comp.destroy');
                 
                 # "Advisee Management" - THESIS REVIEW
-                Route::get('thesis_review', [ThesisReview::class, 'index'])->name('thesis_review.index');
+                Route::get('thesis-review', [ThesisReview::class, 'index'])->name('thesis_review.index');
                 
                 # "Advisee Management" - PROGRESS
                 Route::get('progress', [ProgressReport::class, 'index'])->name('progress.index');
@@ -309,7 +309,6 @@ Route::prefix('faculty')->group(function () {
                 # COMMUNICATION
                 Route::get('communication', [Communication::class, 'create'])->name('communication');
 
-
                 # DEFENSE MAANGEMENT
                 Route::prefix('defense-management')->as('defense_management.')->group(function () {
                     Route::redirect('/', 'defense_management/matrix')->name('index');   // temporary
@@ -366,7 +365,6 @@ Route::prefix('faculty')->group(function () {
                     return Inertia::render('Faculty/management/award_committee/awards_evaluation');
                 })->name('evaluation');
             });
-
 
         Route::get('resources', [ResourceController::class, 'index'])->name('faculty.resources');
     });
