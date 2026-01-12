@@ -196,11 +196,10 @@ interface ActiveTerm {
 interface DashboardProps {
     activeTerm: ActiveTerm;
     currentDate: string;
-    notifications: NotificationItem[];
 }
 
 
-export default function Dashboard({ activeTerm, currentDate, notifications }: DashboardProps) {
+export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
     // console.log('Notifications:', notifications);
 
     return (
@@ -393,24 +392,6 @@ export default function Dashboard({ activeTerm, currentDate, notifications }: Da
                             </div>
                         </div>
                     </div>
-                    
-
-                    {/* TESTING PURPOSE ONLY: */}
-                    <div>
-                        <div className="flex flex-col gap-2">
-                            {notifications.map((notification) => (
-                                <NotificationListItem
-                                    key={notification.id}
-                                    type={notification.data.type ?? null}   // null for internal fallback (defaulkt: bell icon)
-                                    title={notification.data.title} 
-                                    description={notification.data.message} 
-                                    timestamp={getTimeAgo(notification.created_at)} 
-                                    isUnread={notification.read_at === null} 
-                                />
-                            ))}
-                        </div>
-                    </div>
-
             </AppLayout>
         </>
     );

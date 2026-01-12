@@ -45,25 +45,11 @@ class DashboardController extends Controller
         // 3. Get Date Today
         $dateToday = Carbon::now()->format('F j, Y'); // "December 22, 2025"
 
-
-        // TESTING NOTIFICATUION FOR THE ADMIN
-        $notifications = Auth::user()->unreadNotifications->map(function ($n) {
-            return [
-                'id' => $n->id,
-                // Accessing ->data here forces Laravel to cast the JSON string to an Array
-                'data' => $n->data, 
-                'read_at' => $n->read_at,
-                'created_at' => $n->created_at,
-                // specific to your previous frontend code needs:
-                'type' => $n->type, 
-            ];
-        });
-
         // 4. Pass to Frontend
         return Inertia::render('Admin/dashboard', [
             'activeTerm' => $activeTerm,
             'currentDate' => $dateToday,
-            'notifications' => $notifications,
+            // 'notifications' => $notifications,
         ]);
     }
 

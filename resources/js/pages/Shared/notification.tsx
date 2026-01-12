@@ -1,24 +1,42 @@
 import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { NotificationItem, PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { AppContent } from '@/components/app-content';
+import { index } from '@/routes/notifications/index';
 import { Bell } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import FilterSearchSection from '@/components/filter-search-section';
 import { NotificationList, NotificationListItem } from '@/components/ui/notification-list';
+import { getTimeAgo } from '@/lib/utils';
 
-export default function Notification() {
+// Setup
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Notifications',
+        href: index().url,
+    },
+];
+
+const pageHeader: PageHeaderProps = {
+    title: "Notifications",
+    subtitle: "Stay updated with all system notifications and alerts",
+    icon: (
+        // pa correct nalang
+        <Bell className="w-8 h-8 text-primary" />
+    ),
+};
+
+// PAge Props
+interface NotificationProps {
+    notifications: NotificationItem[];
+}
+
+
+export default function Notification({ notifications }: NotificationProps) {
     return (
-        <><AppLayout breadcrumbs={[{ title: 'Notifications', href: '/notifications' } as BreadcrumbItem]}>
+        <AppLayout breadcrumbs={breadcrumbs} pageHeader={pageHeader}>
             <Head title="Notifications" />
-
-            <AppContent
-                title="Notifications"
-                subtitle="Stay updated with all system notifications and alerts"
-                icon={<Bell className="w-8 h-8 text-primary" />}
-                variant="header"
-            > </AppContent>
 
             <div className="space-y-6 font-dm pb-10 flex flex-col items-center w-full">
     
@@ -28,66 +46,30 @@ export default function Notification() {
                 
                 <div className="w-full max-w-[1360px] flex flex-col gap-[35px] rounded-lg">
                     <NotificationList maxHeight="auto">
-                        <NotificationListItem
-                            type="schedule"
-                            title="Defense Schedule Updated"
-                            description="Defense for 'Machine Learning Applications in Healthcare Diagnostics' has been updated."
-                            timestamp="2d ago"
-                            isUnread={true}
-                        />
-                        <NotificationListItem
-                            type="assignment"
-                            title="New Panel Assignment"
-                            description="You have been assigned as a panel member for the defense of 'Blockchain-Based Voting System'."
-                            timestamp="2d ago"
-                            isUnread={true}
-                        />
-                        <NotificationListItem
-                            type="reminder"
-                            title="Upcoming Defense Reminder"
-                            description="Reminder: Defense for 'IoT-Enabled Smart Home Energy Management System' is tomorrow."
-                            timestamp="3d ago"
-                            isUnread={false}
-                        />
-                        <NotificationListItem
-                            type="system"
-                            title="System Maintenance Scheduled"
-                            description="The Defense Management System will undergo scheduled maintenance on December 5, 2025."
-                            timestamp="3d ago"
-                            isUnread={false}
-                        />
-                        <NotificationListItem
-                            type="schedule"
-                            title="Defense Schedule Updated"
-                            description="Defense for 'Machine Learning Applications in Healthcare Diagnostics' has been updated."
-                            timestamp="2d ago"
-                            isUnread={true}
-                        />
-                        <NotificationListItem
-                            type="assignment"
-                            title="New Panel Assignment"
-                            description="You have been assigned as a panel member for the defense of 'Blockchain-Based Voting System'."
-                            timestamp="2d ago"
-                            isUnread={true}
-                        />
-                        <NotificationListItem
-                            type="reminder"
-                            title="Upcoming Defense Reminder"
-                            description="Reminder: Defense for 'IoT-Enabled Smart Home Energy Management System' is tomorrow."
-                            timestamp="3d ago"
-                            isUnread={false}
-                        />
-                        <NotificationListItem
-                            type="system"
-                            title="System Maintenance Scheduled"
-                            description="The Defense Management System will undergo scheduled maintenance on December 5, 2025."
-                            timestamp="3d ago"
-                            isUnread={false}
-                        />
+                        {notifications.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center p-6 text-gray-500">
+                                <Bell className='w-16 h-16 mb-4 text-gray-400' />
+                                <p className="text-center text-sm">
+                                    You don't have any notifications yet. <br /> They'll appear here when something happens!
+                                </p>
+                            </div>
+                        ) : (
+                            notifications.map((notification) => (
+                                <NotificationListItem
+                                    key={notification.id}
+                                    type={notification.data.type ?? null}   // null for internal fallback (defaulkt: bell icon)
+                                    title={notification.data.title}
+                                    description={notification.data.message}
+                                    timestamp={getTimeAgo(notification.created_at)}
+                                    isUnread={notification.read_at === null}
+                                />
+                            ))
+                        )}
                     </NotificationList>
+
                 </div>
             </div>
 
-        </AppLayout><NavFooter /></>
+        </AppLayout>
     );
 }
