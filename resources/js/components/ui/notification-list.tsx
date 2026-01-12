@@ -12,6 +12,10 @@ export interface NotificationItemProps extends React.HTMLAttributes<HTMLDivEleme
     description: string;
     timestamp: string;
     isUnread?: boolean;
+
+    onRead?: () => void; 
+    onDelete?: () => void;
+    isLoading?: boolean;
 }
 
 const getNotificationStyles = (type: NotificationType) => {
@@ -25,18 +29,20 @@ const getNotificationStyles = (type: NotificationType) => {
 };
 
 const NotificationListItem = React.forwardRef<HTMLDivElement, NotificationItemProps>(
-    ({ className, type = 'system', title, description, timestamp, isUnread: initialIsUnread = false, ...props }, ref) => {
+    ({ className, type = 'system', title, description, timestamp, isUnread, onRead, onDelete, isLoading, ...props }, ref) => {
+
+
         // 1. GUMAMIT NG STATE PARA SA REAL-TIME UPDATE
-        const [unread, setUnread] = React.useState(initialIsUnread);
+        // const [unread, setUnread] = React.useState(initialIsUnread);
 
         const style = getNotificationStyles(type);
         const IconComponent = style.icon;
 
         // 2. TOGGLE FUNCTION
-        const handleToggleRead = (e: React.MouseEvent) => {
-            e.stopPropagation();
-            setUnread(!unread);
-        };
+        // const handleToggleRead = (e: React.MouseEvent) => {
+        //     e.stopPropagation();
+        //     // setUnread(!unread);
+        // };
 
         return (
             <div
@@ -45,13 +51,13 @@ const NotificationListItem = React.forwardRef<HTMLDivElement, NotificationItemPr
                     'relative flex gap-4 px-6 py-5 border-border border rounded-xl mb-2 transition-all duration-200',
                     'hover:bg-gray-50 cursor-pointer',
                     // Ang background ng container ay nagbabago base sa state
-                    unread ? 'bg-blue-50/40 border-blue-100' : 'bg-white',
+                    isUnread ? 'bg-blue-50/40 border-blue-100' : 'bg-white',
                     className
                 )}
                 {...props}
             >
                 {/* Red Dot - Lalabas lang kung unread */}
-                {unread && (
+                {isUnread && (
                     <span className="absolute left-2 top-8 w-2 h-2 rounded-full bg-red-700" />
                 )}
 
@@ -60,7 +66,7 @@ const NotificationListItem = React.forwardRef<HTMLDivElement, NotificationItemPr
                 </div>
 
                 <div className="flex flex-col gap-1 flex-1">
-                    <h3 className={cn("text-sm font-semibold leading-tight", unread ? "text-gray-900" : "text-gray-700")}>
+                    <h3 className={cn("text-sm font-semibold leading-tight", isUnread ? "text-gray-900" : "text-gray-700")}>
                         {title}
                     </h3>
                     <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">
@@ -74,9 +80,13 @@ const NotificationListItem = React.forwardRef<HTMLDivElement, NotificationItemPr
                             <Button 
                                 variant={'ghost'} 
                                 className="flex items-center gap-1 text-xs font-medium text-gray-600 hover:text-gray-900 transition-all"
-                                onClick={handleToggleRead}
+                                disabled={isLoading}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onRead?.(); // Call the parent function
+                                }}
                             >
-                                {unread ? (
+                                {isUnread ? (
                                     <>
                                         <Check className="w-3.5 h-3.5" />
                                         Mark Read
@@ -92,7 +102,13 @@ const NotificationListItem = React.forwardRef<HTMLDivElement, NotificationItemPr
                                 )}
                             </Button>
                             
-                            <Button variant={'negative'} className="p-1.5 h-8 w-8">
+                            <Button variant={'negative'} className="p-1.5 h-8 w-8"
+                                disabled={isLoading}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onDelete?.();
+                                }}
+                            >
                                 <Trash2 className="w-3.5 h-3.5" />
                             </Button>
                         </div>

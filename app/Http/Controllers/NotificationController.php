@@ -19,7 +19,7 @@ class NotificationController extends Controller
         // TESTING NOTIFICATUION FOR THE ADMIN
         $notifications = Auth::user()->notifications()
             ->latest()
-            ->paginate(5); // Initial load size
+            ->paginate(15); // Initial load size
         
         return Inertia::render('Shared/notification', [
             'notifications' => $notifications,
@@ -29,7 +29,7 @@ class NotificationController extends Controller
 
     public function load(Request $request)
     {
-        $perPage = 5; 
+        $perPage = 15; 
         $page = $request->input('page', 1); 
 
         $notifications = Auth::user()->notifications()
@@ -47,11 +47,17 @@ class NotificationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function markAsRead(Request $request, $id)
+    public function toggleRead(Request $request, $id)
     {
         $notification = $request->user()->notifications()->findOrFail($id);
-        $notification->markAsRead();
-        return back();
+
+        if ($notification->read()) {
+            $notification->markAsUnread();
+        } else {
+            $notification->markAsRead();
+        }
+
+        return back()->with('success', 'success operation');
     }
     
 

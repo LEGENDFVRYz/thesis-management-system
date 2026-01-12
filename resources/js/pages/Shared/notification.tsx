@@ -3,7 +3,7 @@ import AppLayout from '@/layouts/app-layout';
 import { NotificationItem, PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { AppContent } from '@/components/app-content';
-import { index, load } from '@/routes/notifications/index';
+import { index, load, toggle } from '@/routes/notifications/index';
 import { Bell } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import FilterSearchSection from '@/components/filter-search-section';
@@ -43,10 +43,40 @@ interface NotificationProps {
 export default function Notification({ notifications: initialNotifications }: NotificationProps) {
     const [notifications, setNotifications] = useState(initialNotifications.data);
 
+    const [processingId, setProcessingId] = useState<string | null>(null);
+    const { post, processing } = useForm({});
+
     const [page, setPage] = useState(initialNotifications.current_page);
     const [hasMore, setHasMore] = useState(initialNotifications.next_page_url);
     const [loading, setLoading] = useState(false);
 
+    // function fo mark as read
+    const handleMarkAsRead = (id: string) => {
+        setProcessingId(id);
+        
+        post(toggle(id).url, {
+            preserveScroll: true,
+            preserveState: true,
+            onSuccess: () => {
+                setNotifications(prevNotifications => 
+                    prevNotifications.map(notification => {
+                        if (notification.id === id) {
+                            return { 
+                                ...notification, 
+                                read_at: notification.read_at ? null : new Date().toISOString() 
+                            };
+                        }
+                        return notification;
+                    })
+                );
+                setProcessingId(null);
+            },
+            onError: () => {
+                setProcessingId(null);
+            }
+        });
+    };
+    
     // function for loading more notifications
     const loadMore = async () => {
         if (loading || !hasMore) return;
@@ -103,6 +133,9 @@ export default function Notification({ notifications: initialNotifications }: No
                                     description={notification.data.message}
                                     timestamp={getTimeAgo(notification.created_at)}
                                     isUnread={notification.read_at === null}
+
+                                    onRead={() => handleMarkAsRead(notification.id)}
+                                    isLoading={processing && processingId === notification.id}
                                 />
                             ))
                         )}

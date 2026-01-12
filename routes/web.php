@@ -457,7 +457,7 @@ Route::middleware(['auth'])->group(function() {
     // Notification Routes
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('notifications/load', [NotificationController::class, 'load'])->name('notifications.load');
-    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/{id}/toggle', [NotificationController::class, 'toggleRead'])->name('notifications.toggle');
 
     // Profile (Settings) Management Routes
     Route::get('profilemanagement', function () {
