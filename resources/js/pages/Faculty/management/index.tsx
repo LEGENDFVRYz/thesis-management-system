@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import { index } from '@/routes/faculty/management';
+// import { index } from '@/routes/faculty/management';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { type ReactNode } from 'react';
@@ -14,7 +14,8 @@ interface ManagementLayoutProps {
 const breadcrumb: BreadcrumbItem[] = [
     {
         title: 'Management',
-        href: index().url,
+        href: '#',              // Non-existing page, since this is just a wrapper
+                                // We forcely passed this for sake of frontend breadcrumb organization
     },
 ];
 
