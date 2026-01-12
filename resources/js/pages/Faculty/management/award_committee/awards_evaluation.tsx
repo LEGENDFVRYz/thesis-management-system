@@ -7,17 +7,17 @@ import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
 
 // AWARDS COMMITTEE COMPONENTS
-import { TabNavigation } from './awards_tabNavigation';
-import { PageHeader } from './awards_pageHeader';
-import { EvaluationPage } from './awards_evaluationPage';
-import { ResultsPage } from './awards_resultsPage';
-import { ViewEvaluateModal } from './awards_ViewandEval_modal';
-import { ViewResultsModal } from './awards_viewEvalResult_modal';
+import { TabNavigation } from './components/awards_tabNavigation';
+import { PageHeader } from './components/awards_pageHeader';
+import { EvaluationPage } from './components/awards_evaluationPage';
+import { ResultsPage } from './components/awards_resultsPage';
+import { ViewEvaluateModal } from './components/awards_ViewandEval_modal';
+import { ViewResultsModal } from './components/awards_viewEvalResult_modal';
 
 // UTILITIES AND SAMPLE DATA
-import { EvaluationRow } from './awards_types';
-import { getEvaluationStatus } from './awards_utils';
-import { evaluationData, resultsData, detailedEvaluationResults } from './awards_sampleData';
+import { EvaluationRow } from './components/awards_types';
+import { getEvaluationStatus } from './components/awards_utils';
+import { evaluationData, resultsData, detailedEvaluationResults } from './components/awards_sampleData';
 import { Icon } from '@/components/icon-index';
 
 

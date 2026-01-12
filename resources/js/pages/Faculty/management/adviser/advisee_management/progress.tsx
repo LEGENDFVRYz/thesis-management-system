@@ -19,7 +19,7 @@ import { Head } from '@inertiajs/react';
 import { Filter, Users } from 'lucide-react';
 import { useState } from 'react';
 import AdviseeManagementLayout from '.';
-import { BlockAndTagsFilter } from './progress-filter-search';
+import { BlockAndTagsFilter } from './components/progress-filter-search';
 import { Icon } from '@/components/icon-index';
 
 // Setup

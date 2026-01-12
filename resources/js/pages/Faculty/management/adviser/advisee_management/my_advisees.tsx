@@ -17,7 +17,7 @@ import { Head } from '@inertiajs/react';
 import { Filter, Users } from 'lucide-react';
 import { useState } from 'react';
 import AdviseeManagementLayout from '.';
-import { BlockAndTagsFilter } from './advisee-filter-search';
+import { BlockAndTagsFilter } from './components/advisee-filter-search';
 
 const breadcrumb: BreadcrumbItem[] = [
     {

@@ -5,7 +5,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import ManagementLayout from '@/pages/Faculty/management/index';
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
-import OptionToggle from '@/pages/Faculty/management/adviser/advisee_management/option-toggle';
+import OptionToggle from '@/pages/Faculty/management/adviser/advisee_management/components/option-toggle';
 import FilterSearchSection from '@/components/filter-search-section';
 import StageSwitchToggle from '@/components/stage-toggle';
 import { useState } from 'react';
