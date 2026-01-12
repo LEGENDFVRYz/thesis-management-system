@@ -456,6 +456,8 @@ Route::middleware(['auth'])->group(function() {
 
     // Notification Routes
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('notifications/load', [NotificationController::class, 'load'])->name('notifications.load');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 
     // Profile (Settings) Management Routes
     Route::get('profilemanagement', function () {
@@ -474,8 +476,7 @@ Route::post('file-import', [FileImportController::class, 'store'])->name('file.i
 Route::get('/resources/{filekey}/download', [ResourceController::class, 'download'])->name('resources.download');
 Route::get('/manuscripts/{id}/stream', [PdfViewerController::class, 'streamPdf'])->name('manuscripts.stream');
 
-// Route::get('/notification-test', [NotificationController::class, 'index'])->name('notifications.index');
-Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+
 
 // TEMPORARY: view shared thesis page without affecting guest/admin routes
 Route::get('/test-thesis', function () {

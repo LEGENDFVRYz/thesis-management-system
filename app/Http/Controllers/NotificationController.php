@@ -17,20 +17,29 @@ class NotificationController extends Controller
         // return $request->user()->notifications()->latest()->limit(10)->get();
 
         // TESTING NOTIFICATUION FOR THE ADMIN
-        $notifications = Auth::user()->unreadNotifications->map(function ($n) {
-            return [
-                'id' => $n->id,
-                // Accessing ->data here forces Laravel to cast the JSON string to an Array
-                'data' => $n->data, 
-                'read_at' => $n->read_at,
-                'created_at' => $n->created_at,
-                // specific to your previous frontend code needs:
-                'type' => $n->type, 
-            ];
-        });
-
+        $notifications = Auth::user()->notifications()
+            ->latest()
+            ->paginate(5); // Initial load size
+        
         return Inertia::render('Shared/notification', [
             'notifications' => $notifications,
+        ]);
+    }
+
+
+    public function load(Request $request)
+    {
+        $perPage = 5; 
+        $page = $request->input('page', 1); 
+
+        $notifications = Auth::user()->notifications()
+            ->latest()
+            ->paginate($perPage, ['*'], 'page', $page);
+
+        return response()->json([
+            'data' => $notifications->items(),
+            'next_page_url' => $notifications->nextPageUrl(),
+            'has_more' => $notifications->hasMorePages(),
         ]);
     }
 

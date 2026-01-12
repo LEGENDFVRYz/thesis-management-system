@@ -104,7 +104,7 @@ class AcademicSettingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-public function update(Request $request)
+    public function update(Request $request)
     {
         // SCENARIO 1: UPDATING A SEMESTER
         if ($request->filled('sem_index')) {
@@ -192,10 +192,10 @@ public function update(Request $request)
             // dd($newSemester->load('schoolYear')->toArray());
 
             // Clear the old notifications
-            DB::table('notifications')
-                ->where('type', AcademicYearAnnounced::class) // Target this specific notification class
-                ->whereNull('read_at') // Only remove them if they haven't been read yet
-                ->delete();
+            // DB::table('notifications')
+            //     ->where('type', AcademicYearAnnounced::class) // Target this specific notification class
+            //     ->whereNull('read_at') // Only remove them if they haven't been read yet
+            //     ->delete();
 
             // Notify the users:
             $users = User::first(); // try
