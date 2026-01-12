@@ -1,7 +1,22 @@
 import EvalGradingLayout from './index';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { useState, useMemo } from 'react';
 import { router } from '@inertiajs/react'; // Import router for manual submission
+import { Icon } from '@/components/icon-index';
+
+// Setup
+const pageHeader: PageHeaderProps = {
+    title: "Evaluation and Grading",
+    subtitle: "Input and submit grades for advisees per stage (MOR/DP1/DP2) based on panel evaluations",
+    icon: (
+        // pa correct nalang
+        <Icon
+            name="calendarDefault"
+            className="w-8 h-8 text-primary"
+        />
+    ),
+};
+
 
 // --- Interfaces ---
 interface PeerEvaluation {
@@ -129,8 +144,7 @@ export default function Evaluation({ advisory, id, rubrics, peerEvaluations }: P
         <EvalGradingLayout
             advisoryId={id}
             breadcrumbs={breadcrumbs}
-            title="Evaluation and Grading"
-            description="Input and submit grades for advisees per stage (MOR/DP1/DP2)"
+            pageHeader={pageHeader}
         >
             
             {/*

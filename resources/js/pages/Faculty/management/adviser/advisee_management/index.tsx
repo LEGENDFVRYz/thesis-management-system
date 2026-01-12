@@ -1,10 +1,10 @@
 import { index as my_advisees } from '@/routes/faculty/adviser/my_advisees';
 import { index as group_comp } from '@/routes/faculty/adviser/group_comp';
-import { index as progress } from '@/routes/faculty/adviser/thesis_review';
-import { index as thesis_review } from '@/routes/faculty/adviser/progress';
+import { index as thesis_review } from '@/routes/faculty/adviser/thesis_review';
+import { index as progress } from '@/routes/faculty/adviser/progress';
 
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { type ReactNode } from 'react';
 
@@ -13,8 +13,7 @@ import { TabButton } from '@/components/ui/tabs';
 interface AdviseeManagementLayoutProps {
     children: ReactNode;
     breadcrumbs?: BreadcrumbItem[];
-    title: string;
-    description: string;
+    pageHeader: PageHeaderProps;
 }
 
 const breadcrumb: BreadcrumbItem[] = [
@@ -34,16 +33,14 @@ const tabs = [
 export default function AdviseeManagementLayout({
     children,
     breadcrumbs,
-    title,
-    description,
+    pageHeader
 }: AdviseeManagementLayoutProps) {
     const { url } = usePage();
 
     return (
         <FacultyManagementLayout
             breadcrumbs={[...breadcrumb, ...(breadcrumbs ?? [])]}
-            title={title}
-            description={description}
+            pageHeader={pageHeader}
         >
             {/* PAGE TABS */}
             <div className="mb-6">

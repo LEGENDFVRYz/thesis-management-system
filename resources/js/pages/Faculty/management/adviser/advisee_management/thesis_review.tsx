@@ -1,7 +1,7 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/faculty/adviser/thesis_review';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import AdviseeManagementLayout from '.';
 import { AdviseeGroupCard } from '@/components/ui/card';
@@ -12,13 +12,28 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import { badgesRegistry } from '@/components/badges-registry';
+import { Icon } from '@/components/icon-index';
 
+// Setup
 const breadcrumb: BreadcrumbItem[] = [
     {
         title: 'Thesis Document Review',
         href: index().url,
     },
 ];
+
+const pageHeader: PageHeaderProps = {
+    title: "Thesis Document Review",
+    subtitle: "Review, comment on, and approve/request revisions for submitted thesis documents",
+    icon: (
+                // pa correct nalang
+        <Icon
+            name="calendarDefault"
+            className="w-8 h-8 text-primary"
+        />
+    ),
+};
+
 
 const mockThesisGroups = [
   {
@@ -359,8 +374,7 @@ export default function ThesisReview() {
         return (
             <AdviseeManagementLayout 
                 breadcrumbs={breadcrumb}
-                title="Thesis Document Review" 
-                description="Review, comment on, and approve/request revisions for submitted thesis documents"
+                pageHeader={pageHeader}
             >
                 <div className="space-y-6">
                     <Button
@@ -517,8 +531,7 @@ export default function ThesisReview() {
         return (
             <AdviseeManagementLayout 
                 breadcrumbs={breadcrumb}
-                title="Thesis Document Review" 
-                description="Review, comment on, and approve/request revisions for submitted thesis documents"
+                pageHeader={pageHeader}
             >
                 <div className="space-y-6">
                     <Button
@@ -596,8 +609,7 @@ export default function ThesisReview() {
     return (
         <AdviseeManagementLayout 
             breadcrumbs={breadcrumb}
-            title="Thesis Document Review" 
-            description="Review, comment on, and approve/request revisions for submitted thesis documents"
+            pageHeader={pageHeader}
         >
             <div className="space-y-6">
                 <div className="mb-6 box-border flex h-[125.6px] w-full max-w-[1360px] flex-col items-start gap-4 self-stretch rounded-[10px] border-[0.8px] border-primary/20 bg-card p-[24.8px_24.8px_0.8px_24.8px] font-dm shadow-sm transition-all duration-200">

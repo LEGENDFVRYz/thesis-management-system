@@ -1,13 +1,33 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/faculty/adviser/endorsement/index';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head, useForm} from '@inertiajs/react';
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
 import { Eye, CheckCircle, Layers, X, AlertCircle, Send } from 'lucide-react';
 import { useState } from 'react';
 import DocumentPreview from '@/components/document-preview';
+import { Icon } from '@/components/icon-index';
 
+// Setup
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Endorsements',
+        href: index().url,
+    },
+];
+
+const pageHeader: PageHeaderProps = {
+    title: "Panel Endorsement" ,
+    subtitle: "Endorse approved proposals/theses of your advisory class for formal review",
+    icon: (
+        // pa correct nalang
+        <Icon
+            name="calendarDefault"
+            className="w-8 h-8 text-primary"
+        />
+    ),
+};
 
 // This matches the structure of the object returned by your Laravel Controller
 interface BackendEndorsement {
@@ -299,13 +319,6 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
     );
 };
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Endorsements',
-        href: index().url,
-    },
-];
-
 export default function Endorsement({ endorsements }: { endorsements: BackendEndorsement[] }) {
 
     const mappedProposals: Proposal[] = endorsements ? endorsements.map(item => ({
@@ -325,11 +338,10 @@ export default function Endorsement({ endorsements }: { endorsements: BackendEnd
     return (
         <FacultyManagementLayout 
             breadcrumbs={breadcrumbs}
-            title="Panel Endorsement" 
-            description="Endorse approved proposals/theses of your advisory class for formal review"
+            pageHeader={pageHeader}
         >
             <Head title="Endorsements" />
-            <div className="border-t-2 border-primary my-4"></div>
+            {/* <div className="border-t-2 border-primary my-4"></div> */}
 
             <div className="p-4 font-dm">
                 {mappedProposals.length > 0 ? (

@@ -1,17 +1,26 @@
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { type ReactNode } from 'react';
+import { document_review, grading } from '@/routes/faculty/adviser/evaluation/index';
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
 
 interface EvalGradingLayoutProps {
     children: ReactNode;
     breadcrumbs?: BreadcrumbItem[];
     advisoryId: number; // We need this to build the links dynamically
-    title: string;
-    description: string;
+    pageHeader: PageHeaderProps;
 }
 
-export default function EvalGradingLayout({ children, breadcrumbs, advisoryId, title, description }: EvalGradingLayoutProps) {
+// NOTE: PASSED A BREADCRUMB IF YOU WANT TO MAKE evaluation  since in the frontenc
+// 
+// const breadcrumb: BreadcrumbItem[] = [
+//     {
+//         title: 'Evaluation',
+//         href: '#',      // temporary, since this file is just a wrapper
+//     },
+// ];
+
+export default function EvalGradingLayout({ children, breadcrumbs, advisoryId, pageHeader }: EvalGradingLayoutProps) {
     
     const { url } = usePage();
 
@@ -19,26 +28,25 @@ export default function EvalGradingLayout({ children, breadcrumbs, advisoryId, t
     const tabs = [
         { 
             title: 'Document Review',      
-            href: `/faculty/management/adviser/eval_n_grading/document_review/${advisoryId}` 
+            href: document_review(advisoryId)
         },
         { 
             title: 'Evaluation', 
-            href: `/faculty/management/adviser/eval_n_grading/evaluation/${advisoryId}` 
+            href: grading(advisoryId)
         },
     ];
 
     return (
         <FacultyManagementLayout 
             breadcrumbs={breadcrumbs}
-            title={title} 
-            description={description}
+            pageHeader={pageHeader}
         >
             {/* PAGE TABS */}
             <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
                 <ul className="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500 dark:text-gray-400">
                     {tabs.map((tab) => {
                         // Check if current URL starts with the tab's href
-                        const isActive = url.startsWith(tab.href);
+                        const isActive = url.startsWith(tab.href.url);
                         
                         return (
                             <li key={tab.title} className="me-2">

@@ -1,13 +1,36 @@
 import AppLayout from '@/layouts/app-layout';
 import { useState } from 'react';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import AdviseeManagementLayout from '.';
 import { Head, router } from '@inertiajs/react';
 import CustomTable from './group_table';
 import CreateGroupModal from './create-group';
 import EditGroupModal from './edit-group';
 import ManageGroupModal from './manage-group';
+import { index } from '@/routes/faculty/adviser/group_comp';
 import { destroy } from '@/routes/faculty/adviser/group_comp/index';
+import { Icon } from '@/components/icon-index';
+
+// Page Setup
+const breadcrumb: BreadcrumbItem[] = [
+  {
+    title: 'Group Composition',
+    href: index().url,
+  },
+];
+
+const pageHeader: PageHeaderProps = {
+    title: "Group Composition",
+    subtitle: "Create and manage thesis group compositions and membership changes",
+    icon: (
+              // pa correct nalang
+        <Icon
+            name="calendarDefault"
+            className="w-8 h-8 text-primary"
+        />
+    ),
+};
+
 
 // Types for data from GroupComp.php controller
 interface SectionAdviser {
@@ -44,12 +67,6 @@ interface PageProps {
   studentsWithoutGroup: StudentWithoutGroup[];
 }
 
-const breadcrumb: BreadcrumbItem[] = [
-  {
-    title: 'Group Composition',
-    href: '/faculty/management/adviser/group-composition',
-  },
-];
 
 export default function GroupComposition({ students = [], sectionAdvisers = [], studentsWithoutGroup = [] }: PageProps) {
   // Helper function to get year from course
@@ -144,8 +161,7 @@ export default function GroupComposition({ students = [], sectionAdvisers = [], 
   return (
     <AdviseeManagementLayout
       breadcrumbs={breadcrumb}
-      title="Group Composition"
-      description="Create and manage thesis group compositions and membership changes"
+      pageHeader={pageHeader}
     >
       <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 p-6">
 

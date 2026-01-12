@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Head } from '@inertiajs/react';
-import { evaluation } from '@/routes/faculty/award/index'; 
+import { evaluation } from '@/routes/faculty/awardee/index'; 
 import { NavFooter } from '@/components/nav-footer';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
 
@@ -18,13 +18,29 @@ import { ViewResultsModal } from './awards_viewEvalResult_modal';
 import { EvaluationRow } from './awards_types';
 import { getEvaluationStatus } from './awards_utils';
 import { evaluationData, resultsData, detailedEvaluationResults } from './awards_sampleData';
+import { Icon } from '@/components/icon-index';
 
+
+// SETUP
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Awards Evaluation',
         href: evaluation().url,
     },
 ];
+
+const pageHeader: PageHeaderProps = {
+    title: "Evaluation Page" ,
+    subtitle: "Page for evaluating top 10 project groups based on output, defense, and tech development",
+    icon: (
+        // pa correct nalang
+        <Icon
+            name="calendarDefault"
+            className="w-8 h-8 text-primary"
+        />
+    ),
+};
+
 
 export default function Dashboard() {
     const [activeTab, setActiveTab] = useState<'evaluation' | 'results'>('evaluation');
@@ -58,14 +74,18 @@ export default function Dashboard() {
             
             <FacultyManagementLayout
                 breadcrumbs={breadcrumbs}
-                title={activeTab === 'evaluation' ? 'Evaluation Page' : 'Results Page'}
-                description={
-                    activeTab === 'evaluation'
-                        ? 'Page for evaluating top 10 project groups based on output, defense, and tech development'
-                        : 'View summarized scores, rankings, and awards results'
-                }
+                pageHeader={pageHeader}
+
+                // Split the pages
+                // Note: Hard code ko muna ung header, tytyy
+                // title={activeTab === 'evaluation' ? 'Evaluation Page' : 'Results Page'}
+                // description={
+                //     activeTab === 'evaluation'
+                //         ? 'Page for evaluating top 10 project groups based on output, defense, and tech development'
+                //         : 'View summarized scores, rankings, and awards results'
+                // }
             >
-                <div className="border border-primary mb-4"></div>
+                {/* <div className="border border-primary mb-4"></div> */}
                 
                 {/* Header Section with Tabs */}
                 <div className="mb-6">
@@ -91,7 +111,7 @@ export default function Dashboard() {
                 )}
             </FacultyManagementLayout>
 
-            <NavFooter />
+            {/* <NavFooter /> */}
 
             {/* View & Evaluate Modal (for Evaluation Page) */}
             <ViewEvaluateModal

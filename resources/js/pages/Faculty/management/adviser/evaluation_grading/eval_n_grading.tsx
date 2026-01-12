@@ -1,19 +1,33 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
-import { index } from '@/routes/faculty/adviser/evaluation/index';
-import { type BreadcrumbItem } from '@/types';
+import { index, document_review } from '@/routes/faculty/adviser/evaluation/index';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import ManagementLayout from '@/pages/Faculty/management/index';
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
 import { useState } from 'react';
 import { Link } from '@inertiajs/react';
+import { Icon } from '@/components/icon-index';
 
+// Setup
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Evaluation and Grading',
         href: index().url,
     },
 ];
+
+const pageHeader: PageHeaderProps = {
+    title: "Evaluation and Grading",
+    subtitle: "Input and submit grades for advisees per stage (MOR/DP1/DP2) based on panel evaluations",
+    icon: (
+        // pa correct nalang
+        <Icon
+            name="calendarDefault"
+            className="w-8 h-8 text-primary"
+        />
+    ),
+};
 
 // -- Types ---
 interface PanelReview {
@@ -75,8 +89,7 @@ export default function EvalAndGrading({ myAdvisories: advisory }: EvalGradingPr
     return (
         <FacultyManagementLayout
             breadcrumbs={breadcrumbs}
-            title="Evaluation and Grading" 
-            description="Input and submit grades for advisees per stage (MOR/DP1/DP2) based on panel evaluations"
+            pageHeader={pageHeader}
         >
             
             {/*
@@ -147,7 +160,7 @@ export default function EvalAndGrading({ myAdvisories: advisory }: EvalGradingPr
                                         {/* Evaluate Link */}
                                         <td className="px-6 py-4 text-left">
                                             <Link
-                                                href={`/faculty/management/adviser/eval_n_grading/document_review/${advisory.id}`}
+                                                href={document_review(advisory.id)}
                                                 className="inline-flex items-center justify-center text-sm text-gray-500 dark:text-gray-100 font-medium hover:text-accent-foreground h-9 px-4 py-2 transition-colors"
                                             >
                                                 Evaluate

@@ -14,19 +14,34 @@ import {
 } from '@/components/ui/table';
 import { TimelineState } from '@/components/ui/wizard-timeline';
 import { index } from '@/routes/faculty/adviser/group_comp/index';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Filter, Users } from 'lucide-react';
 import { useState } from 'react';
 import AdviseeManagementLayout from '.';
 import { BlockAndTagsFilter } from './progress-filter-search';
+import { Icon } from '@/components/icon-index';
 
+// Setup
 const breadcrumb: BreadcrumbItem[] = [
     {
         title: 'Progress Monitoring',
         href: index().url,
     },
 ];
+
+const pageHeader: PageHeaderProps = {
+    title: "Progress Monitoring",
+    subtitle: "Track milestone completion and submission history of all advisees",
+    icon: (
+                // pa correct nalang
+        <Icon
+            name="calendarDefault"
+            className="w-8 h-8 text-primary"
+        />
+    ),
+};
+
 
 interface Groups {
     group_code: string;
@@ -132,8 +147,7 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
         return (
             <AdviseeManagementLayout
                 breadcrumbs={breadcrumb}
-                title="Progress Monitoring"
-                description="Track milestone completion and submission history of all advisees"
+                pageHeader={pageHeader}
             >
                 <Head title="Progress Monitoring" />
 
@@ -359,8 +373,7 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
     return (
         <AdviseeManagementLayout
             breadcrumbs={breadcrumb}
-            title="Progress Monitoring"
-            description="Track milestone completion and submission history of all advisees"
+            pageHeader={pageHeader}
         >
             <Head title="Progress Monitoring" />
 

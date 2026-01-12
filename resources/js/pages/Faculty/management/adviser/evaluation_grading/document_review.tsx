@@ -1,6 +1,20 @@
+import { Icon } from '@/components/icon-index';
 import EvalGradingLayout from './index';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { useMemo } from 'react';
+
+// Setup
+const pageHeader: PageHeaderProps = {
+    title: "Evaluation and Grading",
+    subtitle: "Input and submit grades for advisees per stage (MOR/DP1/DP2) based on panel evaluations",
+    icon: (
+        // pa correct nalang
+        <Icon
+            name="calendarDefault"
+            className="w-8 h-8 text-primary"
+        />
+    ),
+};
 
 // --- Types ---
 interface PanelReview {
@@ -43,8 +57,7 @@ export default function DocumentReview({ advisory, id }: Props) {
         <EvalGradingLayout
             advisoryId={id}
             breadcrumbs={breadcrumbs}
-            title="Evaluation and Grading"
-            description="Input and submit grades for advisees per stage (MOR/DP1/DP2) based on panel evaluations"
+            pageHeader={pageHeader}
         >
             
             {/*

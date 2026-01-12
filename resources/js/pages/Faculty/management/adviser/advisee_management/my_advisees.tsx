@@ -12,7 +12,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { index } from '@/routes/faculty/adviser/my_advisees/index';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Filter, Users } from 'lucide-react';
 import { useState } from 'react';
@@ -25,6 +25,20 @@ const breadcrumb: BreadcrumbItem[] = [
         href: index().url,
     },
 ];
+
+const pageHeader: PageHeaderProps = {
+    title: "My Advisees",
+    subtitle: "View and manage all students under supervision with their current thesis stages",
+    icon: (
+        // pa correct nalang
+        <Icon
+            name="calendarDefault"
+            className="w-8 h-8 text-primary"
+        />
+    ),
+};
+
+
 
 interface Advisee {
     student_id: string;
@@ -92,8 +106,7 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
     return (
         <AdviseeManagementLayout
             breadcrumbs={breadcrumb}
-            title="My Advisees"
-            description="View and manage all students under supervision with their current thesis stages"
+            pageHeader={pageHeader}
         >
             <Head title="My Advisees" />
 
