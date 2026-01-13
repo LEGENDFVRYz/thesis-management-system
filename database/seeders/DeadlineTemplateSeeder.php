@@ -128,6 +128,7 @@ class DeadlineTemplateSeeder extends Seeder
                     'sort_order' => $item['sort_order'],
                     'name' => $item['name'],
                     'desc' => $general_desc,    // Generic description of the milestone
+                    'offset' => 7
                 ]);
             }
 
