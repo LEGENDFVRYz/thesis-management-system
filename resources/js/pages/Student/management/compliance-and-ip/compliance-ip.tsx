@@ -13,6 +13,28 @@ import { NavFooter } from '@/components/nav-footer';
 import { FileUpload } from '@/components/file-upload';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { BreadcrumbItem, PageHeaderProps } from '@/types';
+import StudentManagementLayout from '..';
+import { ip } from '@/routes/student/management/compliance/index';
+
+
+// Setup
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: "IP & Plagiarism", 
+        href: ip().url,
+    },
+];
+
+const pageHeader: PageHeaderProps = {
+    title: "IP & Plagiarism",
+    subtitle: "Ensure IP compliance and submit plagiarism reports",
+    icon: (
+        // pa correct nalang
+        <ClipboardCheck className="w-10 h-10 text-[#800000] stroke-[2.5]" />
+    ),
+};
+
 
 interface PageProps {
     auth: {
@@ -22,6 +44,7 @@ interface PageProps {
         };
     };
 }
+
 
 export default function IpPlagiarism({ auth }: PageProps) {
     const isLeader = auth.user.role_in_group === 'Leader';
@@ -92,13 +115,14 @@ export default function IpPlagiarism({ auth }: PageProps) {
     const isReadyToSubmit = isLeader && hasScore && isPassing && allChecked;
 
     return (
-        <div className="min-h-screen bg-white font-sans text-gray-800 flex flex-col">
+        <StudentManagementLayout
+            breadcrumbs={breadcrumbs}
+            pageHeader={pageHeader}
+        >
             <Head title="IP & Compliance" />
 
-            <AppHeader variant="student" />
-
             {/* --- 1. HEADER STRIP --- */}
-            <div className="bg-white border-b-2 border-[#800000]/60 px-6 md:px-[5%] py-6 flex items-start gap-4">
+            {/* <div className="bg-white border-b-2 border-[#800000]/60 px-6 md:px-[5%] py-6 flex items-start gap-4">
                 <div className="mt-1">
                     <ClipboardCheck className="w-10 h-10 text-[#800000] stroke-[2.5]" />
                 </div>
@@ -108,9 +132,9 @@ export default function IpPlagiarism({ auth }: PageProps) {
                         Ensure IP compliance and submit plagiarism reports
                     </p>
                 </div>
-            </div>
+            </div> */}
 
-            <main className="max-w-7xl mx-auto w-full my-8 md:my-10 px-6 space-y-8">
+            <div className="max-w-7xl mx-auto w-full px-6 space-y-8">
 
                 {/* --- 2. STATUS BANNER --- */}
                 <div className={`
@@ -318,8 +342,8 @@ export default function IpPlagiarism({ auth }: PageProps) {
                     </div>
 
                 </div>
-            </main>
-            <NavFooter />
-        </div>
+            </div>
+
+        </StudentManagementLayout>
     );
 }

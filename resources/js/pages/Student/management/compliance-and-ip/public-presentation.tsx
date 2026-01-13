@@ -6,6 +6,29 @@ import { Paperclip, Clock, ListChecks, Users, CloudUpload } from 'lucide-react';
 import { AppHeader } from '@/components/app-header';
 import { NavFooter } from '@/components/nav-footer';
 import { FileUpload } from '@/components/file-upload'; 
+import { BreadcrumbItem, PageHeaderProps } from '@/types';
+import StudentManagementLayout from '..';
+import { ip } from '@/routes/student/management/compliance';
+
+
+// Setup
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: "Public presentation", 
+        href: ip().url,
+    },
+];
+
+const pageHeader: PageHeaderProps = {
+    title: "Public presentation",
+    subtitle: "Register and submit proof of public presentation",
+    icon: (
+        // pa correct nalang
+        <Users className="w-8 h-8 fill-current" />
+    ),
+};
+
+
 
 // --- TYPES ---
 interface AuditLog {
@@ -87,39 +110,37 @@ export default function PublicPresentation({ auth, thesis, audit_trail = [], sta
     ];
 
     return (
-        <div className="min-h-screen bg-[#f5f5f5] font-sans text-[#333] flex flex-col">
+        <StudentManagementLayout
+            breadcrumbs={breadcrumbs}
+            pageHeader={pageHeader}
+        >
+
             <Head title="Public Presentation" />
 
-            {/* Global App Header */}
-            <AppHeader variant="student" />
-
             {/* === NEW DESIGN HEADER === */}
-            <div className="w-full bg-white border-b-[3px] border-[#dca5a5] px-6 py-6 md:px-10">
+            
+            {/* <div className="w-full bg-white border-b-[3px] border-[#dca5a5] px-6 py-6 md:px-10">
                 <div className="max-w-[1440px] mx-auto">
-                    {/* Main Title Row */}
                     <div className="flex items-center gap-3">
-                        {/* Icon Group */}
                         <div className="text-[#6d2929]">
-                            <Users className="w-8 h-8 fill-current" />
+                            
                         </div>
-                        {/* Yellow Title */}
                         <h1 className="text-3xl font-bold text-[#fbbf24] tracking-tight">
                             Public presentation
                         </h1>
                     </div>
 
-                    {/* Subtitle */}
                     <p className="text-[#6d2929] mt-2 text-sm font-medium">
                         Register and submit proof of public presentation
                     </p>
                 </div>
-            </div>
+            </div> */}
 
             {/* === CONTENT WRAPPER === */}
-            <div className="max-w-[1440px] mx-auto w-full my-8 md:my-10 px-4 md:px-10 grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-8 items-start">
+            <div className="max-w-[1440px] mx-auto w-full px-4 grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-8 items-start">
 
                 {/* === LEFT ASIDE (Sticky) === */}
-                <aside className="sticky top-6 space-y-6 order-2 lg:order-1">
+                <aside className="sticky top-0 space-y-6 order-2 lg:order-1">
                     
                     {/* CARD: Approval Status */}
                     <div className="bg-white rounded-lg shadow-sm border-2 border-[#800000] overflow-hidden">
@@ -388,7 +409,8 @@ export default function PublicPresentation({ auth, thesis, audit_trail = [], sta
 
             </div>
 
-            <NavFooter />
-        </div>
+            {/* <NavFooter /> */}
+
+        </StudentManagementLayout>
     );
 }
