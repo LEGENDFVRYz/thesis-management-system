@@ -88,12 +88,13 @@ const studentManagementItems = [
         id: 'student-root',
         title: 'Student',
         children: [
-            { title: 'Progress Tracking', href: '/student/progress' },
-            { title: 'Thesis Management', href: '/student/thesis-management' },
-            { title: 'Defense Management', href: '/student/defense' },
+            { title: 'Progress Tracking', href: '/student/management/progress/overall' },
+            { title: 'Thesis Management', href: '/student/management/thesis' },
+            { title: 'Defense Management', href: '/student/management/defense_matrix' },
+            { title: 'Evaluation Grading', href: '/student/management/evaluation' },
             { title: 'Compliance & IP', href: '/student/compliance', isHeader: true },
-            { title: 'IP & Plagiarism', href: '/student/ip-plagiarism' },
-            { title: 'Public Presentation', href: '/student/public-presentation' }
+            { title: 'IP & Plagiarism', href: '/student/management/compliance/ip' },
+            { title: 'Public Presentation', href: '/student/management/compliance/presentation' },
         ]
     }
 ];
