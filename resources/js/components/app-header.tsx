@@ -124,15 +124,20 @@ export function AppHeader({ breadcrumbs = [], variant }: AppHeaderProps) {
         );
     
     // Determine the faculty subroles in the backend props
-    const facultyRoles = user_info.faculty_roles ?? [];
+    const facultyRoles = user_info?.faculty_roles ?? [];
 
     const filteredFacultyManagementItems = React.useMemo(() => {
+        if (!user_info || facultyRoles.length === 0) {
+            return [];      // If there is no user, return
+        }
+
+        // filter: only include if the faculty has the valid role
         return facultyManagementItems.filter(item =>
-            // filter: only include if the faculty has the valid role
             facultyRoles.includes(item.id)
         );
-    }, [facultyRoles]);
+    }, [facultyRoles, user_info]);
 
+    
     const SharedLinks = () => (
         <>
             <Button variant="primary" asChild className="mx-1 border-none shadow-none">
@@ -241,45 +246,17 @@ export function AppHeader({ breadcrumbs = [], variant }: AppHeaderProps) {
                                 className="cursor-pointer transition-transform hover:scale-110 block group"
                             >
                                 <div className="group-hover:hidden">
-                                    <Icon name="profileDefault" size={24} />
+                                    <Icon name="logoutDefault" size={24} />
                                 </div>
                                 <div className="hidden group-hover:block">
-                                    <Icon name="profileHover" size={24} />
-                                </div>
-                            </a>
-                        )}
-                        
-                        {activeRole === 'admin' && (
-                            <a
-                                href="/admin/profilemanagement"
-                                className="cursor-pointer transition-transform hover:scale-110 block group"
-                            >
-                                <div className="group-hover:hidden">
-                                    <Icon name="profileDefault" size={24} />
-                                </div>
-                                <div className="hidden group-hover:block">
-                                    <Icon name="profileHover" size={24} />
+                                    <Icon name="logoutHover" size={24} />
                                 </div>
                             </a>
                         )}
 
-                        {activeRole === 'faculty' && (
+                        {['admin', 'faculty', 'student'].includes(activeRole) && (
                             <a
-                                href="/faculty/profilemanagement"
-                                className="cursor-pointer transition-transform hover:scale-110 block group"
-                            >
-                                <div className="group-hover:hidden">
-                                    <Icon name="profileDefault" size={24} />
-                                </div>
-                                <div className="hidden group-hover:block">
-                                    <Icon name="profileHover" size={24} />
-                                </div>
-                            </a>
-                        )}
-
-                        {activeRole === 'student' && (
-                            <a
-                                href="/student/profilemanagement"
+                                href={'/profilemanagement'}
                                 className="cursor-pointer transition-transform hover:scale-110 block group"
                             >
                                 <div className="group-hover:hidden">
