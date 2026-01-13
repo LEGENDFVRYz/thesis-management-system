@@ -1,12 +1,9 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/faculty/adviser/progress/index';
-import { index as my_advisees } from '@/routes/faculty/adviser/my_advisees';
-import { index as group_comp } from '@/routes/faculty/adviser/group_comp';
-import { index as progress } from '@/routes/faculty/adviser/thesis_review';
-import { index as thesis_review } from '@/routes/faculty/adviser/progress';
+import { overall, reports } from '@/routes/student/management/progress/index';
 
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { type ReactNode } from 'react';
 import StudentManagementLayout from '@/pages/Student/management/index';
@@ -15,8 +12,7 @@ import StudentManagementLayout from '@/pages/Student/management/index';
 interface ProgressTrackingLayoutProps {
     children: ReactNode;
     breadcrumbs?: BreadcrumbItem[];
-    title: string;
-    description: string;
+    pageHeader: PageHeaderProps;
 }
 
 const breadcrumb: BreadcrumbItem[] = [
@@ -29,22 +25,21 @@ const breadcrumb: BreadcrumbItem[] = [
 const tabs = [
     { 
         title: 'Overall Progress', 
-        href: '/student/management/progress_tracking/overall_progress'
+        href: overall().url
     },
     {
         title: 'Status Report',
-        href: '/student/management/progress_tracking/status_reports' 
+        href: reports().url
     },
 ];
 
-export default function ProgressTrackingLayout({ children, breadcrumbs, title, description }: ProgressTrackingLayoutProps) {
+export default function ProgressTrackingLayout({ children, breadcrumbs, pageHeader }: ProgressTrackingLayoutProps) {
     const { url } = usePage();
 
     return (
         <StudentManagementLayout 
             breadcrumbs={[...breadcrumb, ...(breadcrumbs ?? [])]}
-            title={title} 
-            description={description}
+            pageHeader={pageHeader}
         >
             {/* PAGE TABS */}
             <div className="mb-6 border-b border-gray-200 dark:border-gray-700">

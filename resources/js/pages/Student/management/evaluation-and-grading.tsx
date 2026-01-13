@@ -4,11 +4,26 @@ import { Button } from '@/components/ui/button';
 import { NavFooter } from '@/components/nav-footer';
 import AppLayout from '@/layouts/app-layout';
 import { AppContent } from '@/components/app-content';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
+import StudentManagementLayout from '.';
 
+// Page Setup
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Evaluation & Grading', href: '' },
 ];
+
+const pageHeader: PageHeaderProps = {
+    title: "Evaluation & Grading",
+    subtitle: "Complete thesis defense evaluation form",
+    icon: (
+        // pa correct nalang
+        <div className="flex h-8 w-8 items-center justify-center text-primary">
+            <ClipboardCheck className="h-8 w-8" />
+        </div>
+    ),
+};
+
+
 
 const EvaluationFormSection = () => {
   const [ratings, setRatings] = useState<Record<string, number>>({});
@@ -93,17 +108,11 @@ const EvaluationFormSection = () => {
 
   return (
     <>
-      <AppLayout breadcrumbs={breadcrumbs}>
-        <AppContent
-          variant="header"
-          title="Evaluation & Grading"
-          subtitle="Complete thesis defense evaluation form"
-          icon={
-            <div className="flex h-8 w-8 items-center justify-center text-primary">
-              <ClipboardCheck className="h-8 w-8" />
-            </div>
-          }
-        >
+    <StudentManagementLayout
+        breadcrumbs={breadcrumbs}
+        pageHeader={pageHeader}
+    >
+      
           {/* Confirmation Modal */}
           {modalConfig.isOpen && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -375,11 +384,8 @@ const EvaluationFormSection = () => {
 
             </div>
           </div>
-        </AppContent>
-      </AppLayout>
-      
-      {/* Nav Footer */}
-      <NavFooter/>
+
+    </StudentManagementLayout>
     </>
   );
 };

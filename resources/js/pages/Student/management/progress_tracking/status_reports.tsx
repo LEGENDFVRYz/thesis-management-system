@@ -1,15 +1,27 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import ProgressTrackingLayout from './index';
 import { MessageSquare } from 'lucide-react';
+import { Icon } from '@/components/icon-index';
 
+// Setup
 const breadcrumb: BreadcrumbItem[] = [
     {   title: 'Status Reports',
         href: '#'
     }
 ];
+
+const pageHeader: PageHeaderProps = {
+    title: "Progress Tracking" ,
+    subtitle: "Access a comprehensive archive of student theses",
+    icon: (
+        // pa correct nalang
+        <Icon name="calendarDefault" className="w-8 h-8 text-primary" />
+    ),
+};
+
 
 // --- Interfaces ---
 interface EvaluationComment {
@@ -70,9 +82,8 @@ export default function StatusReports({ groupedComments }: Props) {
 
     return (
         <ProgressTrackingLayout
-            title="Progress Tracking"
-            description="Access a comprehensive archive of student theses"
             breadcrumbs={breadcrumb}
+            pageHeader={pageHeader}
         >
             <Head title="Status Reports" />
 

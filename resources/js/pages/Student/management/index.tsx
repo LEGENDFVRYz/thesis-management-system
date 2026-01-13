@@ -1,16 +1,16 @@
 import AppLayout from '@/layouts/app-layout';
-import { index } from '@/routes/faculty/management';
-import { type BreadcrumbItem } from '@/types';
+import { index } from '@/routes/student/management/index';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { type ReactNode } from 'react';
 
 interface ManagementLayoutProps {
     children: ReactNode;
     breadcrumbs?: BreadcrumbItem[];
-    title: string;
-    description: string;
+    pageHeader: PageHeaderProps;
 }
 
+// Setup
 const breadcrumb: BreadcrumbItem[] = [
     {
         title: 'Management',
@@ -18,21 +18,20 @@ const breadcrumb: BreadcrumbItem[] = [
     },
 ];
 
-export default function StudentManagementLayout({ children, breadcrumbs, title, description }: ManagementLayoutProps) {
+
+export default function StudentManagementLayout({ children, breadcrumbs, pageHeader }: ManagementLayoutProps) {
     return (
         // WRAPPER FOR MANAGEMENT
-        <AppLayout breadcrumbs={[...breadcrumb, ...(breadcrumbs ?? [])]}>
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <div>
-                    <h1 className={`text-[36px] leading-tight text-secondary-foreground-2`}>
-                        {title}
-                    </h1>
-                    <p className="mt-1 text-lg text-primary">
-                        {description}
-                    </p>
-                </div>
+        <AppLayout 
+            breadcrumbs={[...breadcrumb, ...(breadcrumbs ?? [])]}
+            pageHeader={pageHeader}
+        >
+            <div className="flex h-full flex-1">
 
-                {children}
+                {/* Main Content Area */}
+                <div className="flex-1 h-full p-6 overflow-x-auto">
+                    {children}
+                </div>
             </div>
         </AppLayout>
     );

@@ -129,7 +129,7 @@ class EvaluationController extends Controller
 
         // dd($adviserGrade);   
 
-        return Inertia::render('Student/management/eval_n_grading', [
+        return Inertia::render('Student/management/evaluation-and-grading', [
             'hasRecord' => true,
             'details' => [
                 'title' => $defenseDetails->thesis_title,

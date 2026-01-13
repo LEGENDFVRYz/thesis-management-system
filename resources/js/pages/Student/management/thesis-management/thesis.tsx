@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import type { BreadcrumbItem } from '@/types'
+import type { BreadcrumbItem, PageHeaderProps } from '@/types'
 import { Head } from '@inertiajs/react'
-import ThesisManagementLayout from '@/pages/Student/thesis-management/index'
+import ThesisManagementLayout from '@/pages/Student/management/thesis-management/index'
 import { TabButton } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,11 +12,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { thesisManagement } from '@/routes/student'
-import { ThesisDocumentsHeader, ThesisDocumentRow } from '@/pages/Student/thesis-management/thesis-table'
+import { thesis } from '@/routes/student/management/index'
+import { ThesisDocumentsHeader, ThesisDocumentRow } from '@/pages/Student/management/thesis-management/thesis-table'
 import { FileUpload } from '@/components/file-upload'
 import ThesisIcon from '@/components/Icons/thesis_icon.svg'
-import DocumentPreview from '@/pages/Student/thesis-management/thesis-preview'
+import DocumentPreview from '@/pages/Student/management/thesis-management/thesis-preview'
 import { Download, FileText, Trash2, CheckCircle, Clock } from 'lucide-react'
 import {
   Dialog,
@@ -24,10 +24,22 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Checkbox } from '@/components/ui/checkbox'
-import { ConfirmDialog } from '../components/confirm-dialog';
-import { SuccessDialog } from '../components/success-dialog';
-import { DeleteDialog } from '../components/delete-dialog';
-import { DeleteSuccessDialog } from '../components/delete-success-dialog';
+import { ConfirmDialog } from './components/confirm-dialog';
+import { SuccessDialog } from './components/success-dialog';
+import { DeleteDialog } from './components/delete-dialog';
+import { DeleteSuccessDialog } from './components/delete-success-dialog';
+
+// Setup
+const pageHeader: PageHeaderProps = {
+    title: "Thesis Management" ,
+    subtitle: "Access and manage your thesis documents",
+    icon: (
+        // pa correct nalang
+        <img src={ThesisIcon} alt="Thesis Icon" className="h-8 w-8" />
+    ),
+};
+
+
 
 /* TABS */
 const LEADER_TABS = [
@@ -233,10 +245,9 @@ export default function ThesisManagement() {
   const TABS = userRole === 'leader' ? LEADER_TABS : MEMBER_TABS
 
   const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Thesis Management', href: thesisManagement().url },
     {
       title: TABS.find(t => t.key === activeTab)?.label ?? '',
-      href: thesisManagement().url,
+      href: thesis().url,
     },
   ]
   
@@ -318,13 +329,7 @@ export default function ThesisManagement() {
   return (
     <ThesisManagementLayout 
       breadcrumbs={breadcrumbs}
-      title={
-        <div className="flex items-center gap-2">
-          <img src={ThesisIcon} alt="Thesis Icon" className="h-8 w-8" />
-          <span className="font-medium">Thesis Management</span>
-        </div>
-      }
-      description="Access and manage your thesis documents"
+      pageHeader={pageHeader}
     >
       <Head title="Thesis Management" />
 

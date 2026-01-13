@@ -21,6 +21,8 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Calendar, TableIcon } from 'lucide-react';
 import { CardContent } from '@/components/ui/card';
 import { DefenseCalendar } from '@/components/defense-calendar-monthly';
+import { BreadcrumbItem, PageHeaderProps } from '@/types';
+import StudentManagementLayout from '.';
 
 /**
  * SAMPLE DATA: Defense schedules for student view
@@ -58,6 +60,24 @@ const DEFENSE_SCHEDULES = [
     },
 ];
 
+// Setup
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: "Defense Schedule", 
+        href: '/student/defense',
+    },
+];
+
+const pageHeader: PageHeaderProps = {
+    title: "Defense Schedule",
+    subtitle: "View your upcoming thesis defense schedules",
+    icon: (
+        // pa correct nalang
+        <Icon name="calendarDefault" className="w-8 h-8 text-primary" />
+    ),
+};
+
+
 /**
  * MAIN COMPONENT: Student Defense Schedule
  * Displays defense schedules in a simple table format for students
@@ -78,16 +98,13 @@ export default function StudentDefense({ defenses }: { defenses?: any[] }) {
 
     return (
         <>
-            <Head title="Defense Schedule" />
+            <StudentManagementLayout
+                breadcrumbs={breadcrumbs}
+                pageHeader={pageHeader}
+            >
 
-            <AppLayout breadcrumbs={[{ title: 'Defense Schedule', href: '/student/defense' }]}>
-                <AppContent
-                    title="Defense Schedule"
-                    subtitle="View your upcoming thesis defense schedules"
-                    icon={<Icon name="calendarDefault" className="w-8 h-8 text-primary" />}
-                    variant="header"
-                    className="w-screen relative left-[50%] right-[50%] -ml-[50vw] -mr-[50vw]"
-                >
+                    <Head title="Defense Schedule" />
+
                     <div className="space-y-6 font-dm pb-10">
                         {/* Global Search & Search Filters */}
                         <FilterSearchSection variant="DefenseManagement" />
@@ -206,9 +223,10 @@ export default function StudentDefense({ defenses }: { defenses?: any[] }) {
                             )}
                         </div>
                     </div>
-                </AppContent>
-            </AppLayout>
-            <NavFooter />
+
+            </StudentManagementLayout>
+
+            {/* <NavFooter /> */}
         </>
     );
 }

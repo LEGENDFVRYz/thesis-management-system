@@ -108,89 +108,85 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->group(function (
         return Inertia::render('Student/dashboard'); // Your Student Dashboard Component
     })->name('dashboard');
 
-    Route::get('notification', function () {
-        return Inertia::render('Shared/notification');
-    })->name('student.notification');
-
-    // Backend Preapered
+    # Management Tabs
     Route::prefix('management')->group(function () {
         Route::redirect('/', '/dashboard')->name('student.management.index'); 
 
-        // Thesis Management
+        # Thesis Management
         Route::get('thesis', function () {
-            return Inertia::render('Student/management/thesis');
+            return Inertia::render('Student/management/thesis-management/thesis');
         })->name('student.management.thesis');
 
         // Defense Management
-        Route::get('defense_matrix', [MatrixController::class, 'index'])
-            ->name('student.management.defense_matrix');
+        Route::get('defense_matrix', [MatrixController::class, 'index'])->name('student.management.defense_matrix');
+
+        // Evaluation Grading
+        Route::get('evaluation', [EvaluationController::class, 'index'])->name('student.management.eval_n_grading');
 
         // Compliance and IP Module
-        Route::get('compliance_ip', function () {
-            return Inertia::render('Student/management/compliance_ip');
-        })->name('student.management.compliance_ip');
+        Route::prefix('compliance')->group(function () {
 
-        // Progress Tracking
-        Route::prefix('progress_tracking')->group(function () {
-            
-            // Default Route: Redirect to Overall Progress
-            Route::get('/', function () {
-                return redirect()->route('student.management.progress_tracking.overall_progress');
-            });
+            Route::get('ip', function () {
+                return Inertia::render('Student/management/compliance-and-ip/compliance-ip');
+            })->name('student.management.compliance.ip');
 
-            // Overall Progress
-            Route::get('overall_progress', function () {
-                return Inertia::render('Student/management/progress_tracking/overall_progress');
-            })->name('student.management.progress_tracking.overall_progress');
-
-            // Status Reports
-            Route::get('status_reports', [ProgressController::class, 'statusReports'])
-                ->name('student.management.progress_tracking.status_reports');
-
+            Route::get('presentation', function () {
+                return Inertia::render('Student/management/compliance-and-ip/public-presentation');
+            })->name('student.management.compliance.presentation');
         });
 
-        // Defense Evaluation
-        Route::get('eval_n_grading', [EvaluationController::class, 'index'])
-            ->name('student.management.eval_n_grading');
+        // Progress Tracking
+        Route::prefix('progress')->group(function () {
+            
+            Route::get('overall', function () {
+                return Inertia::render('Student/management/progress_tracking/overall_progress');
+            })->name('student.management.progress.overall');
 
+            Route::get('reports', [ProgressController::class, 'statusReports'])
+                ->name('student.management.progress.reports');
+        });
     });
 
     // FRONTEND READY
-    Route::get('student/thesis-management', function () {
-        return Inertia::render('Student/thesis-management/thesis');
-    })->name('student.thesis-management');
+    // Route::get('student/thesis-management', function () {
+    //     return Inertia::render('Student/thesis-management/thesis');
+    // })->name('student.thesis-management');
 
-    Route::get('student/ip-plagiarism', function () {
-        return Inertia::render('Student/compliance and ip/compliance-ip');
-    })->name('student.compliance_ip');
 
-    Route::get('student/public-presentation', function () {
-        return Inertia::render('Student/compliance and ip/public-presentation');
-    })->name('student.public_presentation');
+    
+    // Route::get('student/ip-plagiarism', function () {
+    //     return Inertia::render('Student/compliance and ip/compliance-ip');
+    // })->name('student.compliance_ip');
 
-    Route::get('student/progress', function () {
-        return Inertia::render('Student/progress-tracking/progress');
-    })->name('student.progress');
+    // Route::get('student/public-presentation', function () {
+    //     return Inertia::render('Student/compliance and ip/public-presentation');
+    // })->name('student.public_presentation');
 
-    Route::get('student/defense', function () {
-        return Inertia::render('Student/defense');
-    })->name('student.defense');
 
-    Route::get('student/profilemanagement', function () {
-        return Inertia::render('Student/profilemanagement');
-    })->name('student.profilemanagement');
+    // Route::get('student/progress', function () {
+    //     return Inertia::render('Student/progress-tracking/progress');
+    // })->name('student.progress');
 
-    Route::get('student/evaluation-and-grading', function () {
-        return Inertia::render('Student/evaluation-and-grading');
-    })->name('student.evaluation-and-grading');
 
-    Route::get('resources', function () {
-        return Inertia::render('Student/resources');
-    })->name('student.resources');
+    // Route::get('student/defense', function () {
+    //     return Inertia::render('Student/defense');
+    // })->name('student.defense');
 
-    Route::get('repository', function () {
-        return Inertia::render('Student/repository');
-    })->name('student.repository');
+    // Route::get('student/profilemanagement', function () {
+    //     return Inertia::render('Student/profilemanagement');
+    // })->name('student.profilemanagement');
+
+    // Route::get('student/evaluation-and-grading', function () {
+    //     return Inertia::render('Student/evaluation-and-grading');
+    // })->name('student.evaluation-and-grading');
+
+    // Route::get('resources', function () {
+    //     return Inertia::render('Student/resources');
+    // })->name('student.resources');
+
+    // Route::get('repository', function () {
+    //     return Inertia::render('Student/repository');
+    // })->name('student.repository');
 });
 
 

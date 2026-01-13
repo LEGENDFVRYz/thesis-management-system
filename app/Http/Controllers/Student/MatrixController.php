@@ -110,8 +110,7 @@ class MatrixController extends Controller
             ->get();
 
         // dd($student);
-
-        return Inertia::render('Student/management/defense_matrix', [
+        return Inertia::render('Student/management/defense', [
             'schedules' => $schedules,
             'mySection' => $student->section,
             'yearLevel' => $yearLevel,
