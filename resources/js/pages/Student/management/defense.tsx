@@ -35,7 +35,7 @@ interface DefenseSchedule {
     defense_time_range: string; 
     members: string;            
     panelists: string;          
-    status?: string;            
+    status: string;            
 }
 
 /**
@@ -121,14 +121,12 @@ export default function StudentDefense({ schedules }: { schedules: DefenseSchedu
      * Logic: Filtering data based on status toggle
      * TEMPORARY LOGIC - this will be change by status later
      */
-    const filteredData = defensesData?.filter((def) => {
-        const defDate = new Date(def.defense_date);
-        const today = new Date();
-        today.setHours(0,0,0,0); 
+     const filteredData = defensesData?.filter((def) => {
 
-        const isUpcoming = defDate >= today;
-        
-        return statusFilter === "upcoming" ? isUpcoming : !isUpcoming;
+        const status = def.status?.toLowerCase();
+
+        return statusFilter === "upcoming" ? (status === "upcoming" || !status) : status === "completed";
+
     }) || [];
 
     // --- HELPER TO RENDER STACKED NAMES ---

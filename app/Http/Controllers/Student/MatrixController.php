@@ -17,8 +17,7 @@ class MatrixController extends Controller
     {
         $userId = Auth::id();
 
-        // 1. Get Logged-in Student's Section AND Batch (School Year)
-        // We join tables to find out which School Year the student's group belongs to.
+        // 1. Get Logged-in Student's Info
         $student = DB::table('tbl_students')
             ->join('tbl_thesis_groups', 'tbl_students.group_id', '=', 'tbl_thesis_groups.id')
             ->join('tbl_section_advisers', 'tbl_thesis_groups.section_adviser_id', '=', 'tbl_section_advisers.id')
@@ -36,7 +35,7 @@ class MatrixController extends Controller
             abort(403, 'Student record or Thesis Group not found.');
         }
 
-        // 2. Get Active Year (Keep this for your Group Code calculation)
+        // 2. Get Active Year
         $activeYear = DB::table('tbl_school_years')
             ->join('tbl_semesters', 'tbl_school_years.id', '=', 'tbl_semesters.school_year_id')
             ->where('tbl_semesters.is_active', true)
@@ -57,20 +56,14 @@ class MatrixController extends Controller
             ->join('tbl_faculties as adviser', 'tbl_faculty_assignments.faculty_id', '=', 'adviser.id')
             ->leftJoin('tbl_school_years', 'tbl_faculty_assignments.sy_id', '=', 'tbl_school_years.id')
             
-            // Group Members
+            // Group Members (Keep as Join since it's standard)
             ->leftJoin('tbl_students', 'tbl_thesis_groups.id', '=', 'tbl_students.group_id')
 
-            // Panelists
-            ->leftJoin('tbl_endorsed_panels', function($join) {
-                $join->on('tbl_defense_matrices.id', '=', 'tbl_endorsed_panels.defense_matrix_id')
-                     ->where('tbl_endorsed_panels.is_confirmed', true);
-            })
-            ->leftJoin('tbl_faculty_assignments as panel_assign', 'tbl_endorsed_panels.panel_id', '=', 'panel_assign.id')
-            ->leftJoin('tbl_faculties as panel_faculty', 'panel_assign.faculty_id', '=', 'panel_faculty.id')
+            // REMOVED: Previous LEFT JOINs for panels to avoid duplicates/confusion. 
+            // We now handle panels via Subquery in Select.
 
-            // --- FILTERS ---
-            ->where('tbl_section_advisers.section', $student->section) // Filter by Section
-            ->where('tbl_faculty_assignments.sy_id', $student->sy_id)  // <--- NEW: Filter by Batch/School Year
+            ->where('tbl_section_advisers.section', $student->section)
+            ->where('tbl_faculty_assignments.sy_id', $student->sy_id)
             
             ->select(
                 'tbl_defense_matrices.id as defense_matrix_id',
@@ -78,12 +71,57 @@ class MatrixController extends Controller
                 'tbl_section_advisers.section',
                 'tbl_theses.title as thesis_title',
                 DB::raw("(3 + ($activeYear - tbl_school_years.year)) as year_level"),
+                
                 DB::raw("DATE_FORMAT(tbl_defense_matrices.defense_schedule, '%M %e, %Y') as defense_date"),
                 DB::raw("CONCAT(
                     DATE_FORMAT(tbl_defense_matrices.defense_schedule, '%l:%i %p'), 
                     ' - ', 
                     DATE_FORMAT(DATE_ADD(tbl_defense_matrices.defense_schedule, INTERVAL 1 HOUR), '%l:%i %p')
                 ) as defense_time_range"),
+
+                // --- STATUS LOGIC ---
+                DB::raw("
+                    CASE 
+                        WHEN DATE_ADD(tbl_defense_matrices.defense_schedule, INTERVAL 1 HOUR) < NOW() 
+                             AND (
+                                SELECT COUNT(*) 
+                                FROM tbl_defense_evaluations 
+                                WHERE tbl_defense_evaluations.defense_id = tbl_defense_matrices.id
+                             ) >= 3
+                        THEN 'completed'
+                        ELSE 'upcoming'
+                    END as status
+                "),
+
+                // --- CONDITIONAL PANELISTS LOGIC ---
+                // IF Status is 'completed' -> Show Evaluators (from tbl_defense_evaluations)
+                // ELSE -> Show Endorsed Panels (from tbl_endorsed_panels)
+                DB::raw("
+                    CASE 
+                        WHEN DATE_ADD(tbl_defense_matrices.defense_schedule, INTERVAL 1 HOUR) < NOW() 
+                             AND (
+                                SELECT COUNT(*) 
+                                FROM tbl_defense_evaluations 
+                                WHERE tbl_defense_evaluations.defense_id = tbl_defense_matrices.id
+                             ) >= 3
+                        THEN (
+                            SELECT GROUP_CONCAT(DISTINCT CONCAT(f.name_prefix, ' ', f.first_name, ' ', f.last_name) SEPARATOR ', ')
+                            FROM tbl_defense_evaluations de
+                            JOIN tbl_faculty_assignments fa ON de.evaluator_id = fa.id
+                            JOIN tbl_faculties f ON fa.faculty_id = f.id
+                            WHERE de.defense_id = tbl_defense_matrices.id
+                        )
+                        ELSE (
+                            SELECT GROUP_CONCAT(DISTINCT CONCAT(f.name_prefix, ' ', f.first_name, ' ', f.last_name) SEPARATOR ', ')
+                            FROM tbl_endorsed_panels ep
+                            JOIN tbl_faculty_assignments fa ON ep.panel_id = fa.id
+                            JOIN tbl_faculties f ON fa.faculty_id = f.id
+                            WHERE ep.defense_matrix_id = tbl_defense_matrices.id
+                            AND ep.is_confirmed = 1
+                        )
+                    END as panelists
+                "),
+
                 DB::raw("
                     CONCAT(
                         (3 + ($activeYear - tbl_school_years.year)), 
@@ -92,8 +130,7 @@ class MatrixController extends Controller
                     ) AS group_code
                 "),
                 DB::raw("CONCAT(adviser.name_prefix, ' ', adviser.first_name, ' ', adviser.last_name) as adviser_name"),
-                DB::raw("GROUP_CONCAT(DISTINCT CONCAT(tbl_students.first_name, ' ', tbl_students.last_name) SEPARATOR ', ') as members"),
-                DB::raw("GROUP_CONCAT(DISTINCT CONCAT(panel_faculty.name_prefix, ' ', panel_faculty.first_name, ' ', panel_faculty.last_name) SEPARATOR ', ') as panelists")
+                DB::raw("GROUP_CONCAT(DISTINCT CONCAT(tbl_students.first_name, ' ', tbl_students.last_name) SEPARATOR ', ') as members")
             )
             ->groupBy(
                 'tbl_defense_matrices.id',
@@ -109,7 +146,8 @@ class MatrixController extends Controller
             ->orderBy('tbl_defense_matrices.defense_schedule', 'asc')
             ->get();
 
-        // dd($student);
+        // dd($schedules);
+
         return Inertia::render('Student/management/defense', [
             'schedules' => $schedules,
             'mySection' => $student->section,
