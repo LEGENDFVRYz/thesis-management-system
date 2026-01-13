@@ -103,7 +103,7 @@ Route::middleware('gues')->group(function () {
 Route::post('logout', [StudentLoginController::class, 'destroy'])->name('student.logout');
 
 // AUTHENTICATED STUDENT ROUTES
-Route::middleware(['auth', 'role:student'])->prefix('student')->group(function () {
+Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Student/dashboard'); // Your Student Dashboard Component
     })->name('dashboard');
