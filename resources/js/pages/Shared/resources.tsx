@@ -31,18 +31,30 @@ import AppLayout from '@/layouts/app-layout';
 import { resources } from '@/routes/admin/index';
 import { toggle, remove, store } from '@/routes/admin/resources/index';
 import { download } from '@/routes/resources/index';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 import { BookMarked, Upload, FileText, Download, Check, AlertCircle} from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
+import { format } from 'date-fns';
 
+//SEtup
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Resources',
         href: resources().url,
     },
 ];
+
+const pageHeader: PageHeaderProps = {
+    title: "Resources",
+    subtitle: "Access official department templates and resources with full administrative controls",
+    icon: (
+        // pa correct nalang
+        <BookMarked className="w-8 h-8 text-primary" />
+    ),
+};
+
 
 interface Resource {
     id: number;
@@ -124,16 +136,13 @@ export default function Resources({ resources }: Props) {
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout 
+            breadcrumbs={breadcrumbs}
+            pageHeader={pageHeader}
+        >
             <Head title="Resources" />
 
             <div className="flex flex-col min-h-screen -mt-4 -mx-4 -mb-4 md:-mt-4 md:-mx-6 md:-mb-6 lg:-mt-6 lg:-mx-8 lg:-mb-8">
-                <HeaderCard 
-                    title="Resources" 
-                    description="Access official department templates and resources with full administrative controls"
-                    icon={<BookMarked className="w-8 h-8 text-primary" />}
-                    className="w-full rounded-none border-t-0 border-x-0" 
-                />
 
                 <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 lg:p-8 w-full">
                     <FilterSearchSection variant="DefenseManagement" />
@@ -166,22 +175,22 @@ export default function Resources({ resources }: Props) {
                                         <TableCell className="text-left py-4 px-4">
                                             <div className="flex items-center gap-2">
                                                 <FileText className="w-4 h-4 text-primary" />
-                                                <span className="truncate max-w-[200px]">{file.name}</span>
+                                                <span className="truncate max-w-[200px]">{file.file_name}</span>
                                             </div>
                                         </TableCell>
-                                        <TableCell>{file.type}</TableCell>
-                                        <TableCell>{file.uploadedBy}</TableCell>
+                                        <TableCell>{file.file_type}</TableCell>
+                                        <TableCell>{file.uploaded_by}</TableCell>
                                         <TableCell>
                                             <div className="flex flex-col">
-                                                <span>{file.date}</span>
-                                                <span className="text-xs text-muted-foreground">{file.time}</span>
+                                                <span>{format(new Date(file.uploaded_at), 'MMM d, yyyy')}</span>
+                                                <span className="text-xs text-muted-foreground">{format(new Date(file.uploaded_at), 'h:mm a')}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell>
                                             <span className={`px-3 py-1 rounded-full text-[11px] font-bold border ${
-                                                file.status === 'Active' ? 'bg-[var(--completed-bg)] text-[var(--completed-font-color)] border-[var(--completed-border)]' : 'bg-[var(--pending-bg)] text-[var(--pending-font-color)] border-[var(--pending-border)]'
+                                                file.is_active ? 'bg-[var(--completed-bg)] text-[var(--completed-font-color)] border-[var(--completed-border)]' : 'bg-[var(--pending-bg)] text-[var(--pending-font-color)] border-[var(--pending-border)]'
                                             }`}>
-                                                {file.status}
+                                                {file.is_active ? 'Active' : 'Inactive'}
                                             </span>
                                         </TableCell>
                                         <TableCell>
@@ -349,9 +358,9 @@ export default function Resources({ resources }: Props) {
                     </DialogContent>
                 </Dialog>
 
-                <div className="w-full mt-[120px]">
+                {/* <div className="w-full mt-[120px]">
                     <NavFooter />
-                </div>
+                </div> */}
             </div>
 
             {/* Upload Testing Modal */}
