@@ -1,7 +1,7 @@
 import { HeaderCard } from '@/components/ui/card';
 import { NavFooter } from '@/components/nav-footer';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Users, User } from 'lucide-react';
 import { dashboard } from '@/routes';
@@ -10,10 +10,20 @@ import { Button } from '@/components/ui/button';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Profile Management',
+        title: "Profile Management",
         href: dashboard().url,
     },
 ];
+
+const pageHeader: PageHeaderProps = {
+    title: "Profile Management",
+    subtitle: "Manage admin account settings and security preferences",
+    icon: (
+        // pa correct nalang
+        <Users className="w-8 h-8 text-primary" />
+    ),
+};
+
 
 export default function Profile() {
     const [profileData] = useState({
@@ -28,18 +38,13 @@ export default function Profile() {
     const [twoFactor, setTwoFactor] = useState(false);
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout 
+            breadcrumbs={breadcrumbs}
+            pageHeader={pageHeader}
+        >
             <Head title="Profile Management" />
 
             <div className="flex flex-col min-h-screen -mt-4 -mx-4 -mb-4 md:-mt-4 md:-mx-6 md:-mb-6 lg:-mt-6 lg:-mx-8 lg:-mb-8 bg-slate-50/50">
-                
-                {/* Header */}
-                <HeaderCard 
-                    title="Profile Management" 
-                    description="Manage admin account settings and security preferences"
-                    icon={<Users className="w-8 h-8 text-primary" />}
-                    className="w-full lg:w-full rounded-none border-t-0 border-x-0" 
-                />
 
                 {/* Main Content */}
                 <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 lg:p-8 w-full max-w-7xl mx-auto">
@@ -185,9 +190,9 @@ export default function Profile() {
                 </div>
 
                 {/* Footer */}
-                <div className="w-full mt-[120px]">
+                {/* <div className="w-full mt-[120px]">
                     <NavFooter />
-                </div>
+                </div> */}
             </div>
         </AppLayout>
     );

@@ -409,12 +409,24 @@ SHARED AUTH ROUTES
 */
 Route::middleware(['auth'])->group(function() {
 
-    // Notification Routes
+    // ---- Repository -----
+    Route::get('/test-thesis', function () {
+        return Inertia::render('Shared/repository/thesis');
+    });
+
+    Route::get('/test-thesis-preview', function () {
+        // this one is temporary only, the routing wil be change soon
+        return Inertia::render('Shared/repository/document-preview');
+    });
+
+
+    // ---- Notification Routes ----
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('notifications/load', [NotificationController::class, 'load'])->name('notifications.load');
     Route::post('/notifications/{id}/toggle', [NotificationController::class, 'toggleRead'])->name('notifications.toggle');
+    
 
-    // Profile (Settings) Management Routes
+    // ---- Profile (Settings) Management Routes -----
     Route::get('profilemanagement', function () {
         return Inertia::render('Shared/profilemanagement'); 
     })->name('admin.profilemanagement');
@@ -433,22 +445,5 @@ Route::get('/manuscripts/{id}/stream', [PdfViewerController::class, 'streamPdf']
 
 
 
-// TEMPORARY: view shared thesis page without affecting guest/admin routes
-Route::get('/test-thesis', function () {
-    return Inertia::render('Shared/repository/thesis');
-});
-
-Route::get('/test-thesis-preview', function () {
-    return Inertia::render('Shared/repository/document-preview', [
-        'document' => [
-            'title' => 'Sample Thesis',
-            'url' => '/storage/sample.pdf'
-        ]
-    ]);
-});
-
-Route::get('/committee/proposal-review', function () {
-    return Inertia::render('Committee/proposal-review');
-});
 
 require __DIR__.'/settings.php';

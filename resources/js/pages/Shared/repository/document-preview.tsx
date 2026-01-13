@@ -1,10 +1,28 @@
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, FileText } from 'lucide-react';
+import { ArrowLeft, FileText, Users } from 'lucide-react';
 import { AppHeader } from '@/components/app-header';
 import { NavFooter } from '@/components/nav-footer';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import * as React from 'react';
+import RepositoryLayout from '.';
+import { BreadcrumbItem, PageHeaderProps } from '@/types';
+import { theses } from '@/routes/repository';
+
+
+// Setup
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'Thesis Archive', href: theses().url },
+];
+
+const pageHeader: PageHeaderProps = {
+    title: "Thesis Archive",
+    subtitle: "Browse and explore student thesis projects",
+    icon: (
+        // pa correct nalang
+        <Users className="w-8 h-8 text-primary" />
+    ),
+};
 
 interface ThesisData {
     title: string;
@@ -80,8 +98,12 @@ export default function DocumentPreview({ thesis }: DocumentPreviewProps) {
 
     return (
         <>
+        <RepositoryLayout
+            breadcrumbs={breadcrumbs}
+            pageHeader={pageHeader}
+        >
+        
             <Head title="Thesis Archive" />
-            <AppHeader />
 
             <div className="min-h-screen bg-background">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -300,7 +322,9 @@ export default function DocumentPreview({ thesis }: DocumentPreviewProps) {
                 </div>
             </div>
 
-            <NavFooter />
+            {/* <NavFooter /> */}
+
+        </RepositoryLayout>
         </>
     );
 }

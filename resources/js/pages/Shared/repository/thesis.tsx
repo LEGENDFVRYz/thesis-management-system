@@ -7,7 +7,24 @@ import { ArchiveCard } from '@/components/ui/card';
 import { RepositoryFilterBar } from '@/components/repository-filter-bar';
 import RepositoryLayout from './index';
 import { index, theses } from '@/routes/repository';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
+import { Users } from 'lucide-react';
+
+
+// Setup
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'Thesis Archive', href: theses().url },
+];
+
+const pageHeader: PageHeaderProps = {
+    title: "Thesis Archive",
+    subtitle: "Browse and explore student thesis projects",
+    icon: (
+        // pa correct nalang
+        <Users className="w-8 h-8 text-primary" />
+    ),
+};
+
 
 interface ThesisProps {
     search?: string;
@@ -25,11 +42,6 @@ export default function Thesis({ search = '' }: ThesisProps) {
         selectedSpecialization: '',
         tags: []
     });
-
-    const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Repository', href: index().url },
-        { title: 'Thesis Archive', href: theses().url },
-    ];
 
     // Sample repository data
     const allRepositories = [
@@ -342,14 +354,13 @@ export default function Thesis({ search = '' }: ThesisProps) {
 
     return (
         <>
-            <Head title="Thesis Archive" />
 
-            <RepositoryLayout breadcrumbs={breadcrumbs}>
-
-            <AppContent
-                title="Thesis Archive"
-                subtitle="Browse and explore student thesis projects"
+            <RepositoryLayout 
+                breadcrumbs={breadcrumbs}
+                pageHeader={pageHeader}
             >
+                <Head title="Thesis Archive" />
+
                     {/* Filter Bar */}
                     <div className="mb-8">
                         <RepositoryFilterBar onFilterChange={setFilters} />
@@ -391,10 +402,10 @@ export default function Thesis({ search = '' }: ThesisProps) {
                             </div>
                         )}
                     </div>
-                </AppContent>
+
             </RepositoryLayout>
 
-            <NavFooter />
+            {/* <NavFooter /> */}
         </>
     );
 }
