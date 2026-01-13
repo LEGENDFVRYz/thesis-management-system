@@ -24,7 +24,7 @@ class EvaluationController extends Controller
             ->first();
 
         if (!$student || !$student->group_id) {
-            return Inertia::render('Student/management/eval_n_grading', ['hasRecord' => false]);
+            return Inertia::render('Student/management/evaluation-and-grading', ['hasRecord' => false]);
         }
 
         // 2. Find the LATEST Defense Matrix for this Group
@@ -39,7 +39,7 @@ class EvaluationController extends Controller
             ->first();
 
         if (!$latestDefense) {
-            return Inertia::render('Student/management/eval_n_grading', ['hasRecord' => false]);
+            return Inertia::render('Student/management/evaluation-and-grading', ['hasRecord' => false]);
         }
 
         $defenseId = $latestDefense->id;
