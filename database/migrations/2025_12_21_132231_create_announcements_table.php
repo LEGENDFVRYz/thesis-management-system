@@ -13,15 +13,19 @@ return new class extends Migration
     {
         Schema::create('tbl_announcements', function (Blueprint $table) {
             $table->id();
-
+            
+            // Foreign Key
             $table->foreignId('semester_id')
                   ->constrained('tbl_semesters')
-                  ->onDelete('cascade');
+                  ->cascadeOnDelete();
 
-            // Derived
-            // $table->string('title'); // Copied from template for convenience
+            // Content Fields
+            $table->text('subject');
+            $table->string('priority_level'); // e.g., 'Low', 'Normal', 'High', 'Urgent'
+            $table->text('message');
+            $table->string('target_audience'); // e.g., 'All', 'Student', 'Faculty'
 
-            $table->date('due_date');
+            $table->timestamps();
         });
     }
 

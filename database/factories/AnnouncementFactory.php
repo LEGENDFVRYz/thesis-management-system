@@ -17,10 +17,15 @@ class AnnouncementFactory extends Factory
      */
     public function definition(): array
     {
+        // Ensure we have a semester ID to attach to
+        $semesterId = Semester::inRandomOrder()->first()?->id ?? Semester::factory()->create()->id;
+
         return [
-            'semester_id' => Semester::factory(),
-            // 'title'       => $this->faker->sentence(),
-            'due_date'    => $this->faker->dateTimeBetween('now', '+2 weeks'),
+            'semester_id' => $semesterId,
+            'subject' => $this->faker->sentence(4), // e.g. "Thesis Defense Schedule Update"
+            'priority_level' => $this->faker->randomElement(['Low', 'Medium', 'High', 'Urgent']),
+            'message' => $this->faker->paragraph(3),
+            'target_audience' => $this->faker->randomElement(['All', 'Student', 'Faculty', 'Adviser']),
         ];
     }
 }
