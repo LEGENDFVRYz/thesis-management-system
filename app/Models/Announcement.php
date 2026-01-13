@@ -10,24 +10,18 @@ class Announcement extends Model
     use HasFactory;
 
     protected $table = 'tbl_announcements';
-    public $timestamps = false;
 
     protected $fillable = [
         'semester_id',
-        // 'title',
-        'due_date',
+        'subject',
+        'priority_level',
+        'message',
+        'target_audience',
     ];
 
-    protected $casts = [
-        'due_date' => 'date',
-    ];
-
-    /*
-    ==================================================================================
-    RELATIONSHIPS
-    ==================================================================================
-    */
-
+    /**
+     * Get the semester that owns the announcement.
+     */
     public function semester()
     {
         return $this->belongsTo(Semester::class, 'semester_id');
