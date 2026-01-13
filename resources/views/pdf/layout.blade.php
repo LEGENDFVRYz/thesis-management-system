@@ -1,62 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Report</title>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>PDF Report</title>
 
-    {{-- 
-        STYLE INJECTION:
-        - Use ONLY compiled Vite CSS
-        - Read hashed file via manifest.json
-        - Inline CSS for Browsershot compatibility
-    --}}
-    @php
-        $manifestPath = public_path('build/manifest.json');
+        <style>
+            /* ===============================
+                PDF-SPECIFIC OVERRIDES
+            =============================== */
+            body {
+                margin: 0;
+                padding: 0;
+                color: #000000;               
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 16px;
+                line-height: 1.5;
 
-        if (! file_exists($manifestPath)) {
-            throw new RuntimeException('Vite manifest not found. Run npm run build.');
-        }
+                /* Ensure colors render correctly in PDFs */
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
 
-        $manifest = json_decode(file_get_contents($manifestPath), true);
+            /* ===============================
+            TYPOGRAPHY HELPERS
+            =============================== */
 
-        if (! isset($manifest['resources/js/app.tsx']['css'][0])) {
-            throw new RuntimeException('CSS entry not found in Vite manifest.');
-        }
+            h1 {
+                font-size: 28px;
+                margin: 0 0 16px 0;
+            }
 
-        $cssFile = public_path('build/' . $manifest['resources/js/app.tsx']['css'][0]);
-    @endphp
+            h2 {
+                font-size: 22px;
+                margin: 0 0 14px 0;
+            }
 
+            h3 {
+                font-size: 18px;
+                margin: 0 0 12px 0;
+            }
 
-    <style>
-        {!! file_get_contents($cssFile) !!}
+            p {
+                margin: 0 0 12px 0;
+            }
 
-        /* ===============================
-            PDF-SPECIFIC OVERRIDES
-        =============================== */
-        body {
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-            font-family: sans-serif;
-        }
+            /* ===============================
+            TABLE FOR PDF
+            =============================== */
 
-        .page-break {
-            page-break-after: always;
-        }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
 
-        tr {
-            page-break-inside: avoid;
-        }
+            thead {
+                display: table-header-group;
+            }
 
-        thead {
-            display: table-header-group;
-        }
-    </style>
-</head>
-<body class="text-black text-2md">
-    
-    {{-- Content Slot --}}
-    @yield('content')
+            tr {
+                page-break-inside: avoid;
+            }
 
-</body>
+            th,
+            td {
+                padding: 8px;
+                text-align: left;
+                vertical-align: top;
+            }
+
+            /* ===============================
+            PAGE CONTROL
+            =============================== */
+            .page-break {
+                page-break-after: always;
+            }
+        </style>
+    </head>
+    <body>
+        {{-- Content Slot --}}
+        @yield('content')
+
+    </body>
 </html>
