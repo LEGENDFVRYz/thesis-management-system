@@ -1,4 +1,4 @@
-//UDPATE: CREATED a new filter-serch section for faculty since walang existing na reusbale component for this
+//UDPATE: CREATED a filter-serch section for faculty since walang existing na reusbale component specifically for this
 import { useRef } from 'react';
 import { Filter as FilterIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';

@@ -1,4 +1,4 @@
-//UPDATE: Used existing table component
+//UPDATE: Used existing table component for faculty
 import { Button } from '@/components/ui/button';
 import {
   Table,

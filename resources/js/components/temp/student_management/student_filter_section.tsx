@@ -1,3 +1,4 @@
+//UPDATE: Used the existing filter search component variant for Student Management
 import FilterSearchSection from '@/components/filter-search-section';
 
 interface FilterSectionProps {

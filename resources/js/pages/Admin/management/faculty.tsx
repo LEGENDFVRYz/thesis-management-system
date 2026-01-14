@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { Head } from '@inertiajs/react';
 import ManagementLayout from '@/pages/Admin/management/index';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
@@ -6,14 +6,17 @@ import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 // SHARED COMPONENTS 
 import { NavFooter } from '@/components/nav-footer';
 import { Button } from '@/components/ui/button';
+import { Filter as FilterIcon } from 'lucide-react';
 import { Icon } from '@/components/icon-index';
+import { SearchBar } from '@/components/filter-search';
+import { Sort1, Filter1 } from '@/components/filter-search';
 
 // FACULTY COMPONENTS
+import { Dropdown } from '../../../components/temp/faculty_management/faculty_dropdown';
 import { FacultyTable } from '../../../components/temp/faculty_management/faculty_table';
 import { Faculty } from '../../../components/temp/faculty_management/faculty_types';
 import { AddFacultyModal } from '../../../components/temp/faculty_management/faculty_add_modal';
 import { ViewEditFacultyModal } from '../../../components/temp/faculty_management/faculty_viewandedit_modal';
-import { FacultyFilterSearch } from '../../../components/temp/faculty_management/faculty_filter_search';
 
 // Page Setup
 const breadcrumbs: BreadcrumbItem[] = [
@@ -79,6 +82,9 @@ export default function FacultyManagement({ faculties }: { faculties: RawFaculty
     const [addFacultyOpen, setAddFacultyOpen] = useState(false);
     const [viewEditFacultyOpen, setViewEditFacultyOpen] = useState(false);
     const [selectedFaculty, setSelectedFaculty] = useState<Faculty | null>(null);
+    
+    const sortButtonRef = useRef<HTMLButtonElement>(null);
+    const filterButtonRef = useRef<HTMLButtonElement>(null);
 
     // Apply search 
     const filteredAndSortedData = useMemo(() => {
@@ -100,16 +106,6 @@ export default function FacultyManagement({ faculties }: { faculties: RawFaculty
         setSearchQuery("");
     };
 
-    const handleSortToggle = () => {
-        setSortOpen(!sortOpen);
-        setFilterOpen(false);
-    };
-
-    const handleFilterToggle = () => {
-        setFilterOpen(!filterOpen);
-        setSortOpen(false);
-    };
-
     const handleViewEdit = (faculty: Faculty) => {
         setSelectedFaculty(faculty);
         setViewEditFacultyOpen(true);
@@ -122,47 +118,119 @@ export default function FacultyManagement({ faculties }: { faculties: RawFaculty
                 pageHeader={pageHeader}
             >
                 {/* Filter & Search Section */}
-                <FacultyFilterSearch
-                    searchQuery={searchQuery}
-                    onSearchChange={setSearchQuery}
-                    onClearSearch={handleClearSearch}
-                    sortOpen={sortOpen}
-                    filterOpen={filterOpen}
-                    onSortToggle={handleSortToggle}
-                    onFilterToggle={handleFilterToggle}
-                    onSortClose={() => setSortOpen(false)}
-                    onFilterClose={() => setFilterOpen(false)}
-                />
+                {/* There is no existing Filter Search Component variant for Faculty Management */}
+            <div className="mb-4">
+                <div className="flex flex-col items-start self-stretch w-full max-w-[1360px] bg-card rounded-[10px] border-[0.8px] border-primary/20 shadow-sm h-[134px] p-[24.8px] gap-4 font-dm">
+                    {/* Header */}
+                    <div className="flex flex-row items-center gap-2 self-stretch w-full h-6">
+                        <FilterIcon className="w-5 h-5 text-primary" />
+                        <h2 className="font-dm font-normal text-base leading-6 text-primary">
+                            Search, Sort, & Filter
+                        </h2>
+                    </div>
 
-                {/* Add Faculty Button */}
-                <div className="flex justify-end mb-6">
-                    <Button onClick={() => setAddFacultyOpen(true)}> + Add Faculty </Button>
+                    {/* Controls Row */}
+                    <div className="flex flex-row items-center gap-[10px] self-stretch w-full">
+                        {/* Search Bar */}
+                        <div className="flex-1">
+                            <SearchBar 
+                                variant="filter-section" 
+                                placeholder="Search by name, email, or ID..." 
+                                value={searchQuery} 
+                                onChange={setSearchQuery} 
+                            />
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex flex-row items-center gap-[10px]">
+                            {/* Sort Button with Dropdown */}
+                            <div className="relative">
+                                <Button 
+                                    ref={sortButtonRef}
+                                    variant="secondary" 
+                                    size="icon" 
+                                    className="rounded-lg border-none"
+                                    onClick={() => {
+                                        setSortOpen(!sortOpen);
+                                        setFilterOpen(false);
+                                    }}
+                                >
+                                    <Icon name="sortDefault" size={16} />
+                                </Button>
+                                <Dropdown 
+                                    isOpen={sortOpen} 
+                                    onClose={() => setSortOpen(false)}
+                                    triggerRef={sortButtonRef}
+                                >
+                                    <Sort1 />
+                                </Dropdown>
+                            </div>
+
+                            {/* Filter Button with Dropdown */}
+                            <div className="relative">
+                                <Button 
+                                    ref={filterButtonRef}
+                                    variant="secondary" 
+                                    size="icon" 
+                                    className="rounded-lg border-none"
+                                    onClick={() => {
+                                        setFilterOpen(!filterOpen);
+                                        setSortOpen(false);
+                                    }}
+                                >
+                                    <FilterIcon className="w-4 h-4" />
+                                </Button>
+                                <Dropdown 
+                                    isOpen={filterOpen} 
+                                    onClose={() => setFilterOpen(false)}
+                                    triggerRef={filterButtonRef}
+                                >
+                                    <Filter1 />
+                                </Dropdown>
+                            </div>
+
+                            {/* Clear Search Button */}
+                            <Button 
+                                variant="negative" 
+                                className="px-4 py-2 gap-2 h-9 rounded-lg min-w-[101px]"
+                                onClick={handleClearSearch}
+                            >
+                                <span className="text-[13.33px] font-medium">Clear Search</span>
+                            </Button>
+                        </div>
+                    </div>
                 </div>
-                
-                {/* Data Table */}
-                <FacultyTable 
-                    data={filteredAndSortedData}
-                    onViewEdit={handleViewEdit}
-                />
-                
-                {/* Modals */}
-                <AddFacultyModal 
-                    isOpen={addFacultyOpen} 
-                    onClose={() => setAddFacultyOpen(false)} 
-                />
-                
-                <ViewEditFacultyModal 
-                    isOpen={viewEditFacultyOpen} 
-                    onClose={() => {
-                        setViewEditFacultyOpen(false);
-                        setSelectedFaculty(null);
-                    }}
-                    faculty={selectedFaculty}
-                />
-            </ManagementLayout>
+            </div>
+
+            {/* Add Faculty Button */}
+            <div className="flex justify-end mb-6">
+                <Button onClick={() => setAddFacultyOpen(true)}> + Add Faculty </Button>
+            </div>
             
-            {/* <NavFooter /> */}
-        </>
+            {/* Data Table */}
+            <FacultyTable 
+                data={filteredAndSortedData}
+                onViewEdit={handleViewEdit}
+            />
+            
+            {/* Modals */}
+            <AddFacultyModal 
+                isOpen={addFacultyOpen} 
+                onClose={() => setAddFacultyOpen(false)} 
+            />
+            
+            <ViewEditFacultyModal 
+                isOpen={viewEditFacultyOpen} 
+                onClose={() => {
+                    setViewEditFacultyOpen(false);
+                    setSelectedFaculty(null);
+                }}
+                faculty={selectedFaculty}
+            />
+        </ManagementLayout>
+        
+        {/* <NavFooter /> */}
+    </>
     );
 }
 
