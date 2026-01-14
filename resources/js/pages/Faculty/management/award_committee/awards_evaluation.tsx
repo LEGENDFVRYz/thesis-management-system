@@ -13,7 +13,7 @@ import { ViewEvaluateModal } from './components/awards_ViewandEval_modal';
 import { ViewResultsModal } from './components/awards_viewEvalResult_modal';
 
 // UTILITIES AND SAMPLE DATA
-import { EvaluationRow } from './components/awards_types';
+import { EvaluationRow } from './components/awards_utils';
 import { getEvaluationStatus } from './components/awards_utils';
 import { evaluationData, resultsData, detailedEvaluationResults } from './components/awards_sampleData';
 import { Icon } from '@/components/icon-index';
@@ -90,11 +90,7 @@ export default function Dashboard() {
                 {/* <div className="border border-primary mb-4"></div> */}
                 
                  {/* Tab Navigation */}
-                <div className="mb-6">
-                    <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
-                </div>
-
-                {/* appropriate page based on the active tab */}
+                <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
                 {activeTab === 'evaluation' ? (
                     <EvalPage />
                 ) : (

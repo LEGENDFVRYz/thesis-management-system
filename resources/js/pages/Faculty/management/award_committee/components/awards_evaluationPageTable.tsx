@@ -9,7 +9,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { EvaluationRow } from './awards_types';
+import { EvaluationRow } from './awards_utils';
 import { getCriteriaColor, getStatusColor } from './awards_utils';
 
 interface EvaluationPageProps {

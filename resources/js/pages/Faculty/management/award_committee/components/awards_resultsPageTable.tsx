@@ -9,18 +9,8 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { getRankColor } from './awards_utils';
+import { getRankColor, ResultRow } from './awards_utils';
 
-export interface ResultRow {
-    rank: number;
-    groupCode: string;
-    title: string;
-    criteria1: number | null;
-    criteria2: number | null;
-    criteria3: number | null;
-    totalScore: number | null;
-    isComplete: boolean;
-}
 
 interface ResultsPageProps {
     resultsData: ResultRow[];

@@ -1,4 +1,4 @@
-import { EvaluationStatus } from './awards_types';
+import { EvaluationStatus } from './awards_utils';
 
 interface PageHeaderProps {
     activeTab: 'evaluation' | 'results';

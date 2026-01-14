@@ -6,7 +6,7 @@ import { EvaluationPageTable } from '../components/awards_evaluationPageTable';
 import { ViewEvaluateModal } from '../components/awards_ViewandEval_modal';
 
 // UTILITIES AND SAMPLE DATA
-import { EvaluationRow } from '../components/awards_types';
+import { EvaluationRow } from '../components/awards_utils';
 import { evaluationData } from '../components/awards_sampleData';
 
 
@@ -21,14 +21,17 @@ export default function EvalPage() {
 
     return (
         <>
-            {/* Page Header */}
+            {/* Page Header Desc */}
             <PageHeader activeTab="evaluation" />
+            
 
             {/* EvalPage Content */}
+            
             <EvaluationPageTable 
                 evaluationData={evaluationData}
                 onViewEvaluate={handleViewEvaluate}
             />
+
 
             {/* View & Evaluate Modal */}
             <ViewEvaluateModal

@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 // AWARDS COMMITTEE COMPONENTS
 import { PageHeader } from '../components/awards_pageHeader';
-import { ResultsPageTable as ResultsPageComponent } from '../components/awards_resultsPageTable';
+import { ResultsPageTable } from '../components/awards_resultsPageTable';
 import { ViewResultsModal } from '../components/awards_viewEvalResult_modal';
 
 // UTILITIES AND SAMPLE DATA
@@ -36,7 +36,7 @@ export default function ResultsPage() {
             />
 
             {/* Results Content */}
-            <ResultsPageComponent 
+            <ResultsPageTable
                 resultsData={resultsData}
                 onViewEvaluation={handleViewEvaluationResults}
                 onExport={handleExport}
