@@ -9,8 +9,8 @@ import FacultyManagementLayout from '@/pages/Faculty/management/index';
 // AWARDS COMMITTEE COMPONENTS
 import { TabNavigation } from './components/awards_tabNavigation';
 import { PageHeader } from './components/awards_pageHeader';
-import { EvaluationPage } from './components/awards_evaluationPage';
-import { ResultsPage } from './components/awards_resultsPage';
+import { EvaluationPageTable } from './components/awards_evaluationPageTable';
+import { ResultsPageTable } from './components/awards_resultsPageTable';
 import { ViewEvaluateModal } from './components/awards_ViewandEval_modal';
 import { ViewResultsModal } from './components/awards_viewEvalResult_modal';
 
@@ -19,6 +19,10 @@ import { EvaluationRow } from './components/awards_types';
 import { getEvaluationStatus } from './components/awards_utils';
 import { evaluationData, resultsData, detailedEvaluationResults } from './components/awards_sampleData';
 import { Icon } from '@/components/icon-index';
+
+// SPLIT PAGES
+//import { EvalPage } from './evaluation/evalPage';
+//import { ResultsPage } from './evaluation/resultsPage';
 
 
 // SETUP
@@ -35,7 +39,7 @@ const pageHeader: PageHeaderProps = {
     icon: (
         // pa correct nalang
         <Icon
-            name="calendarDefault"
+            name="docuDefault"
             className="w-8 h-8 text-primary"
         />
     ),
@@ -98,12 +102,12 @@ export default function Dashboard() {
 
                 {/* Content Based on Active Tab */}
                 {activeTab === 'evaluation' ? (
-                    <EvaluationPage 
+                    <EvaluationPageTable
                         evaluationData={evaluationData}
                         onViewEvaluate={handleViewEvaluate}
                     />
                 ) : (
-                    <ResultsPage 
+                    <ResultsPageTable
                         resultsData={resultsData}
                         onViewEvaluation={handleViewEvaluationResults}
                         onExport={handleExport}

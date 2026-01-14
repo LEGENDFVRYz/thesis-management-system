@@ -1,4 +1,12 @@
 import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Student } from './student_interface';
 
 interface StudentTableViewProps {
@@ -8,128 +16,98 @@ interface StudentTableViewProps {
 
 export function StudentTableView({ students, onViewStudent }: StudentTableViewProps) {
   return (
-    <div className="overflow-x-auto">
-      <div className="min-w-[1360px]">
-        {/* Table Header*/}
-        <div className="grid grid-cols-8 h-10 rounded-t-lg bg-primary transition-colors duration-200 hover:bg-destructive-foreground">
-          <div className="flex items-center justify-center p-2.5">
-            <span className="text-white text-center font-sans text-[13.33px] font-medium">
+    <div className="bg-white rounded-lg">
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-primary hover:bg-primary">
+            <TableHead className="text-white text-center text-[13.33px] font-medium rounded-tl-lg">
               Student ID
-            </span>
-          </div>
-          <div className="flex items-center justify-center p-2.5">
-            <span className="text-white text-center font-sans text-[13.33px] font-medium">
+            </TableHead>
+            <TableHead className="text-white text-center text-[13.33px] font-medium">
               Student Name
-            </span>
-          </div>
-          <div className="flex items-center justify-center p-2.5">
-            <span className="text-white text-center font-sans text-[13.33px] font-medium">
+            </TableHead>
+            <TableHead className="text-white text-center text-[13.33px] font-medium">
               PUP Webmail
-            </span>
-          </div>
-          <div className="flex items-center justify-center p-2.5">
-            <span className="text-white text-center font-sans text-[13.33px] font-medium">
+            </TableHead>
+            <TableHead className="text-white text-center text-[13.33px] font-medium">
               Group Code
-            </span>
-          </div>
-          <div className="flex items-center justify-center p-2.5">
-            <span className="text-white text-center font-sans text-[13.33px] font-medium">
+            </TableHead>
+            <TableHead className="text-white text-center text-[13.33px] font-medium">
               Block
-            </span>
-          </div>
-          <div className="flex items-center justify-center p-2.5">
-            <span className="text-white text-center font-sans text-[13.33px] font-medium">
+            </TableHead>
+            <TableHead className="text-white text-center text-[13.33px] font-medium">
               Specialization
-            </span>
-          </div>
-          <div className="flex items-center justify-center p-2.5">
-            <span className="text-white text-center font-sans text-[13.33px] font-medium">
+            </TableHead>
+            <TableHead className="text-white text-center text-[13.33px] font-medium">
               Thesis Adviser
-            </span>
-          </div>
-          <div className="flex items-center justify-center p-2.5">
-            <span className="text-white text-center font-sans text-[13.33px] font-medium">
+            </TableHead>
+            <TableHead className="text-white text-center text-[13.33px] font-medium rounded-tr-lg">
               Action
-            </span>
-          </div>
-        </div>
-
-        {/* Table Rows */}
-        {students.length > 0 ? (
-          students.map((student, index) => (
-            <div
-              key={`${student.studentNumber}-${index}`}
-              className="grid grid-cols-8 min-h-10 bg-white border-b border-gray-100 hover:bg-breadcrumb transition-colors"
-            >
-              {/* Student ID */}
-              <div className="flex items-center justify-center p-2.5">
-                <span className="text-black text-center text-[13.33px] font-medium">
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {students.length > 0 ? (
+            students.map((student, index) => (
+              <TableRow key={`${student.studentNumber}-${index}`} className="hover:bg-breadcrumb">
+                {/* Student ID */}
+                <TableCell className="text-center text-[13.33px] font-medium">
                   {student.studentNumber}
-                </span>
-              </div>
+                </TableCell>
 
-              {/* Student Name */}
-              <div className="flex items-center justify-center p-2.5">
-                <span className="text-center text-[13.33px] font-medium">
+                {/* Student Name */}
+                <TableCell className="text-center text-[13.33px] font-medium">
                   {student.name}
-                </span>
-              </div>
+                </TableCell>
 
-              {/* PUP Webmail */}
-              <div className="flex items-center justify-center p-2.5">
-                <p className="text-center text-[13.33px] font-medium truncate leading-tight">
+                {/* PUP Webmail */}
+                <TableCell className="text-center text-[13.33px] font-medium">
                   {student.email}
-                </p>
-              </div>
+                </TableCell>
 
-              {/* Group Code */}
-              <div className="flex items-center justify-center p-2.5">
-                <span className="text-sm">
+                {/* Group Code */}
+                <TableCell className="text-center text-[13.33px] font-medium">
                   {student.groupCode}
-                </span>
-              </div>
+                </TableCell>
 
-              {/* Block */}
-              <div className="flex items-center justify-center p-2.5">
-                <span className="text-black text-center font-sans text-[13.33px] font-medium">
+                {/* Block */}
+                <TableCell className="text-center text-[13.33px] font-medium">
                   BSCPE {student.yearLevel}-{student.block}
-                </span>
-              </div>
+                </TableCell>
 
-              {/* Specialization */}
-              <div className="flex items-center justify-center p-2.5">
-                <span className="text-center text-[13.33px] font-medium">
+                {/* Specialization */}
+                <TableCell className="text-center text-[13.33px] font-medium">
                   {student.specialization}
-                </span>
-              </div>
+                </TableCell>
 
-              {/* Thesis Adviser */}
-              <div className="flex items-center justify-center p-2.5">
-                <span className="text-center text-[13.33px] font-medium">
+                {/* Thesis Adviser */}
+                <TableCell className="text-center text-[13.33px] font-medium">
                   {student.adviser}
-                </span>
-              </div>
+                </TableCell>
 
-              {/* Action */}
-              <div className="flex items-center justify-center p-2.5">
-                <Button 
-                  variant="outline" 
-                  className='border-primary text-primary'
-                  onClick={() => onViewStudent(student)}
-                >
-                  View
-                </Button>
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="col-span-full text-center py-12 bg-white">
-            <p className="text-gray-500 font-['DM_Sans']">
-              No students found matching your search.
-            </p>
-          </div>
-        )}
-      </div>
+                {/* Action */}
+                <TableCell className="text-center">
+                  <Button 
+                    variant="outline" 
+                    className="border-primary text-primary"
+                    onClick={() => onViewStudent(student)}
+                  >
+                    View
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={8} className="text-center py-12">
+                <p className="text-gray-500">
+                  No students found matching your search.
+                </p>
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 }

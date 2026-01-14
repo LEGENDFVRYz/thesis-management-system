@@ -12,13 +12,13 @@ export const TabNavigation = ({ activeTab, onTabChange }: TabNavigationProps) =>
                 isActive={activeTab === 'evaluation'}
                 onClick={() => onTabChange('evaluation')}
             >
-                Evaluation Page
+                Evaluation
             </TabButton>
             <TabButton
                 isActive={activeTab === 'results'}
                 onClick={() => onTabChange('results')}
             >
-                Results Page
+                Results
             </TabButton>
         </div>
     );
