@@ -9,8 +9,6 @@ import FacultyManagementLayout from '@/pages/Faculty/management/index';
 // AWARDS COMMITTEE COMPONENTS
 import { TabNavigation } from './components/awards_tabNavigation';
 import { PageHeader } from './components/awards_pageHeader';
-import { EvaluationPageTable } from './components/awards_evaluationPageTable';
-import { ResultsPageTable } from './components/awards_resultsPageTable';
 import { ViewEvaluateModal } from './components/awards_ViewandEval_modal';
 import { ViewResultsModal } from './components/awards_viewEvalResult_modal';
 
@@ -21,8 +19,8 @@ import { evaluationData, resultsData, detailedEvaluationResults } from './compon
 import { Icon } from '@/components/icon-index';
 
 // SPLIT PAGES
-//import { EvalPage } from './evaluation/evalPage';
-//import { ResultsPage } from './evaluation/resultsPage';
+import EvalPage from './evaluation/evalPage';
+import ResultsPage from './evaluation/resultsPage';
 
 
 // SETUP
@@ -91,28 +89,18 @@ export default function Dashboard() {
             >
                 {/* <div className="border border-primary mb-4"></div> */}
                 
-                {/* Header Section with Tabs */}
+                 {/* Tab Navigation */}
                 <div className="mb-6">
                     <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
-                    <PageHeader 
-                        activeTab={activeTab} 
-                        evaluationStatus={activeTab === 'results' ? evaluationStatus : undefined}
-                    />
                 </div>
 
-                {/* Content Based on Active Tab */}
+                {/* appropriate page based on the active tab */}
                 {activeTab === 'evaluation' ? (
-                    <EvaluationPageTable
-                        evaluationData={evaluationData}
-                        onViewEvaluate={handleViewEvaluate}
-                    />
+                    <EvalPage />
                 ) : (
-                    <ResultsPageTable
-                        resultsData={resultsData}
-                        onViewEvaluation={handleViewEvaluationResults}
-                        onExport={handleExport}
-                    />
+                    <ResultsPage />
                 )}
+
             </FacultyManagementLayout>
 
             {/* <NavFooter /> */}
