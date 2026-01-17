@@ -1,3 +1,4 @@
+//DESCRIPTION below the tab navigation  
 import { EvaluationStatus } from './awards_utils';
 
 interface PageHeaderProps {
@@ -9,12 +10,12 @@ export const PageHeader = ({ activeTab, evaluationStatus }: PageHeaderProps) => 
     return (
         <div className="flex items-start justify-between">
             <div>
-                <h1 className="text-[35px] font-bold text-primary mb-2">
+                <h1 className="text-[35px] font-bold text-primary">
                     {activeTab === 'evaluation'
                         ? 'Top 10 Candidate Groups for Best Design Project Award'
                         : 'RESULTS'}
                 </h1>
-                <p className="text-black-60">
+                <p className="text-black-60 mb-6">
                     {activeTab === 'evaluation'
                         ? 'The candidates for the Best Design Project Award are listed below for evaluation.'
                         : 'Rankings based on completed evaluations across all criteria.'}
