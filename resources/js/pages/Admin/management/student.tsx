@@ -6,9 +6,9 @@
 
   // SHARED COMPONENTS 
   import { NavFooter } from '@/components/nav-footer';
+  import FilterSearchSection from '@/components/filter-search-section';
 
   // STUDENT MNGMT COMPONENTS
-  import { StudentFilterSection } from '../../../components/temp/student_management/student_filter_section';
   import { StudentTableView } from '../../../components/temp/student_management/student_table_view';
   import { GroupCardView } from '../../../components/temp/student_management/student_groupcard_view';
   import { ViewToggle } from '../../../components/temp/student_management/student_view_toggle';
@@ -56,8 +56,6 @@
     year_level: number;
     thesis_title: string | null;
   }
-
-
 
   export default function StudentManagement({ students }: { students: RawStudent[] }) {
     const [searchQuery, setSearchQuery] = useState("");
@@ -160,20 +158,8 @@
           pageHeader={pageHeader}
         >
           {/* Filter & Search Section */}
-          <StudentFilterSection
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            filterOpen={filterOpen}
-            sortOpen={sortOpen}
-            onFilterToggle={handleFilterToggle}
-            onSortToggle={handleSortToggle}
-            onFilterClose={() => setFilterOpen(false)}
-            onSortClose={() => setSortOpen(false)}
-          
-            onApplySort={setSortOption}
-            onClearFilters={handleClearFilters}
-            view={view}
-          />
+          {/* UPDATE: Used the existing filter and search section for student management*/}
+          <FilterSearchSection variant="StudentManagement" />
 
           {/* View Toggle and Import Button */}
           <ViewToggle

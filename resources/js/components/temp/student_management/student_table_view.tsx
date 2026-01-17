@@ -1,3 +1,4 @@
+//UPDATE: Used the existing table component
 import { Button } from '@/components/ui/button';
 import {
   Table,

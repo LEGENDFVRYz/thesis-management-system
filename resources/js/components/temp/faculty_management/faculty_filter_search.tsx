@@ -1,4 +1,4 @@
-//UDPATE: CREATED a filter-serch section for faculty since walang existing na reusbale component specifically for this
+//Filter & Search section for Faculty Management (self-made component)
 import { useRef } from 'react';
 import { Filter as FilterIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
