@@ -24,14 +24,11 @@ export default function EvalPage() {
             {/* Page Header Desc */}
             <PageHeader activeTab="evaluation" />
             
-
             {/* EvalPage Content */}
-            
             <EvaluationPageTable 
                 evaluationData={evaluationData}
                 onViewEvaluate={handleViewEvaluate}
             />
-
 
             {/* View & Evaluate Modal */}
             <ViewEvaluateModal
