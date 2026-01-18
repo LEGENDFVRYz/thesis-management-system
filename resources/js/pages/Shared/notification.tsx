@@ -1,3 +1,5 @@
+// Notification
+
 import { Head, router, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { NotificationItem, PageHeaderProps, type BreadcrumbItem } from '@/types';
@@ -24,12 +26,11 @@ const pageHeader: PageHeaderProps = {
     title: "Notifications",
     subtitle: "Stay updated with all system notifications and alerts",
     icon: (
-        // pa correct nalang
         <Bell className="w-8 h-8 text-primary" />
     ),
 };
 
-// PAge Props
+// Page Props
 interface NotificationProps {
     notifications: {
         data: NotificationItem[];
@@ -49,6 +50,39 @@ export default function Notification({ notifications: initialNotifications }: No
     const [page, setPage] = useState(initialNotifications.current_page);
     const [hasMore, setHasMore] = useState(initialNotifications.next_page_url);
     const [loading, setLoading] = useState(false);
+
+    const [searchQuery, setSearchQuery] = useState('');
+
+    // Handle Search (with a small delay or on Enter is usually best, but here is direct)
+    const handleSearchChange = (val: string) => {
+        setSearchQuery(val);
+        router.get(index().url, { search: val }, { 
+            preserveState: true, 
+            replace: true,
+            preserveScroll: true 
+        });
+    };
+
+    // Handle Filters (Type, Status, etc.)
+    const handleFilterApply = (filters: any) => {
+        router.get(index().url, { ...filters, search: searchQuery }, {
+            preserveState: true,
+            preserveScroll: true
+        });
+    };
+
+    // Handle Sort
+    const handleSortApply = (sort: string) => {
+        router.get(index().url, { sort, search: searchQuery }, {
+            preserveState: true
+        });
+    };
+
+    // Handle Clear
+    const handleClear = () => {
+        setSearchQuery('');
+        router.get(index().url, {}, { preserveState: false });
+    };
 
     // function fo mark as read
     const handleMarkAsRead = (id: string) => {
@@ -112,7 +146,14 @@ export default function Notification({ notifications: initialNotifications }: No
             <div className="space-y-6 font-dm pb-10 flex flex-col items-center w-full">
     
                 <div className="w-full flex justify-center">
-                    <FilterSearchSection variant="Notifications" />
+                    <FilterSearchSection 
+                        variant="Notifications" 
+                        searchQuery={searchQuery} 
+                        onSearchChange={handleSearchChange} 
+                        onFilterApply={handleFilterApply} 
+                        onSortApply={handleSortApply} 
+                        onClear={handleClear} 
+                    />
                 </div>
                 
                 <div className="w-full max-w-[1360px] flex flex-col gap-[35px] rounded-lg">

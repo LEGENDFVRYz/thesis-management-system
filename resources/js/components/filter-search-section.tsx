@@ -1,3 +1,5 @@
+// Filter Search Section
+
 import * as React from 'react';
 import { useState } from 'react';
 import { Filter, Trash2, CheckCircle2, Calendar, ChevronDown } from 'lucide-react';
@@ -12,25 +14,46 @@ import {
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Committee from '@/actions/App/Http/Controllers/Faculty/Committee';
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 type SectionVariant = 'StudentManagement' | 'DefenseManagement' | 'ThesisArchive' | 'Notifications' | 'Committee';
 
+interface DefenseFilterState {
+    adviser: string;
+    month: string;
+    year: string;
+    block: string;
+    tags: string[];
+}
 interface FilterSearchSectionProps {
     variant?: SectionVariant;
+    searchQuery: string;
+    onSearchChange: (val: string) => void;
+    onFilterApply: (filters: DefenseFilterState) => void; 
+    onSortApply: (sort: string) => void;
+    onClear: () => void;
 }
 
-export default function FilterSearchSection({ variant = 'DefenseManagement' }: FilterSearchSectionProps) {
+export default function FilterSearchSection({ 
+    variant = 'DefenseManagement',
+    searchQuery,
+    onSearchChange,
+    onFilterApply,
+    onSortApply,
+    onClear
+}: FilterSearchSectionProps) {
     const [query, setQuery] = useState('');
     
     // State to manage the Advanced Filter Modal visibility
     const [isRepoFilterModalOpen, setIsRepoFilterModalOpen] = useState(false);
-
     const [isDMFilterModalOpen, setIsDMFilterModalOpen] = useState(false);
     
     // State to manage the Sort Modal visibility
     const [isSort3ModalOpen, setIsSort3ModalOpen] = useState(false);
-
     const [isSortModalOpen, setIsSortModalOpen] = useState(false);
+
+    const [isDMFilterOpen, setIsDMFilterOpen] = useState(false);
+    const [isSortOpen, setIsSortOpen] = useState(false);
 
     /**
      * Container Style Mapping
@@ -61,9 +84,17 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
         setIsSortModalOpen(false);
     }
 
-    function setIsSortOpen(arg0: boolean): void {
-        throw new Error('Function not implemented.');
-    }
+    // 1. Sync Search with Parent
+    const handleSearchChange = (val: string) => {
+        setQuery(val);
+        onSearchChange(val); // Notify parent to filter the list
+    };
+
+    // 2. Clear All Logic
+    const handleClearAll = () => {
+        setQuery('');
+        onClear(); // Call the parent clear function
+    };
 
     return (
         <div className={cn(
@@ -92,16 +123,16 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                 {/* 1. SEARCH BOX */}
                 <div className={cn(
                     "flex flex-col gap-2 font-dm",
-                    (variant === 'ThesisArchive' || variant === 'Notifications' || variant === 'Committee') ? "w-[300px]" : "flex-1"
+                    (variant === 'ThesisArchive' || variant === 'Notifications' || variant === 'Committee') ? "w-[600px]" : "flex-1"
                 )}>
                     {(variant === 'ThesisArchive' || variant === 'Notifications' || variant === 'Committee') && (
                         <label className="text-sm font-medium text-alert-desc font-dm">Search</label>
                     )}
                     <SearchBar 
                         variant="filter-section" 
-                        placeholder="Keywords, Terms..." 
-                        value={query} 
-                        onChange={setQuery} 
+                        placeholder="Keywords, Terms..."
+                        value={searchQuery} 
+                        onChange={handleSearchChange}
                     />
                 </div>
 
@@ -160,19 +191,6 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                 {variant === 'Committee' && (
                     <>
                         <div className="flex flex-col gap-2 flex-1 font-dm">
-                            <label className="text-sm font-medium text-alert-desc font-dm">Adviser</label>
-                            <Select>
-                                <SelectTrigger className="bg-breadcrumb border-primary/10">
-                                    <SelectValue placeholder="Filter by Adviser" />
-                                </SelectTrigger>
-                                <SelectContent className="w-[var(--radix-select-trigger-width)]">
-                                    <SelectItem value="Casuat">Dr. Cherry D. Casuat</SelectItem>
-                                    <SelectItem value="Mahaguay">Engr. Rolito Mahaguay</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div className="flex flex-col gap-2 flex-1 font-dm">
                             <label className="text-sm font-medium text-alert-desc font-dm">Block</label>
                             <Select>
                                 <SelectTrigger className="bg-breadcrumb border-primary/10">
@@ -185,21 +203,6 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                                 </SelectContent>
                             </Select>
                         </div>
-
-                        <div className="flex flex-col gap-2 flex-1 font-dm">
-                            <label className="text-sm font-medium text-alert-desc font-dm">Stages</label>
-                            <Select>
-                                <SelectTrigger className="bg-breadcrumb border-primary/10">
-                                    <SelectValue placeholder="Filter by Stage" />
-                                </SelectTrigger>
-                                <SelectContent className='w-[var(--radix-select-trigger-width)]'>
-                                    <SelectItem value="stage1">All Stages</SelectItem>
-                                    <SelectItem value="stage2">To Review</SelectItem>
-                                    <SelectItem value="stage3">Under Evaluation</SelectItem>
-                                    <SelectItem value="stage4">Evaluated</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
                     </>
                 )}
 
@@ -208,21 +211,42 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                     "flex flex-row items-center gap-[10px] font-dm",
                     (variant === 'ThesisArchive' || variant === 'Notifications' || variant === 'Committee') ? "mt-auto h-9" : ""
                 )}>
+                    {/* --- SORT DROPDOWN --- */}
                     {(variant === 'StudentManagement' || variant === 'Notifications' || variant === 'Committee') && (
-                        <Button variant="secondary" size="icon" className="rounded-lg border-none font-dm" onClick={() => setIsSortModalOpen(true)}>
-                            <Icon name="sortDefault" size={16} />
-                        </Button>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button variant="secondary" size="icon" className="rounded-lg border-none">
+                                    <Icon name="sortDefault" size={16} />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent align="end" sideOffset={8} className="w-fit p-0 border-none shadow-2xl">
+                                <GeneralSort 
+                                    onClose={() => {}} 
+                                    onApply={handleApplyGeneralSort} 
+                                />
+                            </PopoverContent>
+                        </Popover>
                     )}
 
+                    {/* --- FILTER DROPDOWN */}
                     {variant !== 'Notifications' && variant !== 'Committee' && (
-                        <Button 
-                            variant="secondary" 
-                            size="icon" 
-                            className="rounded-lg border-none font-dm"
-                            onClick={() => setIsDMFilterModalOpen(true)} // Calls the modal
-                        >
-                            <Filter className="w-4 h-4" />
-                        </Button>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button variant="secondary" size="icon" className="rounded-lg border-none">
+                                    <Filter className="w-4 h-4" />
+                                </Button>
+                            </PopoverTrigger>
+                            {/* align="end" makes it stick to the right side of the button */}
+                            {/* sideOffset={8} adds a small gap between the button and the box */}
+                            <PopoverContent align="end" sideOffset={8} className="w-[350px] p-0 border-none shadow-2xl bg-transparent">
+                                <DefenseManagementFilter
+                                    onClose={() => {}} 
+                                    onApply={(filters) => {
+                                        onFilterApply(filters); // This sends data back to your Page
+                                    }}
+                                />
+                            </PopoverContent>
+                        </Popover>
                     )}
 
                     {variant === 'Notifications' && (
@@ -232,7 +256,7 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                         </Button>
                     )}
 
-                    <Button variant="negative" className="px-4 py-2 gap-2 h-9 rounded-lg min-w-[101px] font-dm">
+                    <Button variant="negative" onClick={handleClearAll} className="px-4 py-2 gap-2 h-9 rounded-lg min-w-[101px] font-dm">
                         <Trash2 className="w-4 h-4 text-white" />
                         <span className="text-[13.33px] font-medium font-dm">Clear Filter</span>
                     </Button>
@@ -252,34 +276,11 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                 </DialogContent>
             </Dialog>
 
-            {/* --- INTEGRATED DEFENSE MANAGEMENT FILTER MODAL --- */}
-            <Dialog open={isDMFilterModalOpen} onOpenChange={setIsDMFilterModalOpen}>
-                {/* Technical Note: DialogContent has border/bg removed to let the 
-                    RepoFilter's internal shadow and bg-white container show through cleanly.
-                */}
-                <DialogContent className="max-w-md p-0 border-none bg-transparent shadow-none outline-none [&>button]:hidden justify-center">
-                    <DefenseManagementFilter 
-                        onClose={() => setIsDMFilterModalOpen(false)} 
-                    />
-                </DialogContent>
-            </Dialog>
-
             {/* --- INTEGRATED SORT MODAL --- */}
             <Dialog open={isSort3ModalOpen} onOpenChange={setIsSort3ModalOpen}>
                 <DialogContent className="max-w-md p-0 border-none bg-transparent shadow-none outline-none">
                     {/* The call to Sort3 */}
                     <Sort3/>
-                </DialogContent>
-            </Dialog>
-
-            {/* --- INTEGRATED GENERAL SORT MODAL --- */}
-            <Dialog open={isSortModalOpen} onOpenChange={setIsSortModalOpen}>
-                <DialogContent className="max-w-md p-0 border-none bg-transparent shadow-none outline-none [&>button]:hidden justify-center">
-                    {/* The call to General Sort */}
-                    <GeneralSort 
-                        onClose={() => setIsSortOpen(false)} 
-                        onApply={handleApplySort} 
-                    />
                 </DialogContent>
             </Dialog>
 

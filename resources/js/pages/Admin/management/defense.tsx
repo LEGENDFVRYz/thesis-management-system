@@ -1,9 +1,8 @@
+// Defense
+
 import * as React from 'react';
 import { useState, useMemo } from 'react';
 import { Head } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
-import { AppContent } from '@/components/app-content';
-import { NavFooter } from '@/components/nav-footer';
 import { defenses as defensesRoute } from '@/routes/admin/management/index';
 import FilterSearchSection from '@/components/filter-search-section';
 import { Button } from '@/components/ui/button';
@@ -18,7 +17,7 @@ import { DefenseCalendar } from '@/components/defense-calendar-monthly';
 import ManagementLayout from '.';
 import { BreadcrumbItem, PageHeaderProps } from '@/types';
 
-// Page Setup
+// PAGE CONFIGURATION
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Defense', 
@@ -62,8 +61,9 @@ export interface Defense {
   status: string;
 }
 
-/* SUB-COMPONENT: InfoField */
+// SUB-COMPONENT: InfoField
 const InfoField = ({ label, value, icon, className = "" }: { label: string, value: React.ReactNode, icon?: string, className?: string }) => (
+    // Wrapper for: Individual data field
     <div className={cn("flex flex-col gap-1", className)}>
         <span className="text-base font-bold text-primary">{label}</span>
         <div className="flex items-center gap-2 text-foreground">
@@ -76,11 +76,7 @@ const InfoField = ({ label, value, icon, className = "" }: { label: string, valu
 );
 
 
-/**
- * SUB-COMPONENT: DefenseDetailsModal
- * Displays an overlay with comprehensive information regarding a specific defense.
- * Utilizes the custom scrollbar and theme variables from global.css.
- */
+// SUB-COMPONENT: DefenseDetailsModal
 function DefenseDetailsModal({ open, onOpenChange, data }: { open: boolean, onOpenChange: (open: boolean) => void, data: Defense | null }) {
     if (!data) return null;
 
@@ -89,8 +85,9 @@ function DefenseDetailsModal({ open, onOpenChange, data }: { open: boolean, onOp
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="gap-0 w-[900px] h-[605px] max-w-none bg-background rounded-[10px] border-[0.8px] border-border shadow-lg p-0 font-dm overflow-hidden">
-                {/* Modal Header: Title and Description */}
+            <DialogContent className="flex flex-col gap-0 w-2/4 max-w-none bg-background rounded-[10px] border-[0.8px] border-border shadow-lg p-0 font-dm overflow-hidden">
+                {/* MODAL HEADER: TITLE AND DESC */}
+                {/* Wrapper for: Showing title and close actions*/}
                 <div className="px-6 py-[17px] border-b border-border flex items-start justify-between bg-background z-20">
                     <div className="flex flex-col gap-1">
                         <DialogTitle className="text-alert-default text-xl">Defense Details</DialogTitle>
@@ -99,14 +96,16 @@ function DefenseDetailsModal({ open, onOpenChange, data }: { open: boolean, onOp
                     <DialogClose className="opacity-70 hover:opacity-100"><X className="h-5 w-5 text-alert-desc" /></DialogClose>
                 </div>
 
-                {/* Modal Body: Scrollable content area */}
-                <div className="p-6 flex flex-col gap-5 overflow-y-auto h-[calc(605px-85px)] custom-scrollbar">
+                {/* MODAL BODY: CONTENT */}
+                {/* Wrapper for: Providing scrollable area for detailed info*/}
+                <div className="flex-1 custom-scrollbar p-6 flex flex-col gap-5 overflow-y-auto custom-scrollbar">
+                    {/* Wrapper for: ID and Status Row */}
                     <div className="flex items-center justify-between">
                         <InfoField label="Defense ID" value={`DEF-${data.group_code || data.id}`} />
                         {/* Status Badge */}
                         <div className={cn("bg-primary text-primary-foreground px-3 py-1 rounded-lg text-xs font-medium h-[21.59px] flex items-center capitalize", 
                             data.status === 'completed' 
-                                ? "bg-green-600 text-white" // Change this color accordingly - temporary color only
+                                ? "bg-alert-success text-white" // Change color to success color
                                 : "bg-primary text-primary-foreground"
                         )}>
                             {data.status === 'completed' ? "Completed" : "Upcoming"}
@@ -114,14 +113,15 @@ function DefenseDetailsModal({ open, onOpenChange, data }: { open: boolean, onOp
                     </div>
 
                     <InfoField label="Thesis Title" value={data.thesis_title} className="leading-tight" />
-
+                    
+                    {/* Wrapper for: Schedule Grid */}
                     <div className="grid grid-cols-3 gap-6">
                         <InfoField label="Date" value={data.defense_date || "TBA"} icon="calendarDefault" />
                         <InfoField label="Time" value={data.defense_time || "TBA"} />
                         <InfoField label="Venue" value={"Room " + data.defense_room + ", CEA" || "TBA"} />
                     </div>
 
-                    {/* Proponents Section: Maps proponent names into rounded badges */}
+                    {/* Wrapper for: Proponents Section for Listing all student members in a group */}
                     <div className="flex flex-col gap-2">
                         <span className="text-base font-bold text-primary">Proponents</span>
                         <div className="flex flex-wrap gap-2">
@@ -135,7 +135,7 @@ function DefenseDetailsModal({ open, onOpenChange, data }: { open: boolean, onOp
                         </div>
                     </div>
 
-                    {/* Defense Panel: Lists panel members */}
+                    {/* Wrapper for: Defense Panel List */}
                     <div className="flex flex-col gap-2 pb-4">
                         <span className="text-base font-bold text-primary">Defense Panel</span>
                         <div className="flex flex-col gap-2">
@@ -159,11 +159,7 @@ function DefenseDetailsModal({ open, onOpenChange, data }: { open: boolean, onOp
     );
 }
 
-/**
- * MAIN COMPONENT: DefenseTable
- * Orchestrates the Defense Management view, handling filtering, 
- * layout switching (Table vs Calendar), and detailed data inspection.
- */
+// MAIN COMPONENT: DefenseTable
 export default function DefenseTable({ defenses }: { defenses: Defense[] }) {
     const [selectedDef, setSelectedDef] = useState<Defense | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -172,69 +168,89 @@ export default function DefenseTable({ defenses }: { defenses: Defense[] }) {
     const [statusFilter, setStatusFilter] = useState<string>("upcoming");
     const [view, setView] = useState<string>("table");
 
-    /**
-     * Logic: UseMemo filters data based on the statusFilter state.
-     * Uses MOCK_DEFENSES if the passed 'defenses' prop is empty.
-     */
-    // const displayData = useMemo(() => {
-    //     const sourceData = (defenses?.length > 0 && defenses[0].title) ? defenses : MOCK_DEFENSES;
-    //     return sourceData.filter(def => {
-    //         const status = def.status?.toLowerCase() || "upcoming";
-    //         return statusFilter === "upcoming" ? (status === "upcoming") : status === "completed";
-    //     });
-    // }, [defenses, statusFilter]);
-
     const handleViewDetails = (def: Defense) => {
         setSelectedDef(def);
         setIsModalOpen(true);
     };
 
-     /**
-     * Logic: Filtering data based on status toggle
-     */
-    const filteredData = defenses?.filter((def) => {
-        const status = def.status?.toLowerCase();
-        return statusFilter === "upcoming" ? (status === "upcoming" || !status) : status === "completed";
-    }) || [];
+     const [searchQuery, setSearchQuery] = useState('');
+    const [activeFilters, setActiveFilters] = useState<any>({});
 
-    /**
-     * Configuration: Columns for the table.
-     * Rendering logic is centralized here for better maintainability.
-     */
-    // const columns = [
-    //     { label: "ID", render: (d: Defense) => d.id },
-    //     { label: "Title", className: "px-6 text-left max-w-[280px] truncate", render: (d: Defense) => d.title },
-    //     { label: "Proponents", render: (d: Defense) => (
-    //         <div className="flex items-center justify-center gap-2 font-bold text-primary">
-    //             <Icon name="proponentsDefault" size={18} />
-    //             <span>{d.proponents_count || d.proponentList?.length || '0'}</span>
-    //         </div>
-    //     )},
-    //     { label: "Adviser", className: "px-6", render: (d: Defense) => d.adviser },
-    //     { label: "Block", render: (d: Defense) => d.block },
-    //     { label: "Date & Time", render: (d: Defense) => (
-    //         <div className="flex flex-col text-alert-desc">
-    //             <span className="font-semibold text-alert-default">{d.defense_date}</span>
-    //             <span className="text-[10px] font-bold uppercase opacity-60">{d.defense_time}</span>
-    //         </div>
-    //     )},
-    //     { label: "Type", render: (d: Defense) => d.type || 'Title Defense' },
-    // ];
+    // Handle Search
+    const handleSearchChange = (val: string) => {
+        setSearchQuery(val);
+    };
+
+    // Handle Advanced Filters (Adviser, Month, Year, etc.)
+    const handleFilterApply = (filters: any) => {
+        setActiveFilters(filters);
+    };
+
+    // 3. Clear Everything
+    const handleClear = () => {
+        setSearchQuery('');
+        setActiveFilters({});
+    };
+
+    // 4. Update your useMemo to include the Search Query
+    const filteredData = useMemo(() => {
+        return defenses?.filter((def) => {
+            const matchesStatus = statusFilter === (def.status?.toLowerCase() || "upcoming");
+            const matchesSearch = def.thesis_title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                 def.group_code?.toLowerCase().includes(searchQuery.toLowerCase());
+            
+            // Add logic for activeFilters (Adviser, Block, etc.) if filtering locally
+            return matchesStatus && matchesSearch;
+        }) || [];
+    }, [defenses, statusFilter, searchQuery, activeFilters]);
+
+    const columns = useMemo(() => [
+        { label: "ID", render: (d: Defense) => d.group_code || d.id },
+        { label: "Title", className: "px-6 text-left max-w-[280px] truncate", render: (d: Defense) => d.thesis_title || 'Untitled' },
+        { label: "Proponents", render: (d: Defense) => (
+                <div className="flex items-center justify-center gap-2 font-bold text-primary">
+                    <Icon name="proponentsDefault" size={18} />
+                    <span>{d.proponents_count || (d.proponent_names?.split(',').length) || '0'}</span>
+                </div>
+            )
+        },
+        { label: "Adviser", className: "px-6 text-left", render: (d: Defense) => d.adviser_name || 'TBA' },
+        { label: "Block", render: (d: Defense) => `BSCPE ${d.year_level}-${d.block}` },
+        { label: "Date & Time", render: (d: Defense) => (
+                <div className="flex flex-col text-alert-desc leading-tight">
+                    <span className="font-semibold text-alert-default">{d.defense_date}</span>
+                    <span className="text-[10px] font-bold uppercase opacity-70">{d.defense_time}</span>
+                </div>
+            )
+        },
+        { label: "Type", render: (d: Defense) => d.defense_type || 'Title Defense' },
+        { label: "Action", render: (d: Defense) => (
+                <Button variant="tertiary" className="tertiary-btn h-8 px-5 text-[11px] font-bold uppercase" onClick={() => handleViewDetails(d)}>
+                    View Details
+                </Button>
+            )
+        },
+    ], []);
 
     return (
-        <ManagementLayout
-            breadcrumbs={breadcrumbs}
-            pageHeader={pageHeader}
-        >
+        <ManagementLayout breadcrumbs={breadcrumbs} pageHeader={pageHeader} >
             <Head title="Defense Management" />
 
-                    <div className="space-y-6 font-dm pb-10 flex flex-col items-center w-full">
+                    {/* Wrapper for: Main Page Layout */}
+                    <div className="font-dm pb-10 w-full max-w-[1360px] mx-auto space-y-6">
                         
                         {/* Search and Advanced Filter Section */}
-                        <FilterSearchSection variant="DefenseManagement" />
+                        <FilterSearchSection 
+                            variant="DefenseManagement" 
+                            searchQuery={searchQuery}
+                            onSearchChange={handleSearchChange}
+                            onFilterApply={handleFilterApply}
+                            onSortApply={(sort) => console.log(sort)}
+                            onClear={handleClear}
+                        />
                         
                         {/* Control Bar: View Switcher and Status Toggles */}
-                        <div className="w-full max-w-[1360px] mx-auto flex justify-between">
+                        <div className="flex justify-between">
                             {/* Status Filter (Upcoming vs Completed) */}
                             <ToggleGroup type="single" value={statusFilter} onValueChange={(v) => v && setStatusFilter(v)} className="bg-breadcrumb p-1 rounded-full border border-primary/10">
                                 {["upcoming", "completed"].map(s => (
@@ -249,8 +265,8 @@ export default function DefenseTable({ defenses }: { defenses: Defense[] }) {
                             </ToggleGroup>
                         </div>
 
-                        {/* Data Visualization Container */}
-                        <div className="w-full max-w-[1360px] mx-auto rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+                        {/* Data Display Container */}
+                        <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
                             {view === 'table' ? (
                                 <Table>
                                     <TableCaption className="pb-4 font-dm text-alert-desc">End of defense records.</TableCaption>
@@ -265,50 +281,21 @@ export default function DefenseTable({ defenses }: { defenses: Defense[] }) {
                                     </TableHeader>
                                     <TableBody className="divide-y divide-border">
                                         {filteredData.length > 0 ? (
-                                            filteredData.map((def, index) => (
-                                                <TableRow key={index} className="hover:bg-accent/5 transition-colors group">
-                                                    <TableCell className="text-center text-alert-desc font-medium">
-                                                        {def.group_code}
-                                                    </TableCell>
-                                                    <TableCell className="px-6 text-foreground max-w-[280px] truncate font-medium text-left">
-                                                        {def.thesis_title || 'Cannot Retrieve Title'}
-                                                    </TableCell>
-                                                    <TableCell className="text-center">
-                                                        <div className="flex items-center justify-center gap-2 font-bold text-primary">
-                                                            <Icon name="proponentsDefault" size={18} />
-                                                            <span>{def.proponents_count || '0'}</span>
-                                                        </div>
-                                                    </TableCell>
-                                                    <TableCell className="px-6 text-alert-desc text-left">
-                                                        {def.adviser_name || 'Dr. Cherry D. Casuat'}
-                                                    </TableCell>
-                                                    <TableCell className="text-center text-alert-desc">
-                                                        BSCPE {def.year_level}-{def.block}
-                                                    </TableCell>
-                                                    <TableCell className="text-center leading-tight">
-                                                        <div className="flex flex-col text-alert-desc">
-                                                            <span className="font-semibold text-alert-default">{def.defense_date}</span>
-                                                            <span className="text-[10px] font-bold uppercase text-alert-desc/70">{def.defense_time}</span>
-                                                        </div>
-                                                    </TableCell>
-                                                    <TableCell className="text-center text-alert-desc">
-                                                        {def.defense_type || 'Title Defense'}
-                                                    </TableCell>
-                                                    <TableCell className="text-center">
-                                                        {/* Using custom .tertiary-btn class defined in base layer */}
-                                                        <Button 
-                                                            variant="tertiary" 
-                                                            className="tertiary-btn h-8 px-5 text-[11px] font-bold uppercase" 
-                                                            onClick={() => handleViewDetails(def)}
+                                            filteredData.map((def) => (
+                                                <TableRow key={def.id} className="hover:bg-accent/5 transition-colors group">
+                                                    {columns.map((col) => (
+                                                        <TableCell 
+                                                            key={col.label} 
+                                                            className={cn("text-center font-medium py-4", col.className)}
                                                         >
-                                                            View Details
-                                                        </Button>
-                                                    </TableCell>
+                                                            {col.render(def)}
+                                                        </TableCell>
+                                                    ))}
                                                 </TableRow>
                                             ))
                                         ) : (
                                             <TableRow>
-                                                <TableCell colSpan={8} className="py-20 text-center text-alert-desc font-medium">
+                                                <TableCell colSpan={columns.length} className="py-20 text-center text-alert-desc font-medium">
                                                     No {statusFilter} defenses found in records.
                                                 </TableCell>
                                             </TableRow>
@@ -321,8 +308,6 @@ export default function DefenseTable({ defenses }: { defenses: Defense[] }) {
                             )}
                         </div>
                     </div>
-
-            {/* <NavFooter /> */}
             
             {/* Modal portal for viewing full defense details */}
             <DefenseDetailsModal open={isModalOpen} onOpenChange={setIsModalOpen} data={selectedDef} />
@@ -331,8 +316,19 @@ export default function DefenseTable({ defenses }: { defenses: Defense[] }) {
     );
 }
 
+// Const under DefenseTable
 
-
+/**
+ * Logic: UseMemo filters data based on the statusFilter state.
+ * Uses MOCK_DEFENSES if the passed 'defenses' prop is empty.
+ */
+// const displayData = useMemo(() => {
+//     const sourceData = (defenses?.length > 0 && defenses[0].title) ? defenses : MOCK_DEFENSES;
+//     return sourceData.filter(def => {
+//         const status = def.status?.toLowerCase() || "upcoming";
+//         return statusFilter === "upcoming" ? (status === "upcoming") : status === "completed";
+//     });
+// }, [defenses, statusFilter]);
 
 // PAST CODE: (soon to be resolved by kuru)
 // import * as React from 'react';

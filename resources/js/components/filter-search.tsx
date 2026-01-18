@@ -1,3 +1,5 @@
+// Filter Search
+
 import { useState } from "react";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { RadioGroupItemWithLabel } from "@/components/ui/radio-group-with-label";
@@ -11,6 +13,7 @@ import { SecondarySort } from './Icons/secondary-sort';
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent } from "@radix-ui/react-dialog";
+import { Popover, PopoverTrigger, PopoverContent } from "@radix-ui/react-popover";
 
 /* =======================
    FILTER 1
@@ -600,18 +603,31 @@ export function RepoFilter({ onClose, onApply }: { onClose?: () => void; onApply
 }
 
 /* =======================
-   DEFENSE MANAGEMENT FILTER - Defense Management Filter
+    DEFENSE MANAGEMENT FILTER
 ======================= */
 
-export function DefenseManagementFilter({ onClose }: { onClose?: () => void }) {
+interface DefenseFilterState {
+    adviser: string;
+    month: string;
+    year: string;
+    block: string;
+    tags: string[];
+}
+
+export function DefenseManagementFilter({ 
+    onClose, 
+    onApply 
+}: { 
+    onClose?: () => void; 
+    onApply?: (filters: DefenseFilterState) => void 
+}) {
     const [adviser, setAdviser] = useState("");
     const [month, setMonth] = useState("");
     const [year, setYear] = useState("");
     const [block, setBlock] = useState("");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
-    const [isSortModalOpen, setIsSortModalOpen] = useState(false);
 
-    const tags = ["Title Defense", "DP1 Defense", "DP2 Defense", "Title Re-defense", "DP1 Re-defense", "DP2 Re-defense"];
+    const tagsList = ["Title Defense", "DP1 Defense", "DP2 Defense", "Title Re-defense", "DP1 Re-defense", "DP2 Re-defense"];
 
     const toggleTag = (tag: string) => {
         setSelectedTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);
@@ -621,145 +637,154 @@ export function DefenseManagementFilter({ onClose }: { onClose?: () => void }) {
         setAdviser(""); setMonth(""); setYear(""); setBlock(""); setSelectedTags([]);
     };
 
-    const handleApply = () => {
-        console.log("Applied:", { adviser, month, year, block, selectedTags });
+    const handleApplyClick = () => {
+        // Pass the actual filter object back to the parent
+        onApply?.({
+            adviser,
+            month,
+            year,
+            block,
+            tags: selectedTags
+        });
         if (onClose) onClose();
     };
 
+  function handleApplyGeneralSort(sort: string): void {
+    throw new Error("Function not implemented.");
+  }
+
     return (
-        <>
-            <div className="bg-white rounded-lg shadow-lg p-8 w-[450px] h-[600px] relative font-dm flex flex-col border border-border">
-                <h2 className="text-2xl font-bold mb-3 text-primary">Apply Filter</h2>
-                <div className="border-t my-4" />
+        <div className="bg-white rounded-lg shadow-2xl p-6 w-[380px] font-dm flex flex-col border border-border animate-in fade-in zoom-in-95 duration-200">
+            <h2 className="text-xl font-bold mb-1 text-primary">Apply Filter</h2>
+            <div className="border-t border-primary/10 my-4" />
 
-                {/* Scrollable Content Area */}
-                <div className="flex-1 flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar">
-                    <div className="space-y-2">
-                        <label className="text-[13.33px] font-medium text-[#1A1A1A]">Adviser</label>
-                        <Select value={adviser} onValueChange={setAdviser}>
-                            <SelectTrigger className="bg-[#F3EFD0] border-none h-[37px] w-full">
-                                <SelectValue placeholder="Filter by Adviser" />
+            {/* Content Area - Removed fixed height for Popover compatibility */}
+            <div className="flex flex-col gap-4">
+                <div className="space-y-1.5">
+                    <label className="text-[12px] font-semibold text-[#1A1A1A] uppercase tracking-wider">Adviser</label>
+                    <Select value={adviser} onValueChange={setAdviser}>
+                        <SelectTrigger className="bg-breadcrumb border-none h-9 w-full text-[13px]">
+                            <SelectValue placeholder="Filter by Adviser" />
+                        </SelectTrigger>
+                        <SelectContent className="w-[var(--radix-select-trigger-width)]">
+                            <SelectItem value="Casuat">Dr. Cherry D. Casuat</SelectItem>
+                            <SelectItem value="Mahaguay">Engr. Rolito Mahaguay</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div className="flex gap-3">
+                    <div className="flex-1 space-y-1.5">
+                        <label className="text-[12px] font-semibold text-[#1A1A1A] uppercase tracking-wider">Month</label>
+                        <Select value={month} onValueChange={setMonth}>
+                            <SelectTrigger className="bg-breadcrumb border-none h-9 w-full text-[13px]">
+                                <SelectValue placeholder="Month" />
                             </SelectTrigger>
                             <SelectContent className="w-[var(--radix-select-trigger-width)]">
-                                <SelectItem value="Casuat">Dr. Cherry D. Casuat</SelectItem>
-                                <SelectItem value="Mahaguay">Engr. Rolito Mahaguay</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <div className="flex gap-2">
-                        <div className="flex-1 space-y-2">
-                            <label className="text-[13.33px] font-medium text-[#1A1A1A]">Month</label>
-                            <Select value={month} onValueChange={setMonth}>
-                                <SelectTrigger className="bg-[#F3EFD0] border-none h-[37px] w-full">
-                                    <SelectValue placeholder="Filter by Month" />
-                                </SelectTrigger>
-                                <SelectContent className="w-[var(--radix-select-trigger-width)]">
-                                    {["January", "February", "March", "April"].map(m => (
-                                        <SelectItem key={m} value={m}>{m}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="flex-1 space-y-2">
-                            <label className="text-[13.33px] font-medium text-[#1A1A1A]">Year</label>
-                            <Select value={year} onValueChange={setYear}>
-                                <SelectTrigger className="bg-[#F3EFD0] border-none h-[37px] w-full">
-                                    <SelectValue placeholder="Filter by Year" />
-                                </SelectTrigger>
-                                <SelectContent className="w-[var(--radix-select-trigger-width)]">
-                                    {["2024", "2025", "2026"].map(y => (
-                                        <SelectItem key={y} value={y}>{y}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-[13.33px] font-medium text-[#1A1A1A]">Block</label>
-                        <Select value={block} onValueChange={setBlock}>
-                            <SelectTrigger className="bg-[#F3EFD0] border-none h-[37px] w-full">
-                                <SelectValue placeholder="Filter by Block" />
-                            </SelectTrigger>
-                            <SelectContent className="w-[var(--radix-select-trigger-width)]">
-                                {["BSCPE 3-1", "BSCPE 3-2", "BSCPE 3-3", "BSCPE 3-4", "BSCPE 3-5", "BSCPE 3-6"].map(b => (
-                                    <SelectItem key={b} value={b}>{b}</SelectItem>
+                                {["January", "February", "March", "April", "May", "June"].map(m => (
+                                    <SelectItem key={m} value={m}>{m}</SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
                     </div>
-
-                    <div className="space-y-2 pt-2 border-t border-[rgba(115,0,0,0.15)]">
-                        <div className="text-[12px] font-medium text-[#1A1A1A]">Type Tags</div>
-                        <div className="text-[12px] font-medium text-[#5A5A5A]">Interactive Tag Management</div>
-                        <div className="flex flex-wrap gap-2 mt-2">
-                            {tags.map((tag, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => toggleTag(tag)}
-                                    className={cn(
-                                        "px-3 py-1 border-[0.8px] rounded-lg text-[12px] font-medium transition-all duration-200",
-                                        selectedTags.includes(tag) 
-                                            ? "bg-[#730000] text-white border-[#730000]" 
-                                            : "bg-white text-[#730000] border-[#730000] hover:bg-[#730000]/5"
-                                    )}
-                                >
-                                    {tag}
-                                </button>
-                            ))}
-                        </div>
+                    <div className="flex-1 space-y-1.5">
+                        <label className="text-[12px] font-semibold text-[#1A1A1A] uppercase tracking-wider">Year</label>
+                        <Select value={year} onValueChange={setYear}>
+                            <SelectTrigger className="bg-breadcrumb border-none h-9 w-full text-[13px]">
+                                <SelectValue placeholder="Year" />
+                            </SelectTrigger>
+                            <SelectContent className="w-[var(--radix-select-trigger-width)]">
+                                {["2024", "2025", "2026"].map(y => (
+                                    <SelectItem key={y} value={y}>{y}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                 </div>
 
-                {/* Footer */}
-                <div className="mt-auto pt-4 border-t border-[rgba(115,0,0,0.15)] bg-white">
-                    <div className="flex flex-row items-center gap-3 w-full">
-                        {/* Sort Trigger */}
-                        <Button 
-                            variant="secondary" 
-                            size="icon" 
-                            className="bg-[#F3EFD0] h-9 w-9 rounded-lg shrink-0 border-none"
-                            onClick={() => setIsSortModalOpen(true)}
-                        >
-                            <SecondarySort state="default" />
-                        </Button>
+                <div className="space-y-1.5">
+                    <label className="text-[12px] font-semibold text-[#1A1A1A] uppercase tracking-wider">Block</label>
+                    <Select value={block} onValueChange={setBlock}>
+                        <SelectTrigger className="bg-breadcrumb border-none h-9 w-full text-[13px]">
+                            <SelectValue placeholder="Filter by Block" />
+                        </SelectTrigger>
+                        <SelectContent className="w-[var(--radix-select-trigger-width)]">
+                            {["BSCPE 3-1", "BSCPE 3-2", "BSCPE 3-3", "BSCPE 3-4"].map(b => (
+                                <SelectItem key={b} value={b}>{b}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
 
-                        <Button variant="outline" onClick={handleClearAll} className="h-9 px-4 text-[13.33px] border border-border text-[#1A1A1A]">
-                            Clear All
-                        </Button>
-
-                        <Button variant="secondary" onClick={onClose} className="h-9 px-4 text-[13.33px] bg-[#F3EFD0] text-[#730000]">
-                            Cancel
-                        </Button>
-
-                        <Button variant="primary" onClick={handleApply} className="h-9 px-4 text-[13.33px] bg-[#730000] text-white flex-grow">
-                            Apply All Filters
-                        </Button>
+                <div className="space-y-2 pt-2 border-t border-primary/5">
+                    <div className="text-[12px] font-bold text-[#1A1A1A]">TYPE TAGS</div>
+                    <div className="flex flex-wrap gap-1.5">
+                        {tagsList.map((tag, index) => (
+                            <button
+                                key={index}
+                                onClick={() => toggleTag(tag)}
+                                className={cn(
+                                    "px-2.5 py-1 border rounded-md text-[11px] font-medium transition-all",
+                                    selectedTags.includes(tag) 
+                                        ? "bg-primary text-white border-primary" 
+                                        : "bg-white text-primary border-primary/30 hover:bg-primary/5"
+                                )}
+                            >
+                                {tag}
+                            </button>
+                        ))}
                     </div>
                 </div>
             </div>
 
-            {/* Sort Modal */}
-            {isSortModalOpen && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center">
-                    <div 
-                        className="fixed inset-0 bg-black/50 w-[455px] ml-7" 
-                        onClick={() => setIsSortModalOpen(false)} 
-                    />
-                    
-                    {/* Sort Modal Content */}
-                    <div className="relative z-[70] w-full max-w-[350px] px-4 animate-in zoom-in-95 duration-200">
+            {/* Footer */}
+            <div className="mt-6 pt-4 border-t border-primary/10 flex items-center justify-between gap-2">
+                
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button variant="secondary" size="icon" className="rounded-lg border-none">
+                            <ArrowUpDown name="sortDefault" size={16}/>
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent 
+                        side="left" 
+                        align="end" 
+                        sideOffset={30} 
+                        className="w-fit p-0 border-none shadow-2xl"
+                    >
                         <GeneralSort 
-                            onClose={() => setIsSortModalOpen(false)} 
-                            onApply={(sortValue) => {
-                                console.log("Sorted by:", sortValue);
-                                setIsSortModalOpen(false);
-                            }}
+                            onClose={() => {}} 
+                            onApply={handleApplyGeneralSort} 
                         />
-                    </div>
+                    </PopoverContent>
+                </Popover>
+
+                <Button 
+                    variant="outline" 
+                    onClick={handleClearAll} 
+                    className="h-9 px-3 text-[12px] border-primary/20 hover:bg-primary/5 text-primary"
+                >
+                    Reset
+                </Button>
+
+                <div className="flex gap-2 flex-1 justify-end">
+                    <Button 
+                        variant="secondary" 
+                        onClick={onClose} 
+                        className="h-9 px-3 text-[12px] bg-breadcrumb text-primary border-none"
+                    >
+                        Cancel
+                    </Button>
+
+                    <Button 
+                        variant="negative" 
+                        onClick={handleApplyClick} 
+                        className="h-9 px-4 text-[12px] flex-grow shadow-md"
+                    >
+                        Apply Filters
+                    </Button>
                 </div>
-            )}
-        </>
+            </div>
+        </div>
     );
 }
