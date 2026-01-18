@@ -9,8 +9,6 @@ import FacultyManagementLayout from '@/pages/Faculty/management/index';
 // AWARDS COMMITTEE COMPONENTS
 import { TabNavigation } from './components/awards_tabNavigation';
 import { PageHeader } from './components/awards_pageHeader';
-import { ViewEvaluateModal } from './components/awards_ViewandEval_modal';
-import { ViewResultsModal } from './components/awards_viewEvalResult_modal';
 
 // UTILITIES AND SAMPLE DATA
 import { EvaluationRow } from './components/awards_utils';
@@ -21,28 +19,6 @@ import { Icon } from '@/components/icon-index';
 // SPLIT PAGES
 import EvalPage from './evaluation/evalPage';
 import ResultsPage from './evaluation/resultsPage';
-
-
-// SETUP
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Awards Evaluation',
-        href: evaluation().url,
-    },
-];
-
-const pageHeader: PageHeaderProps = {
-    title: "Evaluation Page" ,
-    subtitle: "Page for evaluating top 10 project groups based on output, defense, and tech development",
-    icon: (
-        // pa correct nalang
-        <Icon
-            name="docuDefault"
-            className="w-8 h-8 text-primary"
-        />
-    ),
-};
-
 
 export default function Dashboard() {
     const [activeTab, setActiveTab] = useState<'evaluation' | 'results'>('evaluation');
@@ -64,10 +40,31 @@ export default function Dashboard() {
         }
     };
 
-    const handleExport = () => {
-        // Export btn logic here
-    };
+    // SETUP
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Awards Evaluation',
+        href: evaluation().url,
+    },
+    {
+        title: activeTab === 'evaluation' ? 'Evaluation' : 'Results',
+        href: '#',
+    },
+];
 
+const pageHeader: PageHeaderProps = {
+    title: activeTab === 'evaluation' ? 'Evaluation Page' : 'Results Page',
+    subtitle: activeTab === 'evaluation' 
+            ? 'Page for evaluating top 10 project groups based on output, defense, and tech development'
+            : 'View summarized scores, rankings, and awards results',
+    icon: (
+        // pa correct nalang
+        <Icon
+            name="docuDefault"
+            className="w-8 h-8 text-primary"
+        />
+    ),
+};
     const evaluationStatus = getEvaluationStatus(resultsData);
 
     return (
@@ -100,28 +97,6 @@ export default function Dashboard() {
             </FacultyManagementLayout>
 
             {/* <NavFooter /> */}
-
-            {/* View & Evaluate Modal (for Evaluation Page) */}
-            <ViewEvaluateModal
-                isOpen={isEvaluateModalOpen}
-                onClose={() => setIsEvaluateModalOpen(false)}
-                evaluationData={selectedEvaluation ? {
-                    groupCode: selectedEvaluation.groupCode,
-                    title: selectedEvaluation.title,
-                    proponents: selectedEvaluation.proponents,
-                    adviser: selectedEvaluation.adviser,
-                    criteria1Status: selectedEvaluation.criteria1,
-                    criteria2Status: selectedEvaluation.criteria2,
-                    criteria3Status: selectedEvaluation.criteria3
-                } : null}
-            />
-
-            {/* View Results Modal (for Results Page) */}
-            <ViewResultsModal
-                isOpen={isResultsModalOpen}
-                onClose={() => setIsResultsModalOpen(false)}
-                evaluationData={selectedResultsData}
-            />
         </>
     );
 }
