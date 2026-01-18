@@ -92,6 +92,7 @@ export default function DatePicker({
             e.currentTarget.style.boxShadow = "none";
             e.currentTarget.style.borderColor = "#d4c5a0";
           }}
+          className="placeholder:text-[#730000] text-[#730000]"
           style={{
             width: "100%",
             padding: "0.5rem 0.75rem",
@@ -102,7 +103,7 @@ export default function DatePicker({
             cursor: "pointer",
             outline: "none",
             fontSize: "13.33px",
-            color: "#333333",
+            color: "#730000",
             fontWeight: 600,
           }}
         />
