@@ -306,7 +306,8 @@ export default function DocumentPreview({ thesis }: DocumentPreviewProps) {
                                 <h3 className="text-base font-medium text-foreground font-dm">
                                     {displayThesis.title}
                                 </h3>
-                                <Button variant="secondary">
+                                <Button variant="secondary"
+                                    className="cursor-pointer">
                                     Download Document
                                 </Button>
                             </div>

@@ -612,7 +612,7 @@ export default function SystemRepositoryExpanded() {
               {activeSelectMode ? (
                 <>
                   <X size={16} />
-                  <span className="mx-3 h-4 w-px bg-primary-foreground/40" cursor-pointer/>
+                  <span className="mx-3 h-4 w-px bg-primary-foreground/40 cursor-pointer"/>
                   <span>{activeSelectedIds.length} Selected</span>
                 </>
               ) : (
