@@ -13,7 +13,6 @@ import {
     DialogContent,
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import Committee from '@/actions/App/Http/Controllers/Faculty/Committee';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 type SectionVariant = 'StudentManagement' | 'DefenseManagement' | 'ThesisArchive' | 'Notifications' | 'Committee';
@@ -27,23 +26,23 @@ interface DefenseFilterState {
 }
 interface FilterSearchSectionProps {
     variant?: SectionVariant;
-    searchQuery: string;
-    onSearchChange: (val: string) => void;
-    onFilterApply: (filters: DefenseFilterState) => void; 
-    onSortApply: (sort: string) => void;
-    onClear: () => void;
+    onSearchChange?: (val: string) => void;
+    onFilterApply?: (filters: DefenseFilterState) => void; 
+    onSortApply?: (sort: string) => void;
+    onClear?: () => void;
 }
 
 export default function FilterSearchSection({ 
     variant = 'DefenseManagement',
-    searchQuery,
     onSearchChange,
     onFilterApply,
     onSortApply,
     onClear
 }: FilterSearchSectionProps) {
     const [query, setQuery] = useState('');
-    
+    const [searchQuery, setSearchQuery] = useState('');
+    const [activeFilters, setActiveFilters] = useState<DefenseFilterState | null>(null);
+
     // State to manage the Advanced Filter Modal visibility
     const [isRepoFilterModalOpen, setIsRepoFilterModalOpen] = useState(false);
     const [isDMFilterModalOpen, setIsDMFilterModalOpen] = useState(false);
@@ -84,16 +83,15 @@ export default function FilterSearchSection({
         setIsSortModalOpen(false);
     }
 
-    // 1. Sync Search with Parent
     const handleSearchChange = (val: string) => {
-        setQuery(val);
-        onSearchChange(val); // Notify parent to filter the list
+        setSearchQuery(val);
+        onSearchChange?.(val);
     };
 
-    // 2. Clear All Logic
     const handleClearAll = () => {
-        setQuery('');
-        onClear(); // Call the parent clear function
+        setSearchQuery('');
+        setActiveFilters(null);
+        onClear?.(); 
     };
 
     return (
@@ -242,7 +240,8 @@ export default function FilterSearchSection({
                                 <DefenseManagementFilter
                                     onClose={() => {}} 
                                     onApply={(filters) => {
-                                        onFilterApply(filters); // This sends data back to your Page
+                                        setActiveFilters(filters);
+                                        onFilterApply?.(filters);
                                     }}
                                 />
                             </PopoverContent>

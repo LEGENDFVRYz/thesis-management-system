@@ -148,7 +148,6 @@ export default function Notification({ notifications: initialNotifications }: No
                 <div className="w-full flex justify-center">
                     <FilterSearchSection 
                         variant="Notifications" 
-                        searchQuery={searchQuery} 
                         onSearchChange={handleSearchChange} 
                         onFilterApply={handleFilterApply} 
                         onSortApply={handleSortApply} 

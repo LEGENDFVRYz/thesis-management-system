@@ -753,7 +753,6 @@ export default function ProposalReview({ proposals }: ProposalReviewProps) {
                 {/* FILTER & SEARCH */}
                 <FilterSearchSection 
                     variant="Committee" 
-                    searchQuery={searchQuery} 
                     onSearchChange={handleSearchChange} 
                     onFilterApply={handleFilterApply} 
                     onSortApply={(sort) => console.log("Sorting by:", sort)} 

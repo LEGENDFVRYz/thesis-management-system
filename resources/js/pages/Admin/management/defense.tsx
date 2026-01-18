@@ -242,7 +242,6 @@ export default function DefenseTable({ defenses }: { defenses: Defense[] }) {
                         {/* Search and Advanced Filter Section */}
                         <FilterSearchSection 
                             variant="DefenseManagement" 
-                            searchQuery={searchQuery}
                             onSearchChange={handleSearchChange}
                             onFilterApply={handleFilterApply}
                             onSortApply={(sort) => console.log(sort)}
