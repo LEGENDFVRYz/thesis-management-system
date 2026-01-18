@@ -9,12 +9,8 @@ import {
     Tooltip
 } from "recharts";
 import StageSwitchToggle from '@/components/stage-toggle';
-import { NavFooter } from '@/components/nav-footer';
-import { HeaderCard } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import AppLayout from '@/layouts/app-layout';
-import { PageHeaderProps, type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { FolderOpen, Filter, Download, Calendar, Check } from 'lucide-react';
 import { progress } from '@/routes/faculty/coordinator/thesis/index';
 
@@ -32,30 +28,52 @@ import {
 } from "@/components/ui/dialog";
 import ThesisMonitoringLayout from '.';
 
+// --- Interfaces ---
+interface BreadcrumbItem {
+    title: string;
+    href: string;
+}
 
-// Setup
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Progress Reports', href: progress().url }];
+interface PageHeaderProps {
+    title: string;
+    subtitle: string;
+    icon: React.ReactNode;
+}
+
+interface DashboardProps {
+    course: string;
+    submission: { year: number; submission_count: number }[];
+    completed: { year: number; completed_count: number }[];
+}
+
+// --- Setup ---
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'Progress Reports', href: progress().url }
+];
 
 const pageHeader: PageHeaderProps = {
     title: "Progress Reports",
     subtitle: "Generate and export reports on thesis submissions, completions and guidelines",
     icon: (
-        // pa correct nalang
         <FolderOpen className="w-8 h-8 text-primary" />
     ),
 };
 
-// Sample data
-const DEFAULT_DATA = [
-    { year: 2017, count: 100 }, { year: 2018, count: 125 }, { year: 2019, count: 180 },
-    { year: 2020, count: 150 }, { year: 2021, count: 200 }, { year: 2022, count: 250 },
-    { year: 2023, count: 300 }, { year: 2024, count: 320 }, { year: 2025, count: 360 },
-];
-
-
-export default function ProgressReports() {
+export default function ProgressReports({ submission = [], completed = [], course = 'MOR' }: DashboardProps) {
     const [selectedYear, setSelectedYear] = useState("2024 - 2025");
     const [isExportSuccessOpen, setIsExportSuccessOpen] = useState(false);
+
+    // --- Logic: Handle Stage/Course Switch ---
+    const handleStageChange = (newStage: string) => {
+        router.get(progress().url, 
+            { course: newStage }, 
+            { 
+                preserveState: true, 
+                preserveScroll: true,
+                only: ['submission', 'completed', 'course'] 
+            }
+        );
+    };
 
     const ACADEMIC_YEARS = useMemo(() => {
         const years = [];
@@ -69,12 +87,20 @@ export default function ProgressReports() {
         setIsExportSuccessOpen(true);
     };
 
+    const totalSubmissions = useMemo(() => 
+        submission.reduce((acc, curr) => acc + curr.submission_count, 0), 
+    [submission]);
+
+    const totalCompleted = useMemo(() => 
+        completed.reduce((acc, curr) => acc + curr.completed_count, 0), 
+    [completed]);
+
     return (
         <ThesisMonitoringLayout 
             breadcrumbs={breadcrumbs}
             pageHeader={pageHeader}
         >
-            <Head title="Progress Reports" />
+            <Head title={`Progress Reports`} />
             
             <style dangerouslySetInnerHTML={{ __html: `
                 .custom-year-scrollbar::-webkit-scrollbar { width: 12px; }
@@ -110,21 +136,32 @@ export default function ProgressReports() {
             `}} />
 
             <div className="flex flex-col min-h-screen -mt-4 -mx-4 -mb-4 md:-mt-4 bg-primary-foreground">
-                {/* <HeaderCard 
-                    title="Progress Reports"
-                    description="Generate and export reports on thesis submissions, completions and guidelines"
-                    icon={<FolderOpen className="w-8 h-8 text-primary" />}
-                    className="w-full lg:w-full rounded-none border-t-0 border-x-0 border-b-sidebar-gradient-mid" 
-                /> */}
-
                 <div className="flex flex-1 flex-col gap-8 p-4 w-full">
+                    
                     <div className="flex justify-end w-full">
-                        <StageSwitchToggle />
+                        <StageSwitchToggle 
+                            // value={course} 
+                            onChange={handleStageChange} 
+                        />
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
-                        <TrendCard title="Submission Trend" data={DEFAULT_DATA} dataKey="Submission" rate="50%" rateLabel="Submission Rate" />
-                        <TrendCard title="Completion Trend" data={DEFAULT_DATA} dataKey="Completion" rate="50%" rateLabel="Completion Rate" />
+                        <TrendCard 
+                            title={`Submission Trend`} 
+                            data={submission} 
+                            valueKey="submission_count"
+                            dataLabel="Submissions"
+                            rate={totalSubmissions} 
+                            rateLabel="Total Submissions" 
+                        />
+                        <TrendCard 
+                            title={`Completion Trend`} 
+                            data={completed} 
+                            valueKey="completed_count"
+                            dataLabel="Completions"
+                            rate={totalCompleted} 
+                            rateLabel="Total Completed" 
+                        />
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full">
@@ -183,16 +220,12 @@ export default function ProgressReports() {
                                 <h3 className="text-primary text-[22px] font-dm">Report Templates</h3>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <TemplateCard title="AY 2024 - 2025 Summary" desc="Complete overview of submissions and completions" onUse={handleExport} />
+                                <TemplateCard title={`AY ${selectedYear} Summary`} desc="Complete overview of submissions and completions" onUse={handleExport} />
                                 <TemplateCard title="Monthly Progress Report" desc="Month-by-month breakdown of thesis activities" onUse={handleExport} />
                             </div>
                         </div>
                     </div>
                 </div>
-
-                {/* <div className="w-full mt-[120px]">
-                    <NavFooter />
-                </div> */}
             </div>
 
             <Dialog open={isExportSuccessOpen} onOpenChange={setIsExportSuccessOpen}>
@@ -207,23 +240,39 @@ export default function ProgressReports() {
     );
 }
 
-function TrendCard({ title, data, dataKey, rate, rateLabel }: any) {
+function TrendCard({ title, data, valueKey, dataLabel, rate, rateLabel }: any) {
     return (
         <div className="bg-accent rounded-xl overflow-hidden border border-primary/20 shadow-[0px_4px_12px_rgba(0,0,0,0.1)] flex flex-col">
             <div className="p-6">
                 <h3 className="text-primary font-bold text-lg mb-4 font-dm uppercase tracking-tight">{title}</h3>
                 <div className="flex items-center justify-end gap-2 mb-4">
                     <div className="w-2 h-2 rounded-full bg-primary" />
-                    <span className="text-[12px] text-foreground/60 font-medium font-dm">{dataKey}</span>
+                    <span className="text-[12px] text-foreground/60 font-medium font-dm">{dataLabel}</span>
                 </div>
                 <div className="h-48 w-full">
                     <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
                             <CartesianGrid strokeDasharray="0" stroke="#0000001F" vertical={false} />
-                            <XAxis dataKey="year" tick={{ fill: "#00000099", fontSize: 11 }} axisLine={{ stroke: "#0000001F" }} tickLine={false} />
-                            <YAxis tick={{ fill: "#00000099", fontSize: 11 }} axisLine={{ stroke: "#0000001F" }} tickLine={false} domain={[0, 400]} ticks={[0, 100, 200, 300, 400]} />
+                            <XAxis 
+                                dataKey="year" 
+                                tick={{ fill: "#00000099", fontSize: 11 }} 
+                                axisLine={{ stroke: "#0000001F" }} 
+                                tickLine={false} 
+                            />
+                            <YAxis 
+                                tick={{ fill: "#00000099", fontSize: 11 }} 
+                                axisLine={{ stroke: "#0000001F" }} 
+                                tickLine={false} 
+                                domain={['auto', 'auto']} 
+                            />
                             <Tooltip cursor={{ stroke: '#730000', strokeWidth: 0 }} />
-                            <Line type="linear" dataKey="count" stroke="#730000" strokeWidth={2} dot={false} />
+                            <Line 
+                                type="linear" 
+                                dataKey={valueKey} 
+                                stroke="#730000" 
+                                strokeWidth={2} 
+                                dot={false} 
+                            />
                         </LineChart>
                     </ResponsiveContainer>
                 </div>
