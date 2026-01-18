@@ -8,6 +8,17 @@ import {
 import FAQNavbar from '@/components/faq-navbar';
 import { NavFooter } from '@/components/nav-footer';
 import { Search, HelpCircle } from 'lucide-react';
+import AppLayout from '@/layouts/app-layout';
+import { faq } from '@/routes/index';
+import { BreadcrumbItem } from '@/types';
+
+// Setup
+const breadcrumb: BreadcrumbItem[] = [
+    {
+        title: 'Frequently Asked Questions',
+        href: faq().url,
+    },
+];
 
 type Category = 'All Categories' | 'General' | 'Scheduling' | 'Panels' | 'Technical';
 
@@ -85,10 +96,12 @@ export default function FAQ() {
     });
 
     return (
-        <>
+        <AppLayout
+            breadcrumbs={breadcrumb}
+        >
             <Head title="FAQ" />
-            <FAQNavbar />
-            <div className="min-h-screen bg-gradient-to-br from-[#FDFDFC] to-[#F5F5F0] py-8 px-4 sm:px-6 lg:px-8">
+            {/* <FAQNavbar /> */}
+            <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-4xl mx-auto">
                     {/* Header with Icon */}
                     <div className="text-center mb-6">
@@ -178,9 +191,9 @@ export default function FAQ() {
             </div>
 
             {/* Nav Footer */}
-            <div className="mt-16">
+            {/* <div className="mt-16">
                 <NavFooter />
-            </div>
-        </>
+            </div> */}
+        </AppLayout>
     );
 }

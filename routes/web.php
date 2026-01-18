@@ -23,6 +23,7 @@ use App\Http\Controllers\Faculty\Joint1\DefenseManagement;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\FileImportController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\PdfViewerController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\Shared\ThesisArchive;
@@ -39,21 +40,19 @@ use Laravel\Fortify\Features;
 PUBLIC AND WEB STATIC ROUTES
 ==================================================================================
 */
-Route::get('/', function () {
-    return Inertia::render('welcome', [
-        'canRegister' => false,
-    ]);
-})->name('home');
+Route::get('/', [PageController::class, 'home'])->name('home');
+Route::get('/faq', [PageController::class, 'faq'])->name('faq');
 
-// FAQ Page
-Route::get('/faq', function () {
-    return Inertia::render('faq');
-})->name('faq');
+// ---- PUBLIC ----
+Route::get('/repository', [ThesisArchive::class, 'index'])->name('guest.repository');
+Route::get('/repository/preview/{id}', [ThesisArchive::class, 'show'])->name('guest.repository.preview');
 
-// Route::middleware(['auth', 'verified'])->group(function () {
-//     // Acts as a gateway for each main role     (temporary, soon will have merge gateway controller)
-//     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-// });
+Route::get('/search', function () {
+    return Inertia::render('Guest/filter-search');
+})->name('guest.search');
+
+Route::get('/preview/{id}',  [ThesisArchive::class, 'show'])->name('guest.preview');
+
 
 
 /*
@@ -65,25 +64,10 @@ Route::middleware('guest')->group(function () {
     Route::get('login', [StudentLoginController::class, 'create'])->name('student.login');
     Route::post('login', [StudentLoginController::class, 'store'])->name('student.store');
 
-    Route::get('faculty/login', [FacultyLoginController::class, 'create'])->middleware('gues')->name('faculty.login');
+    Route::get('faculty/login', [FacultyLoginController::class, 'create'])->name('faculty.login');
     Route::post('faculty/login', [FacultyLoginController::class, 'store'])->name('faculty.store');
 });
 
-
-Route::prefix('guest')->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('Guest/landing');
-    })->name('guest.landing');
-
-    Route::get('/repository', [ThesisArchive::class, 'index'])->name('guest.repository');
-    Route::get('/repository/preview/{id}', [ThesisArchive::class, 'show'])->name('guest.repository.preview');
-
-    Route::get('/search', function () {
-        return Inertia::render('Guest/filter-search');
-    })->name('guest.search');
-
-    Route::get('/preview/{id}',  [ThesisArchive::class, 'show'])->name('guest.preview');
-});
 
 
 /*
