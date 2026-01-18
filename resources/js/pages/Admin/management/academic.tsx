@@ -21,7 +21,7 @@ import PinIcon from '@/components/Icons/pin.svg';
 import CheckIcon from '@/components/Icons/ic_check-Default.svg';
 import TimerIcon from '@/components/Icons/timer.svg';
 import ManagementIcon from '@/components/Icons/ic_pen-settings-Default.svg';
-import { RotateCw, Save } from 'lucide-react';
+import { RotateCw } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { Icon } from '@/components/icon-index';
@@ -217,7 +217,7 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
             pageHeader={pageHeader}
         >
             <div className="flex flex-1 h-full flex-col gap-4"> 
-                <div className="flex flex-row gap-4 h-full">
+                <div className="flex flex-row gap-4">
 
                     {/* Academic year settings */}
                     <Card className="bg-[#FDFCF6] h-full border border-[#73000042] shadow-md flex-1">
@@ -231,12 +231,10 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
                             <div>
                                 <label className="text-sm font-medium">Current Academic Year</label>
                                 <div className="bg-[#95969766] border rounded-sm border-[#44444433] px-3 py-2 text-sm flex items-center justify-between">
-                                    <span className="text-[#730000] font-semibold">
+                                    <span className="text-[#730000]">
                                         Academic Year { active_sy ? `${active_sy}–${Number(active_sy) + 1}` : 'not yet activated!'}
                                     </span>
-                                    <img src={CheckIcon} className="w-5 h-5" 
-                                    style={{ filter: "brightness(0) saturate(100%) invert(12%) sepia(86%) saturate(2065%) hue-rotate(335deg)" }} // to make it in 730000 color
-                                    alt="checkmark" />
+                                    <img src={CheckIcon} className="w-5 h-5 brightness-0 saturate-100 invert-[12%] sepia-[86%] saturate-[2065%] hue-rotate-[335deg]" alt="checkmark" />
                                 </div>
                             </div>
                             
@@ -291,8 +289,12 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
                                     onClick={() => acadForm.put(update().url, { preserveScroll: true })}
                                     variant="primary"
                                 >
-                                    {/* ISSUE: WRONG ICON -- RESOLVED */}
-                                     <Save className="w-4 h-4" />
+                                    {/* ISSUE: WRONG ICON */}
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M10.1333 2C10.485 2.00501 10.8205 2.14878 11.0667 2.4L13.6 4.93333C13.8512 5.17951 13.995 5.51497 14 5.86667V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 3.33333C2 2.97971 2.14048 2.64057 2.39052 2.39052C2.64057 2.14048 2.97971 2 3.33333 2H10.1333Z" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round" />
+                                        <path d="M11.3332 13.9998V9.33317C11.3332 9.15636 11.2629 8.98679 11.1379 8.86177C11.0129 8.73674 10.8433 8.6665 10.6665 8.6665H5.33317C5.15636 8.6665 4.98679 8.73674 4.86177 8.86177C4.73674 8.98679 4.6665 9.15636 4.6665 9.33317V13.9998" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round" />
+                                        <path d="M4.6665 2V4.66667C4.6665 4.84348 4.73674 5.01305 4.86177 5.13807C4.98679 5.2631 5.15636 5.33333 5.33317 5.33333H9.99984" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
                                     Save
                                 </Button>
                             </div>
@@ -300,7 +302,7 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
                     </Card>
 
                     {/* Semestral settings */}
-                    <Card className="bg-[#FDFCF6] border border-[#73000042] shadow-md flex-1">
+                    <Card className="bg-[#FDFCF6] border border-[#73000042] shadow-md h-full flex-1">
                         <CardHeader className="flex flex-row items-center gap-2 pb-2">
                             <img src={SemesterIcon} className="w-6 h-6" alt="Semester configuration" />
                             <CardTitle>Semester Configuration</CardTitle>
@@ -313,7 +315,7 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
                                 value={selectedSem !== null ? String(selectedSem) : ""}
                                 onValueChange={(value) => handleSemChange(Number(value))}
                             >
-                                <SelectTrigger className="w-full bg-[#F3EFD0] border border-[#7300001A] text-[#730000] font-semibold rounded-md">
+                                <SelectTrigger className="w-full bg-[#F3EFD0] border border-[#7300001A] text-[#730000] rounded-md">
                                     <SelectValue placeholder="Select Semester" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-[#F3EFD0] border border-[#7300001A]">
@@ -324,7 +326,7 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
 
 
                             {/* DATE PICKER */}
-                            <div className="grid grid-cols-2 gap-4 mb-6">
+                            <div className="grid grid-cols-2 gap-4 mb-4">
                                 <div className='flex-1'>
                                     <label className="text-sm font-medium">Start Date</label>
                                     <DatePicker
@@ -359,14 +361,18 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
                                 </div>
                             </div>
 
-                            <div className="col-span-2 flex justify-end gap-2 mt-2">
-                                {/* ISSUE: WRONG ICON -- RESOLVED */}
+                            <div className="flex justify-end gap-2 mt-2">
+                                {/* ISSUE: WRONG ICON */}
                                 <Button 
                                     variant="primary"
                                     disabled={semForm.processing}
                                     onClick={() => semForm.put(update().url, { preserveScroll: true })}
                                 >
-                                     <Save className="w-4 h-4" />
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M10.1333 2C10.485 2.00501 10.8205 2.14878 11.0667 2.4L13.6 4.93333C13.8512 5.17951 13.995 5.51497 14 5.86667V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 3.33333C2 2.97971 2.14048 2.64057 2.39052 2.39052C2.64057 2.14048 2.97971 2 3.33333 2H10.1333Z" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M11.3332 13.9998V9.33317C11.3332 9.15636 11.2629 8.98679 11.1379 8.86177C11.0129 8.73674 10.8433 8.6665 10.6665 8.6665H5.33317C5.15636 8.6665 4.98679 8.73674 4.86177 8.86177C4.73674 8.98679 4.6665 9.15636 4.6665 9.33317V13.9998" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M4.6665 2V4.66667C4.6665 4.84348 4.73674 5.01305 4.86177 5.13807C4.98679 5.2631 5.15636 5.33333 5.33317 5.33333H9.99984" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
                                     Save
                                 </Button>
                             </div>
