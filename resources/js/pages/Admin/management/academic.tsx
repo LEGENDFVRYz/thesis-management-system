@@ -1,29 +1,19 @@
 import { useState } from 'react';
 import ManagementLayout from '@/pages/Admin/management/index';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
 import { academic } from '@/routes/admin/management/index';
 import { update } from '@/routes/admin/management/academic';
-import { Label } from '@/components/ui/label';
 import { formatLocal } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { toast } from 'sonner';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AcademicYearRangePicker from '@/components/acad-year-range-picker';
 import DatePicker from '@/components/date-picker';
 import AcademicYearIcon from '@/components/Icons/academic-year-management.svg';
 import SemesterIcon from '@/components/Icons/semester-config.svg';
-import TimelineIcon from '@/components/Icons/system-timeline.svg';
-import ProgramIcon from '@/components/Icons/program-overview.svg';
-import PinIcon from '@/components/Icons/pin.svg';
 import CheckIcon from '@/components/Icons/ic_check-Default.svg';
-import TimerIcon from '@/components/Icons/timer.svg';
-import ManagementIcon from '@/components/Icons/ic_pen-settings-Default.svg';
-import { RotateCw, Save } from 'lucide-react';
-import { NavFooter } from '@/components/nav-footer';
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import { Save } from 'lucide-react';
 import { Icon } from '@/components/icon-index';
 
 // Page Setup
@@ -275,7 +265,7 @@ export default function AcademicPage({ active_sy , school_year, active_sem }: Ac
                                     value={acadDate.end ?? undefined}
                                     placeholder="Select End Date"
                                     onChange={(date) => {
-                                        setAcadDate((prev) => ({ ...prev, start: date }));  // render feedbackl
+                                        setAcadDate((prev) => ({ ...prev, end: date }));  // render feedbackl
                                         acadForm.setData('end_date', formatLocal(date));           // form feedback
                                     }}
                                 />
