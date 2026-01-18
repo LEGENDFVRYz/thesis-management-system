@@ -48,7 +48,7 @@ const dp2Milestones = [
 
 // Simulate current student enrollment (In production, fetch from database/API)
 const currentStudentYear = 3;
-const currentStudentSemester = 2; // 1 = First Sem, 2 = Second Sem
+const currentStudentSemester = 1; // 1 = First Sem, 2 = Second Sem
 
 // Determine current course and its milestones based on year and semester
 const getCurrentCourseInfo = (year: number, semester: number) => {
@@ -256,7 +256,6 @@ const calculateTimelineStatus = () => {
   }));
 };
 
-// WizardProgress Component
 interface WizardProgressProps extends React.HTMLAttributes<HTMLDivElement> {
   stepNumber: number;
   stepLabel: string;
@@ -265,7 +264,17 @@ interface WizardProgressProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const WizardProgress = React.forwardRef<HTMLDivElement, WizardProgressProps>(
-  ({ className, stepNumber, stepLabel, state = 'before', progress = 20, ...props }, ref) => {
+  (
+    {
+      className,
+      stepNumber,
+      stepLabel,
+      state = 'before',
+      progress = 20,
+      ...props
+    },
+    ref
+  ) => {
     const renderCircle = () => {
       switch (state) {
         case 'after':
@@ -297,41 +306,56 @@ const WizardProgress = React.forwardRef<HTMLDivElement, WizardProgressProps>(
     const getProgressWidth = () => {
       switch (state) {
         case 'after':
-          return '100%';
+          return 100;
         case 'current':
-          return `${progress}%`;
+          return progress;
         case 'before':
         default:
-          return '0%';
+          return 0;
       }
     };
 
     const getProgressLabel = () => {
       if (state === 'after') return 'Completed';
-      if (state === 'current') return `${progress}%`;
-      return '0%';
+      if (state === 'current') return `${progress.toFixed(1)}%`;
+      return '0.0%';
     };
 
     return (
       <div ref={ref} className={cn('flex flex-col gap-1', className)} {...props}>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-5">
           {renderCircle()}
+
           <span className="text-primary font-bold text-[19px] leading-none font-dm whitespace-nowrap">
             {stepLabel}
           </span>
-          <div className="flex-1 h-2 rounded-lg bg-muted relative overflow-hidden">
+
+          {/* Progress bar */}
+          <div className="flex-1 h-2 rounded-lg bg-muted overflow-hidden">
             <div
-              className="h-full rounded-lg bg-primary-foreground-2 transition-all duration-300 ease-in-out"
-              style={{ width: getProgressWidth() }}
+              className="h-2 rounded-lg bg-primary-foreground-2 transition-all duration-300 ease-in-out"
+              style={{ width: `${getProgressWidth()}%` }}
             />
           </div>
         </div>
-        <span className="text-xs text-gray-500 font-medium ml-[42px]">{getProgressLabel()}</span>
+        
+        {/* Label centered below progress bar */}
+        <div className="flex items-center gap-5">
+          <div className="w-10"></div>
+          <span className="invisible text-primary font-bold text-[19px] leading-none font-dm whitespace-nowrap">
+            {stepLabel}
+          </span>
+          <div className="flex-1 flex justify-center">
+            <span className="text-xs text-gray-500 font-medium">{getProgressLabel()}</span>
+          </div>
+        </div>
       </div>
     );
   }
 );
+
 WizardProgress.displayName = 'WizardProgress';
+
 
 // TrackerBox Component
 function TrackerBox({ count, label, color = 'red', className }: any) {
@@ -355,7 +379,7 @@ function TrackerBox({ count, label, color = 'red', className }: any) {
         <span className="text-2xl font-bold" style={{ color: colors[color].text }}>
           {count}
         </span>
-        <span className="text-sm mt-1 font-medium" style={{ color: colors[color].text }}>
+        <span className="text-sm mt-6 font-medium" style={{ color: colors[color].text }}>
           {label}
         </span>
       </div>
@@ -385,9 +409,9 @@ export default function OverallProgress() {
         >
             <Head title="Overall Progress" />
 
-            <div className="space-y-6">
+            <div className="space-y-2">
                 {/* Wizard Progress */}
-                <section className="space-y-4">
+                <section className="space-y-2">
                     <h3 className="text-[24px] font-bold text-[#730000]">Overall Progress</h3>
                     <div className="flex gap-6">
                         <WizardProgress stepNumber={1} stepLabel="Methods of Research" state={wizardStates.mor.state} progress={wizardStates.mor.progress} className="flex-1" />
@@ -399,7 +423,7 @@ export default function OverallProgress() {
                 {/* Tracker Boxes */}
                 <div className="mt-6">
                     <div className="bg-[#730000] text-white text-center py-2 rounded-t text-[18px]">Overall Tracker</div>
-                    <div className="bg-white rounded-b shadow p-6 space-y-6">
+                    <div className="bg-white rounded-b shadow p-6 space-y-2">
                         <div className="grid grid-cols-4 gap-6">
                             <TrackerBox count={3} label="Pending" color="blue" />
                             <TrackerBox count={2} label="Revisions" color="yellow" />
@@ -439,7 +463,7 @@ export default function OverallProgress() {
                 </div>
 
                 {/* Real-time Schedule Timeline */}
-                <div className="space-y-2 mt-8">
+                <div className="space-y-2 mt-6">
                     <h4 className="font-semibold text-[#730000] text-[18px]">Schedule Timeline</h4>
                     
                     <div className="relative">
@@ -458,7 +482,7 @@ export default function OverallProgress() {
 
                         {/* Timeline events */}
                         {scheduleTimeline.map((event) => (
-                            <div key={event.id} className="relative flex gap-4 pb-6 last:pb-0">
+                            <div key={event.id} className="relative flex gap-6 pb-6 last:pb-0">
                                 {/* Timeline Dot */}
                                 <div className="flex flex-col items-center" style={{ width: '24px', zIndex: 2 }}>
                                     <div className="relative flex items-center justify-center w-6 h-6">
@@ -491,7 +515,7 @@ export default function OverallProgress() {
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="p-0">
-                                        <div className="flex items-center gap-2 mb-1">
+                                        <div className="flex items-center gap-6 mb-1">
                                             <Calendar size={16} color="#730000" />
                                             <span style={{ fontSize: '13px', fontWeight: 600, color: '#730000' }}>{event.dateRange}</span>
                                         </div>
