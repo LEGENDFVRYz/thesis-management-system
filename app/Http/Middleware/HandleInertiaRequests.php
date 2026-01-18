@@ -72,6 +72,14 @@ class HandleInertiaRequests extends Middleware
 
                 return $data;
             },
+            
+            // Toast Setups
+            'flash' => [
+                'success' => session('success'),
+                'error' => session('error'),
+                'info' => session('info'),
+                'warning' => session('warning'),
+            ],
         ];
     }
 }

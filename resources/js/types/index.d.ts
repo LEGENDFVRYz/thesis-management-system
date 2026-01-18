@@ -29,8 +29,10 @@ export interface SharedData {
     auth: Auth;
     sidebarOpen: boolean;
     user_info: UserInfo | null;
+    flash: toastProps
     [key: string]: unknown;
 }
+
 
 export interface User {
     id: number;
@@ -79,4 +81,12 @@ export interface PageHeaderProps {
     title: string;
     subtitle?: string;
     icon?: React.ReactNode;
+}
+
+// Flash Type
+export interface toastProps {
+    success?: string
+    error?: string
+    info?: string
+    warning?: string
 }
