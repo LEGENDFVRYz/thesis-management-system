@@ -92,7 +92,7 @@ export default function Dashboard() {
                  {/* Tab Navigation */}
                 <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
                 {activeTab === 'evaluation' ? (
-                    <EvalPage /> //Split pages
+                    <EvalPage /> 
                 ) : (
                     <ResultsPage />
                 )}
