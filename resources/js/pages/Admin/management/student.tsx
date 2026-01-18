@@ -158,7 +158,7 @@
           pageHeader={pageHeader}
         >
           {/* Filter & Search Section */}
-          {/* UPDATE: Used the existing filter and search section for student management*/}
+          {/* UPDATE: Used the existing filter and search section component for student management*/}
           <FilterSearchSection variant="StudentManagement" />
 
           {/* View Toggle and Import Button */}

@@ -2,6 +2,7 @@ import { useState, useMemo, useRef } from 'react';
 import { Head } from '@inertiajs/react';
 import ManagementLayout from '@/pages/Admin/management/index';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
+import { Plus } from 'lucide-react';
 
 // SHARED COMPONENTS 
 import { NavFooter } from '@/components/nav-footer';
@@ -147,7 +148,10 @@ export default function FacultyManagement({ faculties }: { faculties: RawFaculty
             
             {/* Add Faculty Button */}
             <div className="flex justify-end mt-6 mb-6">
-                <Button onClick={() => setAddFacultyOpen(true)}> + Add Faculty </Button>
+                <Button onClick={() => setAddFacultyOpen(true)}> 
+                    <Plus className="w-4 h-4" />
+                    Add Faculty 
+                </Button>
             </div>
             
             {/* Faculty Data Table */}

@@ -66,7 +66,7 @@ export const ResultsPageTable = ({ resultsData, onViewEvaluation, onExport }: Re
                                         {row.rank}
                                     </span>
                                 </TableCell>
-                                <TableCell className="text-center text-[13.33px] text-gray-700 whitespace-normal break-words">
+                                <TableCell className="text-center text-[13.33px] text-gray-700 whitespace-normal truncate">
                                     {row.title}
                                 </TableCell>
                                 <TableCell className="text-center text-[13.33px] text-gray-700 font-medium whitespace-normal break-words">

@@ -7,7 +7,7 @@ interface TabNavigationProps {
 
 export const TabNavigation = ({ activeTab, onTabChange }: TabNavigationProps) => {
     return (
-        <div className="inline-flex mb-8">
+        <div className="inline-flex mb-4">
             <TabButton
                 isActive={activeTab === 'evaluation'}
                 onClick={() => onTabChange('evaluation')}

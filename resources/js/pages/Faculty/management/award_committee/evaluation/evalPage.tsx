@@ -9,7 +9,6 @@ import { ViewEvaluateModal } from '../components/awards_ViewandEval_modal';
 import { EvaluationRow } from '../components/awards_utils';
 import { evaluationData } from '../components/awards_sampleData';
 
-
 export default function EvalPage() {
     const [isEvaluateModalOpen, setIsEvaluateModalOpen] = useState(false);
     const [selectedEvaluation, setSelectedEvaluation] = useState<EvaluationRow | null>(null);
@@ -21,18 +20,16 @@ export default function EvalPage() {
 
     return (
         <>
-            {/* Page Header Desc */}
+            {/* Page Header Description (below Tab Navigation)*/}
             <PageHeader activeTab="evaluation" />
-            
 
-            {/* EvalPage Content */}
+            {/* EvalPage Table Content */}
             <EvaluationPageTable 
                 evaluationData={evaluationData}
                 onViewEvaluate={handleViewEvaluate}
             />
 
-
-            {/* View & Evaluate Modal */}
+            {/* View & Evaluate Action Button Modal */}
             <ViewEvaluateModal
                 isOpen={isEvaluateModalOpen}
                 onClose={() => setIsEvaluateModalOpen(false)}

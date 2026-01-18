@@ -29,20 +29,20 @@ export default function ResultsPage() {
 
     return (
         <>
-            {/* Page Header */}
+            {/* Page Header Descriptipn (below Tab Navigation)*/}
             <PageHeader 
                 activeTab="results" 
                 evaluationStatus={evaluationStatus}
             />
 
-            {/* Results Content */}
+            {/* Results Page Table Content */}
             <ResultsPageTable
                 resultsData={resultsData}
                 onViewEvaluation={handleViewEvaluationResults}
                 onExport={handleExport}
             />
 
-            {/* View Results Modal */}
+            {/* View Results Button Modal */}
             <ViewResultsModal
                 isOpen={isResultsModalOpen}
                 onClose={() => setIsResultsModalOpen(false)}

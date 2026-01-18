@@ -18,7 +18,7 @@ export const PageHeader = ({ activeTab, evaluationStatus }: PageHeaderProps) => 
                 <p className="text-black-60 mb-6">
                     {activeTab === 'evaluation'
                         ? 'The candidates for the Best Design Project Award are listed below for evaluation.'
-                        : 'Rankings based on completed evaluations across all criteria.'}
+                        : 'Rankings based on evaluation across all criteria.'}
                 </p>
             </div>
             

@@ -30,13 +30,13 @@ export const EvaluationPageTable = ({ evaluationData, onViewEvaluate }: Evaluati
                             Thesis Title
                         </TableHead>
                         <TableHead className="text-white text-center text-[10px] sm:text-xs lg:text-[13.33px] font-semibold whitespace-normal break-words">
-                            Criteria 1: Design Project Output
+                            Criteria 1: <br /> Design Project Output
                         </TableHead>
                         <TableHead className="text-white text-center text-[10px] sm:text-xs lg:text-[13.33px] font-semibold whitespace-normal break-words">
-                            Criteria 2: Design Project Proposal Defense Performance
+                            Criteria 2: <br /> Design Project Proposal Defense Performance
                         </TableHead>
                         <TableHead className="text-white text-center text-[10px] sm:text-xs lg:text-[13.33px] font-semibold whitespace-normal break-words">
-                            Criteria 3: Technological Development
+                            Criteria 3: <br /> Technological Development
                         </TableHead>
                         <TableHead className="text-white text-center text-[10px] sm:text-xs lg:text-[13.33px] font-semibold whitespace-normal break-words">
                             Evaluation Status
@@ -52,7 +52,7 @@ export const EvaluationPageTable = ({ evaluationData, onViewEvaluate }: Evaluati
                             <TableCell className="text-center text-[13.33px] font-medium whitespace-normal break-words">
                                 {row.groupCode}
                             </TableCell>
-                            <TableCell className="text-center text-[13.33px] whitespace-normal break-words">
+                            <TableCell className="text-center text-[13.33px] whitespace-normal truncate">
                                 {row.title}
                             </TableCell>
                             <TableCell className={`text-center text-[13.33px] font-medium whitespace-normal break-words ${getCriteriaColor(row.criteria1)}`}>
