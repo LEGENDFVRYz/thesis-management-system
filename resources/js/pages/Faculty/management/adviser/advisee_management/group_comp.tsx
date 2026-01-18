@@ -33,7 +33,7 @@ const pageHeader: PageHeaderProps = {
 // Types for data from GroupComp.php controller
 interface SectionAdviser {
   section_adviser_id: number;
-  section: number;
+  section: string;
   year_level: number;
 }
 
