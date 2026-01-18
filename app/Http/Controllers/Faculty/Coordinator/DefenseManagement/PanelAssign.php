@@ -11,8 +11,6 @@ class PanelAssign extends Controller
 {
     public function index()
     {
-        // ... (Your existing index code remains exactly the same) ...
-        
         $activeYear = DB::table('tbl_school_years')
             ->join('tbl_semesters', 'tbl_school_years.id', '=', 'tbl_semesters.school_year_id')
             ->where('tbl_semesters.is_active', true)
@@ -106,26 +104,20 @@ class PanelAssign extends Controller
     {
         $request->validate([
             'defense_matrix_id' => 'required|exists:tbl_defense_matrices,id',
-            'panel_ids' => 'required|array',
+            'panel_ids' => 'required|array|min:3|max:3', // Enforce exactly 3
             'panel_ids.*' => 'distinct|exists:tbl_faculty_assignments,id'
         ]);
 
         DB::beginTransaction();
         try {
-            $confirmedCount = DB::table('tbl_endorsed_panels')
+            // 1. SYNC STRATEGY: Remove panelists NOT in the new list
+            // This handles removals and swaps correctly.
+            DB::table('tbl_endorsed_panels')
                 ->where('defense_matrix_id', $request->defense_matrix_id)
-                ->where('is_confirmed', '!=', 0)
-                ->count();
-    
-            $availableSlots = 3 - $confirmedCount;
-    
-            if ($availableSlots <= 0) {
-                return response()->json([
-                    'success' => false, 
-                    'message' => 'Cannot add to panel.'
-                ], 400);
-            }
+                ->whereNotIn('panel_id', $request->panel_ids)
+                ->delete();
 
+            // 2. Add or Update the requested panelists
             foreach ($request->panel_ids as $panelId) {
                 DB::table('tbl_endorsed_panels')->updateOrInsert(
                     [
@@ -133,14 +125,17 @@ class PanelAssign extends Controller
                         'panel_id' => $panelId,
                     ],
                     [
-                        'is_confirmed' => 0, // CHANGED FROM null TO 0
+                        // Ensure is_confirmed is set to 0 (Pending) if adding new
+                        // You can change this logic if you want to preserve existing status
+                        'is_confirmed' => 0, 
                     ]
                 );
             }
 
             DB::commit();
+            // Inertia requires a redirect back, not JSON
             return back()->with('success', 'Panel assignments saved successfully.');
-    
+
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withErrors(['error' => $e->getMessage()]);
@@ -162,49 +157,9 @@ class PanelAssign extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
-            'defense_matrix_id' => 'required|exists:tbl_defense_matrices,id',
-            'panel_ids' => 'required|array',
-            'panel_ids.*' => 'distinct|exists:tbl_faculty_assignments,id'
-        ]);
-    
-        DB::beginTransaction();
-        try {
-            $confirmedCount = DB::table('tbl_endorsed_panels')
-                ->where('defense_matrix_id', $request->defense_matrix_id)
-                ->where('is_confirmed', '!=', 0)
-                ->count();
-    
-            $availableSlots = 3 - $confirmedCount;
-    
-            if ($availableSlots <= 0) {
-                return response()->json([
-                    'success' => false, 
-                    'message' => 'Cannot add to panel.'
-                ], 400);
-            }
-    
-            $panelsToAdd = array_slice($request->panel_ids, 0, $availableSlots);
-    
-            foreach ($panelsToAdd as $panelId) {
-                DB::table('tbl_endorsed_panels')->updateOrInsert(
-                    [
-                        'defense_matrix_id' => $request->defense_matrix_id,
-                        'panel_id' => $panelId,
-                    ],
-                    [
-                        'is_confirmed' => 0, // CHANGED FROM null TO 0
-                    ]
-                );
-            }
-    
-            DB::commit();
-            return back()->with('success', 'Panel assignments updated successfully.');
-    
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->withErrors(['error' => $e->getMessage()]);
-        }
+        // Since we are syncing the full list of 3 panels, 
+        // the logic is identical to store.
+        return $this->store($request);
     }
 
     public function destroy(string $id)

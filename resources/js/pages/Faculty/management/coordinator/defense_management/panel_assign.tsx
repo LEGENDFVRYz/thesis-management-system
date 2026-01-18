@@ -1,5 +1,4 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import AppLayout from '@/layouts/app-layout';
 import { index as matrix } from '@/routes/faculty/coordinator/defense_management/matrix';
 import { index as panel_assign } from '@/routes/faculty/coordinator/defense_management/panel_assign';
 import { BreadcrumbItem, PageHeaderProps } from '@/types';
@@ -20,7 +19,6 @@ import {
 import React, { useState, useEffect } from 'react';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from '@/lib/utils';
-import { HeaderCard } from "@/components/ui/card";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -33,7 +31,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { NavFooter } from '@/components/nav-footer';
 import DocumentPreview from '@/components/document-preview';
 import DefenseManagementLayout from '.';
 
@@ -130,7 +127,6 @@ const pageHeader: PageHeaderProps = {
     title: "Panel Assignment",
     subtitle: "Assign and manage panel members",
     icon: (
-        // pa correct nalang
         <div className="flex h-full w-full items-center justify-center rounded-md bg-[#800000] text-white">
             <Users className="h-5 w-5" />
         </div>
@@ -143,6 +139,7 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
     const [activeTab, setActiveTab] = useState<'assignments' | 'conflicts'>('assignments');
     
     // --- STATE MANAGEMENT ---
+    // Using local state to allow immediate UI updates (Optimistic UI)
     const [localTheses, setLocalTheses] = useState<Thesis[]>(endorsed_thesis); 
     const [openThesisId, setOpenThesisId] = useState<number | null>(null);
     const [thesisAssignments, setThesisAssignments] = useState<Record<number, Panelist[]>>({});
@@ -154,7 +151,7 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
     
     const [selectedDocument, setSelectedDocument] = useState<{title: string, type: string} | null>(null);
 
-    // Sync props with local state
+    // Sync props with local state if the server data changes
     useEffect(() => {
         setLocalTheses(endorsed_thesis);
     }, [endorsed_thesis]);
@@ -188,6 +185,7 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
         });
     };
 
+    // --- SAVE LOGIC WITH POPUP AND BADGE UPDATE ---
     const handleSaveChanges = (thesis: Thesis) => {
         const currentAssignments = thesisAssignments[thesis.thesis_id] || [];
         
@@ -206,8 +204,6 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
         };
     
         const onSuccess = () => {
-            // Update local state: Set is_complete to true AND update the panels array
-            // This ensures the badge updates immediately
             setLocalTheses(prevTheses => 
                 prevTheses.map(t => 
                     t.thesis_id === thesis.thesis_id 
@@ -230,15 +226,17 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
     
         const hasExistingPanels = thesis.panels && thesis.panels.length > 0;
     
+        // UPDATED URLS BELOW:
+        // Removed "/management" and changed "defense_management" to "defense-management"
         if (hasExistingPanels) {
             router.put(
-                `/faculty/management/coordinator/defense_management/panel-assign/${thesis.defense_matrix_id}`,
+                `/faculty/coordinator/defense-management/panel-assign/${thesis.defense_matrix_id}`,
                 payload,
                 { onSuccess, onError }
             );
         } else {
             router.post(
-                '/faculty/management/coordinator/defense_management/panel-assign',
+                '/faculty/coordinator/defense-management/panel-assign',
                 payload,
                 { onSuccess, onError }
             );
@@ -272,18 +270,6 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
 
             <div className="flex flex-col min-h-screen bg-primary-foreground -mt-4 -mx-4 -mb-4 ">
                 
-                {/* Header Card */}
-                {/* <HeaderCard
-                    title="Panel Assignment"
-                    description="Assign and manage panel members"
-                    className="w-full max-w-none rounded-none border-t-0 border-x-0"
-                    icon={
-                        <div className="flex h-full w-full items-center justify-center rounded-md bg-[#800000] text-white">
-                            <Users className="h-5 w-5" />
-                        </div>
-                    }
-                /> */}
-
                 <div className="flex flex-1 flex-col gap-6 p-4 pt-0 w-full">
 
                     {/* 1. Page Tabs */}
@@ -417,7 +403,7 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                                                                     </div>
                                                                 </div>
                                                                 <div className="flex items-center gap-4">
-                                                                    {/* Status Pill - Updated to check if exactly 3 panels are saved */}
+                                                                    {/* BADGE CHANGING LOGIC: Checks length dynamically */}
                                                                     {thesis.panels.length === 3 ? (
                                                                         <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
                                                                             Assigned
@@ -573,8 +559,6 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                         )}
                     </div>
                 </div>
-
-                {/* <NavFooter /> */}
             </div>
 
             {/* ================= SUCCESS NOTIFICATION MODAL ================= */}

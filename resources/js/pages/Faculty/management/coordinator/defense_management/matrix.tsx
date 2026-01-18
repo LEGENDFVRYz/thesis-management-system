@@ -34,10 +34,11 @@ import {
     SelectTrigger, 
     SelectValue 
 } from "@/components/ui/select";
+import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 
 // --- LAYOUTS ---
 import DefenseManagementLayout from '.';
-import { PageHeaderProps } from '@/types';
+import { PageHeaderProps, BreadcrumbItem } from '@/types';
 import { index as panel_assign } from '@/routes/faculty/coordinator/defense_management/panel_assign/index';
 
 // --- CUSTOM ASSETS ---
@@ -146,20 +147,34 @@ const InteractiveIcon = ({
     );
 };
 
-const TabButton = ({ isActive, children, className, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { isActive?: boolean }) => (
-    <button
-        className={cn(
-            'h-12 px-[20px] flex flex-col justify-center items-center gap-2.5 rounded-t-[10px] transition-colors',
-            isActive ? 'bg-[#9b000a] text-white' : 'bg-[#800000] text-white/70 hover:bg-[#9b000a] hover:text-white',
-            className
-        )}
-        {...props}
-    >
-        <span className="font-medium text-[16px] leading-normal whitespace-nowrap font-dm">
-            {children}
-        </span>
-    </button>
+// Matched TabButton from Code A
+interface TabButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    isActive?: boolean;
+}
+
+const TabButton = React.forwardRef<HTMLButtonElement, TabButtonProps>(
+    ({ className, isActive = false, children, ...props }, ref) => (
+        <button
+            ref={ref}
+            className={cn(
+                'h-12 px-[20px] flex flex-col justify-center items-center gap-2.5',
+                'rounded-t-[10px] transition-colors',
+                isActive
+                    ? 'bg-[#9b000a] text-white'
+                    : 'bg-[#800000] text-white/70 hover:bg-[#9b000a] hover:text-white',
+                className
+            )}
+            {...props}
+        >
+            <div className="flex justify-center items-center gap-2.5">
+                <span className="font-medium text-[16px] leading-normal whitespace-nowrap font-dm">
+                    {children}
+                </span>
+            </div>
+        </button>
+    )
 );
+TabButton.displayName = 'TabButton';
 
 const StatusBadge = ({ status }: { status: string }) => {
     const badges = {
@@ -182,7 +197,12 @@ const INITIAL_DEFENSES: Defense[] = [
     { id: '5', title: 'FPGA Implementation of...', block: 'BSCpE 4-4', room: 'Room 315', panel: 'Flores, Garcia, Mendoza', date: new Date('2025-11-29T09:00:00'), status: 'Cancelled', section: '4-4', adviser: 'Dr. Strange', groupCode: '2105', equipment: 'Board' },
 ];
 
-const breadcrumbs = [{ title: 'Matrix Management', href: '#' }];
+const breadcrumbs: BreadcrumbItem[] = [
+    { 
+        title: 'Matrix Management', 
+        href: '#' 
+    },
+];
 
 const pageHeader: PageHeaderProps = {
     title: "Matrix Management",
@@ -259,108 +279,141 @@ export default function MatrixManagement() {
         <DefenseManagementLayout breadcrumbs={breadcrumbs} pageHeader={pageHeader}>
             <Head title="Matrix Management" />
             
-            <div className="flex flex-col gap-6">
+            {/* Added Wrapper to match Code A's full-bleed feel */}
+            <div className="flex flex-col min-h-screen bg-primary-foreground -mt-4 -mx-4 -mb-4">
                 
-                {/* 1. Navigation Tabs */}
-                <div className="flex items-end gap-1 mb-0 border-b border-[#800000]/10 pb-0">
-                    <TabButton onClick={() => router.get(panel_assign().url)}>Panel Assignment</TabButton>
-                    <TabButton isActive>Matrix Management</TabButton>
-                </div>
+                {/* Main Content Container matched to Code A */}
+                <div className="flex flex-1 flex-col gap-6 p-4 pt-0 w-full">
+                
+                    {/* 1. Page Tabs - Matched Style */}
+                    <div className="flex items-end gap-1 mb-0 border-b border-[#800000]/10 pb-0">
+                        <TabButton 
+                            isActive={false} 
+                            onClick={() => router.get(panel_assign().url)}
+                        >
+                            Panel Assignment
+                        </TabButton>
+                        <TabButton isActive={true}>
+                            Matrix Management
+                        </TabButton>
+                    </div>
 
-                {/* 2. Controls */}
-                <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center pt-2">
-                    <Button 
-                        variant="primary" 
-                        onClick={() => setFormModalState({ open: true, mode: 'add', data: null })}
-                    >
-                        <Plus className="mr-2 h-4 w-4" /> Schedule a Defense
-                    </Button>
-
-                    <ToggleGroup 
-                        type="single" 
-                        value={viewMode} 
-                        onValueChange={(value) => { if(value) setViewMode(value as 'table' | 'calendar') }}
-                        className="bg-[#F3E5CA] rounded-xl p-1 gap-1 w-auto whitespace-nowrap"
-                    >
-                        <ToggleGroupItem value="table" className="data-[state=on]:bg-[#800000] data-[state=on]:text-white text-[#800000] h-8 px-3 text-xs font-bold">
-                            <LayoutList className="mr-2 h-3 w-3" /> Table View
-                        </ToggleGroupItem>
-                        <ToggleGroupItem value="calendar" className="data-[state=on]:bg-[#800000] data-[state=on]:text-white text-[#800000] h-8 px-3 text-xs font-bold">
-                            <CalendarDays className="mr-2 h-3 w-3" /> Calendar View
-                        </ToggleGroupItem>
-                    </ToggleGroup>
-                </div>
-
-                {/* 3. Main Content Area */}
-                <div className="min-h-[600px] flex-1">
-                    {viewMode === 'calendar' ? (
-                        <DefenseCalendarWeekly 
-                            events={calendarEvents}
-                            value={currentDate}
-                            onChange={setCurrentDate}
-                            className="shadow-sm border-sidebar-border/70 h-full"
-                        />
-                    ) : (
-                        <div className="rounded-xl border border-gray-200 overflow-hidden shadow-sm dark:border-sidebar-border h-full flex flex-col bg-white">
-                            <div className={`${GRID_LAYOUT} bg-[#800000] text-white text-sm font-bold`}>
-                                <span className="text-center">Title</span>
-                                <span className="text-center">Block</span>
-                                <span className="text-center">Room</span>
-                                <span className="text-center">Panel</span>
-                                <span className="text-center">Date & Time</span>
-                                <span className="text-center">Status</span>
-                                <span className="text-center">Action</span>
-                            </div>
-                            <div className="flex-1 overflow-auto">
-                                {defensesList.map((defense) => (
-                                    <div key={defense.id} className={`${GRID_LAYOUT} border-b border-gray-100 hover:bg-gray-50 transition-colors`}>
-                                        <span className="text-sm text-gray-800 font-medium truncate" title={defense.title}>{defense.title}</span>
-                                        <span className="text-sm text-gray-800 text-center">{defense.block}</span>
-                                        <span className="text-sm text-gray-800 text-center">{defense.room}</span>
-                                        <span className="text-sm text-gray-800 truncate text-center" title={defense.panel}>{defense.panel}</span>
-                                        <div className="flex flex-col items-center text-sm text-gray-800">
-                                            <span>{defense.date.toLocaleDateString()}</span>
-                                            <span className="text-xs text-gray-500">{defense.date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span>
-                                        </div>
-                                        <div className="flex justify-center"><StatusBadge status={defense.status} /></div>
-                                        
-                                        {/* --- INTERACTIVE ICONS --- */}
-                                        <div className="flex items-center justify-center gap-3">
-                                            <InteractiveIcon 
-                                                def={ic_eyeopen_Default} 
-                                                hover={ic_eyeopen_Hover} 
-                                                clicked={ic_eyeopen_Clicked} 
-                                                onClick={() => setFormModalState({ open: true, mode: 'view', data: defense })} 
-                                                title="View Details" 
-                                            />
-                                            <InteractiveIcon 
-                                                def={ic_edit_Default} 
-                                                hover={ic_edit_Hover} 
-                                                clicked={ic_edit_Clicked} 
-                                                onClick={() => setFormModalState({ open: true, mode: 'edit', data: defense })} 
-                                                title="Edit" 
-                                            />
-                                            <InteractiveIcon 
-                                                def={ic_delete_Default} 
-                                                hover={ic_delete_Hover} 
-                                                clicked={ic_delete_Clicked} 
-                                                onClick={() => setDeleteModalState({ open: true, id: defense.id })} 
-                                                title="Delete" 
-                                            />
-                                        </div>
-
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="bg-gray-50 px-5 py-3 text-xs text-center text-gray-500 border-t border-gray-200 mt-auto">
-                                {defensesList.length} Upcoming Defenses
-                            </div>
+                    {/* 2. Controls & Filters - Matched Spacing */}
+                    <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center pt-2">
+                        {/* Action Button (Now on the Left) */}
+                        <div className="flex items-center gap-2">
+                            <Button 
+                                variant="primary" 
+                                onClick={() => setFormModalState({ open: true, mode: 'add', data: null })}
+                            >
+                                <Plus className="mr-2 h-4 w-4" /> Schedule a Defense
+                            </Button>
                         </div>
-                    )}
+
+                        {/* Sub-Tabs - Matched Style to Code A (Now on the Right) */}
+                        <ToggleGroup 
+                            type="single" 
+                            value={viewMode} 
+                            onValueChange={(value) => { if(value) setViewMode(value as 'table' | 'calendar') }}
+                            className="bg-[#F3E5CA] rounded-lg p-1 gap-1 inline-flex"
+                        >
+                            <ToggleGroupItem 
+                                value="calendar" 
+                                className="whitespace-nowrap w-auto data-[state=on]:bg-[#800000] data-[state=on]:text-white text-[#800000] hover:bg-[#800000]/10 hover:text-[#800000] h-8 px-4 text-xs font-bold"
+                            >
+                                <CalendarDays className="mr-2 h-3 w-3" /> Calendar View
+                            </ToggleGroupItem>
+                            <ToggleGroupItem 
+                                value="table" 
+                                className="whitespace-nowrap w-auto data-[state=on]:bg-[#800000] data-[state=on]:text-white text-[#800000] hover:bg-[#800000]/10 hover:text-[#800000] h-8 px-4 text-xs font-bold"
+                            >
+                                <LayoutList className="mr-2 h-3 w-3" /> Table View
+                            </ToggleGroupItem>
+                        </ToggleGroup>
+                    </div>
+
+                    {/* 3. Main Content Area */}
+                    <div className="min-h-[600px] flex-1">
+                        {viewMode === 'calendar' ? (
+                            <DefenseCalendarWeekly 
+                                events={calendarEvents}
+                                value={currentDate}
+                                onChange={setCurrentDate}
+                                className="shadow-sm border-sidebar-border/70 h-full"
+                            />
+                        ) : (
+                            /* Matched container style for table view to look like a card */
+                            <div className="rounded-xl border bg-card shadow-sm h-full flex flex-col bg-white overflow-hidden">
+                                <div className={`${GRID_LAYOUT} bg-[#800000] text-white text-sm font-bold`}>
+                                    <span className="text-center">Title</span>
+                                    <span className="text-center">Block</span>
+                                    <span className="text-center">Room</span>
+                                    <span className="text-center">Panel</span>
+                                    <span className="text-center">Date & Time</span>
+                                    <span className="text-center">Status</span>
+                                    <span className="text-center">Action</span>
+                                </div>
+                                <div className="flex-1 overflow-auto">
+                                    {defensesList.length === 0 ? (
+                                        <div className="relative flex h-full min-h-[400px] flex-col items-center justify-center">
+                                            <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/10 dark:stroke-neutral-100/10" />
+                                            <div className="z-10 text-center">
+                                                <CalendarIcon className="mx-auto mb-2 size-10 text-muted-foreground/50" />
+                                                <h3 className="text-lg font-medium">No Schedules</h3>
+                                                <p className="text-sm text-muted-foreground">No defense schedules found.</p>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        defensesList.map((defense) => (
+                                            <div key={defense.id} className={`${GRID_LAYOUT} border-b border-gray-100 hover:bg-gray-50 transition-colors`}>
+                                                <span className="text-sm text-gray-800 font-medium truncate" title={defense.title}>{defense.title}</span>
+                                                <span className="text-sm text-gray-800 text-center">{defense.block}</span>
+                                                <span className="text-sm text-gray-800 text-center">{defense.room}</span>
+                                                <span className="text-sm text-gray-800 truncate text-center" title={defense.panel}>{defense.panel}</span>
+                                                <div className="flex flex-col items-center text-sm text-gray-800">
+                                                    <span>{defense.date.toLocaleDateString()}</span>
+                                                    <span className="text-xs text-gray-500">{defense.date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span>
+                                                </div>
+                                                <div className="flex justify-center"><StatusBadge status={defense.status} /></div>
+                                                
+                                                {/* --- INTERACTIVE ICONS --- */}
+                                                <div className="flex items-center justify-center gap-3">
+                                                    <InteractiveIcon 
+                                                        def={ic_eyeopen_Default} 
+                                                        hover={ic_eyeopen_Hover} 
+                                                        clicked={ic_eyeopen_Clicked} 
+                                                        onClick={() => setFormModalState({ open: true, mode: 'view', data: defense })} 
+                                                        title="View Details" 
+                                                    />
+                                                    <InteractiveIcon 
+                                                        def={ic_edit_Default} 
+                                                        hover={ic_edit_Hover} 
+                                                        clicked={ic_edit_Clicked} 
+                                                        onClick={() => setFormModalState({ open: true, mode: 'edit', data: defense })} 
+                                                        title="Edit" 
+                                                    />
+                                                    <InteractiveIcon 
+                                                        def={ic_delete_Default} 
+                                                        hover={ic_delete_Hover} 
+                                                        clicked={ic_delete_Clicked} 
+                                                        onClick={() => setDeleteModalState({ open: true, id: defense.id })} 
+                                                        title="Delete" 
+                                                    />
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                                <div className="bg-gray-50 px-5 py-3 text-xs text-center text-gray-500 border-t border-gray-200 mt-auto">
+                                    {defensesList.length} Upcoming Defenses
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
-            {/* --- MODALS --- */}
+            {/* --- MODALS (Placed outside the main flex flow but inside layout) --- */}
             <DefenseFormDialog 
                 open={formModalState.open} 
                 onOpenChange={(open) => setFormModalState(prev => ({ ...prev, open }))}
