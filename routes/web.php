@@ -193,8 +193,7 @@ Route::prefix('faculty')->group(function () {
                 
                 # "Advisee Management" - PROGRESS
                 Route::get('progress', [ProgressReport::class, 'index'])->name('progress.index');
-                
-                
+
                 // ----------------------------------------------------------------------
                 // NOTE: DEFENSE MANAGEMENT OF ADVISER HAS BEEN JOINED WITH PANEL
                 // ----------------------------------------------------------------------
