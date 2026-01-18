@@ -19,6 +19,7 @@ use App\Http\Controllers\Faculty\Coordinator\Communication;
 use App\Http\Controllers\Faculty\Coordinator\DefenseManagement\Matrix;
 use App\Http\Controllers\Faculty\Coordinator\DefenseManagement\PanelAssign;
 use App\Http\Controllers\Faculty\Coordinator\ThesisMonitoring\ThesisRegistry;
+use App\Http\Controllers\Faculty\Coordinator\ThesisMonitoring\ProgressReports;
 use App\Http\Controllers\Faculty\Joint1\DefenseManagement;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\FileImportController;
@@ -279,13 +280,11 @@ Route::prefix('faculty')->group(function () {
 
                 # THESIS MONITORING
                 Route::prefix('thesis')->as('thesis.')->group(function () {
-                    Route::redirect('/', 'thesis_monitoring/thesis_registry')->name('index');     // temporary
+                    Route::redirect('/', 'thesis/thesis_registry')->name('index');     // temporary
 
                     Route::get('registry', [ThesisRegistry::class, 'index'])->name('registry');
-
-                    Route::get('progress', function () {
-                        return Inertia::render('Faculty/management/coordinator/thesis_monitoring/progress');
-                    })->name('progress');
+                    Route::get('progress', [ProgressReports::class, 'index'])->name('progress');
+                    
                 });
 
                 # GRADING MANAGEMENT
