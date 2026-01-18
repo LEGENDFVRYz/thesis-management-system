@@ -33,9 +33,10 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
+
 /*
 ==================================================================================
-WEB STATIC ROUTES       (global routes)
+PUBLIC AND WEB STATIC ROUTES
 ==================================================================================
 */
 Route::get('/', function () {
@@ -43,19 +44,6 @@ Route::get('/', function () {
         'canRegister' => false,
     ]);
 })->name('home');
-
-// UI Showcase (temporary - for testing components)
-Route::get('/ui-showcase', function () {
-    return Inertia::render('ui-showcase');
-})->name('ui-showcase');
-
-Route::get('/components-showcase', function () {
-    return Inertia::render('components-showcase');
-})->name('components-showcase');
-
-Route::get('/badges-icons-showcase', function () {
-    return Inertia::render('badges-icons-showcase');
-})->name('badges-icons-showcase');
 
 // FAQ Page
 Route::get('/faq', function () {
@@ -68,7 +56,20 @@ Route::get('/faq', function () {
 // });
 
 
-// GUEST ROUTES
+/*
+==================================================================================
+GUEST ROUTES
+==================================================================================
+*/
+Route::middleware('guest')->group(function () {
+    Route::get('login', [StudentLoginController::class, 'create'])->name('student.login');
+    Route::post('login', [StudentLoginController::class, 'store'])->name('student.store');
+
+    Route::get('faculty/login', [FacultyLoginController::class, 'create'])->middleware('gues')->name('faculty.login');
+    Route::post('faculty/login', [FacultyLoginController::class, 'store'])->name('faculty.store');
+});
+
+
 Route::prefix('guest')->group(function () {
     Route::get('/', function () {
         return Inertia::render('Guest/landing');
@@ -84,25 +85,12 @@ Route::prefix('guest')->group(function () {
     Route::get('/preview/{id}',  [ThesisArchive::class, 'show'])->name('guest.preview');
 });
 
-// PUBLIC ARCHIVE (legacy routes - redirect to guest)
-Route::prefix('repository')->group(function () {
-    Route::redirect('/', '/guest/repository')->name('repository.index');
-    Route::redirect('thesis', '/guest/repository')->name('repository.theses');
-});
-
 
 /*
 ==================================================================================
 STUDENT ROUTES
 ==================================================================================
 */
-Route::middleware('gues')->group(function () {
-    Route::get('login', [StudentLoginController::class, 'create'])->name('student.login');
-    Route::post('login', [StudentLoginController::class, 'store'])->name('student.store');
-});
-Route::post('logout', [StudentLoginController::class, 'destroy'])->name('student.logout');
-
-// AUTHENTICATED STUDENT ROUTES
 Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Student/dashboard'); // Your Student Dashboard Component
@@ -152,20 +140,12 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 
 /*
 ==================================================================================
-FACULTY ROUTES      (NON-ADMIN SIDE)
+FACULTY ROUTES  (NON-ADMIN SIDE)
 ==================================================================================
 - Expected Roles: "ADVISER", "PANEL", "COORDINATOR"
 
 */
 Route::prefix('faculty')->group(function () {
-    // PUBLIC FACULTY ROUTES
-    Route::middleware('gues')->group(function () {
-        Route::get('login', [FacultyLoginController::class, 'create'])->middleware('gues')->name('faculty.login');
-        Route::post('login', [FacultyLoginController::class, 'store'])->name('faculty.store');
-    });
-    Route::post('logout', [FacultyLoginController::class, 'destroy'])->name('faculty.logout');  // can be removed
-
-    // AUTHENTICATED FACULTY ROUTES
     Route::middleware(['auth', 'role:faculty'])->group(function () {
         Route::get('dashboard', function () {
             return Inertia::render('Faculty/dashboard');
@@ -329,7 +309,7 @@ Route::prefix('faculty')->group(function () {
 
 /*
 ==================================================================================
-ADMIN ROUTES      
+ADMIN ROUTES 
 
 Note: Pages of admin side are still in the faculty by default (switch is in the navigation) 
 ==================================================================================
@@ -430,6 +410,10 @@ Route::middleware(['auth'])->group(function() {
     Route::get('profilemanagement', function () {
         return Inertia::render('Shared/profilemanagement'); 
     })->name('admin.profilemanagement');
+
+    // ---- Shared Operations ----
+    Route::post('logout', [StudentLoginController::class, 'destroy'])->name('student.logout');              // technically the same thing
+    Route::post('faculty/logout', [FacultyLoginController::class, 'destroy'])->name('faculty.logout');      // technically the same thing
 });
 
 
@@ -443,6 +427,24 @@ Route::post('file-import', [FileImportController::class, 'store'])->name('file.i
 Route::get('/resources/{filekey}/download', [ResourceController::class, 'download'])->name('resources.download');
 Route::get('/manuscripts/{id}/stream', [PdfViewerController::class, 'streamPdf'])->name('manuscripts.stream');
 
+
+
+/*
+==================================================================================
+TESTING ROUTES (temporary only)
+==================================================================================
+*/
+Route::get('/ui-showcase', function () {
+    return Inertia::render('ui-showcase');
+})->name('ui-showcase');
+
+Route::get('/components-showcase', function () {
+    return Inertia::render('components-showcase');
+})->name('components-showcase');
+
+Route::get('/badges-icons-showcase', function () {
+    return Inertia::render('badges-icons-showcase');
+})->name('badges-icons-showcase');
 
 
 
