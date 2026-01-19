@@ -9,7 +9,7 @@ import EditGroupModal from './components/edit-group';
 import ManageGroupModal from './components/manage-group';
 import { index } from '@/routes/faculty/adviser/group_comp';
 import { destroy } from '@/routes/faculty/adviser/group_comp/index';
-import { Icon } from '@/components/icon-index';
+import { Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 // Page Setup
@@ -21,14 +21,11 @@ const breadcrumb: BreadcrumbItem[] = [
 ];
 
 const pageHeader: PageHeaderProps = {
-  title: "Group Composition",
-  subtitle: "Create and manage thesis group compositions and membership changes",
-  icon: (
-    <Icon
-      name="proponentsDefault"
-      className="w-8 h-8 text-primary"
-    />
-  ),
+    title: "Group Composition",
+    subtitle: "Create and manage thesis group compositions and membership changes",
+    icon: (
+        <Users className="w-8 h-8 text-primary" />
+    ),
 };
 
 // Types for data from GroupComp.php controller

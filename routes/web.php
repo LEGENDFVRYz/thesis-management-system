@@ -50,6 +50,19 @@ Route::get('/ui-showcase', function () {
     return Inertia::render('ui-showcase');
 })->name('ui-showcase');
 
+// Temporary routes for testing error pages
+Route::get('/test-404', function () {
+    return Inertia::render('Error/404');
+})->name('test.404');
+
+Route::get('/test-500', function () {
+    return Inertia::render('Error/500');
+})->name('test.500');
+
+Route::get('/test-403', function () {
+    return Inertia::render('Error/403');
+})->name('test.403');
+
 Route::get('/components-showcase', function () {
     return Inertia::render('components-showcase');
 })->name('components-showcase');
@@ -117,6 +130,30 @@ Route::middleware(['auth', 'role:student'])->group(function () {
         Route::get('thesis', function () {
             return Inertia::render('Student/management/thesis-management/thesis');
         })->name('student.management.thesis');
+
+        // Route::redirect('thesis', '/management/thesis/documents')->name('student.management.thesis');
+
+        // Route::prefix('thesis')->group(function () {
+        //     Route::get('documents', function () {
+        //         return Inertia::render('Student/management/thesis-management/documents');
+        //     })->name('student.management.thesis.documents');
+
+        //     Route::get('compare', function () {
+        //         return Inertia::render('Student/management/thesis-management/compare');
+        //     })->name('student.management.thesis.compare');
+
+        //     Route::get('comments', function () {
+        //         return Inertia::render('Student/management/thesis-management/comments');
+        //     })->name('student.management.thesis.comments');
+
+        //     Route::get('final-submission', function () {
+        //         return Inertia::render('Student/management/thesis-management/final-submission');
+        //     })->name('student.management.thesis.final_submission');
+
+        //     Route::get('change-request', function () {
+        //         return Inertia::render('Student/management/thesis-management/change-request');
+        //     })->name('student.management.thesis.change_request');
+        // });
 
         # Defense Management
         Route::get('defense_matrix', [MatrixController::class, 'index'])->name('student.management.defense_matrix');

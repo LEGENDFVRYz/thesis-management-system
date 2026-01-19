@@ -1,20 +1,15 @@
-import React, { useState } from 'react';
-import { Users, Calendar, Save, Send, ClipboardCheck } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { NavFooter } from '@/components/nav-footer';
-import AppLayout from '@/layouts/app-layout';
-import { AppContent } from '@/components/app-content';
+import { ClipboardCheck, Users, Calendar } from 'lucide-react';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import StudentManagementLayout from '.';
 
 // Page Setup
 const breadcrumbs: BreadcrumbItem[] = [
-  { title: 'Evaluation & Grading', href: '' },
+  { title: 'Evaluation Review', href: '' },
 ];
 
 const pageHeader: PageHeaderProps = {
-    title: "Evaluation & Grading",
-    subtitle: "Complete thesis defense evaluation form",
+    title: "Evaluation Review",
+    subtitle: "View the summary of grades and feedback given by the panel and adviser",
     icon: (
         // pa correct nalang
         <div className="flex h-8 w-8 items-center justify-center text-primary">
@@ -26,8 +21,14 @@ const pageHeader: PageHeaderProps = {
 
 
 const EvaluationFormSection = () => {
-  const [ratings, setRatings] = useState<Record<string, number>>({});
-  const [modalConfig, setModalConfig] = useState<{ isOpen: boolean; type: 'save' | 'submit' | null }>({ isOpen: false, type: null });
+  // Mock data for display - ratings already given by panel/adviser
+  const ratings: Record<string, number> = {
+    '1-0': 3, '1-1': 3, '1-2': 4,
+    '2-0': 3,
+    '3-0': 4, '3-1': 3, '3-2': 3,
+    '4-0': 3, '4-1': 4, '4-2': 3,
+    '5-0': 3, '5-1': 3, '5-2': 4, '5-3': 3, '5-4': 3,
+  };
 
   const group = {
     code: '3301',
@@ -93,70 +94,24 @@ const EvaluationFormSection = () => {
     }
   ];
 
-  const handleRatingChange = (sectionId: number, indicatorIndex: number, value: number) => {
-    setRatings(prev => ({ ...prev, [`${sectionId}-${indicatorIndex}`]: value }));
-  };
-
-  const handleConfirmAction = () => {
-    if (modalConfig.type === 'save') {
-      console.log("Saving Draft...");
-    } else if (modalConfig.type === 'submit') {
-      console.log("Submitting Grades...");
-    }
-    setModalConfig({ isOpen: false, type: null });
-  };
-
   return (
-    <>
     <StudentManagementLayout
         breadcrumbs={breadcrumbs}
         pageHeader={pageHeader}
     >
-      
-          {/* Confirmation Modal */}
-          {modalConfig.isOpen && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-              <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 text-center">
-                <div className="mx-auto w-16 h-16 bg-[#900000] rounded-full flex items-center justify-center mb-6 shadow-md">
-                  <span className="text-white text-4xl font-bold">!</span>
-                </div>
-                <h2 className="text-lg font-bold text-gray-900 mb-2">
-                  Are you sure you want to {modalConfig.type === 'save' ? 'save changes' : 'submit grades'}?
-                </h2>
-                <p className="text-gray-900 font-medium text-sm mb-8">
-                  This action cannot be undone.
-                </p>
-                <div className="flex items-center justify-center gap-4">
-                  <Button variant="link"
-                    onClick={() => setModalConfig({ isOpen: false, type: null })}
-                    className="px-10 py-2.5 rounded-full border border-gray-800 text-gray-900 font-bold hover:bg-gray-50 transition-colors min-w-[120px]"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleConfirmAction}
-                    className="px-10 py-2.5 rounded-full bg-[#900000] text-white font-bold hover:bg-[#700000] transition-colors shadow-sm min-w-[120px]"
-                  >
-                    Confirm
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
-
           <div className="flex flex-1 flex-col gap-6 w-full">
             <div className="space-y-6">
-              
+
               {/* Header */}
-              <h2 className="text-[#900000] text-lg font-bold mb-6">
-                Individual Evaluation
+              <h2 className="text-primary text-lg font-bold mb-6">
+                Evaluation Summary
               </h2>
 
               {/* Defense Details Card */}
-              <div className="bg-[#FDFCF6] border border-stone-200 rounded-xl p-6 shadow-sm">
+              <div className="bg-accent border border-stone-200 rounded-xl p-6 shadow-sm">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h2 className="text-[#900000] font-bold text-lg">Defense Details</h2>
+                    <h2 className="text-primary font-bold text-lg">Defense Details</h2>
                     <p className="text-gray-500 text-xs mt-1">Complete information about the thesis defense</p>
                   </div>
                   <div className="text-right">
@@ -169,30 +124,30 @@ const EvaluationFormSection = () => {
                 </div>
                 
                 <div className="mt-6">
-                  <h3 className="text-[#900000] text-xs font-bold mb-1">Thesis Title</h3>
+                  <h3 className="text-primary text-xs font-bold mb-1">Thesis Title</h3>
                   <p className="font-bold text-gray-800 text-sm">{group.title}</p>
                 </div>
 
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-12 gap-6">
                   <div className="md:col-span-7 grid grid-cols-3 gap-y-6 gap-x-4">
                     <div className="col-span-1">
-                      <h3 className="text-[#900000] text-xs font-bold">Block</h3>
+                      <h3 className="text-primary text-xs font-bold">Block</h3>
                       <span className="text-gray-600 text-xs mt-1 inline-block bg-stone-100 px-2 py-0.5 rounded border border-stone-200">BSCPE 3-3</span>
                     </div>
                     <div className="col-span-1">
-                      <h3 className="text-[#900000] text-xs font-bold">Venue</h3>
+                      <h3 className="text-primary text-xs font-bold">Venue</h3>
                       <p className="text-gray-600 text-xs mt-1">Room 313, CEA</p>
                     </div>
                     <div className="col-span-1">
-                      <h3 className="text-[#900000] text-xs font-bold">Time</h3>
+                      <h3 className="text-primary text-xs font-bold">Time</h3>
                       <p className="text-gray-600 text-xs mt-1">09:00 AM</p>
                     </div>
                     <div className="col-span-1">
-                      <h3 className="text-[#900000] text-xs font-bold">Thesis Adviser</h3>
+                      <h3 className="text-primary text-xs font-bold">Thesis Adviser</h3>
                       <p className="text-gray-600 text-xs mt-1">Dr. Maria Santos</p>
                     </div>
                     <div className="col-span-2">
-                      <h3 className="text-[#900000] text-xs font-bold">Date</h3>
+                      <h3 className="text-primary text-xs font-bold">Date</h3>
                       <p className="text-gray-600 text-xs mt-1 flex items-center gap-1">
                         <Calendar className="w-3 h-3" /> 11/25/2025
                       </p>
@@ -200,10 +155,10 @@ const EvaluationFormSection = () => {
                   </div>
 
                   <div className="md:col-span-2">
-                    <h3 className="text-[#900000] text-xs font-bold">Proponents</h3>
+                    <h3 className="text-primary text-xs font-bold">Proponents</h3>
                     <div className="flex flex-col gap-2 mt-1">
                       {['John Doe', 'Jane Smith', 'Mike Johnson', 'John Doe'].map((name, i) => (
-                        <span key={i} className="bg-[#F5ECD5] text-[#700000] text-[10px] px-2 py-1 rounded-full font-bold w-fit flex items-center gap-1">
+                        <span key={i} className="bg-primary/10 text-primary text-[10px] px-2 py-1 rounded-full font-bold w-fit flex items-center gap-1">
                           <Users className="w-3 h-3" /> {name}
                         </span>
                       ))}
@@ -211,11 +166,11 @@ const EvaluationFormSection = () => {
                   </div>
 
                   <div className="md:col-span-3">
-                    <h3 className="text-[#900000] text-xs font-bold">Defense Panel</h3>
+                    <h3 className="text-primary text-xs font-bold">Defense Panel</h3>
                     <div className="flex flex-col gap-3 mt-2">
                       {panelists.map((panelist) => (
                         <div key={panelist.id} className="flex items-center gap-2 p-1.5 bg-white rounded-lg border border-stone-100 shadow-sm">
-                          <span className="bg-[#BC8585] text-white text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-bold">
+                          <span className="bg-primary/60 text-white text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-bold">
                             {panelist.role}
                           </span>
                           <span className="text-gray-800 text-xs font-bold">{panelist.name}</span>
@@ -229,9 +184,9 @@ const EvaluationFormSection = () => {
               {/* Panelist Evaluation Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-2">
                 {panelists.map((panelist) => (
-                  <div key={panelist.id} className="bg-[#FDFCF6] border border-stone-200 rounded-xl p-6 shadow-sm">
+                  <div key={panelist.id} className="bg-accent border border-stone-200 rounded-xl p-6 shadow-sm">
                     <div className="flex items-center gap-3 mb-6 pb-4 border-b border-stone-100">
-                      <div className="w-8 h-8 rounded-full bg-[#BC8585] text-white font-bold text-xs flex items-center justify-center shadow-sm">
+                      <div className="w-8 h-8 rounded-full bg-primary/60 text-white font-bold text-xs flex items-center justify-center shadow-sm">
                         {panelist.role}
                       </div>
                       <span className="font-bold text-gray-800 text-sm">{panelist.name}</span>
@@ -239,11 +194,11 @@ const EvaluationFormSection = () => {
 
                     <div className="flex justify-between items-start mb-6">
                       <div>
-                        <h4 className="text-[#900000] text-xs font-bold mb-1">Total Score</h4>
+                        <h4 className="text-primary text-xs font-bold mb-1">Total Score</h4>
                         <span className="text-lg font-bold text-gray-800">{panelist.score}</span>
                       </div>
                       <div className="text-right">
-                        <h4 className="text-[#900000] text-xs font-bold mb-1">Evaluation Decision</h4>
+                        <h4 className="text-primary text-xs font-bold mb-1">Evaluation Decision</h4>
                         <span className={`text-[10px] px-3 py-1 rounded-full font-bold text-white shadow-sm ${
                           panelist.decision === 'Accepted' ? 'bg-evaluated-font-color' : 'bg-primary'
                         }`}>
@@ -253,7 +208,7 @@ const EvaluationFormSection = () => {
                     </div>
 
                     <div>
-                      <h4 className="text-[#900000] text-xs font-bold mb-2">Comments/Recommendations</h4>
+                      <h4 className="text-primary text-xs font-bold mb-2">Comments/Recommendations</h4>
                       <p className="text-xs text-gray-600 leading-relaxed">
                         {panelist.comments}
                       </p>
@@ -263,7 +218,7 @@ const EvaluationFormSection = () => {
               </div>
 
               {/* Rubrics Section */}
-              <div className="bg-[#FDFCF6] border border-stone-200 rounded-xl p-8 shadow-sm mt-10">
+              <div className="bg-accent border border-stone-200 rounded-xl p-8 shadow-sm mt-10">
                 {rubricSections.map((rubric, idx) => (
                   <div key={rubric.id} className="space-y-4">
                     {idx > 0 && <div className="w-full h-px bg-black my-10" />}
@@ -273,23 +228,23 @@ const EvaluationFormSection = () => {
                       <p className="text-xs font-bold max-w-4xl leading-relaxed">{rubric.description}</p>
                     </div>
 
-                    <div className="border border-[#D4A3A3] rounded-xl overflow-hidden shadow-sm">
+                    <div className="border border-primary/30 rounded-xl overflow-hidden shadow-sm">
                       <table className="w-full text-left border-collapse">
                         <thead>
                           <tr className="text-center text-xs">
-                            <th className="px-4 py-3 w-[20%] text-left font-bold bg-[#700000] text-white">
+                            <th className="px-4 py-3 w-[20%] text-left font-bold bg-primary text-white">
                               Performance Indicator
                             </th>
-                            <th className="px-4 py-3 w-[18%] bg-[#F5ECD5] text-[#520000] font-bold border-r border-[#E0D0A0]">
+                            <th className="px-4 py-3 w-[18%] bg-primary/10 text-primary font-bold border-r border-sidebar-accent/50">
                               1<br/>Insufficient
                             </th>
-                            <th className="px-4 py-3 w-[18%] bg-[#F5ECD5] text-[#520000] font-bold border-r border-[#E0D0A0]">
+                            <th className="px-4 py-3 w-[18%] bg-primary/10 text-primary font-bold border-r border-sidebar-accent/50">
                               2<br/>Developing
                             </th>
-                            <th className="px-4 py-3 w-[18%] bg-[#F5ECD5] text-[#520000] font-bold border-r border-[#E0D0A0]">
+                            <th className="px-4 py-3 w-[18%] bg-primary/10 text-primary font-bold border-r border-sidebar-accent/50">
                               3<br/>Proficient
                             </th>
-                            <th className="px-4 py-3 w-[18%] bg-[#F5ECD5] text-[#520000] font-bold">
+                            <th className="px-4 py-3 w-[18%] bg-primary/10 text-primary font-bold">
                               4<br/>Advanced
                             </th>
                             <th className="px-2 py-3 w-[8%] bg-[#E5E5E5] text-gray-700 font-bold border-l border-gray-300">
@@ -313,12 +268,12 @@ const EvaluationFormSection = () => {
                                   {[1, 2, 3, 4].map((val) => (
                                     <div key={val} className="flex flex-col items-center">
                                       <span className="text-[9px] font-bold text-gray-400 mb-1">{val}</span>
-                                      <input 
-                                        type="radio" 
+                                      <input
+                                        type="radio"
                                         name={`rating-${rubric.id}-${i}`}
                                         checked={ratings[`${rubric.id}-${i}`] === val}
-                                        onChange={() => handleRatingChange(rubric.id, i, val)}
-                                        className="appearance-none w-5 h-5 border-2 border-gray-400 rounded-full checked:border-[#900000] checked:border-[6px] transition-all cursor-pointer bg-white"
+                                        readOnly
+                                        className="appearance-none w-5 h-5 border-2 border-gray-400 rounded-full checked:border-primary checked:border-[6px] transition-all cursor-default bg-white"
                                       />
                                     </div>
                                   ))}
@@ -338,55 +293,21 @@ const EvaluationFormSection = () => {
               
               {/* Total Score and Decision Section */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-[#FDFCF6] border border-[#D4A3A3] rounded-xl p-6 shadow-sm flex flex-col justify-center items-center">
-                  <span className="text-[#900000] font-bold text-sm mb-1">Total Score</span>
+                <div className="bg-accent border border-primary/30 rounded-xl p-6 shadow-sm flex flex-col justify-center items-center">
+                  <span className="text-primary font-bold text-sm mb-1">Total Score</span>
                   <span className="text-4xl font-bold text-gray-800">3.0</span>
                 </div>
-                <div className="bg-[#FDFCF6] border border-[#D4A3A3] rounded-xl p-6 shadow-sm md:col-span-2">
-                  <h3 className="text-[#900000] font-bold text-sm mb-4">Evaluation Decision</h3>
-                  <div className="flex gap-8">
-                    <label className="flex items-center gap-3 cursor-pointer group">
-                      <input 
-                        type="radio" 
-                        name="decision" 
-                        defaultChecked
-                        className="appearance-none w-5 h-5 border-2 border-gray-300 rounded-full checked:border-[#900000] checked:border-[6px] transition-all" 
-                      />
-                      <span className="font-bold text-gray-700 group-hover:text-[#900000] transition-colors">Accepted</span>
-                    </label>
-                    <label className="flex items-center gap-3 cursor-pointer group">
-                      <input 
-                        type="radio" 
-                        name="decision" 
-                        className="appearance-none w-5 h-5 border-2 border-gray-300 rounded-full checked:border-[#900000] checked:border-[6px] transition-all" 
-                      />
-                      <span className="font-bold text-gray-700 group-hover:text-[#900000] transition-colors">Rejected</span>
-                    </label>
-                  </div>
+                <div className="bg-accent border border-primary/30 rounded-xl p-6 shadow-sm md:col-span-2 flex flex-col justify-center items-center">
+                  <h3 className="text-primary font-bold text-sm mb-3">Evaluation Decision</h3>
+                  <span className="inline-flex items-center px-6 py-3 rounded-full text-lg font-bold bg-green-100 text-green-700 border border-green-300">
+                    Accepted
+                  </span>
                 </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex justify-end gap-3 pt-4 pb-8">
-                <Button
-                  onClick={() => setModalConfig({ isOpen: true, type: 'save' })}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#730000] text-white text-sm font-bold hover:bg-[#850000] shadow-sm transition-all"
-                >
-                  <Save className="w-4 h-4" /> Save as Draft
-                </Button>
-                <Button 
-                  onClick={() => setModalConfig({ isOpen: true, type: 'submit' })}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#520000] text-white text-sm font-bold hover:bg-[#3d0000] shadow-sm transition-all"
-                >
-                  <Send className="w-4 h-4" /> Submit Grades
-                </Button>
               </div>
 
             </div>
           </div>
-
     </StudentManagementLayout>
-    </>
   );
 };
 

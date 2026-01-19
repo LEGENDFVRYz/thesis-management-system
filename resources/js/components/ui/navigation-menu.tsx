@@ -21,6 +21,10 @@ function NavigationMenu({
         "group/navigation-menu relative flex max-w-max flex-1 items-center justify-center",
         className
       )}
+      // Use onPointerEnter and onPointerMove to disable hover behavior
+      onPointerEnter={(e) => e.preventDefault()}
+      onPointerMove={(e) => e.preventDefault()}
+      onPointerLeave={(e) => e.preventDefault()}
       {...props}
     >
       {children}
@@ -71,6 +75,10 @@ function NavigationMenuTrigger({
     <NavigationMenuPrimitive.Trigger
       data-slot="navigation-menu-trigger"
       className={cn(navigationMenuTriggerStyle(), "group", className)}
+      // Prevent default hover behavior, only respond to clicks
+      onPointerEnter={(e) => e.preventDefault()}
+      onPointerMove={(e) => e.preventDefault()}
+      onPointerLeave={(e) => e.preventDefault()}
       {...props}
     >
       {children}{" "}

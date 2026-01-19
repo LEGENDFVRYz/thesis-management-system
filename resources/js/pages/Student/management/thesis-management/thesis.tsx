@@ -42,7 +42,7 @@ const pageHeader: PageHeaderProps = {
 const LEADER_TABS = [
   { key: 'documents', label: 'Documents' },
   { key: 'compare', label: 'Compare' },
-  { key: 'workflow', label: 'Workflow' },
+  { key: 'comments', label: 'Comments' }, // Changed from workflow
   { key: 'final_submission', label: 'Final Submission' },
   { key: 'change_request', label: 'Change Request' },
 ]
@@ -50,7 +50,7 @@ const LEADER_TABS = [
 const MEMBER_TABS = [
   { key: 'documents', label: 'Documents' },
   { key: 'compare', label: 'Compare' },
-  { key: 'workflow', label: 'Workflow' },
+  { key: 'comments', label: 'Comments' }, // Changed from workflow
   { key: 'transfer_request', label: 'Transfer Request' },
 ]
 
@@ -938,111 +938,14 @@ export default function ThesisManagement({ currentMilestone }: { currentMileston
           </>
         )}
 
-        {/* WORKFLOW TAB */}
-        {activeTab === 'workflow' && (
+        {/* COMMENTS TAB */}
+        {activeTab === 'comments' && (
           <>
             <h2 className="mb-4 text-3xl font-medium text-[#730000]">
-              Workflow
+              Comments
             </h2>
 
-            {/* Document Dropdown */}
-            <div className="mb-6">
-              <Select>
-                <SelectTrigger className="w-full bg-[#FFF9E6] border border-[#E5E5E5]">
-                  <SelectValue placeholder="Document" />
-                </SelectTrigger>
-                <SelectContent className="w-[var(--radix-select-trigger-width)]">
-                  <SelectItem value="doc1">Document 1</SelectItem>
-                  <SelectItem value="doc2">Document 2</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
 
-            {/* Progress Section */}
-            <div className="mb-8">
-              <h3 className="text-xl font-semibold text-[#730000] mb-6">Progress</h3>
-
-              {/* Progress Stepper */}
-              <div className="relative py-4">
-                <div className="flex items-start justify-between">
-                  {WORKFLOW_STAGES.map((stage, index) => (
-                    <div key={stage.key} className="flex flex-col items-center flex-1 relative">
-                      {/* Stage Circle - Using timeline component pattern */}
-                      <div className="relative z-10 flex items-center justify-center mb-4">
-                        {stage.completed ? (
-                          <div className="relative" style={{ width: '32px', height: '32px' }}>
-                            {/* Outer layer */}
-                            <div
-                              style={{
-                                position: 'absolute',
-                                inset: 0,
-                                width: '32px',
-                                height: '32px',
-                                borderRadius: '50%',
-                                backgroundColor: '#9B000A63',
-                              }}
-                            />
-                            {/* Middle layer */}
-                            <div
-                              style={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                width: '22px',
-                                height: '22px',
-                                borderRadius: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                backgroundColor: '#9B000A',
-                              }}
-                            />
-                            {/* Inner layer */}
-                            <div
-                              style={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                width: '14px',
-                                height: '14px',
-                                borderRadius: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                backgroundColor: '#730000',
-                              }}
-                            />
-                          </div>
-                        ) : (
-                          <div
-                            className="rounded-full"
-                            style={{
-                              width: '32px',
-                              height: '32px',
-                              border: '4px solid #9B000A',
-                              backgroundColor: 'white'
-                            }}
-                          />
-                        )}
-                      </div>
-
-                      {/* Connecting Line */}
-                      {index < WORKFLOW_STAGES.length - 1 && (
-                        <div
-                          className="absolute top-4 left-1/2 h-1 bg-[#FFBD00]"
-                          style={{
-                            width: 'calc(100% - 32px)',
-                            transform: 'translateX(16px)',
-                            zIndex: 1,
-                          }}
-                        />
-                      )}
-
-                      {/* Stage Label */}
-                      <span className="text-sm font-medium text-gray-900 text-center">
-                        {stage.label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
 
             {/* Comments and Feedbacks Section */}
             <div className="mb-6">

@@ -2,12 +2,8 @@ import { Link } from '@inertiajs/react';
 import ManagementLayout from '@/pages/Admin/management/index';
 import { system } from '@/routes/admin/management/policies/index';
 import { TabButton } from '@/components/ui/tabs';
-import ManagementIcon from '@/components/Icons/ic_pen-settings-Default.svg';
 import { BreadcrumbItem, PageHeaderProps } from '@/types';
 
-import SystemRulesTab from './system-rules';
-import WorkflowApprovalTab from './workflow-approval';
-import DocumentRequirementsTab from './document-requirements';
 import GradingPoliciesTab from './grading-policies';
 import OverallGuidelinesTab from './overall-guidelines';
 import { Icon } from '@/components/icon-index';
@@ -16,11 +12,10 @@ import { Icon } from '@/components/icon-index';
 // Page Header
 const pageHeader: PageHeaderProps = {
     title: "Department Policies",
-    subtitle: "Loremm Ipsumm... paedit nalang",
+    subtitle: "Configure grading and overall policies in the system",
     icon: (
-        // paki corretc nalang
         <Icon
-            name="calendarDefault"
+            name="sysConfig"
             className="w-8 h-8 text-primary"
         />
     ),
@@ -28,28 +23,27 @@ const pageHeader: PageHeaderProps = {
 
 // Define the tabs for navigation
 const POLICY_TABS = [
-    { key: 'system', label: 'System Rules', url: '/admin/management/policies/system' },
-    { key: 'workflow', label: 'Workflow Approval', url: '/admin/management/policies/workflow' },
-    { key: 'documents', label: 'Document Requirements', url: '/admin/management/policies/documents' },
     { key: 'grading', label: 'Grading Policies', url: '/admin/management/policies/grading' },
     { key: 'guidelines', label: 'Overall Guidelines', url: '/admin/management/policies/guidelines' },
 ];
 
 type Props = {
-    currentTab: 'system' | 'workflow' | 'documents' | 'grading' | 'guidelines';
-    [key: string]: any; 
+    currentTab?: string;
+    [key: string]: any;
 };
 
-export default function DepartmentPolicy({ currentTab = 'system', ...props }: Props) {
-    
+export default function DepartmentPolicy({ currentTab, ...props }: Props) {
+    // Normalize tab - fallback to 'grading' if invalid or missing
+    const activeTab = (currentTab === 'grading' || currentTab === 'guidelines') ? currentTab : 'grading';
+
     // Helper to get current label
     const getTabLabel = (tabKey: string) => {
-        return POLICY_TABS.find(tab => tab.key === tabKey)?.label || 'System Rules';
+        return POLICY_TABS.find(tab => tab.key === tabKey)?.label || 'Grading Policies';
     };
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Department Policies', href: system().url },
-        { title: getTabLabel(currentTab), href: '#' },
+        { title: getTabLabel(activeTab), href: '#' },
     ];
 
     return (
@@ -60,15 +54,15 @@ export default function DepartmentPolicy({ currentTab = 'system', ...props }: Pr
             <div className="bg-white">
                 <div className="flex">
                     {POLICY_TABS.map(tab => (
-                        <Link 
-                            key={tab.key} 
+                        <Link
+                            key={tab.key}
                             href={tab.url}
-                            preserveState 
+                            preserveState
                             preserveScroll
                         >
                             <TabButton
-                                isActive={currentTab === tab.key}
-                                onClick={() => {}} 
+                                isActive={activeTab === tab.key}
+                                onClick={() => {}}
                             >
                                 {tab.label}
                             </TabButton>
@@ -91,11 +85,8 @@ export default function DepartmentPolicy({ currentTab = 'system', ...props }: Pr
                     }}
                 >
                     {/* CONDITIONAL RENDERING BASED ON PROP */}
-                    {currentTab === 'system' && <SystemRulesTab {...props} />}
-                    {currentTab === 'workflow' && <WorkflowApprovalTab {...props} />}
-                    {currentTab === 'documents' && <DocumentRequirementsTab {...props} />}
-                    {currentTab === 'grading' && <GradingPoliciesTab {...props} />}
-                    {currentTab === 'guidelines' && <OverallGuidelinesTab {...props} />}
+                    {activeTab === 'grading' && <GradingPoliciesTab {...props} />}
+                    {activeTab === 'guidelines' && <OverallGuidelinesTab {...props} />}
                 </div>
             </div>
         </ManagementLayout>

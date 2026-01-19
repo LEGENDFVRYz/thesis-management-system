@@ -30,11 +30,7 @@ const pageHeader: PageHeaderProps = {
     title: "My Advisees",
     subtitle: "View and manage all students under supervision with their current thesis stages",
     icon: (
-        // pa correct nalang
-        <Icon
-            name="calendarDefault"
-            className="w-8 h-8 text-primary"
-        />
+        <Users className="w-8 h-8 text-primary" />
     ),
 };
 

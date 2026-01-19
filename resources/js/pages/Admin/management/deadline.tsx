@@ -5,13 +5,22 @@ import { deadline } from '@/routes/admin/management/index';
 import { update } from '@/routes/admin/management/deadline/index';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronRight } from 'lucide-react';
-import { Calendar } from '@/components/calendar';
+import { ChevronRight, Calendar, Save } from 'lucide-react';
 import { DeadlineTimelineView } from './components/deadline-timeline-view';
 import { DeadlineSubmissionSchedule } from './components/deadline-submission-schedule';
 import { DeadlineDefenseSchedule } from './components/deadline-defense-schedule';
 import { DeadlineNotificationRules } from './components/deadline-notification-rules';
 import { Icon } from '@/components/icon-index';
+import { Button } from '@/components/ui/button';
+import DatePicker from '@/components/date-picker';
+import CloseIcon from '@/components/Icons/ic_close-Default.svg';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 
 // Page Setup
 const breadcrumbs: BreadcrumbItem[] = [
@@ -26,7 +35,7 @@ const pageHeader: PageHeaderProps = {
     subtitle: "Set submission windows, defense periods, and grading deadlines",
     icon: (
         <Icon
-            name="calendarDefault"
+            name="sysConfig"
             className="w-8 h-8 text-primary"
         />
     ),
@@ -42,7 +51,17 @@ interface WorkflowStep {
     desc: string | null;
     start_date: string | null;
     offset: number;
+    person_assigned?: string;
 }
+
+// Person Assigned options
+const PERSON_ASSIGNED_OPTIONS = [
+    { value: 'student', label: 'Student' },
+    { value: 'adviser', label: 'Adviser' },
+    { value: 'committee', label: 'Committee' },
+    { value: 'panel', label: 'Panel' },
+    { value: 'coordinator', label: 'Coordinator' },
+];
 interface DeadlineProps {
     allowed_stages: number[];
     workflow: WorkflowStep[];
@@ -71,7 +90,7 @@ export default function DeadlinePage({ allowed_stages, workflow }: DeadlineProps
             breadcrumbs={breadcrumbs}
             pageHeader={pageHeader}
         >
-            <div className="flex flex-col gap-6 p-4">
+            <div className="flex flex-col gap-3 p-4">
                 {/* LEIGH PAST CODE: resolve later */}
 
                 {/* Three Column Grid */}
@@ -103,7 +122,7 @@ export default function DeadlinePage({ allowed_stages, workflow }: DeadlineProps
 
                 {/* --- WORKFLOW SECTION --- */}
                 {/* Note: Sample Frontend for testing the deadline edit (update) operations */}
-                <div className="relative min-h-[50vh] flex-1 rounded-xl">
+                <div className="relative rounded-xl">
                     
                     {currentSteps.length === 0 ? (
                         <div className="flex h-40 items-center justify-center rounded-lg border border-dashed text-muted-foreground">
@@ -128,7 +147,9 @@ export default function DeadlinePage({ allowed_stages, workflow }: DeadlineProps
 
                 {/* Timeline View - Full Width */}
                 {/* Note: currently view method lang yung component, nead a way to update the set date in the deadline */}
-                <DeadlineTimelineView />
+                <div className="mb-[120px]">
+                    <DeadlineTimelineView />
+                </div>
             </div>
 
             {/* --- TESTING MODAL --- */}
@@ -154,7 +175,7 @@ function WorkflowCard({
     onClick: () => void;
 }) {
     return (
-        <div className="group relative flex flex-col justify-between rounded-lg border border-sidebar-border/70 bg-sidebar-background p-5 shadow-sm transition-all hover:border-primary/50 hover:shadow-md">
+        <div className="group relative flex flex-col justify-between rounded-lg border border-sidebar-border/70 bg-accent p-5 shadow-sm transition-all hover:border-primary/50 hover:shadow-md">
             
             {/* Header: Step Number & Title */}
             <div>
@@ -208,7 +229,8 @@ function WorkflowCard({
 }
 
 
-// --- Testing modal ---
+// --- Workflow Edit Modal ---
+// Edits: event name, person responsible, and duration (offset in days)
 function DeadlineDateModal({
     open,
     onClose,
@@ -218,12 +240,33 @@ function DeadlineDateModal({
     onClose: () => void;
     step: WorkflowStep;
 }) {
+    // Local state for DatePicker (needs Date object)
+    const [startDate, setStartDate] = useState<Date | undefined>(
+        step.start_date ? new Date(step.start_date) : undefined
+    );
+
     const { data, setData, put, processing, errors } = useForm({
         event_id: step.event_id,
+        name: step.name,
+        desc: step.desc ?? '',
+        offset: step.offset,
         start_date: step.start_date ?? '',
+        person_assigned: step.person_assigned ?? '',
     });
 
     if (!open) return null;
+
+    // Handle date change from DatePicker
+    const handleDateChange = (date: Date | undefined) => {
+        setStartDate(date);
+        if (date) {
+            // Format as YYYY-MM-DD for backend
+            const formatted = date.toISOString().split('T')[0];
+            setData('start_date', formatted);
+        } else {
+            setData('start_date', '');
+        }
+    };
 
     const submit = () => {
         put(update(step.event_id).url, {
@@ -232,45 +275,119 @@ function DeadlineDateModal({
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div className="w-full max-w-sm rounded-lg bg-background p-6 shadow-lg">
-                <h2 className="mb-4 text-lg font-semibold">
-                    Update Start Date
-                </h2>
-
-                {errors._error && (
-                    <div className="text-sm text-red-600 text-center">
-                        {errors._error}
-                    </div>
-                )}
-
-                <input
-                    type="date"
-                    value={data.start_date ?? undefined}
-                    onChange={(e) => setData('start_date', e.target.value)}
-                    className="w-full rounded border px-3 py-2 text-sm"
-                />
-                {errors.start_date && (
-                    <div className="w-full text-sm text-primary text-center">
-                        {errors.start_date}
-                    </div>
-                )}
-
-                <div className="mt-5 flex justify-end gap-2">
-                    <button
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <div className="w-full max-w-2xl bg-white rounded-xl shadow-xl">
+                {/* HEADER */}
+                <div className="bg-primary text-white px-6 py-4 flex items-center justify-between rounded-t-xl">
+                    <h2 className="text-xl font-medium">Edit Workflow Step</h2>
+                    <img
+                        src={CloseIcon}
+                        className="w-5 h-5 cursor-pointer filter brightness-0 invert"
                         onClick={onClose}
-                        className="text-sm text-muted-foreground"
-                    >
-                        Cancel
-                    </button>
+                    />
+                </div>
 
-                    <button
-                        disabled={processing}
+                {/* CONTENT */}
+                <div className="p-8 space-y-6">
+                    {/* Event Name and Person Assigned */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-900 mb-2">Event Name</label>
+                            <input
+                                type="text"
+                                value={data.name}
+                                onChange={(e) => setData('name', e.target.value)}
+                                className="w-full rounded-[8px] border border-transparent bg-breadcrumb px-[12px] py-[8px] text-[13.33px] font-medium text-[#1a1a1a] outline-none transition-all shadow-xs placeholder:text-[#1a1a1a]/50 hover:border-primary-foreground-2 focus-visible:border-primary focus-visible:ring-0"
+                                placeholder="e.g., Title Proposal Submission"
+                            />
+                            {errors.name && (
+                                <p className="mt-1 text-xs text-primary">{errors.name}</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-900 mb-2">Person Assigned</label>
+                            <Select
+                                value={data.person_assigned}
+                                onValueChange={(value) => setData('person_assigned', value)}
+                            >
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Select person" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {PERSON_ASSIGNED_OPTIONS.map((option) => (
+                                        <SelectItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            {errors.person_assigned && (
+                                <p className="mt-1 text-xs text-primary">{errors.person_assigned}</p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Description */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-900 mb-2">Description</label>
+                        <textarea
+                            value={data.desc}
+                            onChange={(e) => setData('desc', e.target.value)}
+                            placeholder="e.g., Students submit title proposals to adviser"
+                            rows={3}
+                            className="w-full min-h-[100px] rounded-[8px] border border-transparent bg-breadcrumb px-[12px] py-[8px] text-[13.33px] font-medium text-[#1a1a1a] outline-none transition-all shadow-xs placeholder:text-[#1a1a1a]/50 hover:border-primary-foreground-2 focus-visible:border-primary focus-visible:ring-0 resize-none"
+                        />
+                        {errors.desc && (
+                            <p className="mt-1 text-xs text-primary">{errors.desc}</p>
+                        )}
+                    </div>
+
+                    {/* Duration and Deadline Date */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-900 mb-2">Duration (days)</label>
+                            <input
+                                type="number"
+                                min={0}
+                                value={data.offset}
+                                onChange={(e) => setData('offset', parseInt(e.target.value) || 0)}
+                                className="w-full rounded-[8px] border border-transparent bg-breadcrumb px-[12px] py-[8px] text-[13.33px] font-medium text-[#1a1a1a] outline-none transition-all shadow-xs placeholder:text-[#1a1a1a]/50 hover:border-primary-foreground-2 focus-visible:border-primary focus-visible:ring-0"
+                                placeholder="e.g., 7"
+                            />
+                            {errors.offset && (
+                                <p className="mt-1 text-xs text-primary">{errors.offset}</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-900 mb-2">Deadline Date</label>
+                            <DatePicker
+                                value={startDate}
+                                onChange={handleDateChange}
+                                placeholder="Select Date"
+                                displayFormat="full"
+                            />
+                            {errors.start_date && (
+                                <p className="mt-1 text-xs text-primary">{errors.start_date}</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* DIVIDER */}
+                <div className="border-t border-gray-200"></div>
+
+                {/* FOOTER */}
+                <div className="px-6 py-4 flex justify-end">
+                    <Button
                         onClick={submit}
-                        className="rounded bg-primary px-4 py-2 text-sm text-white"
+                        disabled={processing}
+                        className="bg-primary text-white hover:bg-primary/90 flex items-center gap-2"
                     >
-                        Save
-                    </button>
+                        <Save className="w-4 h-4" />
+                        {processing ? 'Saving...' : 'Save Changes'}
+                    </Button>
                 </div>
             </div>
         </div>

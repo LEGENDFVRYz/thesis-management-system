@@ -20,7 +20,7 @@ import { Filter, Users } from 'lucide-react';
 import { useState } from 'react';
 import AdviseeManagementLayout from '.';
 import { BlockAndTagsFilter } from './components/progress-filter-search';
-import { Icon } from '@/components/icon-index';
+import ProgressTrackingIcon from '@/components/Icons/progress_tracking.svg';
 
 // Setup
 const breadcrumb: BreadcrumbItem[] = [
@@ -34,11 +34,7 @@ const pageHeader: PageHeaderProps = {
     title: "Progress Monitoring",
     subtitle: "Track milestone completion and submission history of all advisees",
     icon: (
-                // pa correct nalang
-        <Icon
-            name="calendarDefault"
-            className="w-8 h-8 text-primary"
-        />
+        <img src={ProgressTrackingIcon} alt="Progress Monitoring" className="w-8 h-8" />
     ),
 };
 

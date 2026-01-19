@@ -14,7 +14,7 @@ import { PageHeader } from './components/awards_pageHeader';
 import { EvaluationRow } from './components/awards_utils';
 import { getEvaluationStatus } from './components/awards_utils';
 import { evaluationData, resultsData, detailedEvaluationResults } from './components/awards_sampleData';
-import { Icon } from '@/components/icon-index';
+import EvaluationIcon from '@/components/Icons/evaluation.svg';
 
 // SPLIT PAGES
 import EvalPage from './evaluation/evalPage';
@@ -54,15 +54,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const pageHeader: PageHeaderProps = {
     title: activeTab === 'evaluation' ? 'Evaluation Page' : 'Results Page',
-    subtitle: activeTab === 'evaluation' 
+    subtitle: activeTab === 'evaluation'
             ? 'Page for evaluating top 10 project groups based on output, defense, and tech development'
             : 'View summarized scores, rankings, and awards results',
     icon: (
-        // pa correct nalang
-        <Icon
-            name="docuDefault"
-            className="w-8 h-8 text-primary"
-        />
+        <img src={EvaluationIcon} alt="Evaluation" className="w-8 h-8" />
     ),
 };
     const evaluationStatus = getEvaluationStatus(resultsData);

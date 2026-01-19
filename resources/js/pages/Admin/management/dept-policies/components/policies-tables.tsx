@@ -7,7 +7,7 @@ interface PoliciesHeaderProps {
 
 export function PoliciesHeader({ columns }: PoliciesHeaderProps) {
     return (
-        <thead className="bg-[#730000] text-white">
+        <thead className="bg-primary text-white">
             <tr>
                 {columns.map((column, index) => (
                     <th key={index} className="px-6 py-3 text-center text-base">
@@ -34,11 +34,11 @@ export function PoliciesRow({ data, onEdit, onDelete }: PoliciesRowProps) {
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'Active':
-                return '#0D542B';
+                return 'var(--evaluated-font-color)';
             case 'Mandatory':
-                return '#730000';
+                return 'var(--primary)';
             default:
-                return '#717182';
+                return 'var(--muted-foreground)';
         }
     };
 
