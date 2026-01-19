@@ -15,7 +15,7 @@ import ThesisManagementLayout from '@/pages/Student/management/thesis-management
 import {
     ThesisDocumentRow,
     ThesisDocumentsHeader,
-} from '@/pages/Student/management/thesis-management/thesis-table';
+} from './components/thesis-table';
 import type { BreadcrumbItem, PageHeaderProps } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Upload } from 'lucide-react';

@@ -89,7 +89,7 @@ const studentManagementItems = [
         title: 'Student',
         children: [
             { title: 'Progress Tracking', href: '/management/progress/overall' },
-            { title: 'Thesis Management', href: '/management/thesis' },
+            { title: 'Thesis Management', href: '/management/thesis/documents' },
             { title: 'Defense Management', href: '/management/defense_matrix' },
             { title: 'Evaluation Grading', href: '/management/evaluation' },
             { title: 'Compliance & IP', href: '/compliance', isHeader: true },
