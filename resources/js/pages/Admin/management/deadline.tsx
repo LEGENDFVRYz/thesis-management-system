@@ -175,7 +175,7 @@ function WorkflowCard({
     onClick: () => void;
 }) {
     return (
-        <div className="group relative flex flex-col justify-between rounded-lg border border-sidebar-border/70 bg-[#FDFCF6] p-5 shadow-sm transition-all hover:border-primary/50 hover:shadow-md">
+        <div className="group relative flex flex-col justify-between rounded-lg border border-sidebar-border/70 bg-accent p-5 shadow-sm transition-all hover:border-primary/50 hover:shadow-md">
             
             {/* Header: Step Number & Title */}
             <div>
@@ -278,7 +278,7 @@ function DeadlineDateModal({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
             <div className="w-full max-w-2xl bg-white rounded-xl shadow-xl">
                 {/* HEADER */}
-                <div className="bg-[#730000] text-white px-6 py-4 flex items-center justify-between rounded-t-xl">
+                <div className="bg-primary text-white px-6 py-4 flex items-center justify-between rounded-t-xl">
                     <h2 className="text-xl font-medium">Edit Workflow Step</h2>
                     <img
                         src={CloseIcon}
@@ -383,7 +383,7 @@ function DeadlineDateModal({
                     <Button
                         onClick={submit}
                         disabled={processing}
-                        className="bg-[#730000] text-white hover:bg-[#5a0000] flex items-center gap-2"
+                        className="bg-primary text-white hover:bg-primary/90 flex items-center gap-2"
                     >
                         <Save className="w-4 h-4" />
                         {processing ? 'Saving...' : 'Save Changes'}

@@ -103,15 +103,15 @@ const EvaluationFormSection = () => {
             <div className="space-y-6">
 
               {/* Header */}
-              <h2 className="text-[#900000] text-lg font-bold mb-6">
+              <h2 className="text-primary text-lg font-bold mb-6">
                 Evaluation Summary
               </h2>
 
               {/* Defense Details Card */}
-              <div className="bg-[#FDFCF6] border border-stone-200 rounded-xl p-6 shadow-sm">
+              <div className="bg-accent border border-stone-200 rounded-xl p-6 shadow-sm">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h2 className="text-[#900000] font-bold text-lg">Defense Details</h2>
+                    <h2 className="text-primary font-bold text-lg">Defense Details</h2>
                     <p className="text-gray-500 text-xs mt-1">Complete information about the thesis defense</p>
                   </div>
                   <div className="text-right">
@@ -124,30 +124,30 @@ const EvaluationFormSection = () => {
                 </div>
                 
                 <div className="mt-6">
-                  <h3 className="text-[#900000] text-xs font-bold mb-1">Thesis Title</h3>
+                  <h3 className="text-primary text-xs font-bold mb-1">Thesis Title</h3>
                   <p className="font-bold text-gray-800 text-sm">{group.title}</p>
                 </div>
 
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-12 gap-6">
                   <div className="md:col-span-7 grid grid-cols-3 gap-y-6 gap-x-4">
                     <div className="col-span-1">
-                      <h3 className="text-[#900000] text-xs font-bold">Block</h3>
+                      <h3 className="text-primary text-xs font-bold">Block</h3>
                       <span className="text-gray-600 text-xs mt-1 inline-block bg-stone-100 px-2 py-0.5 rounded border border-stone-200">BSCPE 3-3</span>
                     </div>
                     <div className="col-span-1">
-                      <h3 className="text-[#900000] text-xs font-bold">Venue</h3>
+                      <h3 className="text-primary text-xs font-bold">Venue</h3>
                       <p className="text-gray-600 text-xs mt-1">Room 313, CEA</p>
                     </div>
                     <div className="col-span-1">
-                      <h3 className="text-[#900000] text-xs font-bold">Time</h3>
+                      <h3 className="text-primary text-xs font-bold">Time</h3>
                       <p className="text-gray-600 text-xs mt-1">09:00 AM</p>
                     </div>
                     <div className="col-span-1">
-                      <h3 className="text-[#900000] text-xs font-bold">Thesis Adviser</h3>
+                      <h3 className="text-primary text-xs font-bold">Thesis Adviser</h3>
                       <p className="text-gray-600 text-xs mt-1">Dr. Maria Santos</p>
                     </div>
                     <div className="col-span-2">
-                      <h3 className="text-[#900000] text-xs font-bold">Date</h3>
+                      <h3 className="text-primary text-xs font-bold">Date</h3>
                       <p className="text-gray-600 text-xs mt-1 flex items-center gap-1">
                         <Calendar className="w-3 h-3" /> 11/25/2025
                       </p>
@@ -155,10 +155,10 @@ const EvaluationFormSection = () => {
                   </div>
 
                   <div className="md:col-span-2">
-                    <h3 className="text-[#900000] text-xs font-bold">Proponents</h3>
+                    <h3 className="text-primary text-xs font-bold">Proponents</h3>
                     <div className="flex flex-col gap-2 mt-1">
                       {['John Doe', 'Jane Smith', 'Mike Johnson', 'John Doe'].map((name, i) => (
-                        <span key={i} className="bg-[#F5ECD5] text-[#700000] text-[10px] px-2 py-1 rounded-full font-bold w-fit flex items-center gap-1">
+                        <span key={i} className="bg-primary/10 text-primary text-[10px] px-2 py-1 rounded-full font-bold w-fit flex items-center gap-1">
                           <Users className="w-3 h-3" /> {name}
                         </span>
                       ))}
@@ -166,11 +166,11 @@ const EvaluationFormSection = () => {
                   </div>
 
                   <div className="md:col-span-3">
-                    <h3 className="text-[#900000] text-xs font-bold">Defense Panel</h3>
+                    <h3 className="text-primary text-xs font-bold">Defense Panel</h3>
                     <div className="flex flex-col gap-3 mt-2">
                       {panelists.map((panelist) => (
                         <div key={panelist.id} className="flex items-center gap-2 p-1.5 bg-white rounded-lg border border-stone-100 shadow-sm">
-                          <span className="bg-[#BC8585] text-white text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-bold">
+                          <span className="bg-primary/60 text-white text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-bold">
                             {panelist.role}
                           </span>
                           <span className="text-gray-800 text-xs font-bold">{panelist.name}</span>
@@ -184,9 +184,9 @@ const EvaluationFormSection = () => {
               {/* Panelist Evaluation Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-2">
                 {panelists.map((panelist) => (
-                  <div key={panelist.id} className="bg-[#FDFCF6] border border-stone-200 rounded-xl p-6 shadow-sm">
+                  <div key={panelist.id} className="bg-accent border border-stone-200 rounded-xl p-6 shadow-sm">
                     <div className="flex items-center gap-3 mb-6 pb-4 border-b border-stone-100">
-                      <div className="w-8 h-8 rounded-full bg-[#BC8585] text-white font-bold text-xs flex items-center justify-center shadow-sm">
+                      <div className="w-8 h-8 rounded-full bg-primary/60 text-white font-bold text-xs flex items-center justify-center shadow-sm">
                         {panelist.role}
                       </div>
                       <span className="font-bold text-gray-800 text-sm">{panelist.name}</span>
@@ -194,11 +194,11 @@ const EvaluationFormSection = () => {
 
                     <div className="flex justify-between items-start mb-6">
                       <div>
-                        <h4 className="text-[#900000] text-xs font-bold mb-1">Total Score</h4>
+                        <h4 className="text-primary text-xs font-bold mb-1">Total Score</h4>
                         <span className="text-lg font-bold text-gray-800">{panelist.score}</span>
                       </div>
                       <div className="text-right">
-                        <h4 className="text-[#900000] text-xs font-bold mb-1">Evaluation Decision</h4>
+                        <h4 className="text-primary text-xs font-bold mb-1">Evaluation Decision</h4>
                         <span className={`text-[10px] px-3 py-1 rounded-full font-bold text-white shadow-sm ${
                           panelist.decision === 'Accepted' ? 'bg-evaluated-font-color' : 'bg-primary'
                         }`}>
@@ -208,7 +208,7 @@ const EvaluationFormSection = () => {
                     </div>
 
                     <div>
-                      <h4 className="text-[#900000] text-xs font-bold mb-2">Comments/Recommendations</h4>
+                      <h4 className="text-primary text-xs font-bold mb-2">Comments/Recommendations</h4>
                       <p className="text-xs text-gray-600 leading-relaxed">
                         {panelist.comments}
                       </p>
@@ -218,7 +218,7 @@ const EvaluationFormSection = () => {
               </div>
 
               {/* Rubrics Section */}
-              <div className="bg-[#FDFCF6] border border-stone-200 rounded-xl p-8 shadow-sm mt-10">
+              <div className="bg-accent border border-stone-200 rounded-xl p-8 shadow-sm mt-10">
                 {rubricSections.map((rubric, idx) => (
                   <div key={rubric.id} className="space-y-4">
                     {idx > 0 && <div className="w-full h-px bg-black my-10" />}
@@ -228,23 +228,23 @@ const EvaluationFormSection = () => {
                       <p className="text-xs font-bold max-w-4xl leading-relaxed">{rubric.description}</p>
                     </div>
 
-                    <div className="border border-[#D4A3A3] rounded-xl overflow-hidden shadow-sm">
+                    <div className="border border-primary/30 rounded-xl overflow-hidden shadow-sm">
                       <table className="w-full text-left border-collapse">
                         <thead>
                           <tr className="text-center text-xs">
-                            <th className="px-4 py-3 w-[20%] text-left font-bold bg-[#700000] text-white">
+                            <th className="px-4 py-3 w-[20%] text-left font-bold bg-primary text-white">
                               Performance Indicator
                             </th>
-                            <th className="px-4 py-3 w-[18%] bg-[#F5ECD5] text-[#520000] font-bold border-r border-[#E0D0A0]">
+                            <th className="px-4 py-3 w-[18%] bg-primary/10 text-primary font-bold border-r border-sidebar-accent/50">
                               1<br/>Insufficient
                             </th>
-                            <th className="px-4 py-3 w-[18%] bg-[#F5ECD5] text-[#520000] font-bold border-r border-[#E0D0A0]">
+                            <th className="px-4 py-3 w-[18%] bg-primary/10 text-primary font-bold border-r border-sidebar-accent/50">
                               2<br/>Developing
                             </th>
-                            <th className="px-4 py-3 w-[18%] bg-[#F5ECD5] text-[#520000] font-bold border-r border-[#E0D0A0]">
+                            <th className="px-4 py-3 w-[18%] bg-primary/10 text-primary font-bold border-r border-sidebar-accent/50">
                               3<br/>Proficient
                             </th>
-                            <th className="px-4 py-3 w-[18%] bg-[#F5ECD5] text-[#520000] font-bold">
+                            <th className="px-4 py-3 w-[18%] bg-primary/10 text-primary font-bold">
                               4<br/>Advanced
                             </th>
                             <th className="px-2 py-3 w-[8%] bg-[#E5E5E5] text-gray-700 font-bold border-l border-gray-300">
@@ -273,7 +273,7 @@ const EvaluationFormSection = () => {
                                         name={`rating-${rubric.id}-${i}`}
                                         checked={ratings[`${rubric.id}-${i}`] === val}
                                         readOnly
-                                        className="appearance-none w-5 h-5 border-2 border-gray-400 rounded-full checked:border-[#900000] checked:border-[6px] transition-all cursor-default bg-white"
+                                        className="appearance-none w-5 h-5 border-2 border-gray-400 rounded-full checked:border-primary checked:border-[6px] transition-all cursor-default bg-white"
                                       />
                                     </div>
                                   ))}
@@ -293,12 +293,12 @@ const EvaluationFormSection = () => {
               
               {/* Total Score and Decision Section */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-[#FDFCF6] border border-[#D4A3A3] rounded-xl p-6 shadow-sm flex flex-col justify-center items-center">
-                  <span className="text-[#900000] font-bold text-sm mb-1">Total Score</span>
+                <div className="bg-accent border border-primary/30 rounded-xl p-6 shadow-sm flex flex-col justify-center items-center">
+                  <span className="text-primary font-bold text-sm mb-1">Total Score</span>
                   <span className="text-4xl font-bold text-gray-800">3.0</span>
                 </div>
-                <div className="bg-[#FDFCF6] border border-[#D4A3A3] rounded-xl p-6 shadow-sm md:col-span-2 flex flex-col justify-center items-center">
-                  <h3 className="text-[#900000] font-bold text-sm mb-3">Evaluation Decision</h3>
+                <div className="bg-accent border border-primary/30 rounded-xl p-6 shadow-sm md:col-span-2 flex flex-col justify-center items-center">
+                  <h3 className="text-primary font-bold text-sm mb-3">Evaluation Decision</h3>
                   <span className="inline-flex items-center px-6 py-3 rounded-full text-lg font-bold bg-green-100 text-green-700 border border-green-300">
                     Accepted
                   </span>

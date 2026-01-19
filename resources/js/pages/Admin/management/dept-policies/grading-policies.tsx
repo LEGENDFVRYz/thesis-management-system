@@ -32,11 +32,11 @@ export default function GradingPoliciesTab() {
         <div className="space-y-8">
             {/* DEFENSE RUBRICS TABLE */}
             <div>
-                <h2 className="font-medium text-[#730000] mb-4" style={{ fontSize: '24px' }}>Defense Rubrics</h2>
+                <h2 className="font-medium text-primary mb-4" style={{ fontSize: '24px' }}>Defense Rubrics</h2>
                 <div className="bg-white rounded-xl border overflow-hidden">
                     <Table>
-                        <TableHeader className="bg-[#730000] text-white">
-                            <TableRow className="hover:bg-[#730000] border-none">
+                        <TableHeader className="bg-primary text-white">
+                            <TableRow className="hover:bg-primary border-none">
                                 <TableHead className="px-6 py-3 text-center text-base text-white">Category</TableHead>
                                 <TableHead className="px-6 py-3 text-center text-base text-white">Weight</TableHead>
                                 <TableHead className="px-6 py-3 text-center text-base text-white">Minimum Score</TableHead>
@@ -71,11 +71,11 @@ export default function GradingPoliciesTab() {
 
             {/* GRADING SCALE TABLE (Static) */}
             <div>
-                <h2 className="font-medium text-[#730000] mb-4" style={{ fontSize: '24px' }}>Grading Scale</h2>
+                <h2 className="font-medium text-primary mb-4" style={{ fontSize: '24px' }}>Grading Scale</h2>
                 <div className="bg-white rounded-xl border overflow-hidden">
                     <Table>
-                        <TableHeader className="bg-[#730000] text-white">
-                            <TableRow className="hover:bg-[#730000] border-none">
+                        <TableHeader className="bg-primary text-white">
+                            <TableRow className="hover:bg-primary border-none">
                                 <TableHead className="px-6 py-3 text-center text-base text-white">Grade</TableHead>
                                 <TableHead className="px-6 py-3 text-center text-base text-white">Percentage / Equivalent</TableHead>
                                 <TableHead className="px-6 py-3 text-center text-base text-white">Description</TableHead>
