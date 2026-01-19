@@ -17,9 +17,10 @@ import {
     ThesisDocumentsHeader,
 } from './components/thesis-table';
 import type { BreadcrumbItem, PageHeaderProps } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { Upload } from 'lucide-react';
 import { useState } from 'react';
+import { upload } from '@/routes/student/thesis/documents/index';
 import { ConfirmDialog } from './components/confirm-dialog';
 import { SuccessDialog } from './components/success-dialog';
 import { ThesisTabs } from './components/thesis-tabs'; // Import the shared tabs
@@ -32,6 +33,24 @@ type DocumentEntry = {
     description: string;
     date: string;
     status: string;
+};
+
+type Submission = {
+    id: number;
+    title: string;
+    document_type: string;
+    description: string;
+    file_path: string;
+    submitted_at: string;
+    status: number; // 0=Pending, 1=Review, 2=Approved, etc.
+};
+
+type Milestone = {
+    id: number;
+    stage: number; // 1=MOR, 2=DP1, 3=DP2
+    name: string;
+    desc: string;
+    submission?: Submission | null;
 };
 
 const MILESTONES = [
@@ -137,82 +156,74 @@ const INITIAL_DOCUMENTS_BY_MILESTONE: Record<string, DocumentEntry[]> = {
     ],
 };
 
+
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Documents', href: '#' }];
+
 const pageHeader: PageHeaderProps = {
     title: 'Thesis Management',
     subtitle: 'Access and manage your thesis documents',
     icon: <img src={ThesisIcon} alt="Thesis Icon" className="h-8 w-8" />,
 };
 
-export default function ThesisDocuments({
-    currentMilestone = 'dp2',
-}: {
-    currentMilestone?: string;
-}) {
+interface Props {
+    documentsByMilestone: Record<string, DocumentEntry[]>;
+    group_id: number;
+    current_stage_key: string;
+    active_event_id?: number | null;
+}
+
+export default function ThesisDocuments({ 
+    documentsByMilestone,
+    group_id,
+    current_stage_key,
+    active_event_id 
+}: Props) {
     // Milestone Logic
-    const currentMilestoneIndex = Math.max(
-        MILESTONES.findIndex((m) => m.key === currentMilestone),
-        0,
-    );
-    const availableMilestones = MILESTONES.slice(0, currentMilestoneIndex + 1);
-    const defaultMilestoneKey =
-        availableMilestones.find((m) => m.key === currentMilestone)?.key ??
-        MILESTONES[0].key;
+// --- 1. SETUP INERTIA FORM ---
+    const { data, setData, post, processing, errors, reset, progress } = useForm({
+        title: '',
+        document_type: '',
+        description: '',
+        file: null as File | null,
+        event_id: null, // Backend handles this automatically if null
+    });
 
-    const [selectedMilestone, setSelectedMilestone] =
-        useState(defaultMilestoneKey);
-    const selectedMilestoneLabel =
-        availableMilestones.find((m) => m.key === selectedMilestone)?.label ??
-        '';
-    const [documentsByMilestone, setDocumentsByMilestone] = useState(
-        INITIAL_DOCUMENTS_BY_MILESTONE,
-    );
-    const documentsForMilestone = documentsByMilestone[selectedMilestone] ?? [];
-
-    // UI States
+    // --- UI STATES ---
+    // Initialize selected tab based on the backend's calculated stage
+    const [selectedMilestone, setSelectedMilestone] = useState(current_stage_key || 'mor');
+    
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [isSubmitDocsOpen, setIsSubmitDocsOpen] = useState(false);
     const [isSuccessOpen, setIsSuccessOpen] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
 
-    // Form States
-    const [uploadTitle, setUploadTitle] = useState('');
-    const [uploadType, setUploadType] = useState('');
-    const [uploadDescription, setUploadDescription] = useState('');
+    // --- COMPUTED ---
+    // Safely get the list for the current tab, default to empty array
+    const documentsForMilestone = documentsByMilestone[selectedMilestone] || [];
+    const selectedMilestoneLabel = MILESTONES.find((m) => m.key === selectedMilestone)?.label || '';
 
-    const breadcrumbs: BreadcrumbItem[] = [{ title: 'Documents', href: '#' }];
-
+    // --- HANDLERS ---
     const handleSaveDocument = () => {
-        const newDoc: DocumentEntry = {
-            id: Date.now(),
-            title: uploadTitle.trim() || 'Untitled Document',
-            type: uploadType || 'Unspecified',
-            description: uploadDescription.trim() || 'Uploaded document',
-            date: new Date().toLocaleDateString('en-US', {
-                month: 'long',
-                day: 'numeric',
-                year: 'numeric',
-            }),
-            status: 'For Revision',
-        };
-
-        setDocumentsByMilestone((prev) => ({
-            ...prev,
-            [selectedMilestone]: [newDoc, ...(prev[selectedMilestone] ?? [])],
-        }));
-
-        setIsUploadModalOpen(false);
-        setUploadTitle('');
-        setUploadType('');
-        setUploadDescription('');
-        setSuccessMessage(`Document saved for ${selectedMilestoneLabel}`);
-        setIsSuccessOpen(true);
+        post(upload().url, {
+            onSuccess: () => {
+                setIsUploadModalOpen(false);
+                setSuccessMessage('Document uploaded successfully');
+                setIsSuccessOpen(true);
+                reset(); // Clear form
+            },
+            onError: (err) => {
+                console.error("Upload failed", err);
+            }
+        });
     };
 
     const handleSubmitDocuments = () => {
+        // Implementation for "Submit All" / "Submit for Review" feature
         setIsSubmitDocsOpen(false);
         setSuccessMessage(`Documents submitted for ${selectedMilestoneLabel}`);
         setIsSuccessOpen(true);
     };
+
 
     return (
         <ThesisManagementLayout
@@ -247,11 +258,8 @@ export default function ThesisDocuments({
                             </SelectTrigger>
 
                             <SelectContent className="w-[var(--radix-select-trigger-width)]">
-                                {availableMilestones.map((milestone) => (
-                                    <SelectItem
-                                        key={milestone.key}
-                                        value={milestone.key}
-                                    >
+                                {MILESTONES.map((milestone) => (
+                                    <SelectItem key={milestone.key} value={milestone.key}>
                                         {milestone.label}
                                     </SelectItem>
                                 ))}
@@ -309,21 +317,17 @@ export default function ThesisDocuments({
             </div>
 
             {/* Upload Modal */}
-            <Dialog
-                open={isUploadModalOpen}
-                onOpenChange={setIsUploadModalOpen}
-            >
+            <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
                 <DialogContent className="max-w-3xl">
-                    <div className="mb-4 flex items-center justify-between">
-                        <div>
-                            <h3 className="text-2xl font-semibold text-[#730000]">
-                                Upload Document
-                            </h3>
-                        </div>
+                    <div className="mb-4">
+                        <h3 className="text-2xl font-semibold text-[#730000]">
+                            Upload Document
+                        </h3>
                     </div>
 
                     <div className="space-y-6">
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
+                            {/* Title */}
                             <div className="space-y-2">
                                 <label className="mb-2 block text-sm font-medium text-gray-700">
                                     Document Title
@@ -332,45 +336,37 @@ export default function ThesisDocuments({
                                     type="text"
                                     placeholder="Document Title"
                                     className="h-10 max-w-xs bg-[#F3EFD0] px-3 py-2 font-[DM_Sans] placeholder:text-gray-600"
-                                    value={uploadTitle}
-                                    onChange={(e) =>
-                                        setUploadTitle(e.target.value)
-                                    }
+                                    value={data.title}
+                                    onChange={(e) => setData('title', e.target.value)}
                                 />
+                                {errors.title && <span className="text-red-500 text-xs">{errors.title}</span>}
                             </div>
 
+                            {/* Type */}
                             <div className="space-y-2">
                                 <label className="mb-2 block text-sm font-medium text-gray-700">
                                     Type
                                 </label>
                                 <Select
-                                    value={uploadType}
-                                    onValueChange={setUploadType}
+                                    value={data.document_type}
+                                    onValueChange={(val) => setData('document_type', val)}
                                 >
                                     <SelectTrigger className="h-10 w-full bg-[#F3EFD0] px-3 py-2 placeholder:text-gray-500">
                                         <SelectValue placeholder="Specify Document Type" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="thesis-proposal">
-                                            Thesis Proposal
-                                        </SelectItem>
-                                        <SelectItem value="chapter">
-                                            Chapter
-                                        </SelectItem>
-                                        <SelectItem value="supporting-document">
-                                            Supporting Document
-                                        </SelectItem>
-                                        <SelectItem value="final-thesis">
-                                            Final Thesis
-                                        </SelectItem>
-                                        <SelectItem value="others">
-                                            Others
-                                        </SelectItem>
+                                        <SelectItem value="Thesis Proposal">Thesis Proposal</SelectItem>
+                                        <SelectItem value="Chapter">Chapter</SelectItem>
+                                        <SelectItem value="Supporting Document">Supporting Document</SelectItem>
+                                        <SelectItem value="Final Thesis">Final Thesis</SelectItem>
+                                        <SelectItem value="Others">Others</SelectItem>
                                     </SelectContent>
                                 </Select>
+                                {errors.document_type && <span className="text-red-500 text-xs">{errors.document_type}</span>}
                             </div>
                         </div>
 
+                        {/* Description */}
                         <div>
                             <label className="mb-2 block text-sm font-medium text-gray-700">
                                 Document Description
@@ -379,22 +375,53 @@ export default function ThesisDocuments({
                                 rows={3}
                                 className="w-full rounded-md border bg-[#F3EFD0] px-4 py-2 placeholder:text-gray-500 focus:ring-2 focus:ring-[#730000] focus:outline-none"
                                 placeholder="Description"
-                                value={uploadDescription}
-                                onChange={(e) =>
-                                    setUploadDescription(e.target.value)
-                                }
+                                value={data.description}
+                                onChange={(e) => setData('description', e.target.value)}
                             />
                         </div>
 
-                        <FileUpload />
+                        {/* UPDATED FILE UPLOAD COMPONENT */}
+                        <div className="space-y-2">
+                            <FileUpload
+                                maxSizeMB={100}
+                                multiple={false}
+                                isUploading={processing}
+                                uploadProgress={progress?.percentage ?? 0}
+                                onFileSelect={(files: File[]) => {
+                                    // We take the first file from the array
+                                    setData('file', files[0] ?? null);
+                                }}
+                                onError={(err) => {
+                                    // You can set a form error here manually if you wish
+                                    console.error(err); 
+                                }}
+                            />
+                            
+                            {/* Show selected file name if not uploading yet */}
+                            {data.file && !processing && (
+                                <p className="text-sm text-green-600 mt-1">
+                                    Ready to upload: <span className="font-medium">{data.file.name}</span>
+                                </p>
+                            )}
+                            
+                            {errors.file && <span className="text-red-500 text-xs">{errors.file}</span>}
+                        </div>
 
-                        <div className="flex justify-end">
+                        <div className="flex justify-end gap-3">
+                            <Button 
+                                variant="secondary" 
+                                onClick={() => setIsUploadModalOpen(false)}
+                                disabled={processing}
+                            >
+                                Cancel
+                            </Button>
                             <Button
                                 variant="primary"
                                 className="px-8"
                                 onClick={handleSaveDocument}
+                                disabled={processing || !data.file}
                             >
-                                Save
+                                {processing ? 'Uploading...' : 'Save'}
                             </Button>
                         </div>
                     </div>
