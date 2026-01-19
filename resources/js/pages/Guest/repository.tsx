@@ -5,6 +5,30 @@ import { AppContent } from '@/components/app-content';
 import { NavFooter } from '@/components/nav-footer';
 import { ArchiveCard } from '@/components/ui/card';
 import { RepositoryFilterBar } from '@/components/repository-filter-bar';
+import AppLayout from '@/layouts/app-layout';
+import { BreadcrumbItem, PageHeaderProps } from '@/types';
+import { Icon } from '@/components/icon-index';
+import { index } from '@/routes/guest/repository/index';
+
+// Setup
+const breadcrumb: BreadcrumbItem[] = [
+    {
+        title: 'Management',
+        href: index().url,
+    },
+];
+
+const pageHeader: PageHeaderProps = {
+    title: "Thesis Repository",
+    subtitle: "Browse and explore undergraduate thesis projects",
+    icon: (
+        // pa correct nalang
+        <Icon
+            name="calendarDefault"
+            className="w-8 h-8 text-primary"
+        />
+    ),
+};
 
 interface Archive {
     journal_id: number;
@@ -90,13 +114,13 @@ export default function GuestRepository({ search = '', archives = [] }: Reposito
 
     return (
         <>
+        <AppLayout
+            breadcrumbs={breadcrumb}
+            pageHeader={pageHeader}
+        >
             <Head title="Repository" />
-            <AppHeader variant="guest" />
+            {/* <AppHeader variant="guest" /> */}
 
-            <AppContent
-                title="Thesis Repository"
-                subtitle="Browse and explore undergraduate thesis projects"
-            >
                 {/* Filter Bar */}
                 <div className="mb-8">
                     <RepositoryFilterBar onFilterChange={setFilters} />
@@ -133,9 +157,9 @@ export default function GuestRepository({ search = '', archives = [] }: Reposito
                         </div>
                     )}
                 </div>
-            </AppContent>
 
-            <NavFooter />
+            {/* <NavFooter /> */}
+        </AppLayout>
         </>
     );
 }

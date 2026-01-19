@@ -6,10 +6,10 @@ import { ResearchAreaChart } from '@/components/research-area-distribution-pie';
 import FilterIcon from '@/components/icons/filter-icon';
 import { Button } from '@/components/ui/button';
 import { RepoFilter } from '@/components/filter-search';
-import RecentDP from './recent-dp';
+import RecentDP from './components/recent-dp';
 import { MetricCard } from '@/components/ui/card';
 import UndergraduateThesis from './undergraduate-thesis';
-import QuickLinks from './quick-links';
+import QuickLinks from './components/quick-links';
 
 export default function GuestLanding() {
     const [searchQuery, setSearchQuery] = useState('');

@@ -3,6 +3,30 @@ import { ArrowLeft, FileText } from 'lucide-react';
 import { AppHeader } from '@/components/app-header';
 import { NavFooter } from '@/components/nav-footer';
 import PdfViewer from '@/components/pdf-viewer';
+import { BreadcrumbItem, PageHeaderProps } from '@/types';
+import { index } from '@/routes/guest/repository/index';
+import { Icon } from '@/components/icon-index';
+import AppLayout from '@/layouts/app-layout';
+
+// Setup
+const breadcrumb: BreadcrumbItem[] = [
+    {
+        title: 'Management',
+        href: index().url,
+    },
+];
+
+const pageHeader: PageHeaderProps = {
+    title: "Thesis Repository",
+    subtitle: "Browse and explore undergraduate thesis projects",
+    icon: (
+        // pa correct nalang
+        <Icon
+            name="calendarDefault"
+            className="w-8 h-8 text-primary"
+        />
+    ),
+};
 
 
 
@@ -24,14 +48,19 @@ export default function DocumentPreview({ journal }: DocumentPreviewProps) {
     
     return (
         <>
+        <AppLayout
+            breadcrumbs={breadcrumb}
+            pageHeader={pageHeader}
+        >
+            
             <Head title="Document Review" />
-            <AppHeader variant="guest" />
+            {/* <AppHeader variant="guest" /> */}
 
             <div className="min-h-screen bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     {/* Return Button */}
                     <Link
-                        href="/guest/repository"
+                        href="/repository"
                         className="inline-flex items-center gap-2 text-primary hover:underline mb-6 font-['DM_Sans']"
                     >
                         <ArrowLeft className="w-5 h-5" />
@@ -96,7 +125,8 @@ export default function DocumentPreview({ journal }: DocumentPreviewProps) {
                 </div>
             </div>
 
-            <NavFooter />
+            {/* <NavFooter /> */}
+        </AppLayout>
         </>
     );
 }

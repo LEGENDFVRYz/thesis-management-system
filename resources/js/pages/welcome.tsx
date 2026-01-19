@@ -6,10 +6,10 @@ import { ResearchAreaChart } from '@/components/research-area-distribution-pie';
 import FilterIcon from '@/components/icons/filter-icon';
 import { Button } from '@/components/ui/button';
 import { RepoFilter } from '@/components/filter-search';
-import RecentDP from './Guest/recent-dp';
+import RecentDP from './Guest/components/recent-dp';
 import { MetricCard } from '@/components/ui/card';
 import UndergraduateThesis from './Guest/undergraduate-thesis';
-import QuickLinks from './Guest/quick-links';
+import QuickLinks from './Guest/components/quick-links';
 
 export default function Welcome() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -17,7 +17,7 @@ export default function Welcome() {
 
     const handleSearch = () => {
         if (searchQuery.trim()) {
-            router.visit('/guest/repository', {
+            router.visit('/repository', {
                 data: { search: searchQuery.trim() },
                 preserveState: true,
             });

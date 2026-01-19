@@ -44,7 +44,7 @@ Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/faq', [PageController::class, 'faq'])->name('faq');
 
 // ---- PUBLIC ----
-Route::get('/repository', [ThesisArchive::class, 'index'])->name('guest.repository');
+Route::get('/repository', [ThesisArchive::class, 'index'])->name('guest.repository.index');
 Route::get('/repository/preview/{id}', [ThesisArchive::class, 'show'])->name('guest.repository.preview');
 
 Route::get('/search', function () {
