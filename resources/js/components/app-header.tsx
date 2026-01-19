@@ -230,7 +230,7 @@ export function AppHeader({ breadcrumbs = [], variant }: AppHeaderProps) {
                                     <Link href="/" className='hover:text-primary-foreground-2'>Home</Link>
                                 </Button>
                                 <Button variant="primary" asChild className="mx-1 border-none shadow-none">
-                                    <Link href="/guest/repository" className='hover:text-primary-foreground-2'>Repository</Link>
+                                    <Link href="/repository" className='hover:text-primary-foreground-2'>Repository</Link>
                                 </Button>
                             </>
                         )}
