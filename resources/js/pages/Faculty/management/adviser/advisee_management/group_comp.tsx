@@ -31,7 +31,8 @@ const pageHeader: PageHeaderProps = {
 // Types for data from GroupComp.php controller
 interface SectionAdviser {
   section_adviser_id: number;
-  section: number;
+  section: string;
+  year_level: number;
 }
 
 interface StudentWithoutGroup {
@@ -40,21 +41,25 @@ interface StudentWithoutGroup {
   student_number: string;
   email: string;
   section: string;
+  year_level: number;
 }
 
 interface Student {
+  defense_id: string;
+  title: string | null;
+  student_id: string;
   student_name: string;
-  student_number: string;
-  email: string;
-  is_leader: boolean;
-  section: string;
+  student_program_section: string;
+  student_email: string;
+  group_number: number;
+  section: number;
+  year_level: number;
+  group_code: string;
+  adviser_name: string;
+  // Critical fields for CRUD operations
   group_id: number;
   section_adviser_id: number;
-  formatted_group_number: string;
-  course: string;
-  block: string;
-  faculty_id: number;
-  thesis_title: string | null;
+  is_leader: boolean;
 }
 
 interface PageProps {
@@ -76,26 +81,24 @@ export default function GroupComposition({
   };
 
   // Derive groups from students data
-  const groupsMap = new Map<string, {
+  const groupsMap = new Map<number, {
     groupId: number;
     sectionAdviserId: number;
-    groupNumber: string;
+    groupCode: string;
     title: string | null;
     block: string;
-    course: string;
     proponents: number
   }>();
 
   students.forEach(student => {
-    const groupKey = student.formatted_group_number;
+    const groupKey = student.group_id;
     if (!groupsMap.has(groupKey)) {
       groupsMap.set(groupKey, {
         groupId: student.group_id,
         sectionAdviserId: student.section_adviser_id,
-        groupNumber: student.formatted_group_number,
-        title: student.thesis_title,
-        block: student.block,
-        course: student.course,
+        groupCode: student.group_code,
+        title: student.title,
+        block: student.student_program_section,
         proponents: 0,
       });
     }
@@ -107,26 +110,21 @@ export default function GroupComposition({
   const rows = Array.from(groupsMap.values()).map((group) => ({
     group_id: group.groupId,
     section_adviser_id: group.sectionAdviserId,
-    "Group Number": group.groupNumber,
+    "Group Number": group.groupCode,
     Title: group.title ?? 'No Title Yet',
     Proponents: group.proponents,
-    Block: `BSCPE ${getYearFromCourse(group.course)}-${group.block}`,
+    Block: group.block,
   }));
 
   // Helper function to get members for a specific group
-  const getMembersForGroup = (groupNumber: string | number) => {
-    const groupNumberStr = String(groupNumber);
-    const filteredStudents = students.filter(
-      student => student.formatted_group_number === groupNumberStr
-    );
-    console.log('Raw students for group', groupNumberStr, filteredStudents);
+  const getMembersForGroup = (groupId: number) => {
+    const filteredStudents = students.filter(student => student.group_id === groupId);
     return filteredStudents.map((student, index) => {
-      console.log('Student is_leader value:', student.student_name, student.is_leader, typeof student.is_leader);
       return {
-        id: index + 1,
+        id: index + 1, // This is a temporary id for the mapping
         name: student.student_name,
-        studentNumber: student.student_number,
-        email: student.email,
+        studentNumber: student.student_id,
+        email: student.student_email,
         isLeader: Boolean(student.is_leader),
       };
     });
@@ -195,50 +193,53 @@ export default function GroupComposition({
       studentsWithoutGroup={studentsWithoutGroup}
     />
 
-    <EditGroupModal
-      isOpen={isEditModalOpen}
-      onClose={() => {
-        setIsEditModalOpen(false);
-        setSelectedRow(null);
-      }}
-      sectionAdvisers={sectionAdvisers}
-      studentsWithoutGroup={studentsWithoutGroup}
-      groupData={selectedRow ? {
-        groupId: selectedRow.group_id,
-        sectionAdviserId: selectedRow.section_adviser_id,
-        block: selectedRow.Block,
-        members: getMembersForGroup(selectedRow["Group Number"]),
-      } : undefined}
-    />
+      {/* Edit Group Modal */}
+      <EditGroupModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedRow(null);
+        }}
+        sectionAdvisers={sectionAdvisers}
+        studentsWithoutGroup={studentsWithoutGroup}
+        groupData={selectedRow ? {
+          groupId: selectedRow.group_id,
+          sectionAdviserId: selectedRow.section_adviser_id,
+          block: selectedRow.Block,
+          members: getMembersForGroup(selectedRow.group_id),
+        } : undefined}
+      />
 
-    <ManageGroupModal
-      isOpen={isManageModalOpen}
-      onClose={() => {
-        setIsManageModalOpen(false);
-        setSelectedRow(null);
-      }}
-      sectionAdvisers={sectionAdvisers}
-      studentsWithoutGroup={studentsWithoutGroup}
-      groupData={selectedRow ? {
-        groupId: selectedRow.group_id,
-        sectionAdviserId: selectedRow.section_adviser_id,
-        members: students
-          .filter(student => student.formatted_group_number === String(selectedRow["Group Number"]))
-          .map((student, index) => {
-            const nameParts = student.student_name.split(',').map(p => p.trim());
-            const lastName = nameParts[0] || '';
-            const firstAndMiddle = nameParts[1] || '';
-            const initials = (firstAndMiddle.charAt(0) + lastName.charAt(0)).toUpperCase();
-            return {
-              id: index + 1,
-              name: student.student_name,
-              studentNumber: student.student_number,
-              initials,
-              isLeader: student.is_leader,
-            };
-          }),
-      } : undefined}
-    />
-  </AdviseeManagementLayout>
-);
+      {/* Manage Group Modal */}
+      <ManageGroupModal
+        isOpen={isManageModalOpen}
+        onClose={() => {
+          setIsManageModalOpen(false);
+          setSelectedRow(null);
+        }}
+        sectionAdvisers={sectionAdvisers}
+        studentsWithoutGroup={studentsWithoutGroup}
+        groupData={selectedRow ? {
+          groupId: selectedRow.group_id,
+          sectionAdviserId: selectedRow.section_adviser_id,
+          members: students
+            .filter(student => student.group_id === selectedRow.group_id)
+            .map((student, index) => {
+              // Generate initials from student name
+              const nameParts = student.student_name.split(',').map(p => p.trim());
+              const lastName = nameParts[0] || '';
+              const firstAndMiddle = nameParts[1] || '';
+              const initials = (firstAndMiddle.charAt(0) + lastName.charAt(0)).toUpperCase();
+              return {
+                id: index + 1,
+                name: student.student_name,
+                studentNumber: student.student_id,
+                initials,
+                isLeader: student.is_leader,
+              };
+            }),
+        } : undefined}
+      />
+    </AdviseeManagementLayout>
+  );
 }

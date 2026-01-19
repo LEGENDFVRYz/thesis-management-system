@@ -94,8 +94,10 @@ export default function GuestRepository({ search = '', archives = [] }: Reposito
             <AppHeader variant="guest" />
 
             <AppContent
-                title="Thesis Repository"
-                subtitle="Browse and explore undergraduate thesis projects"
+                pageHeader={{
+                    title: 'Thesis Repository',
+                    subtitle: 'Browse and explore undergraduate thesis projects',
+                }}
             >
                 {/* Filter Bar */}
                 <div className="mb-8">

@@ -16,7 +16,8 @@ interface Member {
 
 interface SectionAdviser {
   section_adviser_id: number;
-  section: number;
+  section: string;
+  year_level: number;
 }
 
 interface StudentWithoutGroup {
