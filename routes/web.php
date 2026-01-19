@@ -103,6 +103,7 @@ Route::middleware(['auth', 'role:student'])->group(function () {
             
             // 1. Documents (Default Page)
             Route::get('/documents', [ThesisManagementController::class, 'documents'])->name('documents');
+            Route::post('/documents/upload', [ThesisManagementController::class, 'documentUpload'])->name('documents.upload');
 
             // 2. Compare
             Route::get('/compare', [ThesisManagementController::class, 'compare'])->name('compare');

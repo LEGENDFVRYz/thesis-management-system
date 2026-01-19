@@ -6,12 +6,20 @@ import { useState } from "react";
 import ApprovedBadge from '@/components/badges/verdict_badges-Approved.svg'
 import RejectedBadge from '@/components/badges/verdict_badges-Rejected.svg'
 import RevisionBadge from '@/components/badges/verdict_badges-For_Revision.svg'
+import PendingBadge from '@/components/badges/status_badge-Pending_Review.svg'
 
 const primaryBg = '#730000';
 
 // Function to get the appropriate verdict badge based on status
 const getVerdictBadge = (status: string) => {
   const s = status.toLowerCase();
+
+  if (s.includes('pending')) {
+    return {
+      src: PendingBadge,
+      alt: 'Pending',
+    };
+  }
 
   if (s.includes('approved')) {
     return {
