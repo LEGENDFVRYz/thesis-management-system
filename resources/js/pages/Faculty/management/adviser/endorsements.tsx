@@ -357,10 +357,12 @@ export default function Endorsement({ endorsements }: { endorsements: BackendEnd
             <Head title="Endorsements" />
             {/* Filter/Search Section */}
             <div className="mb-6">
-                <FilterSearchSection variant="DefenseManagement" />
+                <div className="w-full xl:max-w-[1248px] mx-auto px-4 xl:px-0">
+                    <FilterSearchSection variant="DefenseManagement" />
+                </div>
             </div>
-            {/* <div className="border-t-2 border-primary my-4"></div> */}
-            <div className="p-4 font-dm">
+            
+            <div className="font-dm w-full xl:max-w-[1248px] mx-auto px-4 xl:px-0">
                 {mappedProposals.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                         {mappedProposals.map((proposal) => (
