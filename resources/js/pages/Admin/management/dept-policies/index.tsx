@@ -12,11 +12,10 @@ import { Icon } from '@/components/icon-index';
 // Page Header
 const pageHeader: PageHeaderProps = {
     title: "Department Policies",
-    subtitle: "Loremm Ipsumm... paedit nalang",
+    subtitle: "Configure grading and overall policies in the system",
     icon: (
-        // paki corretc nalang
         <Icon
-            name="calendarDefault"
+            name="sysConfig"
             className="w-8 h-8 text-primary"
         />
     ),
@@ -29,11 +28,13 @@ const POLICY_TABS = [
 ];
 
 type Props = {
-    currentTab: 'grading' | 'guidelines';
+    currentTab?: string;
     [key: string]: any;
 };
 
-export default function DepartmentPolicy({ currentTab = 'grading', ...props }: Props) {
+export default function DepartmentPolicy({ currentTab, ...props }: Props) {
+    // Normalize tab - fallback to 'grading' if invalid or missing
+    const activeTab = (currentTab === 'grading' || currentTab === 'guidelines') ? currentTab : 'grading';
 
     // Helper to get current label
     const getTabLabel = (tabKey: string) => {
@@ -42,7 +43,7 @@ export default function DepartmentPolicy({ currentTab = 'grading', ...props }: P
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Department Policies', href: system().url },
-        { title: getTabLabel(currentTab), href: '#' },
+        { title: getTabLabel(activeTab), href: '#' },
     ];
 
     return (
@@ -53,15 +54,15 @@ export default function DepartmentPolicy({ currentTab = 'grading', ...props }: P
             <div className="bg-white">
                 <div className="flex">
                     {POLICY_TABS.map(tab => (
-                        <Link 
-                            key={tab.key} 
+                        <Link
+                            key={tab.key}
                             href={tab.url}
-                            preserveState 
+                            preserveState
                             preserveScroll
                         >
                             <TabButton
-                                isActive={currentTab === tab.key}
-                                onClick={() => {}} 
+                                isActive={activeTab === tab.key}
+                                onClick={() => {}}
                             >
                                 {tab.label}
                             </TabButton>
@@ -84,8 +85,8 @@ export default function DepartmentPolicy({ currentTab = 'grading', ...props }: P
                     }}
                 >
                     {/* CONDITIONAL RENDERING BASED ON PROP */}
-                    {currentTab === 'grading' && <GradingPoliciesTab {...props} />}
-                    {currentTab === 'guidelines' && <OverallGuidelinesTab {...props} />}
+                    {activeTab === 'grading' && <GradingPoliciesTab {...props} />}
+                    {activeTab === 'guidelines' && <OverallGuidelinesTab {...props} />}
                 </div>
             </div>
         </ManagementLayout>

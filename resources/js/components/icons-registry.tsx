@@ -129,6 +129,7 @@ import TableHoverIcon from "./Icons/ic_table-Hover.svg?react";
 import UploadClickedIcon from "./Icons/ic_upload-Clicked.svg?react";
 import UploadDefaultIcon from "./Icons/ic_upload-Default.svg?react";
 import UploadHoverIcon from "./Icons/ic_upload-Hover.svg?react";
+import SysConfigIcon from "./Icons/ic_sys-config.svg?react";
 
 export const iconRegistry = {
   about: AboutIcon,
@@ -262,6 +263,7 @@ export const iconRegistry = {
   uploadClicked: UploadClickedIcon,
   uploadDefault: UploadDefaultIcon,
   uploadHover: UploadHoverIcon,
+  sysConfig: SysConfigIcon,
 };
 
 export type IconName = keyof typeof iconRegistry;

@@ -35,7 +35,7 @@ const pageHeader: PageHeaderProps = {
     subtitle: "Set submission windows, defense periods, and grading deadlines",
     icon: (
         <Icon
-            name="calendarDefault"
+            name="sysConfig"
             className="w-8 h-8 text-primary"
         />
     ),

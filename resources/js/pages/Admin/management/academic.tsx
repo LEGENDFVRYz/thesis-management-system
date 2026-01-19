@@ -39,7 +39,7 @@ const pageHeader: PageHeaderProps = {
     subtitle: "Configure academic year, semester parameters, and system timeline",
     icon: (
         <Icon
-            name="calendarDefault"
+            name="sysConfig"
             className="w-8 h-8 text-primary"
         />
     ),
