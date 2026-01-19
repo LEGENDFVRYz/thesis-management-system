@@ -23,8 +23,7 @@ const pageHeader: PageHeaderProps = {
     title: "Public presentation",
     subtitle: "Register and submit proof of public presentation",
     icon: (
-        // pa correct nalang
-        <Users className="w-8 h-8 fill-current" />
+        <Users className="w-8 h-8 text-primary" />
     ),
 };
 

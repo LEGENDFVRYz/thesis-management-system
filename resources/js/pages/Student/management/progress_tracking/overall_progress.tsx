@@ -3,7 +3,7 @@ import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import ProgressTrackingLayout from './index';
 import { Check, Calendar } from 'lucide-react';
-import { Icon } from '@/components/icon-index';
+import ProgressTrackingIcon from '@/components/Icons/progress_tracking.svg';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -16,7 +16,7 @@ const breadcrumb: BreadcrumbItem[] = [
 const pageHeader: PageHeaderProps = {
     title: "Progress Tracking",
     subtitle: "Access a comprehensive archive of student theses",
-    icon: <Icon name="calendarDefault" className="w-8 h-8 text-primary" />
+    icon: <img src={ProgressTrackingIcon} alt="Progress Tracking" className="w-8 h-8" />
 };
 
 // The current course is automatically determined by student's year and semester:

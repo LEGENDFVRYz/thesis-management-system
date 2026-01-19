@@ -6,7 +6,7 @@ import { AppContent } from '@/components/app-content';
 import { FileText, Search, Edit3, ArrowRight, CheckCircle2, MessageSquare, XCircle, Eye, Trash } from 'lucide-react';
 import { index, store } from '@/routes/faculty/committee/proposal_review/index';
 import { NavFooter } from '@/components/nav-footer';
-import { Icon } from '@/components/icon-index';
+import ReviewIcon from '@/components/Icons/review.svg';
 import { CommitteeCard } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import FilterSearchSection from '@/components/filter-search-section';
@@ -30,11 +30,7 @@ const pageHeader: PageHeaderProps = {
     title: "Proposal Review",
     subtitle: "Review and evaluate thesis proposals submitted for committee approval",
     icon: (
-        // pa correct nalang
-        <Icon
-            name="calendarDefault"
-            className="w-8 h-8 text-primary"
-        />
+        <img src={ReviewIcon} alt="Proposal Review" className="w-8 h-8" />
     ),
 };
 

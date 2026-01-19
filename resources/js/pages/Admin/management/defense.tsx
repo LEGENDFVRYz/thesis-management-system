@@ -13,6 +13,7 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Calendar, TableIcon, X } from 'lucide-react';
+import DefenseManagementIcon from '@/components/Icons/defense_management.svg';
 import { CardContent } from '@/components/ui/card';
 import { DefenseCalendar } from '@/components/defense-calendar-monthly';
 import ManagementLayout from '.';
@@ -30,10 +31,7 @@ const pageHeader: PageHeaderProps = {
     title: "Defense Management",
     subtitle: "Monitor schedules and assignments",
     icon: (
-        <Icon
-            name="calendarDefault"
-            className="w-8 h-8 text-primary"
-        />
+        <img src={DefenseManagementIcon} alt="Defense Management" className="w-8 h-8" />
     ),
 };
 
