@@ -245,7 +245,7 @@ export function AppHeader({ breadcrumbs = [], variant }: AppHeaderProps) {
                                 href="/login"
                                 className="cursor-pointer transition-transform hover:scale-110 block group"
                             >
-                                <div className="group-hover:hidden">
+                                <div className="group-hover:hidden [&_svg]:brightness-0 [&_svg]:invert">
                                     <Icon name="logoutDefault" size={24} />
                                 </div>
                                 <div className="hidden group-hover:block">
@@ -259,7 +259,7 @@ export function AppHeader({ breadcrumbs = [], variant }: AppHeaderProps) {
                                 href={'/profilemanagement'}
                                 className="cursor-pointer transition-transform hover:scale-110 block group"
                             >
-                                <div className="group-hover:hidden">
+                                <div className="group-hover:hidden [&_svg]:brightness-0 [&_svg]:invert">
                                     <Icon name="profileDefault" size={24} />
                                 </div>
                                 <div className="hidden group-hover:block">
@@ -274,7 +274,7 @@ export function AppHeader({ breadcrumbs = [], variant }: AppHeaderProps) {
                                 href="/notifications"
                                 className="cursor-pointer transition-transform hover:scale-110 block group"
                             >
-                                <div className="group-hover:hidden">
+                                <div className="group-hover:hidden [&_svg]:brightness-0 [&_svg]:invert">
                                     <Icon name="notificationDefault" size={24} />
                                 </div>
                                 <div className="hidden group-hover:block">
@@ -288,7 +288,7 @@ export function AppHeader({ breadcrumbs = [], variant }: AppHeaderProps) {
                             href="/faq"
                             className="cursor-pointer transition-transform hover:scale-110 block group"
                         >
-                            <div className="group-hover:hidden">
+                            <div className="group-hover:hidden [&_svg]:brightness-0 [&_svg]:invert">
                                 <Icon name="faqDefault" size={24} />
                             </div>
                             <div className="hidden group-hover:block">

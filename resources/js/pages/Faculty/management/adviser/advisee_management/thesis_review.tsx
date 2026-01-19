@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import { badgesRegistry } from '@/components/badges-registry';
-import { Icon } from '@/components/icon-index';
+import ReviewIcon from '@/components/Icons/review.svg';
 
 // Setup
 const breadcrumb: BreadcrumbItem[] = [
@@ -26,11 +26,7 @@ const pageHeader: PageHeaderProps = {
     title: "Thesis Document Review",
     subtitle: "Review, comment on, and approve/request revisions for submitted thesis documents",
     icon: (
-                // pa correct nalang
-        <Icon
-            name="calendarDefault"
-            className="w-8 h-8 text-primary"
-        />
+        <img src={ReviewIcon} alt="Thesis Review" className="w-8 h-8" />
     ),
 };
 

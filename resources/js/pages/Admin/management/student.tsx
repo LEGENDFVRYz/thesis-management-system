@@ -3,8 +3,9 @@
   import { Head } from '@inertiajs/react';
   import ManagementLayout from '@/pages/Admin/management/index';
   import { PageHeaderProps, type BreadcrumbItem } from '@/types';
+  import { Users } from 'lucide-react';
 
-  // SHARED COMPONENTS 
+  // SHARED COMPONENTS
   import { NavFooter } from '@/components/nav-footer';
   import FilterSearchSection from '@/components/filter-search-section';
 
@@ -21,7 +22,6 @@
   import { studentData, thesisTitles } from '../../../components/temp/student_management/student_sampleData';
 
   import { filterAndSortStudents, filterAndSortGroups, groupStudentsByCode } from '../../../components/temp/student_management/student_data_utilities';
-  import { Icon } from '@/components/icon-index';
 
 
   // Page Setup
@@ -36,11 +36,7 @@
       title: "Student Management",
       subtitle: "View and Manage Student Accounts and Thesis Group Assignments",
       icon: (
-          // paki coprrect nalang ng icon
-          <Icon
-              name="proponentsDefault"
-              className="w-8 h-8 text-primary"
-          />
+          <Users className="w-8 h-8 text-primary" />
       ),
   };
 

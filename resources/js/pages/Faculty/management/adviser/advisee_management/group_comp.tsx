@@ -9,7 +9,7 @@ import EditGroupModal from './components/edit-group';
 import ManageGroupModal from './components/manage-group';
 import { index } from '@/routes/faculty/adviser/group_comp';
 import { destroy } from '@/routes/faculty/adviser/group_comp/index';
-import { Icon } from '@/components/icon-index';
+import { Users } from 'lucide-react';
 
 // Page Setup
 const breadcrumb: BreadcrumbItem[] = [
@@ -23,11 +23,7 @@ const pageHeader: PageHeaderProps = {
     title: "Group Composition",
     subtitle: "Create and manage thesis group compositions and membership changes",
     icon: (
-              // pa correct nalang
-        <Icon
-            name="calendarDefault"
-            className="w-8 h-8 text-primary"
-        />
+        <Users className="w-8 h-8 text-primary" />
     ),
 };
 
