@@ -2,6 +2,7 @@ import { index as my_advisees } from '@/routes/faculty/adviser/my_advisees';
 import { index as group_comp } from '@/routes/faculty/adviser/group_comp';
 import { index as thesis_review } from '@/routes/faculty/adviser/thesis_review';
 import { index as progress } from '@/routes/faculty/adviser/progress';
+import { index as change_request } from '@/routes/faculty/adviser/change_request/index';
 
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
@@ -28,6 +29,7 @@ const tabs = [
     { title: 'Group Composition', href: group_comp() },
     { title: 'Progress Monitoring', href: progress() },
     { title: 'Thesis Review', href: thesis_review() },
+    { title: 'Change Request', href: change_request() },
 ];
 
 export default function AdviseeManagementLayout({

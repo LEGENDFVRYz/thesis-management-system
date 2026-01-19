@@ -13,6 +13,7 @@ use App\Http\Controllers\Faculty\Adviser\AdviseeManagement\GroupComp;
 use App\Http\Controllers\Faculty\Adviser\AdviseeManagement\MyAdvisees;
 use App\Http\Controllers\Faculty\Adviser\AdviseeManagement\ProgressReport;
 use App\Http\Controllers\Faculty\Adviser\AdviseeManagement\ThesisReview;
+use App\Http\Controllers\Faculty\Adviser\AdviseeManagement\ChangeRequest;
 use App\Http\Controllers\Faculty\Adviser\EvaluationGrading;
 use App\Http\Controllers\Faculty\Committee\ProposalReview;
 use App\Http\Controllers\Faculty\Coordinator\Communication;
@@ -195,7 +196,9 @@ Route::prefix('faculty')->group(function () {
                                 
                 # "Advisee Management" - PROGRESS
                 Route::get('progress', [ProgressReport::class, 'index'])->name('progress.index');
-                
+
+                # "Advisee Management" - CHANGE REQUEST
+                Route::get('change-request', [ChangeRequest::class, 'index'])->name('change_request.index');
                 
                 // ----------------------------------------------------------------------
                 // NOTE: DEFENSE MANAGEMENT OF ADVISER HAS BEEN JOINED WITH PANEL
