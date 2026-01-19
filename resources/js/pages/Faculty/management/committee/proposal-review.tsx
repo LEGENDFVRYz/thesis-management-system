@@ -7,6 +7,7 @@ import { FileText, Search, Edit3, ArrowRight, CheckCircle2, MessageSquare, XCirc
 import { index, store } from '@/routes/faculty/committee/proposal_review/index';
 import { NavFooter } from '@/components/nav-footer';
 import ReviewIcon from '@/components/Icons/review.svg';
+import { Icon } from '@/components/icon-index';
 import { CommitteeCard } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import FilterSearchSection from '@/components/filter-search-section';

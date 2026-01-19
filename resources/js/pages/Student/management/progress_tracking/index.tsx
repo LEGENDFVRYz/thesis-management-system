@@ -1,4 +1,3 @@
-import { index } from '@/routes/faculty/adviser/progress/index';
 import { overall, reports } from '@/routes/student/management/progress/index';
 import { TabButton } from '@/components/ui/tabs';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
@@ -16,7 +15,7 @@ interface ProgressTrackingLayoutProps {
 const breadcrumb: BreadcrumbItem[] = [
     {
         title: 'Progress Tracking',
-        href: index().url,
+        href: overall().url,
     },
 ];
 
