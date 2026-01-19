@@ -1,4 +1,3 @@
-import { SearchBar, Sort2 } from '@/components/filter-search';
 import { Icon } from '@/components/icon-index';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,11 +12,11 @@ import {
 } from '@/components/ui/table';
 import { index } from '@/routes/faculty/adviser/my_advisees/index';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
-import { Filter, Users } from 'lucide-react';
+import { Head, router } from '@inertiajs/react';
+import { Users } from 'lucide-react';
 import { useState } from 'react';
 import AdviseeManagementLayout from '.';
-import { BlockAndTagsFilter } from './components/advisee-filter-search';
+import { AdviseeFilterSearch } from './components/advisee-filter-search';
 
 const breadcrumb: BreadcrumbItem[] = [
     {
@@ -27,18 +26,11 @@ const breadcrumb: BreadcrumbItem[] = [
 ];
 
 const pageHeader: PageHeaderProps = {
-    title: "My Advisees",
-    subtitle: "View and manage all students under supervision with their current thesis stages",
-    icon: (
-        // pa correct nalang
-        <Icon
-            name="calendarDefault"
-            className="w-8 h-8 text-primary"
-        />
-    ),
+    title: 'My Advisees',
+    subtitle:
+        'View and manage all students under supervision with their current thesis stages',
+    icon: <Icon name="peopleLinear" className="h-8 w-8 text-primary" />,
 };
-
-
 
 interface Advisee {
     student_id: string;
@@ -47,6 +39,9 @@ interface Advisee {
     group_code: string;
     block: string;
     thesis_stage: string;
+    thesis_title: string;
+    co_researchers: string[];
+    progress_percentage: number;
 }
 
 interface MyAdviseesProps {
@@ -67,6 +62,13 @@ const sampleAdvisees: Advisee[] = Array(20)
             'Manuscript Submission',
             'DP1 Manuscript Revision',
         ][index % 3],
+        thesis_title: [
+            'Machine Learning Applications in Healthcare',
+            'IoT-Based Smart Home System',
+            'Blockchain for Supply Chain Management',
+        ][index % 3],
+        co_researchers: ['Jane Smith', 'John Doe', 'Alice Johnson'],
+        progress_percentage: [40, 60, 80][index % 3],
     }));
 
 export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
@@ -75,11 +77,8 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
     const [selectedAdvisee, setSelectedAdvisee] = useState<Advisee | null>(
         null,
     );
-    const [isSortOpen, setIsSortOpen] = useState(false);
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedBlock, setSelectedBlock] = useState('');
-
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     const filteredAdvisees = displayAdvisees.filter((advisee) => {
@@ -110,83 +109,39 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
         >
             <Head title="My Advisees" />
 
-            {/* Filter & Search Section with Container Styling */}
-            <div className="box-border flex h-[134px] w-full max-w-[1360px] flex-col items-start gap-4 self-stretch rounded-[10px] border-[0.8px] border-primary/20 bg-card p-[24.8px_24.8px_0.8px_24.8px] font-dm shadow-sm transition-all duration-200">
-                {/* Header Section */}
-                <div className="flex h-6 w-full flex-row items-center gap-2 self-stretch rounded-none font-dm">
-                    <Filter className="h-5 w-5 text-primary" />
-                    <h2 className="font-dm text-base leading-6 font-normal text-primary">
-                        Search, Sort, & Filter
-                    </h2>
-                </div>
+            <AdviseeFilterSearch
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                selectedBlock={selectedBlock}
+                onBlockChange={setSelectedBlock}
+                selectedTags={selectedTags}
+                onTagsChange={setSelectedTags}
+                onClearFilters={() => {
+                    setSearchQuery('');
+                    setSelectedBlock('');
+                    setSelectedTags([]);
+                }}
+            />
 
-                {/* Controls Row */}
-                <div className="flex w-full flex-row items-center justify-center gap-[10px] self-stretch font-dm">
-                    {/* Search Box */}
-                    <div className="flex-1 font-dm">
-                        <SearchBar
-                            variant="filter-section"
-                            placeholder="Search student name, student ID, or thesis title..."
-                            value={searchQuery}
-                            onChange={setSearchQuery}
-                        />
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex flex-row items-center gap-[10px] font-dm">
-                        {/* Sort Button */}
-                        <Button
-                            variant="secondary"
-                            size="icon"
-                            className="rounded-lg border-none font-dm"
-                            onClick={() => setIsSortOpen(true)}
-                        >
-                            <Icon name="sortDefault" size={16} />
-                        </Button>
-
-                        {/* Filter Button */}
-                        <Button
-                            variant="secondary"
-                            size="icon"
-                            className="rounded-lg border-none font-dm"
-                            onClick={() => setIsFilterOpen(true)}
-                        >
-                            <Filter className="h-4 w-4" />
-                        </Button>
-
-                        {/* Clear Filter Button */}
-                        <Button
-                            variant="negative"
-                            className="h-9 min-w-[101px] gap-2 rounded-lg px-4 py-2 font-dm"
-                            onClick={() => {
-                                setSearchQuery('');
-                                setSelectedBlock('');
-                                setSelectedTags([]);
-                            }}
-                        >
-                            <span className="font-dm text-[13.33px] font-medium">
-                                Clear Filter
-                            </span>
-                        </Button>
-                    </div>
-                </div>
-            </div>
+            <Badge variant="default" className="mt-4 mb-4">
+                Total Advisees ({filteredAdvisees.length})
+            </Badge>
 
             {/* Table Section */}
             <div className="overflow-x-auto rounded-lg border-1 border-[var(--primary)] bg-primary-foreground shadow">
-                <Table className="w-[1360px]">
+                <Table className="w-full table-fixed">
                     <TableHeader>
                         <TableRow className="bg-primary hover:bg-primary">
                             <TableHead className="text-center text-primary-foreground">
                                 Student ID
                             </TableHead>
-                            <TableHead className="text-center text-primary-foreground">
+                            <TableHead className="w-[180px] text-center text-primary-foreground">
                                 Student Name
                             </TableHead>
-                            <TableHead className="text-center text-primary-foreground">
+                            <TableHead className="w-[280px] text-center text-primary-foreground">
                                 PUP Webmail
                             </TableHead>
-                            <TableHead className="text-center text-primary-foreground">
+                            <TableHead className="w-[120px] text-center text-primary-foreground">
                                 Group Code
                             </TableHead>
                             <TableHead className="text-center text-primary-foreground">
@@ -207,13 +162,13 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                                     <TableCell className="text-center font-medium">
                                         {advisee.student_id}
                                     </TableCell>
-                                    <TableCell className="text-center">
+                                    <TableCell className="w-[180px] text-center break-words whitespace-normal">
                                         {advisee.student_name}
                                     </TableCell>
-                                    <TableCell className="text-center">
+                                    <TableCell className="w-[280px] text-center whitespace-nowrap">
                                         {advisee.pup_webmail}
                                     </TableCell>
-                                    <TableCell className="text-center">
+                                    <TableCell className="w-[120px] text-center whitespace-nowrap">
                                         {advisee.group_code}
                                     </TableCell>
                                     <TableCell className="text-center">
@@ -340,7 +295,15 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                                     <p className="text-body-1 mb-2 pb-2 font-bold text-primary">
                                         THESIS INFORMATION
                                     </p>
-                                    <Button variant="primary" size="sm">
+                                    <Button
+                                        variant="primary"
+                                        size="sm"
+                                        onClick={() => {
+                                            router.visit(
+                                                `/faculty/adviser/progress`,
+                                            );
+                                        }}
+                                    >
                                         View
                                     </Button>
                                 </div>
@@ -351,34 +314,25 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                                             Thesis Title
                                         </p>
                                         <p className="font-medium">
-                                            Machine Learning Applications in
-                                            Healthcare
+                                            {selectedAdvisee?.thesis_title}
                                         </p>
                                     </div>
-
                                     <div>
                                         <p className="text-body-3 text-alert-desc">
                                             Co-researchers
                                         </p>
                                         <div className="mt-2 flex gap-2">
-                                            <Badge
-                                                variant="outline"
-                                                className="rounded-full"
-                                            >
-                                                Jane Smith
-                                            </Badge>
-                                            <Badge
-                                                variant="outline"
-                                                className="rounded-full"
-                                            >
-                                                Jane Smith
-                                            </Badge>
-                                            <Badge
-                                                variant="outline"
-                                                className="rounded-full"
-                                            >
-                                                Jane Smith
-                                            </Badge>
+                                            {selectedAdvisee?.co_researchers.map(
+                                                (researcher, idx) => (
+                                                    <Badge
+                                                        key={idx}
+                                                        variant="outline"
+                                                        className="rounded-full"
+                                                    >
+                                                        {researcher}
+                                                    </Badge>
+                                                ),
+                                            )}
                                         </div>
                                     </div>
 
@@ -398,11 +352,16 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                                         <div className="h-3 w-full overflow-hidden rounded-full bg-primary">
                                             <div
                                                 className="h-full bg-primary-foreground-2"
-                                                style={{ width: '60%' }}
+                                                style={{
+                                                    width: `${selectedAdvisee?.progress_percentage}%`,
+                                                }}
                                             />
                                         </div>
                                         <p className="mt-1 text-sm font-medium">
-                                            60% Complete
+                                            {
+                                                selectedAdvisee?.progress_percentage
+                                            }
+                                            % Complete
                                         </p>
                                     </div>
                                 </div>
@@ -422,31 +381,6 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                             </Button>
                         </div>
                     </div>
-                </DialogContent>
-            </Dialog>
-
-            <Dialog open={isSortOpen} onOpenChange={setIsSortOpen}>
-                <DialogContent className="p-0">
-                    <Sort2 />
-                </DialogContent>
-            </Dialog>
-
-            <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-                <DialogContent
-                    className="p-0 [&_[data-slot=dialog-overlay]]:bg-foreground/20 [&_[data-slot=dialog-overlay]]:backdrop-blur-sm"
-                    style={{ maxWidth: '350px' }}
-                >
-                    <BlockAndTagsFilter
-                        block={selectedBlock}
-                        onBlockChange={setSelectedBlock}
-                        tags={selectedTags}
-                        onTagsChange={setSelectedTags}
-                        onApply={() => setIsFilterOpen(false)}
-                        onReset={() => {
-                            setSelectedBlock('');
-                            setSelectedTags([]);
-                        }}
-                    />
                 </DialogContent>
             </Dialog>
         </AdviseeManagementLayout>
