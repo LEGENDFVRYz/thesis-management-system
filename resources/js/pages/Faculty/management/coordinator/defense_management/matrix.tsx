@@ -157,20 +157,24 @@ const TabButton = React.forwardRef<HTMLButtonElement, TabButtonProps>(
         <button
             ref={ref}
             className={cn(
-                'h-12 px-[20px] flex flex-col justify-center items-center gap-2.5',
-                'rounded-t-[10px] transition-colors',
-                isActive
-                    ? 'bg-[#9b000a] text-white'
-                    : 'bg-[#800000] text-white/70 hover:bg-[#9b000a] hover:text-white',
-                className
-            )}
-            {...props}
-        >
-            <div className="flex justify-center items-center gap-2.5">
-                <span className="font-medium text-[16px] leading-normal whitespace-nowrap font-dm">
-                    {children}
-                </span>
-            </div>
+                            'h-9 px-[15px] flex flex-col justify-center items-center gap-2.5',
+                            'rounded-t-[10px] transition-colors',
+                            'shadow-[inset_0_4px_4px_rgba(0,0,0,0.25)]',
+            
+                            // Base background
+                            isActive
+                                ? 'bg-[#9b000a]'
+                                : 'bg-primary hover:bg-[#9b000a]',
+            
+                            className
+                        )}
+                        {...props}
+                    >
+                        <div className="flex justify-center items-center gap-2.5">
+                            <span className="text-primary-foreground-2 font-medium text-[19px] leading-normal whitespace-nowrap font-dm">
+                                {children}
+                            </span>
+                        </div>
         </button>
     )
 );
@@ -310,24 +314,30 @@ export default function MatrixManagement() {
                             </Button>
                         </div>
 
-                        {/* Sub-Tabs - Matched Style to Code A (Now on the Right) */}
-                        <ToggleGroup 
-                            type="single" 
-                            value={viewMode} 
-                            onValueChange={(value) => { if(value) setViewMode(value as 'table' | 'calendar') }}
-                            className="bg-[#F3E5CA] rounded-lg p-1 gap-1 inline-flex"
+                        {/* Sub-Tabs - Switcher */}
+                        <ToggleGroup
+                            type="single"
+                            value={viewMode}
+                            onValueChange={(val) => val && setViewMode(val as 'table' | 'calendar')}
+                            className="bg-[#F3E5CA] p-1 rounded-full border border-[#800000]/10"
                         >
-                            <ToggleGroupItem 
-                                value="calendar" 
-                                className="whitespace-nowrap w-auto data-[state=on]:bg-[#800000] data-[state=on]:text-white text-[#800000] hover:bg-[#800000]/10 hover:text-[#800000] h-8 px-4 text-xs font-bold"
+                            <ToggleGroupItem
+                                value="table"
+                                className={cn(
+                                    "gap-2 h-8 px-6 rounded-full text-xs font-bold uppercase transition-all",
+                                    viewMode === 'table' ? "bg-[#800000] text-white shadow-md" : "text-[#800000] hover:bg-white/50"
+                                )}
                             >
-                                <CalendarDays className="mr-2 h-3 w-3" /> Calendar View
+                                <LayoutList className="w-4 h-4" /> Table
                             </ToggleGroupItem>
-                            <ToggleGroupItem 
-                                value="table" 
-                                className="whitespace-nowrap w-auto data-[state=on]:bg-[#800000] data-[state=on]:text-white text-[#800000] hover:bg-[#800000]/10 hover:text-[#800000] h-8 px-4 text-xs font-bold"
+                            <ToggleGroupItem
+                                value="calendar"
+                                className={cn(
+                                    "gap-2 h-8 px-6 rounded-full text-xs font-bold uppercase transition-all",
+                                    viewMode === 'calendar' ? "bg-[#800000] text-white shadow-md" : "text-[#800000] hover:bg-white/50"
+                                )}
                             >
-                                <LayoutList className="mr-2 h-3 w-3" /> Table View
+                                <CalendarDays className="w-4 h-4" /> Calendar
                             </ToggleGroupItem>
                         </ToggleGroup>
                     </div>

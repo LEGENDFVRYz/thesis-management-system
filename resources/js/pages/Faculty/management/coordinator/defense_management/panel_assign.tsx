@@ -14,7 +14,8 @@ import {
     X,
     UserCheck,
     Save,
-    Check
+    Check,
+    AlertCircle,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -93,17 +94,21 @@ const TabButton = React.forwardRef<HTMLButtonElement, TabButtonProps>(
         <button
             ref={ref}
             className={cn(
-                'h-12 px-[20px] flex flex-col justify-center items-center gap-2.5',
-                'rounded-t-[10px] transition-colors',
-                isActive
-                    ? 'bg-[#9b000a] text-white'
-                    : 'bg-[#800000] text-white/70 hover:bg-[#9b000a] hover:text-white',
-                className
-            )}
+                            'h-9 px-[15px] flex flex-col justify-center items-center gap-2.5',
+                            'rounded-t-[10px] transition-colors',
+                            'shadow-[inset_0_4px_4px_rgba(0,0,0,0.25)]',
+            
+                            // Base background
+                            isActive
+                                ? 'bg-[#9b000a]'
+                                : 'bg-primary hover:bg-[#9b000a]',
+            
+                            className
+                        )}
             {...props}
         >
             <div className="flex justify-center items-center gap-2.5">
-                <span className="font-medium text-[16px] leading-normal whitespace-nowrap font-dm">
+                <span className="text-primary-foreground-2 font-medium text-[19px] leading-normal whitespace-nowrap font-dm">
                     {children}
                 </span>
             </div>
@@ -288,24 +293,30 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                     {/* 2. Controls & Filters */}
                     <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center pt-2">
 
-                        {/* Sub-Tabs */}
+                        {/* Sub-Tabs: Assignments vs Conflicts */}
                         <ToggleGroup
                             type="single"
                             value={activeTab}
                             onValueChange={(value) => { if (value) setActiveTab(value as 'assignments' | 'conflicts') }}
-                            className="bg-[#F3E5CA] rounded-lg p-1 gap-1 inline-flex"
+                            className="bg-[#F3E5CA] p-1 rounded-full border border-[#800000]/10 inline-flex"
                         >
                             <ToggleGroupItem
                                 value="assignments"
-                                className="whitespace-nowrap w-auto data-[state=on]:bg-[#800000] data-[state=on]:text-white text-[#800000] hover:bg-[#800000]/10 hover:text-[#800000] h-8 px-4 text-xs font-bold"
+                                className={cn(
+                                    "gap-2 h-8 px-6 rounded-full text-xs font-bold uppercase transition-all",
+                                    activeTab === 'assignments' ? "bg-[#800000] text-white shadow-md" : "text-[#800000] hover:bg-white/50"
+                                )}
                             >
-                                Panel Assignments
+                                <Users className="w-4 h-4" /> Panel Assignments
                             </ToggleGroupItem>
                             <ToggleGroupItem
                                 value="conflicts"
-                                className="whitespace-nowrap w-auto data-[state=on]:bg-[#800000] data-[state=on]:text-white text-[#800000] hover:bg-[#800000]/10 hover:text-[#800000] h-8 px-4 text-xs font-bold"
+                                className={cn(
+                                    "gap-2 h-8 px-6 rounded-full text-xs font-bold uppercase transition-all whitespace-nowrap",
+                                    activeTab === 'conflicts' ? "bg-[#800000] text-white shadow-md" : "text-[#800000] hover:bg-white/50"
+                                )}
                             >
-                                Conflict Approvals
+                                <AlertCircle className="w-4 h-4" /> Conflict Approvals
                             </ToggleGroupItem>
                         </ToggleGroup>
 
