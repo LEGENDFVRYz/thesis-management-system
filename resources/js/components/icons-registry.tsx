@@ -43,6 +43,8 @@ import EditDefaultIcon from "./Icons/ic_edit-Default.svg?react";
 import EditHoverIcon from "./Icons/ic_edit-Hover.svg?react";
 import EdittableDefaultIcon from "./Icons/ic_edittable-Default.svg?react";
 import EdittableVariant2Icon from "./Icons/ic_edittable-Variant2.svg?react";
+import EndorsementButtonModalIcon from "./Icons/EndorsementButtonModal.svg?react";
+import EndorsmentICIcon from "./Icons/EndorsmentIC.svg?react";
 import EvalIcon from "./Icons/EvalIcon.svg?react";
 import EyecloseClickedIcon from "./Icons/ic_eyeclose-Clicked.svg?react";
 import EyecloseDefaultIcon from "./Icons/ic_eyeclose-Default.svg?react";
@@ -176,6 +178,8 @@ export const iconRegistry = {
   editHover: EditHoverIcon,
   edittableDefault: EdittableDefaultIcon,
   edittableVariant2: EdittableVariant2Icon,
+  endorsementButtonModal: EndorsementButtonModalIcon,
+  endorsementIC: EndorsmentICIcon,
   evalIcon: EvalIcon,
   eyecloseClicked: EyecloseClickedIcon,
   eyecloseDefault: EyecloseDefaultIcon,

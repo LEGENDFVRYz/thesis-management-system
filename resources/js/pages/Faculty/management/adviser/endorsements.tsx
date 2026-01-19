@@ -21,10 +21,9 @@ const pageHeader: PageHeaderProps = {
     title: "Panel Endorsement" ,
     subtitle: "Endorse approved proposals/theses of your advisory class for formal review",
     icon: (
-        // pa correct nalang
         <Icon
-            name="calendarDefault"
-            className="w-8 h-8 text-primary"
+            name="endorsementIC"
+            size={32}
         />
     ),
 };
@@ -112,8 +111,11 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                         </p>
                     </div>
                     
-                    {/* Status Badge using 'endorsed' variables */}
-                    <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-[var(--endorsed-bg)] text-[var(--endorsed-font-color)] border border-[var(--endorsed-border)]">
+                    <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border ${
+                        data.status === 'Endorsed' 
+                            ? 'bg-[var(--endorsed-bg)] text-[var(--endorsed-font-color)] border-[var(--endorsed-border)]' 
+                            : 'bg-[var(--breadcrumb)] text-muted-foreground border-border'
+                    }`}>
                         <CheckCircle className="w-3 h-3 mr-1" />
                         {data.status}
                     </span>
@@ -140,27 +142,6 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                         <p className="text-xs font-semibold text-foreground">{data.approvalDate}</p>
                     </div>
                 </div>
-                
-                
-                {/*  Removed Panel Members Section
-                <div className="mb-6 flex-1">
-                    <p className="text-[10px] text-muted-foreground mb-2">Panel Members</p>
-                    <div className="space-y-2">
-                        {data.panelMembers.map((member) => (
-                            <div key={member.id} className="flex items-center gap-2">
-                                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] text-white font-bold`}
-                                    style={{
-                                        backgroundColor: member.role === 'P1' ? 'var(--chart-1)' : 
-                                                         member.role === 'P2' ? 'var(--chart-2)' : 
-                                                        'var(--chart-3)' 
-                                    }}>
-                                    {member.role}
-                                </div>
-                                <span className="text-xs text-foreground font-medium">{member.name}</span>
-                            </div>
-                        ))}
-                    </div>
-                </div> */}
 
                 <div className="flex gap-3 mt-auto pt-4 border-t border-border">
                     <button 
@@ -179,7 +160,7 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                             {processing ? 'Processing...' : 'Endorse'}
                         </button>
                     ) : (
-                        <button disabled className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-gray-400 bg-gray-50 border border-gray-100 rounded-[var(--radius-sm)] cursor-not-allowed">
+                        <button disabled className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-[var(--evaluated-font-color)] bg-[var(--evaluated-bg)] border border-[var(--evaluated-border)] rounded-[var(--radius-sm)] cursor-not-allowed">
                             <CheckCircle size={14} />
                             Endorsed
                         </button>
@@ -215,100 +196,95 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
 
             {showEndorseModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm font-dm">
-                    <div className="bg-background rounded-[var(--radius-lg)] shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="bg-background rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-border/50">
                         
                         {/* Primary Color Header */}
-                        <div className="bg-primary text-primary-foreground px-6 py-4 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <Send className="w-5 h-5 -rotate-45" />
-                                <h2 className="text-lg font-medium tracking-wide">Endorse Proposal for Defense</h2>
+                        <div className="bg-primary text-primary-foreground px-6 py-5 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-primary-foreground/10 rounded-lg">
+                                    <Icon name="endorsementButtonModal" size={22} />
+                                </div>
+                                <div>
+                                    <h2 className="text-base font-semibold tracking-wide">Endorse Proposal</h2>
+                                    <p className="text-xs text-primary-foreground/70">Submit for Defense Review</p>
+                                </div>
                             </div>
                             <button 
                                 onClick={() => setShowEndorseModal(false)}
-                                className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+                                className="p-1.5 rounded-md text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10 transition-all"
                             >
-                                <X size={20} />
+                                <X size={18} />
                             </button>
                         </div>
 
                         <div className="p-6">
-                            <h3 className="text-lg font-semibold text-foreground mb-4 leading-snug">
-                                {data.title}
-                            </h3>
+                            {/* Thesis Title Card */}
+                            <div className="bg-muted/50 rounded-lg p-4 mb-5 border border-border/50">
+                                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5 font-medium">Thesis Title</p>
+                                <h3 className="text-sm font-semibold text-foreground leading-relaxed">
+                                    {data.title}
+                                </h3>
+                            </div>
 
-                            <div className="grid grid-cols-2 gap-y-2 text-sm text-muted-foreground mb-6">
-                                <div className="flex">
-                                    <span className="w-24">Students:</span>
-                                    <span className="font-medium text-foreground">{data.proponents.join(', ')}</span>
+                            {/* Info Grid */}
+                            <div className="grid grid-cols-2 gap-4 mb-5">
+                                <div className="space-y-3">
+                                    <div>
+                                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Students</p>
+                                        <div className="text-xs font-medium text-foreground space-y-0.5">
+                                            {data.proponents.map((name, idx) => (
+                                                <p key={idx}>{name}</p>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Block</p>
+                                        <p className="text-xs font-medium text-foreground">BSCPE {data.year_level}-{data.block}</p>
+                                    </div>
                                 </div>
-                                <div className="flex justify-end">
-                                    <span className="w-20">Adviser:</span>
-                                    <span className="font-medium text-foreground">{data.adviser}</span>
-                                </div>
-                                <div className="flex">
-                                    <span className="w-24">Block:</span>
-                                    <span className="font-medium text-foreground">BSCPE {data.year_level}-{data.block}</span>
-                                </div>
-                                <div className="flex justify-end">
-                                    <span className="w-20">Approval Date:</span>
-                                    <span className="font-medium text-foreground">{data.approvalDate}</span>
+                                <div className="space-y-3">
+                                    <div>
+                                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Adviser</p>
+                                        <p className="text-xs font-medium text-foreground">{data.adviser}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Approval Date</p>
+                                        <p className="text-xs font-medium text-foreground">{data.approvalDate}</p>
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Removed Assigned Panel Members Section
-                            <div className="mb-6">
-                                <h4 className="text-sm font-medium text-foreground mb-2">Assigned Panel Members</h4>
-                                <div className="flex flex-wrap gap-2">
-                                    {data.panelMembers.map((member) => (
-                                        <div key={member.id} className="flex items-center px-3 py-1 rounded-full bg-[var(--pending-bg)] border border-[var(--pending-border)] text-[var(--pending-font-color)] text-sm">
-                                            {member.name}
-                                        </div>
-                                    ))}
+                            {/* Confirmation Box */}
+                            <div className="bg-[var(--revision-bg)] border border-[var(--revision-border)] rounded-lg p-4 flex gap-3">
+                                <div className="p-1.5 bg-[var(--revision-border)]/30 rounded-full h-fit">
+                                    <AlertCircle className="w-4 h-4 text-[var(--revision-font-color)]" />
                                 </div>
-                            </div> */}
-
-                            {/* Warning/Confirmation Box using 'revision' colors (Yellow theme) */}
-                            <div className="bg-[var(--revision-bg)] border border-[var(--revision-border)] rounded-lg p-4 mb-6 flex gap-3">
-                                <AlertCircle className="w-5 h-5 text-[var(--revision-font-color)] flex-shrink-0 mt-0.5" />
                                 <div>
-                                    <h4 className="text-sm font-bold text-[var(--revision-font-color)] mb-1">Endorsement Confirmation</h4>
-                                    <p className="text-xs text-[var(--revision-font-color)] opacity-90 mb-2">By endorsing this proposal, you confirm that:</p>
-                                    <ul className="list-none space-y-1">
-                                        {['All panel members have been properly assigned', 'The proposal meets defense requirements', 'The panel is ready to schedule the defense'].map((item, idx) => (
-                                            <li key={idx} className="text-xs text-[var(--revision-font-color)] flex items-start gap-1.5 font-medium">
-                                                <span>›</span> {item}
+                                    <h4 className="text-xs font-bold text-[var(--revision-font-color)] mb-2">Endorsement Confirmation</h4>
+                                    <p className="text-[11px] text-[var(--revision-font-color)]/80 mb-2">By endorsing, you confirm that:</p>
+                                    <ul className="space-y-1.5">
+                                        {['All panel members have been assigned', 'The proposal meets defense requirements', 'The panel is ready for scheduling'].map((item, idx) => (
+                                            <li key={idx} className="text-[11px] text-[var(--revision-font-color)] flex items-center gap-2 font-medium">
+                                                <CheckCircle className="w-3 h-3 flex-shrink-0" /> {item}
                                             </li>
                                         ))}
                                     </ul>
                                 </div>
                             </div>
-
-                            <div className="mb-2">
-                                <label className="block text-sm font-medium text-foreground mb-1">
-                                    Remarks / Justification
-                                </label>
-                                <textarea
-                                    value={remarks}
-                                    onChange={(e) => setRemarks(e.target.value)}
-                                    placeholder="Text field input..."
-                                    className="w-full min-h-[80px] p-3 rounded-md border border-input bg-background text-foreground focus:border-ring focus:ring-1 focus:ring-ring text-sm resize-none"
-                                />
-                            </div>
                         </div>
 
-                        <div className="px-6 py-4 border-t border-border flex justify-end gap-3">
+                        <div className="px-6 py-4 bg-muted/30 border-t border-border flex justify-end gap-3">
                             <button
                                 onClick={() => setShowEndorseModal(false)}
-                                className="px-4 py-2 text-sm font-medium text-foreground bg-transparent border border-border rounded-md hover:bg-[var(--breadcrumb)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
+                                className="px-4 py-2 text-xs font-medium text-muted-foreground bg-background border border-border rounded-lg hover:bg-muted hover:text-foreground transition-all"
                             >
                                 Cancel
                             </button>
-                            {/* Reverted Submit Endorsement Button to Outline/White style */}
                             <button
                                 onClick={handleEndorseSubmit}
-                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground bg-transparent border border-border rounded-md hover:bg-[var(--breadcrumb)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
+                                disabled={processing}
+                                className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 transition-all disabled:opacity-50 shadow-sm"
                             >
-                                <CheckCircle size={16} />
                                 {processing ? 'Submitting...' : 'Submit Endorsement'}
                             </button>
                         </div>
