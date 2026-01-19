@@ -141,10 +141,10 @@ export function AppHeader({ breadcrumbs = [], variant }: AppHeaderProps) {
     const SharedLinks = () => (
         <>
             <Button variant="primary" asChild className="mx-1 border-none shadow-none">
-                <Link href="/faculty/repository" className='hover:text-primary-foreground-2'>Repository</Link>
+                <Link href="/repository" className='hover:text-primary-foreground-2'>Repository</Link>
             </Button>
             <Button variant="primary" asChild className="mx-1 border-none shadow-none">
-                <Link href="/faculty/resources" className='hover:text-primary-foreground-2'>Resources</Link>
+                <Link href="/resources" className='hover:text-primary-foreground-2'>Resources</Link>
             </Button>
         </>
     );
@@ -187,10 +187,10 @@ export function AppHeader({ breadcrumbs = [], variant }: AppHeaderProps) {
                                 </Button>
                                 <GlobalNavDropdown label="Management" variant="admin" items={adminManagementItems} />
                                 <Button variant="primary" asChild className="mx-1 border-none shadow-none">
-                                    <Link href="/admin/repository/resources" className='hover:text-primary-foreground-2'>Repository</Link>
+                                    <Link href="/admin/repository/system-repository" className='hover:text-primary-foreground-2'>Repository</Link>
                                 </Button>
                                 <Button variant="primary" asChild className="mx-1 border-none shadow-none">
-                                    <Link href="/admin/resources" className='hover:text-primary-foreground-2'>Resources</Link>
+                                    <Link href="/resources" className='hover:text-primary-foreground-2'>Resources</Link>
                                 </Button>
                             </>
                         )}

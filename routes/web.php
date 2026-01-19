@@ -347,7 +347,7 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
     Route::prefix('repository')->group(function () {
         Route::redirect('/', 'repository/thesis')->name('admin.repository.index');
 
-        Route::get('resources', function () {
+        Route::get('system-repository', function () {
             return Inertia::render('Admin/repository/system');
         })->name('admin.repository.system');
 
@@ -374,14 +374,14 @@ SHARED AUTH ROUTES
 Route::middleware(['auth'])->group(function() {
 
     // ---- Repository -----
-    Route::get('/test-thesis', function () {
-        return Inertia::render('Shared/repository/thesis');
-    });
+    // Route::get('/test-thesis', function () {
+    //     return Inertia::render('Shared/repository/thesis');
+    // });
 
-    Route::get('/test-thesis-preview', function () {
-        // this one is temporary only, the routing wil be change soon
-        return Inertia::render('Shared/repository/document-preview');
-    });
+    // Route::get('/test-thesis-preview', function () {
+    //     // this one is temporary only, the routing wil be change soon
+    //     return Inertia::render('Shared/repository/document-preview');
+    // });
 
 
     // ---- Notification Routes ----
