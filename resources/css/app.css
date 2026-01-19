@@ -220,7 +220,16 @@
     --body-3: 0.83rem;                          /* 15px */
     --body-4: 0.75rem;                            /* 12px */
     --body-5: 0.5625rem;                          /* 9px */
+
+    --db-red: #730000;  
+    --db-green: #0D542B; 
+    --db-gray: #717182; 
+
+    --db-light-green: rgba(13, 84, 43, 0.3);
+    --db-light-gray: #D9D9D9
 }
+
+
 
 [data-theme='dark'] {
     --background: oklch(0.145 0 0);
@@ -811,7 +820,21 @@
     .bg-alert-info { background-color: var(--alert-info); }
     .bg-alert-success { background-color: var(--alert-success); }
     .bg-alert-warning { background-color: var(--alert-warning); }
+
+    .text-db-red { color: var(--db-red);}
+    .text-db-green { color: var(--db-green);}
+    .text-db-gray { color: var(--db-gray); }
+    .bg-db-red { background-color: var(--db-red);}
+    .bg-db-green { background-color: var(--db-green);}
+    .bg-db-gray { background-color: var(--db-gray);}
+    .bg-db-light-green { background-color: var(--db-light-green);}
+    .bg-db-light-gray {background-color: var(--db-light-gray);}
+    .border-db-red { border-color: var(--db-red);}
+    .border-db-green {border-color: var(--db-green);}
+    .border-db-gray {border-color: var(--db-gray);}
 }
+
+
 
 @layer utilities {
   .text-body-1 { font-size: var(--body-1); }
