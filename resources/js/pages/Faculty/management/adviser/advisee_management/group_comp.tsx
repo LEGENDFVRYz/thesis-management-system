@@ -10,6 +10,7 @@ import ManageGroupModal from './components/manage-group';
 import { index } from '@/routes/faculty/adviser/group_comp';
 import { destroy } from '@/routes/faculty/adviser/group_comp/index';
 import { Icon } from '@/components/icon-index';
+import { Button } from '@/components/ui/button';
 
 // Page Setup
 const breadcrumb: BreadcrumbItem[] = [
@@ -20,17 +21,15 @@ const breadcrumb: BreadcrumbItem[] = [
 ];
 
 const pageHeader: PageHeaderProps = {
-    title: "Group Composition",
-    subtitle: "Create and manage thesis group compositions and membership changes",
-    icon: (
-              // pa correct nalang
-        <Icon
-            name="calendarDefault"
-            className="w-8 h-8 text-primary"
-        />
-    ),
+  title: "Group Composition",
+  subtitle: "Create and manage thesis group compositions and membership changes",
+  icon: (
+    <Icon
+      name="proponentsDefault"
+      className="w-8 h-8 text-primary"
+    />
+  ),
 };
-
 
 // Types for data from GroupComp.php controller
 interface SectionAdviser {
@@ -67,8 +66,11 @@ interface PageProps {
   studentsWithoutGroup: StudentWithoutGroup[];
 }
 
-
-export default function GroupComposition({ students = [], sectionAdvisers = [], studentsWithoutGroup = [] }: PageProps) {
+export default function GroupComposition({ 
+  students = [], 
+  sectionAdvisers = [], 
+  studentsWithoutGroup = [] 
+}: PageProps) {
   // Helper function to get year from course
   const getYearFromCourse = (course: string): string => {
     if (course === 'MOR') return '3';
@@ -117,7 +119,9 @@ export default function GroupComposition({ students = [], sectionAdvisers = [], 
   // Helper function to get members for a specific group
   const getMembersForGroup = (groupNumber: string | number) => {
     const groupNumberStr = String(groupNumber);
-    const filteredStudents = students.filter(student => student.formatted_group_number === groupNumberStr);
+    const filteredStudents = students.filter(
+      student => student.formatted_group_number === groupNumberStr
+    );
     console.log('Raw students for group', groupNumberStr, filteredStudents);
     return filteredStudents.map((student, index) => {
       console.log('Student is_leader value:', student.student_name, student.is_leader, typeof student.is_leader);
@@ -159,87 +163,85 @@ export default function GroupComposition({ students = [], sectionAdvisers = [], 
   };
 
   return (
-    <AdviseeManagementLayout
-      breadcrumbs={breadcrumb}
-      pageHeader={pageHeader}
-    >
-      <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 p-6">
-
-        {/* Create New Group Button */}
-        <div className="flex items-center justify-end mb-4">
-          <button
-            onClick={() => setIsGroupModalOpen(true)}
-            className="flex items-center gap-2 w-[190px] h-[36px] bg-[#730000] rounded-[8px] px-4 py-2 text-white font-medium hover:bg-red-800 transition"
-          >
-            <span>+</span> Create New Group
-          </button>
-        </div>
-
-        {/* Table */}
-        <CustomTable
-          rows={rows}
-          onEditClick={handleEditClick}
-          onManageClick={handleManageClick}
-          onRemoveClick={handleRemoveClick}
-        />
-
+  <AdviseeManagementLayout
+    breadcrumbs={breadcrumb}
+    pageHeader={pageHeader}
+  >
+    <div className="relative min-h-screen flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 p-6">
+      {/* Create New Group Button */}
+      <div className="flex items-center justify-end mb-6">
+        <Button
+          onClick={() => setIsGroupModalOpen(true)}
+          variant="negative"
+          size="default"  
+          className="min-w-[160px] gap-2"  
+        >
+          <span className="text-base font-semibold">+</span>  
+          <span>Create New Group</span>
+        </Button>
       </div>
 
-      {/* Create Group Modal */}
-      <CreateGroupModal
-        isOpen={isGroupModalOpen}
-        onClose={() => setIsGroupModalOpen(false)}
-        sectionAdvisers={sectionAdvisers}
-        studentsWithoutGroup={studentsWithoutGroup}
+      {/* Table */}
+      <CustomTable
+        rows={rows}
+        onEditClick={handleEditClick}
+        onManageClick={handleManageClick}
+        onRemoveClick={handleRemoveClick}
       />
+    </div>
 
-      {/* Edit Group Modal */}
-      <EditGroupModal
-        isOpen={isEditModalOpen}
-        onClose={() => {
-          setIsEditModalOpen(false);
-          setSelectedRow(null);
-        }}
-        sectionAdvisers={sectionAdvisers}
-        studentsWithoutGroup={studentsWithoutGroup}
-        groupData={selectedRow ? {
-          groupId: selectedRow.group_id,
-          sectionAdviserId: selectedRow.section_adviser_id,
-          block: selectedRow.Block,
-          members: getMembersForGroup(selectedRow["Group Number"]),
-        } : undefined}
-      />
+    {/* Modals remain the same */}
+    <CreateGroupModal
+      isOpen={isGroupModalOpen}
+      onClose={() => setIsGroupModalOpen(false)}
+      sectionAdvisers={sectionAdvisers}
+      studentsWithoutGroup={studentsWithoutGroup}
+    />
 
-      {/* Manage Group Modal */}
-      <ManageGroupModal
-        isOpen={isManageModalOpen}
-        onClose={() => {
-          setIsManageModalOpen(false);
-          setSelectedRow(null);
-        }}
-        sectionAdvisers={sectionAdvisers}
-        studentsWithoutGroup={studentsWithoutGroup}
-        groupData={selectedRow ? {
-          groupId: selectedRow.group_id,
-          sectionAdviserId: selectedRow.section_adviser_id,
-          members: students
-            .filter(student => student.formatted_group_number === String(selectedRow["Group Number"]))
-            .map((student, index) => {
-              // Generate initials from student name
-              const nameParts = student.student_name.split(',').map(p => p.trim());
-              const lastName = nameParts[0] || '';
-              const firstAndMiddle = nameParts[1] || '';
-              const initials = (firstAndMiddle.charAt(0) + lastName.charAt(0)).toUpperCase();
-              return {
-                id: index + 1,
-                name: student.student_name,
-                studentNumber: student.student_number,
-                initials,
-                isLeader: student.is_leader,
-              };
-            }),
-        } : undefined}
-      />
-    </AdviseeManagementLayout>
-  );
+    <EditGroupModal
+      isOpen={isEditModalOpen}
+      onClose={() => {
+        setIsEditModalOpen(false);
+        setSelectedRow(null);
+      }}
+      sectionAdvisers={sectionAdvisers}
+      studentsWithoutGroup={studentsWithoutGroup}
+      groupData={selectedRow ? {
+        groupId: selectedRow.group_id,
+        sectionAdviserId: selectedRow.section_adviser_id,
+        block: selectedRow.Block,
+        members: getMembersForGroup(selectedRow["Group Number"]),
+      } : undefined}
+    />
+
+    <ManageGroupModal
+      isOpen={isManageModalOpen}
+      onClose={() => {
+        setIsManageModalOpen(false);
+        setSelectedRow(null);
+      }}
+      sectionAdvisers={sectionAdvisers}
+      studentsWithoutGroup={studentsWithoutGroup}
+      groupData={selectedRow ? {
+        groupId: selectedRow.group_id,
+        sectionAdviserId: selectedRow.section_adviser_id,
+        members: students
+          .filter(student => student.formatted_group_number === String(selectedRow["Group Number"]))
+          .map((student, index) => {
+            const nameParts = student.student_name.split(',').map(p => p.trim());
+            const lastName = nameParts[0] || '';
+            const firstAndMiddle = nameParts[1] || '';
+            const initials = (firstAndMiddle.charAt(0) + lastName.charAt(0)).toUpperCase();
+            return {
+              id: index + 1,
+              name: student.student_name,
+              studentNumber: student.student_number,
+              initials,
+              isLeader: student.is_leader,
+            };
+          }),
+      } : undefined}
+    />
+  </AdviseeManagementLayout>
+);
 }
