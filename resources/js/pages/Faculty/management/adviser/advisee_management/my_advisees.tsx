@@ -30,11 +30,23 @@ interface Advisee {
     pup_webmail: string;
     group_code: string;
     block: string;
+
+    // NEW FIELDS
+    thesis_title: string;
+    co_researchers: string;
+    thesis_stage: string;
+    progress: number;
 }
 
 interface MyAdviseesProps {
-    advisees: Advisee[];
+    advisees: {
+        data: Advisee[];
+        current_page: number;
+        last_page: number;
+        total: number;
+    };
 }
+
 
 // Sample data - 1 student duplicated 20 times
 const sampleAdvisees: Advisee[] = Array(20).fill({
@@ -42,11 +54,16 @@ const sampleAdvisees: Advisee[] = Array(20).fill({
     student_name: 'Rona Dela Cruz',
     pup_webmail: 'ronadelacruz@iskolarngbayan.pup.edu.ph',
     group_code: '3301',
-    block: 'BSCPE 3-3',
+    block: 'BSCPE (3-3)',
+
+    thesis_title: 'Machine Learning Applications in Healthcare',
+    co_researchers: 'Jane Smith, John Doe, Mary Jane',
+    thesis_stage: 'Manuscript Submission',
+    progress: 60,
 });
 
 export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
-    const displayAdvisees = advisees.length > 0 ? advisees : sampleAdvisees; // Using sample data
+    const displayAdvisees = advisees.data;//.length > 0 ? advisees : sampleAdvisees; // Using sample data
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [selectedAdvisee, setSelectedAdvisee] = useState<Advisee | null>(
         null,
@@ -166,6 +183,7 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                     </p>
                 </div>
             </div>
+
             <Dialog open={isProfileOpen} onOpenChange={setIsProfileOpen}>
                 <DialogContent
                     className="p-0 [&_[data-slot=dialog-overlay]]:bg-foreground/20 [&_[data-slot=dialog-overlay]]:backdrop-blur-sm"
@@ -232,6 +250,7 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                                     </div>
                                 </div>
                             </div>
+
                             {/* Right Column - Thesis Information */}
                             <div>
                                 <div className="flex items-start justify-between">
@@ -249,8 +268,7 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                                             Thesis Title
                                         </p>
                                         <p className="font-medium">
-                                            Machine Learning Applications in
-                                            Healthcare
+                                            {selectedAdvisee?.thesis_title}
                                         </p>
                                     </div>
 
@@ -259,24 +277,17 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                                             Co-researchers
                                         </p>
                                         <div className="mt-2 flex gap-2">
-                                            <Badge
-                                                variant="outline"
-                                                className="rounded-full"
-                                            >
-                                                Jane Smith
-                                            </Badge>
-                                            <Badge
-                                                variant="outline"
-                                                className="rounded-full"
-                                            >
-                                                Jane Smith
-                                            </Badge>
-                                            <Badge
-                                                variant="outline"
-                                                className="rounded-full"
-                                            >
-                                                Jane Smith
-                                            </Badge>
+                                            {selectedAdvisee?.co_researchers
+                                                .split(', ')
+                                                .map((name, index) => (
+                                                    <Badge
+                                                        key={index}
+                                                        variant="outline"
+                                                        className="rounded-full"
+                                                    >
+                                                        {name}
+                                                    </Badge>
+                                                ))}
                                         </div>
                                     </div>
 
@@ -285,7 +296,7 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                                             Thesis Stage
                                         </p>
                                         <p className="font-medium">
-                                            Manuscript Submission
+                                            {selectedAdvisee?.thesis_stage}
                                         </p>
                                     </div>
 
@@ -296,11 +307,13 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                                         <div className="h-3 w-full overflow-hidden rounded-full bg-primary">
                                             <div
                                                 className="h-full bg-primary-foreground-2"
-                                                style={{ width: '60%' }}
+                                                style={{
+                                                    width: `${selectedAdvisee?.progress}%`,
+                                                }}
                                             />
                                         </div>
                                         <p className="mt-1 text-sm font-medium">
-                                            60% Complete
+                                            {selectedAdvisee?.progress}% Complete
                                         </p>
                                     </div>
                                 </div>
