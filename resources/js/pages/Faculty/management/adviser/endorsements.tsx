@@ -8,6 +8,7 @@ import { Eye, CheckCircle, Layers, X, AlertCircle, Send } from 'lucide-react';
 import { useState } from 'react';
 import DocumentPreview from '@/components/document-preview';
 import { Icon } from '@/components/icon-index';
+import FilterSearchSection from '@/components/filter-search-section';
 
 // Setup
 const breadcrumbs: BreadcrumbItem[] = [
@@ -21,10 +22,9 @@ const pageHeader: PageHeaderProps = {
     title: "Panel Endorsement" ,
     subtitle: "Endorse approved proposals/theses of your advisory class for formal review",
     icon: (
-        // pa correct nalang
         <Icon
-            name="calendarDefault"
-            className="w-8 h-8 text-primary"
+            name="endorsementIC"
+            size={32}
         />
     ),
 };
@@ -64,42 +64,77 @@ interface Proposal {
     manuscriptUrl?: string;
 }
 
-const mockProposals: Proposal[] = Array(6).fill({
-    id: '1',
-    title: 'Cloud-Based Hospital Management System',
-    groupCode: '[GROUP CODE e.g 2101]',
-    proponents: ['William Brown', 'Amelia Wilson', 'Benjamin Lee'],
-    block: 'BSCpE 3-3',
-    adviser: 'Prof. James Lee',
-    approvalDate: '12/5/2025',
-    status: 'Endorsed',
-    manuscriptUrl: 'https://www.w3.org/WAI/WCAG21/Techniques/pdf/pdf1.pdf',
-    panelMembers: [
-        { id: 'p1', role: 'P1', name: 'Dr. Robert Chen' },
-        { id: 'p2', role: 'P2', name: 'Dr. Sofia Smith' },
-        { id: 'p3', role: 'P3', name: 'Engr. John Johnson' },
-    ],
-}).map((item, index) => ({ ...item, id: index.toString() }));
+
+
+const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, subtitle }: { isOpen: boolean; onClose: () => void; onConfirm: () => void; title?: string; subtitle?: string }) => {
+    if (!isOpen) return null;
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-150">
+            <div className="bg-white rounded-xl shadow-lg py-6 px-8 w-full max-w-[340px] flex flex-col items-center text-center animate-in zoom-in-95 duration-150 font-dm">
+                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mb-4">
+                    <span className="text-white text-xl font-semibold">!</span>
+                </div>
+                <p className="text-sm font-medium text-foreground mb-0.5">
+                    {title || 'Are you sure you want to submit this endorsement?'}
+                </p>
+                <p className="text-xs text-muted-foreground mb-5">
+                    {subtitle || 'This action cannot be undone.'}
+                </p>
+                <div className="flex gap-3 w-full">
+                    <button 
+                        onClick={onClose} 
+                        className="flex-1 py-2 px-4 rounded-full border border-border text-foreground text-xs font-medium hover:bg-muted transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        onClick={onConfirm} 
+                        className="flex-1 py-2 px-4 rounded-full bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
+                    >
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const EndorsementCard = ({ data }: { data: Proposal }) => {
     const [showPreview, setShowPreview] = useState(false);
     const [showEndorseModal, setShowEndorseModal] = useState(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [remarks, setRemarks] = useState('');
 
     const { put, processing } = useForm({});
 
     const handleEndorseSubmit = () => {
+        setShowConfirmModal(true);
+    };
+
+    const [successMsg, setSuccessMsg] = useState('');
+    const handleConfirmEndorse = () => {
         put(`/faculty/management/adviser/endorsement/${data.id}`, {
             onSuccess: () => {
                 setShowEndorseModal(false);
+                setShowConfirmModal(false);
                 setRemarks('');
+                setSuccessMsg('Endorsement submitted successfully!');
+                setTimeout(() => setSuccessMsg(''), 3000);
             },
-            onError: (err:any) => console.error(err)
+            onError: (err:any) => {
+                setShowConfirmModal(false);
+                console.error(err);
+            }
         });
     };
 
     return (
         <>
+            {successMsg && (
+                <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-[200] bg-green-600 text-white px-6 py-3 rounded shadow-lg animate-in fade-in duration-200">
+                    {successMsg}
+                </div>
+            )}
             <div className="bg-card dark:bg-card rounded-[var(--radius-lg)] shadow-sm border border-border p-5 flex flex-col h-full hover:shadow-md transition-shadow">
             
                 <div className="flex justify-between items-start mb-2">
@@ -112,8 +147,11 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                         </p>
                     </div>
                     
-                    {/* Status Badge using 'endorsed' variables */}
-                    <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-[var(--endorsed-bg)] text-[var(--endorsed-font-color)] border border-[var(--endorsed-border)]">
+                    <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border ${
+                        data.status === 'Endorsed' 
+                            ? 'bg-[var(--endorsed-bg)] text-[var(--endorsed-font-color)] border-[var(--endorsed-border)]' 
+                            : 'bg-[var(--breadcrumb)] text-muted-foreground border-border'
+                    }`}>
                         <CheckCircle className="w-3 h-3 mr-1" />
                         {data.status}
                     </span>
@@ -140,27 +178,6 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                         <p className="text-xs font-semibold text-foreground">{data.approvalDate}</p>
                     </div>
                 </div>
-                
-                
-                {/*  Removed Panel Members Section
-                <div className="mb-6 flex-1">
-                    <p className="text-[10px] text-muted-foreground mb-2">Panel Members</p>
-                    <div className="space-y-2">
-                        {data.panelMembers.map((member) => (
-                            <div key={member.id} className="flex items-center gap-2">
-                                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] text-white font-bold`}
-                                    style={{
-                                        backgroundColor: member.role === 'P1' ? 'var(--chart-1)' : 
-                                                         member.role === 'P2' ? 'var(--chart-2)' : 
-                                                        'var(--chart-3)' 
-                                    }}>
-                                    {member.role}
-                                </div>
-                                <span className="text-xs text-foreground font-medium">{member.name}</span>
-                            </div>
-                        ))}
-                    </div>
-                </div> */}
 
                 <div className="flex gap-3 mt-auto pt-4 border-t border-border">
                     <button 
@@ -169,7 +186,7 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                         <Eye size={14} /> 
                         View Manuscript
                     </button>
-                    {/* Reverted Endorse Button to Outline/White style */}
+              
                     {data.status !== 'Endorsed' ? (
                         <button 
                             onClick={() => setShowEndorseModal(true)}
@@ -179,7 +196,7 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                             {processing ? 'Processing...' : 'Endorse'}
                         </button>
                     ) : (
-                        <button disabled className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-gray-400 bg-gray-50 border border-gray-100 rounded-[var(--radius-sm)] cursor-not-allowed">
+                        <button disabled className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-[var(--evaluated-font-color)] bg-[var(--evaluated-bg)] border border-[var(--evaluated-border)] rounded-[var(--radius-sm)] cursor-not-allowed">
                             <CheckCircle size={14} />
                             Endorsed
                         </button>
@@ -215,106 +232,103 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
 
             {showEndorseModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm font-dm">
-                    <div className="bg-background rounded-[var(--radius-lg)] shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                        
+                    <div className="bg-background rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-border/50">
                         {/* Primary Color Header */}
-                        <div className="bg-primary text-primary-foreground px-6 py-4 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <Send className="w-5 h-5 -rotate-45" />
-                                <h2 className="text-lg font-medium tracking-wide">Endorse Proposal for Defense</h2>
+                        <div className="bg-primary text-primary-foreground px-6 py-5 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-primary-foreground/10 rounded-lg">
+                                    <Icon name="endorsementButtonModal" size={22} />
+                                </div>
+                                <div>
+                                    <h2 className="text-base font-semibold tracking-wide">Endorse Proposal</h2>
+                                    <p className="text-xs text-primary-foreground/70">Submit for Defense Review</p>
+                                </div>
                             </div>
                             <button 
                                 onClick={() => setShowEndorseModal(false)}
-                                className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+                                className="p-1.5 rounded-md text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10 transition-all"
                             >
-                                <X size={20} />
+                                <X size={18} />
                             </button>
                         </div>
-
                         <div className="p-6">
-                            <h3 className="text-lg font-semibold text-foreground mb-4 leading-snug">
-                                {data.title}
-                            </h3>
-
-                            <div className="grid grid-cols-2 gap-y-2 text-sm text-muted-foreground mb-6">
-                                <div className="flex">
-                                    <span className="w-24">Students:</span>
-                                    <span className="font-medium text-foreground">{data.proponents.join(', ')}</span>
+                            {/* Thesis Title Card */}
+                            <div className="bg-muted/50 rounded-lg p-4 mb-5 border border-border/50">
+                                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5 font-medium">Thesis Title</p>
+                                <h3 className="text-sm font-semibold text-foreground leading-relaxed">
+                                    {data.title}
+                                </h3>
+                            </div>
+                            {/* Info Grid */}
+                            <div className="grid grid-cols-2 gap-4 mb-5">
+                                <div className="space-y-3">
+                                    <div>
+                                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Students</p>
+                                        <div className="text-xs font-medium text-foreground space-y-0.5">
+                                            {data.proponents.map((name, idx) => (
+                                                <p key={idx}>{name}</p>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Block</p>
+                                        <p className="text-xs font-medium text-foreground">BSCPE {data.year_level}-{data.block}</p>
+                                    </div>
                                 </div>
-                                <div className="flex justify-end">
-                                    <span className="w-20">Adviser:</span>
-                                    <span className="font-medium text-foreground">{data.adviser}</span>
-                                </div>
-                                <div className="flex">
-                                    <span className="w-24">Block:</span>
-                                    <span className="font-medium text-foreground">BSCPE {data.year_level}-{data.block}</span>
-                                </div>
-                                <div className="flex justify-end">
-                                    <span className="w-20">Approval Date:</span>
-                                    <span className="font-medium text-foreground">{data.approvalDate}</span>
+                                <div className="space-y-3">
+                                    <div>
+                                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Adviser</p>
+                                        <p className="text-xs font-medium text-foreground">{data.adviser}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Approval Date</p>
+                                        <p className="text-xs font-medium text-foreground">{data.approvalDate}</p>
+                                    </div>
                                 </div>
                             </div>
-
-                            {/* Removed Assigned Panel Members Section
-                            <div className="mb-6">
-                                <h4 className="text-sm font-medium text-foreground mb-2">Assigned Panel Members</h4>
-                                <div className="flex flex-wrap gap-2">
-                                    {data.panelMembers.map((member) => (
-                                        <div key={member.id} className="flex items-center px-3 py-1 rounded-full bg-[var(--pending-bg)] border border-[var(--pending-border)] text-[var(--pending-font-color)] text-sm">
-                                            {member.name}
-                                        </div>
-                                    ))}
+                            {/* Confirmation Box */}
+                            <div className="bg-[var(--revision-bg)] border border-[var(--revision-border)] rounded-lg p-4 flex gap-3">
+                                <div className="p-1.5 bg-[var(--revision-border)]/30 rounded-full h-fit">
+                                    <AlertCircle className="w-4 h-4 text-[var(--revision-font-color)]" />
                                 </div>
-                            </div> */}
-
-                            {/* Warning/Confirmation Box using 'revision' colors (Yellow theme) */}
-                            <div className="bg-[var(--revision-bg)] border border-[var(--revision-border)] rounded-lg p-4 mb-6 flex gap-3">
-                                <AlertCircle className="w-5 h-5 text-[var(--revision-font-color)] flex-shrink-0 mt-0.5" />
                                 <div>
-                                    <h4 className="text-sm font-bold text-[var(--revision-font-color)] mb-1">Endorsement Confirmation</h4>
-                                    <p className="text-xs text-[var(--revision-font-color)] opacity-90 mb-2">By endorsing this proposal, you confirm that:</p>
-                                    <ul className="list-none space-y-1">
-                                        {['All panel members have been properly assigned', 'The proposal meets defense requirements', 'The panel is ready to schedule the defense'].map((item, idx) => (
-                                            <li key={idx} className="text-xs text-[var(--revision-font-color)] flex items-start gap-1.5 font-medium">
-                                                <span>›</span> {item}
+                                    <h4 className="text-xs font-bold text-[var(--revision-font-color)] mb-2">Endorsement Confirmation</h4>
+                                    <p className="text-[11px] text-[var(--revision-font-color)]/80 mb-2">By endorsing, you confirm that:</p>
+                                    <ul className="space-y-1.5">
+                                        {['All panel members have been assigned', 'The proposal meets defense requirements', 'The panel is ready for scheduling'].map((item, idx) => (
+                                            <li key={idx} className="text-[11px] text-[var(--revision-font-color)] flex items-center gap-2 font-medium">
+                                                <CheckCircle className="w-3 h-3 flex-shrink-0" /> {item}
                                             </li>
                                         ))}
                                     </ul>
                                 </div>
                             </div>
-
-                            <div className="mb-2">
-                                <label className="block text-sm font-medium text-foreground mb-1">
-                                    Remarks / Justification
-                                </label>
-                                <textarea
-                                    value={remarks}
-                                    onChange={(e) => setRemarks(e.target.value)}
-                                    placeholder="Text field input..."
-                                    className="w-full min-h-[80px] p-3 rounded-md border border-input bg-background text-foreground focus:border-ring focus:ring-1 focus:ring-ring text-sm resize-none"
-                                />
-                            </div>
                         </div>
-
-                        <div className="px-6 py-4 border-t border-border flex justify-end gap-3">
+                        <div className="px-6 py-4 bg-muted/30 border-t border-border flex justify-end gap-3">
                             <button
                                 onClick={() => setShowEndorseModal(false)}
-                                className="px-4 py-2 text-sm font-medium text-foreground bg-transparent border border-border rounded-md hover:bg-[var(--breadcrumb)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
+                                className="px-4 py-2 text-xs font-medium text-muted-foreground bg-background border border-border rounded-lg hover:bg-muted hover:text-foreground transition-all"
                             >
                                 Cancel
                             </button>
-                            {/* Reverted Submit Endorsement Button to Outline/White style */}
                             <button
                                 onClick={handleEndorseSubmit}
-                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground bg-transparent border border-border rounded-md hover:bg-[var(--breadcrumb)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
+                                disabled={processing}
+                                className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 transition-all disabled:opacity-50 shadow-sm"
                             >
-                                <CheckCircle size={16} />
                                 {processing ? 'Submitting...' : 'Submit Endorsement'}
                             </button>
                         </div>
                     </div>
                 </div>
             )}
+            <ConfirmationModal
+                isOpen={showConfirmModal}
+                onClose={() => setShowConfirmModal(false)}
+                onConfirm={handleConfirmEndorse}
+                title="Are you sure you want to submit this endorsement?"
+                subtitle="This action cannot be undone."
+            />
         </>
     );
 };
@@ -341,9 +355,14 @@ export default function Endorsement({ endorsements }: { endorsements: BackendEnd
             pageHeader={pageHeader}
         >
             <Head title="Endorsements" />
-            {/* <div className="border-t-2 border-primary my-4"></div> */}
-
-            <div className="p-4 font-dm">
+            {/* Filter/Search Section */}
+            <div className="mb-6">
+                <div className="w-full xl:max-w-[1248px] mx-auto px-4 xl:px-0">
+                    <FilterSearchSection variant="DefenseManagement" />
+                </div>
+            </div>
+            
+            <div className="font-dm w-full xl:max-w-[1248px] mx-auto px-4 xl:px-0">
                 {mappedProposals.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                         {mappedProposals.map((proposal) => (
@@ -356,7 +375,6 @@ export default function Endorsement({ endorsements }: { endorsements: BackendEnd
                     </div>
                 )}
             </div>
-
         </FacultyManagementLayout>
     );
 }
