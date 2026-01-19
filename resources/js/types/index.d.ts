@@ -30,6 +30,7 @@ export interface SharedData {
     sidebarOpen: boolean;
     user_info: UserInfo | null;
     flash: toastProps
+    visitor: visitorProps
     [key: string]: unknown;
 }
 
@@ -89,4 +90,10 @@ export interface toastProps {
     error?: string
     info?: string
     warning?: string
+}
+
+// Visitor Gate Tag
+export interface visitorProps {
+    type: string | null;
+    id?: string
 }

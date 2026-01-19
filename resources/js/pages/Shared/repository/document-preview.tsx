@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import * as React from 'react';
 import RepositoryLayout from '.';
 import { BreadcrumbItem, PageHeaderProps } from '@/types';
-import { theses } from '@/routes/repository';
+import { theses } from '@/routes/index';
 
 
 // Setup

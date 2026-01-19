@@ -80,6 +80,12 @@ class HandleInertiaRequests extends Middleware
                 'info' => session('info'),
                 'warning' => session('warning'),
             ],
+
+            // Guest Handler
+            'visitor' => fn() => [
+                'type' => auth()->check() ? 'user' : (request()->cookie('guest_id') ? 'guest' : null),
+                'id' => auth()->id() ?? request()->cookie('guest_id'),
+            ],
         ];
     }
 }
