@@ -20,19 +20,20 @@ import type { BreadcrumbItem, PageHeaderProps } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { Upload } from 'lucide-react';
 import { useState } from 'react';
-import { upload } from '@/routes/student/thesis/documents/index';
+import { download, upload } from '@/routes/student/thesis/documents/index';
 import { ConfirmDialog } from './components/confirm-dialog';
 import { SuccessDialog } from './components/success-dialog';
 import { ThesisTabs } from './components/thesis-tabs'; // Import the shared tabs
 
 // --- TYPES & MOCK DATA ---
 type DocumentEntry = {
-    id: number;
+    id: number | string;
     title: string;
     type: string;
     description: string;
     date: string;
     status: string;
+    is_submitted?: boolean;
 };
 
 type Submission = {
@@ -59,104 +60,6 @@ const MILESTONES = [
     { key: 'dp2', label: 'DP2' },
 ];
 
-const INITIAL_DOCUMENTS_BY_MILESTONE: Record<string, DocumentEntry[]> = {
-    mor: [
-        {
-            id: 1,
-            title: 'Machine Learning Applications',
-            type: 'Thesis Proposal',
-            description: 'Initial thesis proposal document',
-            date: 'December 19, 2025',
-            status: 'For Revision',
-        },
-        {
-            id: 2,
-            title: 'Research Methodology',
-            type: 'Chapter',
-            description: 'Chapter 1: Methodology and approach',
-            date: 'December 18, 2025',
-            status: 'Approved',
-        },
-        {
-            id: 3,
-            title: 'Literature Review',
-            type: 'Chapter',
-            description: 'Comprehensive literature review section',
-            date: 'December 17, 2025',
-            status: 'For Revision',
-        },
-        {
-            id: 4,
-            title: 'Initial Research Data',
-            type: 'Supporting Document',
-            description: 'Preliminary findings',
-            date: 'December 16, 2025',
-            status: 'Approved',
-        },
-    ],
-    dp1: [
-        {
-            id: 5,
-            title: 'Machine Learning Applications',
-            type: 'Thesis Proposal',
-            description: 'Revised proposal addressing feedback',
-            date: 'December 20, 2025',
-            status: 'Rejected',
-        },
-        {
-            id: 6,
-            title: 'Implementation Framework',
-            type: 'Chapter',
-            description: 'Framework and architecture design',
-            date: 'December 21, 2025',
-            status: 'For Revision',
-        },
-        {
-            id: 7,
-            title: 'Experimental Results',
-            type: 'Chapter',
-            description: 'Results from initial experiments',
-            date: 'December 22, 2025',
-            status: 'Approved',
-        },
-    ],
-    dp2: [
-        {
-            id: 8,
-            title: 'Machine Learning Applications',
-            type: 'Thesis Proposal',
-            description: 'Final refined proposal version',
-            date: 'December 22, 2025',
-            status: 'Approved',
-        },
-        {
-            id: 9,
-            title: 'Analysis and Discussion',
-            type: 'Chapter',
-            description: 'Detailed analysis of results',
-            date: 'December 23, 2025',
-            status: 'Approved',
-        },
-        {
-            id: 10,
-            title: 'Conclusion and Future Work',
-            type: 'Chapter',
-            description: 'Conclusions and recommendations',
-            date: 'December 24, 2025',
-            status: 'For Revision',
-        },
-        {
-            id: 11,
-            title: 'Source Code and Documentation',
-            type: 'Supporting Document',
-            description: 'Complete source code with comments',
-            date: 'December 25, 2025',
-            status: 'Approved',
-        },
-    ],
-};
-
-
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Documents', href: '#' }];
 
 const pageHeader: PageHeaderProps = {
@@ -178,8 +81,8 @@ export default function ThesisDocuments({
     current_stage_key,
     active_event_id 
 }: Props) {
-    // Milestone Logic
-// --- 1. SETUP INERTIA FORM ---
+
+    // --- FORM UPLOAD ---
     const { data, setData, post, processing, errors, reset, progress } = useForm({
         title: '',
         document_type: '',
@@ -189,7 +92,6 @@ export default function ThesisDocuments({
     });
 
     // --- UI STATES ---
-    // Initialize selected tab based on the backend's calculated stage
     const [selectedMilestone, setSelectedMilestone] = useState(current_stage_key || 'mor');
     
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -198,7 +100,6 @@ export default function ThesisDocuments({
     const [successMessage, setSuccessMessage] = useState('');
 
     // --- COMPUTED ---
-    // Safely get the list for the current tab, default to empty array
     const documentsForMilestone = documentsByMilestone[selectedMilestone] || [];
     const selectedMilestoneLabel = MILESTONES.find((m) => m.key === selectedMilestone)?.label || '';
 
@@ -218,10 +119,16 @@ export default function ThesisDocuments({
     };
 
     const handleSubmitDocuments = () => {
-        // Implementation for "Submit All" / "Submit for Review" feature
         setIsSubmitDocsOpen(false);
         setSuccessMessage(`Documents submitted for ${selectedMilestoneLabel}`);
         setIsSuccessOpen(true);
+    };
+
+    const handleDownload = (doc: DocumentEntry) => {
+        // Prevent downloading if it's just a placeholder requirement
+        if (!doc.is_submitted) return;
+        
+        window.open(download(doc.id).url, '_self');
     };
 
 
@@ -284,11 +191,14 @@ export default function ThesisDocuments({
                             {documentsForMilestone.map((doc) => (
                                 <ThesisDocumentRow
                                     key={doc.id}
+                                    id={doc.id}
                                     document={doc.title}
                                     description={doc.description}
                                     type={doc.type}
                                     date={doc.date}
                                     status={doc.status}
+                                    onDownload={() => handleDownload(doc)}
+                                    isSubmitted={doc.is_submitted}
                                 />
                             ))}
                             {documentsForMilestone.length === 0 && (

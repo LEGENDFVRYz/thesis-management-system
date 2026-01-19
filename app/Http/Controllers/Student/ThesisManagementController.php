@@ -9,6 +9,7 @@ use App\Models\Semester;
 use App\Models\Submission;
 use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -200,6 +201,48 @@ class ThesisManagementController extends Controller
 
         return back()->with('success', 'Document uploaded successfully.');
     }
+
+    public function documentDownload($id)
+    {
+        // Find submission by ID
+        $submission = Submission::findOrFail($id);
+
+        // Optional: Add security check (e.g., if auth user belongs to the group)
+        // if ($submission->group_id !== Auth::user()->student->group_id) abort(403);
+
+        // Check if file exists
+        if (!Storage::disk('local')->exists($submission->file_path)) {
+            return back()->with('error', 'File not found.');
+        }
+
+        // Download with original title
+        $extension = pathinfo($submission->file_path, PATHINFO_EXTENSION);
+        $filename = $submission->title . '.' . $extension;
+
+        return Storage::download($submission->file_path, $filename);
+    }
+
+    public function documentView($id)
+    {
+        $submission = Submission::findOrFail($id);
+
+        // Security Check: Ensure user belongs to the group
+        // if ($submission->group_id !== Auth::user()->student->group_id) abort(403);
+
+        if (!Storage::disk('local')->exists($submission->file_path)) {
+            abort(404, 'File not found.');
+        }
+
+        $file = Storage::disk('local')->path($submission->file_path);
+        $mimeType = Storage::disk('local')->mimeType($submission->file_path);
+
+        // Return the file for inline viewing
+        return response()->file($file, [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => 'inline; filename="' . $submission->title . '"'
+        ]);
+    }
+
 
     /**
      *  COMPARE PAGE

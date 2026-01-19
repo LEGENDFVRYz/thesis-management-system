@@ -107,7 +107,7 @@ export default function DocumentPreview({ journal }: DocumentPreviewProps) {
                                 <PdfViewer 
                                     fileUrl={stream(journal.id).url} 
                                     className="shadow-lg bg-accent-foreground"
-                                /> 
+                                />
                             ) : (
                                 <>
                                     <FileText className="w-16 h-16 text-gray-400 mb-4" />
