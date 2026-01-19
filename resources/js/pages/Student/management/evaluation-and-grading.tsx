@@ -1,20 +1,15 @@
-import React, { useState } from 'react';
-import { Users, Calendar, Save, Send, ClipboardCheck } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { NavFooter } from '@/components/nav-footer';
-import AppLayout from '@/layouts/app-layout';
-import { AppContent } from '@/components/app-content';
+import { ClipboardCheck, Users, Calendar } from 'lucide-react';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import StudentManagementLayout from '.';
 
 // Page Setup
 const breadcrumbs: BreadcrumbItem[] = [
-  { title: 'Evaluation & Grading', href: '' },
+  { title: 'Evaluation Review', href: '' },
 ];
 
 const pageHeader: PageHeaderProps = {
-    title: "Evaluation & Grading",
-    subtitle: "Complete thesis defense evaluation form",
+    title: "Evaluation Review",
+    subtitle: "View the summary of grades and feedback given by the panel and adviser",
     icon: (
         // pa correct nalang
         <div className="flex h-8 w-8 items-center justify-center text-primary">
@@ -26,8 +21,14 @@ const pageHeader: PageHeaderProps = {
 
 
 const EvaluationFormSection = () => {
-  const [ratings, setRatings] = useState<Record<string, number>>({});
-  const [modalConfig, setModalConfig] = useState<{ isOpen: boolean; type: 'save' | 'submit' | null }>({ isOpen: false, type: null });
+  // Mock data for display - ratings already given by panel/adviser
+  const ratings: Record<string, number> = {
+    '1-0': 3, '1-1': 3, '1-2': 4,
+    '2-0': 3,
+    '3-0': 4, '3-1': 3, '3-2': 3,
+    '4-0': 3, '4-1': 4, '4-2': 3,
+    '5-0': 3, '5-1': 3, '5-2': 4, '5-3': 3, '5-4': 3,
+  };
 
   const group = {
     code: '3301',
@@ -93,63 +94,17 @@ const EvaluationFormSection = () => {
     }
   ];
 
-  const handleRatingChange = (sectionId: number, indicatorIndex: number, value: number) => {
-    setRatings(prev => ({ ...prev, [`${sectionId}-${indicatorIndex}`]: value }));
-  };
-
-  const handleConfirmAction = () => {
-    if (modalConfig.type === 'save') {
-      console.log("Saving Draft...");
-    } else if (modalConfig.type === 'submit') {
-      console.log("Submitting Grades...");
-    }
-    setModalConfig({ isOpen: false, type: null });
-  };
-
   return (
-    <>
     <StudentManagementLayout
         breadcrumbs={breadcrumbs}
         pageHeader={pageHeader}
     >
-      
-          {/* Confirmation Modal */}
-          {modalConfig.isOpen && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-              <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 text-center">
-                <div className="mx-auto w-16 h-16 bg-[#900000] rounded-full flex items-center justify-center mb-6 shadow-md">
-                  <span className="text-white text-4xl font-bold">!</span>
-                </div>
-                <h2 className="text-lg font-bold text-gray-900 mb-2">
-                  Are you sure you want to {modalConfig.type === 'save' ? 'save changes' : 'submit grades'}?
-                </h2>
-                <p className="text-gray-900 font-medium text-sm mb-8">
-                  This action cannot be undone.
-                </p>
-                <div className="flex items-center justify-center gap-4">
-                  <Button variant="link"
-                    onClick={() => setModalConfig({ isOpen: false, type: null })}
-                    className="px-10 py-2.5 rounded-full border border-gray-800 text-gray-900 font-bold hover:bg-gray-50 transition-colors min-w-[120px]"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleConfirmAction}
-                    className="px-10 py-2.5 rounded-full bg-[#900000] text-white font-bold hover:bg-[#700000] transition-colors shadow-sm min-w-[120px]"
-                  >
-                    Confirm
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
-
           <div className="flex flex-1 flex-col gap-6 w-full">
             <div className="space-y-6">
-              
+
               {/* Header */}
               <h2 className="text-[#900000] text-lg font-bold mb-6">
-                Individual Evaluation
+                Evaluation Summary
               </h2>
 
               {/* Defense Details Card */}
@@ -313,12 +268,12 @@ const EvaluationFormSection = () => {
                                   {[1, 2, 3, 4].map((val) => (
                                     <div key={val} className="flex flex-col items-center">
                                       <span className="text-[9px] font-bold text-gray-400 mb-1">{val}</span>
-                                      <input 
-                                        type="radio" 
+                                      <input
+                                        type="radio"
                                         name={`rating-${rubric.id}-${i}`}
                                         checked={ratings[`${rubric.id}-${i}`] === val}
-                                        onChange={() => handleRatingChange(rubric.id, i, val)}
-                                        className="appearance-none w-5 h-5 border-2 border-gray-400 rounded-full checked:border-[#900000] checked:border-[6px] transition-all cursor-pointer bg-white"
+                                        readOnly
+                                        className="appearance-none w-5 h-5 border-2 border-gray-400 rounded-full checked:border-[#900000] checked:border-[6px] transition-all cursor-default bg-white"
                                       />
                                     </div>
                                   ))}
@@ -342,51 +297,17 @@ const EvaluationFormSection = () => {
                   <span className="text-[#900000] font-bold text-sm mb-1">Total Score</span>
                   <span className="text-4xl font-bold text-gray-800">3.0</span>
                 </div>
-                <div className="bg-[#FDFCF6] border border-[#D4A3A3] rounded-xl p-6 shadow-sm md:col-span-2">
-                  <h3 className="text-[#900000] font-bold text-sm mb-4">Evaluation Decision</h3>
-                  <div className="flex gap-8">
-                    <label className="flex items-center gap-3 cursor-pointer group">
-                      <input 
-                        type="radio" 
-                        name="decision" 
-                        defaultChecked
-                        className="appearance-none w-5 h-5 border-2 border-gray-300 rounded-full checked:border-[#900000] checked:border-[6px] transition-all" 
-                      />
-                      <span className="font-bold text-gray-700 group-hover:text-[#900000] transition-colors">Accepted</span>
-                    </label>
-                    <label className="flex items-center gap-3 cursor-pointer group">
-                      <input 
-                        type="radio" 
-                        name="decision" 
-                        className="appearance-none w-5 h-5 border-2 border-gray-300 rounded-full checked:border-[#900000] checked:border-[6px] transition-all" 
-                      />
-                      <span className="font-bold text-gray-700 group-hover:text-[#900000] transition-colors">Rejected</span>
-                    </label>
-                  </div>
+                <div className="bg-[#FDFCF6] border border-[#D4A3A3] rounded-xl p-6 shadow-sm md:col-span-2 flex flex-col justify-center items-center">
+                  <h3 className="text-[#900000] font-bold text-sm mb-3">Evaluation Decision</h3>
+                  <span className="inline-flex items-center px-6 py-3 rounded-full text-lg font-bold bg-green-100 text-green-700 border border-green-300">
+                    Accepted
+                  </span>
                 </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex justify-end gap-3 pt-4 pb-8">
-                <Button
-                  onClick={() => setModalConfig({ isOpen: true, type: 'save' })}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#730000] text-white text-sm font-bold hover:bg-[#850000] shadow-sm transition-all"
-                >
-                  <Save className="w-4 h-4" /> Save as Draft
-                </Button>
-                <Button 
-                  onClick={() => setModalConfig({ isOpen: true, type: 'submit' })}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#520000] text-white text-sm font-bold hover:bg-[#3d0000] shadow-sm transition-all"
-                >
-                  <Send className="w-4 h-4" /> Submit Grades
-                </Button>
               </div>
 
             </div>
           </div>
-
     </StudentManagementLayout>
-    </>
   );
 };
 
