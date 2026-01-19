@@ -5,6 +5,7 @@ import { NavFooter } from '@/components/nav-footer';
 import PdfViewer from '@/components/pdf-viewer';
 import { BreadcrumbItem, PageHeaderProps } from '@/types';
 import { index } from '@/routes/guest/repository/index';
+import { stream } from '@/routes/manuscripts/index';
 import { Icon } from '@/components/icon-index';
 import AppLayout from '@/layouts/app-layout';
 
@@ -102,16 +103,15 @@ export default function DocumentPreview({ journal }: DocumentPreviewProps) {
                             }}
                         >
                             {journal?.file_path ? (
-                                <iframe
-                                    src={`/storage/${journal.file_path}`}
-                                    className="w-full h-full"
-                                    style={{ minHeight: '600px' }}
-                                    title={journal.title}
-                                />
+                                <PdfViewer 
+                                    fileUrl={stream(journal.id).url} 
+                                    className="shadow-lg bg-accent-foreground"
+                                /> 
                             ) : (
                                 <>
                                     <FileText className="w-16 h-16 text-gray-400 mb-4" />
                                     <p className="text-gray-600 font-['DM_Sans']">No document available</p>
+                                    <p className="text-gray-500">Either Remove or the following file is private currently</p>
                                 </>
                             )}
 

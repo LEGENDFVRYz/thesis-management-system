@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ArchivedJournal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -10,9 +11,11 @@ class PdfViewerController extends Controller
 {
     public function streamPdf($id)
     {
-        // Testing path (for rendering purposes)
-        $filePath = 'testing/long.pdf';
+        // temporary: get the id of the journal (not safe but will work)
+        $journal = ArchivedJournal::findOrFail($id);
         
+        // $filePath = 'testing/long.pdf';
+        $filePath = $journal->file_path;
 
         // Security Check: 
         if (!Storage::disk('local')->exists($filePath)) {
