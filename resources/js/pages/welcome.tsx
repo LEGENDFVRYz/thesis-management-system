@@ -11,6 +11,7 @@ import RecentDP from './Guest/components/recent-dp';
 import { MetricCard } from '@/components/ui/card';
 import UndergraduateThesis from './Guest/components/undergraduate-thesis';
 import QuickLinks from './Guest/components/quick-links';
+import AppLayout from '@/layouts/app-layout';
 
 export default function Welcome() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -58,7 +59,7 @@ export default function Welcome() {
             },
         });
     };
-
+        
 
     // Placeholder thesis data
     const recentProjects = [
@@ -95,14 +96,15 @@ export default function Welcome() {
     ];
 
     return (
-        <>
+        <AppLayout>
+
             <Head title="Thesis Management System" />
-            <AppHeader variant="guest" />
+            {/* <AppHeader variant="guest" /> */}
 
             {/* Main Content */}
             <div className="min-h-screen bg-white">
                 {/* Header with Search */}
-                <div className="bg-white py-8 px-4 sm:px-6 lg:px-8">
+                <div className="bg-white py-4 sm:px-6 lg:px-8">
                     <div className="max-w-6xl mx-auto">
                         <h1 className="text-4xl font-bold text-primary text-center mb-8 font-['DM_Sans']">
                             THESIS MANAGEMENT SYSTEM
@@ -152,7 +154,7 @@ export default function Welcome() {
                 </div>
 
                 {/* Hero Section with Background Image */}
-                <div className="relative w-full overflow-hidden">
+                <div className="relative w-screen left-[calc(-50vw+50%)] overflow-hidden h-10/12">
                     <img
                         src="/images/guest-bg.svg"
                         alt="PUP Campus"
@@ -238,6 +240,6 @@ export default function Welcome() {
                     </div>
                 </div>
             )}
-        </>
+        </AppLayout>
     );
 }
