@@ -17,9 +17,28 @@ type SectionVariant = 'StudentManagement' | 'DefenseManagement' | 'ThesisArchive
 
 interface FilterSearchSectionProps {
     variant?: SectionVariant;
+    searchValue?: string;
+    onSearchChange?: (value: string) => void;
+    onFilterClick?: () => void;
+    onSortClick?: () => void;
+    onSortApply?: (value: string) => void;
+    onFilterApply?: (tags: string[]) => void;
+    onClearFilters?: () => void;
+    showFilterButton?: boolean;
 }
 
-export default function FilterSearchSection({ variant = 'DefenseManagement' }: FilterSearchSectionProps) {
+export default function FilterSearchSection({ 
+    variant = 'DefenseManagement',
+    searchValue,
+    onSearchChange,
+    onFilterClick,
+    onSortClick,
+    onClearFilters,
+    onSortApply,
+    onFilterApply,
+    showFilterButton = true
+}: FilterSearchSectionProps) {
+    const [localQuery, setLocalQuery] = useState('');
     const [query, setQuery] = useState('');
     
     // State to manage the Advanced Filter Modal visibility
@@ -31,6 +50,28 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
     const [isSort3ModalOpen, setIsSort3ModalOpen] = useState(false);
 
     const [isSortModalOpen, setIsSortModalOpen] = useState(false);
+
+    // Determine values to use (Controlled vs Uncontrolled)
+    const activeQuery = searchValue !== undefined ? searchValue : localQuery;
+    const handleSearchChange = onSearchChange || setLocalQuery;
+
+    /**
+     * HANDLERS
+     * These wrap the internal state + parent callbacks
+     */
+    const handleInternalSortApply = (sortBy: string) => {
+        console.log("Sort Applied:", sortBy);
+        if (onSortApply) onSortApply(sortBy); // Send data to parent
+        setIsSortModalOpen(false);
+        setIsSort3ModalOpen(false);
+    };
+
+    const handleInternalFilterApply = (tags: string[]) => {
+        console.log("Filter Applied:", tags);
+        if (onFilterApply) onFilterApply(tags); // Send data to parent
+        setIsRepoFilterModalOpen(false);
+        setIsDMFilterModalOpen(false);
+    };
 
     /**
      * Container Style Mapping
@@ -100,8 +141,8 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                     <SearchBar 
                         variant="filter-section" 
                         placeholder="Keywords, Terms..." 
-                        value={query} 
-                        onChange={setQuery} 
+                        value={activeQuery} 
+                        onChange={handleSearchChange}
                     />
                 </div>
 
@@ -209,17 +250,21 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                     (variant === 'ThesisArchive' || variant === 'Notifications' || variant === 'Committee') ? "mt-auto h-9" : ""
                 )}>
                     {(variant === 'StudentManagement' || variant === 'Notifications' || variant === 'Committee') && (
-                        <Button variant="secondary" size="icon" className="rounded-lg border-none font-dm" onClick={() => setIsSortModalOpen(true)}>
+                        <Button variant="secondary"
+                            size="icon"
+                            className="rounded-lg border-none font-dm"
+                            onClick={onSortClick || (() => setIsSortModalOpen(true))}
+                        >
                             <Icon name="sortDefault" size={16} />
                         </Button>
                     )}
 
-                    {variant !== 'Notifications' && variant !== 'Committee' && (
+                    {variant !== 'Notifications' && variant !== 'Committee' && showFilterButton && (
                         <Button 
                             variant="secondary" 
                             size="icon" 
                             className="rounded-lg border-none font-dm"
-                            onClick={() => setIsDMFilterModalOpen(true)} // Calls the modal
+                            onClick={onFilterClick || (() => setIsDMFilterModalOpen(true))} // Calls the modal
                         >
                             <Filter className="w-4 h-4" />
                         </Button>
@@ -232,7 +277,7 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                         </Button>
                     )}
 
-                    <Button variant="negative" className="px-4 py-2 gap-2 h-9 rounded-lg min-w-[101px] font-dm">
+                    <Button variant="negative" className="px-4 py-2 gap-2 h-9 rounded-lg min-w-[101px] font-dm" onClick={onClearFilters}>
                         <Trash2 className="w-4 h-4 text-white" />
                         <span className="text-[13.33px] font-medium font-dm">Clear Filter</span>
                     </Button>
@@ -247,7 +292,7 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                 <DialogContent className="max-w-md p-0 border-none bg-transparent shadow-none outline-none">
                     <RepoFilter 
                         onClose={() => setIsRepoFilterModalOpen(false)} 
-                        onApply={handleApplyFilters}
+                        onApply={handleInternalFilterApply}
                     />
                 </DialogContent>
             </Dialog>
@@ -277,8 +322,8 @@ export default function FilterSearchSection({ variant = 'DefenseManagement' }: F
                 <DialogContent className="max-w-md p-0 border-none bg-transparent shadow-none outline-none [&>button]:hidden justify-center">
                     {/* The call to General Sort */}
                     <GeneralSort 
-                        onClose={() => setIsSortOpen(false)} 
-                        onApply={handleApplySort} 
+                        onClose={() => setIsSortModalOpen(false)} 
+                        onApply={handleInternalSortApply}
                     />
                 </DialogContent>
             </Dialog>

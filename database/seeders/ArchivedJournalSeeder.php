@@ -9,6 +9,7 @@ use App\Models\DefenseMatrix;
 use Faker\Factory;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Arr;
 
 class ArchivedJournalSeeder extends Seeder
 {
@@ -17,6 +18,14 @@ class ArchivedJournalSeeder extends Seeder
      */
     public function run(): void
     {
+        // List of Realistic Computer Engineering Keywords
+        $cpeKeywords = [
+            'Embedded Systems', 'Internet of Things (IoT)', 'Computer Vision', 'Artificial Intelligence', 'Machine Learning',
+            'Robotics & Automation', 'Network Security', 'Data Science & Analytics', 'Software Engineering', 'Web & Mobile Computing',
+            'Digital Signal Processing', 'Cloud Computing', 'System Architecture', 'Wireless Communications', 'Cybersecurity',
+            'Information Systems', 'Human-Computer Interaction'
+        ];
+
         // 1. Get only DP2 (Final) Defenses
         $finalDefenses = DefenseMatrix::where('course', 'DP2')->get();
 
@@ -40,6 +49,9 @@ class ArchivedJournalSeeder extends Seeder
                     continue;
                 }
 
+                $randomKeywords = Arr::random($cpeKeywords, rand(3, 6));
+                $keywordsString = implode(', ', $randomKeywords);
+
                 // 5. Create Archive Record
                 $faker = Factory::create();
                 $dummy_filename = 'journal_' . $faker->uuid() . '.pdf';
@@ -50,7 +62,7 @@ class ArchivedJournalSeeder extends Seeder
                     'file_path' => $dummy_filepath . $dummy_filename,
                     
                     // Optional: Use words from the real thesis title as keywords
-                    'keywords' => $this->generateKeywords($defense->endorsement->thesis->title ?? 'Research'),
+                    'keywords' => $keywordsString,
                 ]);
 
                 // Generate Dummy Manuscript PDF for this archived journal

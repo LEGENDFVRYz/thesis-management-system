@@ -24,13 +24,30 @@ export interface FacultyFormData {
   status?: string;
 }
 
+// --- VALIDATION REGEX PATTERNS ---
+
 // Email validation regex
 export const validateEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 };
 
-// Validate individual field
+// Name validation regex (Letters, spaces, hyphens, periods only. No numbers.)
+export const validateName = (name: string): boolean => {
+  const nameRegex = /^[a-zA-Z\s\-\.]+$/;
+  return nameRegex.test(name);
+};
+
+// Faculty ID validation regex
+// Format: xxxx(numbers)-xxxxx(numbers)-xx(letters/numbers)-x(number)
+// Example: 2020-12345-MN-0
+export const validateFacultyId = (id: string): boolean => {
+  const idRegex = /^\d{4}-\d{5}-[a-zA-Z0-9]{1,5}-[a-zA-Z0-9]{1,4}$/;
+  return idRegex.test(id);
+};
+
+// --- FIELD VALIDATION LOGIC ---
+
 export const validateField = (
   name: string, 
   value: string, 
@@ -38,57 +55,65 @@ export const validateField = (
 ): string | undefined => {
   switch (name) {
     case 'firstName':
-      return value.trim() === '' ? 'First name is required' : undefined;
+      if (value.trim() === '') return 'First name is required';
+      if (!validateName(value)) return 'First name cannot contain numbers';
+      return undefined;
+
     case 'lastName':
-      return value.trim() === '' ? 'Last name is required' : undefined;
+      if (value.trim() === '') return 'Last name is required';
+      if (!validateName(value)) return 'Last name cannot contain numbers';
+      return undefined;
+
     case 'facultyId':
-      return value.trim() === '' ? 'Faculty ID is required' : undefined;
+      if (value.trim() === '') return 'Faculty ID is required';
+      if (!validateFacultyId(value)) return 'Invalid ID Format (e.g., 2020-12345-MN-0)';
+      return undefined;
+
     case 'pupWebmail':
       if (value.trim() === '') return 'PUP Webmail is required';
       if (!validateEmail(value)) return 'Please enter a valid email address';
       return undefined;
+
     case 'facultyType':
       return value === '' ? 'Faculty type is required' : undefined;
+
     case 'adviseeBlock':
       if (formData.roles.includes("Thesis Adviser") && value === '') {
         return 'Thesis advisee block is required for thesis adviser role';
       }
       return undefined;
+
     default:
       return undefined;
   }
 };
 
-// Validate all fields
+// --- FORM VALIDATION ---
+
 export const validateForm = (
   formData: FacultyFormData,
   setErrors: (errors: ValidationErrors) => void
 ): boolean => {
   const newErrors: ValidationErrors = {};
   
-  const firstNameError = validateField('firstName', formData.firstName, formData);
-  if (firstNameError) newErrors.firstName = firstNameError;
+  // Validate all fields
+  const fieldsToValidate = ['firstName', 'lastName', 'facultyId', 'pupWebmail', 'facultyType', 'adviseeBlock'];
   
-  const lastNameError = validateField('lastName', formData.lastName, formData);
-  if (lastNameError) newErrors.lastName = lastNameError;
-  
-  const facultyIdError = validateField('facultyId', formData.facultyId, formData);
-  if (facultyIdError) newErrors.facultyId = facultyIdError;
-  
-  const pupWebmailError = validateField('pupWebmail', formData.pupWebmail, formData);
-  if (pupWebmailError) newErrors.pupWebmail = pupWebmailError;
-  
-  const facultyTypeError = validateField('facultyType', formData.facultyType, formData);
-  if (facultyTypeError) newErrors.facultyType = facultyTypeError;
-
-  const adviseeBlockError = validateField('adviseeBlock', formData.adviseeBlock, formData);
-  if (adviseeBlockError) newErrors.adviseeBlock = adviseeBlockError;
+  fieldsToValidate.forEach(field => {
+    // Cast field to keyof FacultyFormData to access value safely
+    // However, adviseeBlock needs special handling in validateField which accepts full formData
+    const error = validateField(field, formData[field as keyof FacultyFormData] as string, formData);
+    if (error) {
+      newErrors[field as keyof ValidationErrors] = error;
+    }
+  });
 
   setErrors(newErrors);
   return Object.keys(newErrors).length === 0;
 };
 
-// Custom hook for faculty form validation
+// --- CUSTOM HOOK ---
+
 export const useFacultyValidation = () => {
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -97,12 +122,21 @@ export const useFacultyValidation = () => {
   const handleBlur = (fieldName: string, formData: FacultyFormData) => {
     setTouched(prev => ({ ...prev, [fieldName]: true }));
     
-    // Validate if submit has been attempted
-    if (isSubmitAttempted) {
-      const value = formData[fieldName as keyof FacultyFormData] as string;
-      const error = validateField(fieldName, value, formData);
-      setErrors(prev => ({ ...prev, [fieldName]: error }));
-    }
+    // Validate immediately on blur only if submit was already attempted OR strictly per field logic
+    // Usually, we want instant feedback on blur for format errors
+    const value = formData[fieldName as keyof FacultyFormData] as string;
+    const error = validateField(fieldName, value, formData);
+    
+    // Update error state
+    setErrors(prev => {
+        const newErrors = { ...prev };
+        if (error) {
+            newErrors[fieldName as keyof ValidationErrors] = error;
+        } else {
+            delete newErrors[fieldName as keyof ValidationErrors];
+        }
+        return newErrors;
+    });
   };
 
   const handleInputChange = (
@@ -110,10 +144,20 @@ export const useFacultyValidation = () => {
     value: string, 
     formData: FacultyFormData
   ) => {
-    // Only clear/update error when user starts typing if submit has been attempted
-    if (isSubmitAttempted && touched[fieldName]) {
-      const error = validateField(fieldName, value, formData);
-      setErrors(prev => ({ ...prev, [fieldName]: error }));
+    // If field has an error, clear it as the user types (optimistic UI)
+    // OR re-validate to see if fixed
+    if (errors[fieldName as keyof ValidationErrors]) {
+       const error = validateField(fieldName, value, formData);
+       setErrors(prev => {
+         const newErrors = { ...prev };
+         if (!error) {
+             delete newErrors[fieldName as keyof ValidationErrors];
+         } else {
+             // Optional: Update error message dynamically while typing
+             // newErrors[fieldName as keyof ValidationErrors] = error; 
+         }
+         return newErrors;
+       });
     }
   };
 
@@ -122,13 +166,11 @@ export const useFacultyValidation = () => {
     currentRoles: string[],
     formData: FacultyFormData
   ) => {
-    // If removing Thesis Adviser role, clear advisee block error
     if (role === "Thesis Adviser" && currentRoles.includes(role)) {
       setErrors(prev => ({ ...prev, adviseeBlock: undefined }));
       setTouched(prev => ({ ...prev, adviseeBlock: false }));
     }
     
-    // If adding Thesis Adviser role and submit was attempted, validate advisee block
     if (role === "Thesis Adviser" && !currentRoles.includes(role) && isSubmitAttempted) {
       const error = validateField('adviseeBlock', formData.adviseeBlock, formData);
       setErrors(prev => ({ ...prev, adviseeBlock: error }));
@@ -139,9 +181,9 @@ export const useFacultyValidation = () => {
     formData: FacultyFormData,
     onSuccess: () => void
   ) => {
-    
     setIsSubmitAttempted(true);
   
+    // Mark all relevant fields as touched
     const touchedFields: Record<string, boolean> = {
       firstName: true,
       lastName: true,
@@ -150,12 +192,11 @@ export const useFacultyValidation = () => {
       facultyType: true,
     };
 
-    // Add adviseeBlock if Thesis Adviser is selected
     if (formData.roles.includes("Thesis Adviser")) {
       touchedFields.adviseeBlock = true;
     }
 
-    setTouched(touchedFields);
+    setTouched(prev => ({ ...prev, ...touchedFields }));
 
     if (validateForm(formData, setErrors)) {
       setIsSubmitAttempted(false);
