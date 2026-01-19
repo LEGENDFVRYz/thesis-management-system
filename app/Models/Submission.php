@@ -19,11 +19,15 @@ class Submission extends Model
      */
     protected $fillable = [
         'group_id',
-        'milestone_id',
-        'title',          // From "Document Title"
-        'document_type',  // From "Type"
-        'description',    // From "Document Description"
-        'file_path',      // Path to the uploaded file
+        'event_id',       // CHANGED from milestone_id
+        // 'semester_id', // Helper
+        'stage',       // Helper (1=MOR, 2=DP1, 3=DP2)
+        'title',
+        'document_type',
+        'description',
+        'file_path',
+        'comments',       // For teacher feedback
+        'status',         // To track approval
         'submitted_at',
     ];
 
@@ -32,6 +36,7 @@ class Submission extends Model
      */
     protected $casts = [
         'submitted_at' => 'datetime',
+        'status' => 'integer',
     ];
 
     /**
