@@ -373,7 +373,7 @@ export default function SystemRepository() {
                     {/* Action Column */}
                     <div className="flex items-center justify-center px-[10px]">
                       <button
-                        className="h-8 px-3 flex items-center justify-center gap-[6px] rounded-lg border-[0.8px] border-primary/75 hover:bg-breadcrumb transition-colors"
+                        className="h-8 px-3 flex items-center justify-center gap-[6px] rounded-lg border-[0.8px] border-primary/75 hover:bg-breadcrumb transition-colors cursor-pointer"
                         onClick={() => setSelectedId(item.id)}
                       >
                         <span className="text-primary/75 font-dm text-[13.33px] font-medium leading-normal">
@@ -413,7 +413,7 @@ export default function SystemRepository() {
                 variant="default"
                 size="sm"
                 onClick={handleDeleteClick}
-                className="h-8 px-3 gap-[6px] rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
+                className="h-8 px-3 gap-[6px] rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
               >
                 <Trash2 size={16} className="text-white" />
                 <span className="text-[12px] font-medium">Delete</span>
@@ -440,7 +440,7 @@ export default function SystemRepository() {
                         {currentSyncStatus === 'Failed' && (
                           <button
                             onClick={handleSyncNow}
-                            className="text-foreground font-dm text-[12px] font-medium underline hover:text-primary"
+                            className="text-foreground font-dm text-[12px] font-medium underline hover:text-primary cursor-pointer"
                           >
                             Sync now
                           </button>
@@ -627,7 +627,7 @@ export default function SystemRepository() {
               <div className="flex justify-center gap-4">
                 <Button
                   variant="secondary"
-                  className="rounded-full px-8"
+                  className="rounded-full px-8 cursor-pointer"
                   onClick={() => setShowDeleteConfirm(false)}
                   size="default"
                 >
@@ -636,7 +636,7 @@ export default function SystemRepository() {
 
                 <Button
                   variant="negative"
-                  className="rounded-full px-8"
+                  className="rounded-full px-8 cursor-pointer"
                   onClick={handleConfirmDelete}
                   size="default"
                 >
@@ -673,7 +673,7 @@ export default function SystemRepository() {
               <div className="flex justify-center">
                 <Button
                   variant="secondary"
-                  className="rounded-full px-10 bg-alert-success text-primary-foreground hover:bg-alert-success"
+                  className="rounded-full px-10 bg-alert-success text-primary-foreground hover:bg-alert-success cursor-pointer"
                   onClick={() => setShowDeleteSuccess(false)}
                   size="default"
                 >

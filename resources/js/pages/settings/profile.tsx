@@ -8,8 +8,16 @@ import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { edit } from '@/routes/profile';
@@ -167,7 +175,7 @@ export default function Profile() {
 
                                 {/* Actions */}
                                 <div className="flex items-center gap-4">
-                                    <Button disabled={processing} data-test="update-profile-button">
+                                    <Button variant="primary" disabled={processing} data-test="update-profile-button">
                                         Save
                                     </Button>
 
@@ -187,7 +195,7 @@ export default function Profile() {
 
                     {/* Transfer Admin Role - Only for Admin Users */}
                     {isAdmin && (
-                        <div className="mt-8 p-4 border rounded-lg bg-white dark:bg-gray-800">
+                        <div className="mt-8 p-4 border rounded-lg bg-primary-foreground dark:bg-gray-800">
                             <HeadingSmall
                                 title="Transfer Admin Role"
                                 description="Assign admin privileges to another faculty member"
@@ -200,38 +208,46 @@ export default function Profile() {
                             >
                                 <div className="grid gap-2">
                                     <Label htmlFor="faculty_id">Select Faculty</Label>
-                                    <select
-                                        id="faculty_id"
-                                        name="faculty_id"
-                                        className="border rounded p-2"
-                                        required
-                                        defaultValue=""
-                                    >
-                                        <option value="" disabled>
-                                            -- Select Faculty --
-                                        </option>
-                                        {facultyList.map((f: Faculty) => (
-                                            <option key={f.id} value={f.id}>
-                                                {f.name} ({f.email})
-                                            </option>
-                                        ))}
-                                    </select>
+                                    
+                                    <Select name="faculty_id" required>
+                                        <SelectTrigger 
+                                            id="faculty_id" 
+                                            className="w-full justify-between bg-[#F4F4D0] border-none text-foreground shadow-none hover:bg-[#EBEBBE]"
+                                        >
+                                            <SelectValue placeholder="-- Select Faculty --" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-primary-foreground w-[var(--radix-select-trigger-width)]">
+                                            {facultyList.map((f: Faculty) => (
+                                                <SelectItem key={f.id} value={f.id.toString()}>
+                                                    {f.name} ({f.email})
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
 
                                 <div className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        id="revoke_self"
-                                        name="revoke_self"
-                                        value="1"  // Add this
-                                        className="w-4 h-4"
+                                    <input type="hidden" name="revoke_self" id="revoke_self_hidden" value="" />
+                                    
+                                    <Checkbox 
+                                        id="revoke_self" 
+                                        onCheckedChange={(checked) => {
+                                            const hiddenInput = document.getElementById('revoke_self_hidden') as HTMLInputElement;
+                                            if (hiddenInput) {
+                                                hiddenInput.value = checked ? "1" : "";
+                                            }
+                                        }}
                                     />
-                                    <Label htmlFor="revoke_self">
+                                    
+                                    <Label 
+                                        htmlFor="revoke_self"
+                                        className="text-sm font-medium leading-none cursor-pointer"
+                                    >
                                         Revoke my admin privileges after transfer
                                     </Label>
                                 </div>
 
-                                <Button type="submit">Transfer Admin</Button>
+                                <Button variant="primary" type="submit">Transfer Admin</Button>
                             </Form>
                         </div>
                     )}

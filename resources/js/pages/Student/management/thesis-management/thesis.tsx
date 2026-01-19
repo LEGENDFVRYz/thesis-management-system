@@ -16,8 +16,7 @@ import { thesis } from '@/routes/student/management/index'
 import { ThesisDocumentsHeader, ThesisDocumentRow } from '@/pages/Student/management/thesis-management/thesis-table'
 import { FileUpload } from '@/components/file-upload'
 import ThesisIcon from '@/components/Icons/thesis_icon.svg'
-import DocumentPreview from '@/pages/Student/management/thesis-management/thesis-preview'
-import { Download, FileText, Trash2, CheckCircle, Clock } from 'lucide-react'
+import { Trash2, CheckCircle, Clock, Upload, FileText } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -39,13 +38,9 @@ const pageHeader: PageHeaderProps = {
     ),
 };
 
-
-
 /* TABS */
 const LEADER_TABS = [
   { key: 'documents', label: 'Documents' },
-  { key: 'upload', label: 'Upload' },
-  { key: 'history', label: 'History' },
   { key: 'compare', label: 'Compare' },
   { key: 'workflow', label: 'Workflow' },
   { key: 'final_submission', label: 'Final Submission' },
@@ -54,87 +49,117 @@ const LEADER_TABS = [
 
 const MEMBER_TABS = [
   { key: 'documents', label: 'Documents' },
-  { key: 'history', label: 'History' },
   { key: 'compare', label: 'Compare' },
   { key: 'workflow', label: 'Workflow' },
   { key: 'transfer_request', label: 'Transfer Request' },
 ]
 
-/* SAMPLE DATA  */
-const DOCUMENTS = [
-  {
-    id: 1,
-    title: 'Machine Learning Applications',
-    description: 'Initial thesis proposal document',
-    type: 'Thesis Proposal',
-    version: 'v1',
-    date: 'December 19, 2025',
-    status: 'For Revision',
-  },
-  {
-    id: 2,
-    title: 'Machine Learning Applications',
-    description: 'Initial thesis proposal document',
-    type: 'Thesis Proposal',
-    version: 'v1',
-    date: 'December 19, 2025',
-    status: 'Rejected',
-  },
-  {
-    id: 3,
-    title: 'Machine Learning Applications',
-    description: 'Initial thesis proposal document',
-    type: 'Thesis Proposal',
-    version: 'v1',
-    date: 'December 19, 2025',
-    status: 'Approved',
-  },
-]
+type DocumentEntry = {
+  id: number
+  title: string
+  type: string
+  description: string
+  date: string
+  status: string
+}
 
-const HISTORY_DOCUMENTS = [
-  {
-    id: 1,
-    title: 'Machine Learning Applications',
-    type: 'Thesis Proposal',
-    version: 'v3',
-    date: 'December 19, 2025',
-  },
-  {
-    id: 2,
-    title: 'Machine Learning Applications',
-    type: 'Thesis Proposal',
-    version: 'v3',
-    date: 'December 19, 2025',
-  },
-  {
-    id: 3,
-    title: 'Machine Learning Applications',
-    type: 'Thesis Proposal',
-    version: 'v3',
-    date: 'December 19, 2025',
-  },
-  {
-    id: 4,
-    title: 'Machine Learning Applications',
-    type: 'Thesis Proposal',
-    version: 'v2',
-    date: 'December 18, 2025',
-  },
-  {
-    id: 5,
-    title: 'Machine Learning Applications',
-    type: 'Thesis Proposal',
-    version: 'v2',
-    date: 'December 18, 2025',
-  },
-  {
-    id: 6,
-    title: 'Machine Learning Applications',
-    type: 'Thesis Proposal',
-    version: 'v2',
-    date: 'December 18, 2025',
-  },
-]
+/* SAMPLE DATA (per milestone) */
+const INITIAL_DOCUMENTS_BY_MILESTONE: Record<string, DocumentEntry[]> = {
+  mor: [
+    {
+      id: 1,
+      title: 'Machine Learning Applications',
+      type: 'Thesis Proposal',
+      description: 'Initial thesis proposal document',
+      date: 'December 19, 2025',
+      status: 'For Revision',
+    },
+    {
+      id: 2,
+      title: 'Research Methodology',
+      type: 'Chapter',
+      description: 'Chapter 1: Methodology and approach',
+      date: 'December 18, 2025',
+      status: 'Approved',
+    },
+    {
+      id: 3,
+      title: 'Literature Review',
+      type: 'Chapter',
+      description: 'Comprehensive literature review section',
+      date: 'December 17, 2025',
+      status: 'For Revision',
+    },
+    {
+      id: 4,
+      title: 'Initial Research Data',
+      type: 'Supporting Document',
+      description: 'Preliminary findings',
+      date: 'December 16, 2025',
+      status: 'Approved',
+    },
+  ],
+  dp1: [
+    {
+      id: 5,
+      title: 'Machine Learning Applications',
+      type: 'Thesis Proposal',
+      description: 'Revised proposal addressing feedback',
+      date: 'December 20, 2025',
+      status: 'Rejected',
+    },
+    {
+      id: 6,
+      title: 'Implementation Framework',
+      type: 'Chapter',
+      description: 'Framework and architecture design',
+      date: 'December 21, 2025',
+      status: 'For Revision',
+    },
+    {
+      id: 7,
+      title: 'Experimental Results',
+      type: 'Chapter',
+      description: 'Results from initial experiments',
+      date: 'December 22, 2025',
+      status: 'Approved',
+    },
+  ],
+  dp2: [
+    {
+      id: 8,
+      title: 'Machine Learning Applications',
+      type: 'Thesis Proposal',
+      description: 'Final refined proposal version',
+      date: 'December 22, 2025',
+      status: 'Approved',
+    },
+    {
+      id: 9,
+      title: 'Analysis and Discussion',
+      type: 'Chapter',
+      description: 'Detailed analysis of results',
+      date: 'December 23, 2025',
+      status: 'Approved',
+    },
+    {
+      id: 10,
+      title: 'Conclusion and Future Work',
+      type: 'Chapter',
+      description: 'Conclusions and recommendations',
+      date: 'December 24, 2025',
+      status: 'For Revision',
+    },
+    {
+      id: 11,
+      title: 'Source Code and Documentation',
+      type: 'Supporting Document',
+      description: 'Complete source code with comments',
+      date: 'December 25, 2025',
+      status: 'Approved',
+    },
+  ],
+}
 
 const COMPARE_VERSIONS = [
   { value: 'v1', label: 'v1 - December 19, 2025' },
@@ -236,11 +261,37 @@ const WORKFLOW_STAGES = [
   { key: 'approved', label: 'Approved', completed: false },
 ]
 
-export default function ThesisManagement() {
+// Milestone list is ordered; extend as new milestones are added
+const MILESTONES = [
+  { key: 'mor', label: 'MOR' },
+  { key: 'dp1', label: 'DP1' },
+  { key: 'dp2', label: 'DP2' },
+]
+
+export default function ThesisManagement({ currentMilestone }: { currentMilestone?: string }) {
+  // Milestone Filter States {Hide the milestones if student has not reached them yet}
+  const studentCurrentMilestone = currentMilestone ?? 'dp2'
+  const currentMilestoneIndex = Math.max(
+    MILESTONES.findIndex(milestone => milestone.key === studentCurrentMilestone),
+    0
+  )
+  const availableMilestones = MILESTONES.slice(0, currentMilestoneIndex + 1)
+  const defaultMilestoneKey =
+    availableMilestones.find(milestone => milestone.key === studentCurrentMilestone)?.key ??
+    availableMilestones[availableMilestones.length - 1]?.key ??
+    MILESTONES[0].key
+  const [selectedMilestone, setSelectedMilestone] = useState(defaultMilestoneKey)
+  const selectedMilestoneLabel =
+    availableMilestones.find(milestone => milestone.key === selectedMilestone)?.label ?? ''
+  const [documentsByMilestone, setDocumentsByMilestone] = useState<Record<string, DocumentEntry[]>>(INITIAL_DOCUMENTS_BY_MILESTONE)
+  const documentsForMilestone = documentsByMilestone[selectedMilestone] ?? []
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false)
+  const [uploadTitle, setUploadTitle] = useState('')
+  const [uploadType, setUploadType] = useState('')
+  const [uploadDescription, setUploadDescription] = useState('')
+  const [isSubmitDocsOpen, setIsSubmitDocsOpen] = useState(false)
   const [activeTab, setActiveTab] = useState('documents')
   const userRole: 'leader' | 'member' = 'leader' // Change default role as needed
-  const [documentType, setDocumentType] = useState('')
-  const [uploadedFile, setUploadedFile] = useState<{ name: string; uploaded: boolean; progress?: number } | null>(null)
   // User role 
   const TABS = userRole === 'leader' ? LEADER_TABS : MEMBER_TABS
 
@@ -252,7 +303,6 @@ export default function ThesisManagement() {
   ]
   
   // Confirmation Modal States
-  const [isSubmitUploadOpen, setIsSubmitUploadOpen] = useState(false);
   const [isSubmitFinalOpen, setIsSubmitFinalOpen] = useState(false);
   const [isSubmitChangeOpen, setIsSubmitChangeOpen] = useState(false);
   const [isSubmitFeedbackOpen, setIsSubmitFeedbackOpen] = useState(false);
@@ -266,29 +316,39 @@ export default function ThesisManagement() {
   const [isDeleteSuccessOpen, setIsDeleteSuccessOpen] = useState(false);
   const [docToDelete, setDocToDelete] = useState<number | null>(null);
 
-  // Handler for Upload Tab - Save & Submit
-  const handleSubmitUpload = () => {
-    console.log('Document uploaded and submitted');
-    
-    // Close confirmation dialog first
-    setIsSubmitUploadOpen(false);
-    
-    // Simulate file upload with loading animation
-    setUploadedFile({ name: 'Thesis Title Thesis Title.pdf', uploaded: false, progress: 0 });
-    
-    const interval = setInterval(() => {
-      setUploadedFile(prev => {
-        if (!prev || prev.progress! >= 100) {
-          clearInterval(interval);
-          // Show success after upload completes
-          setSuccessMessage('Document submitted successfully!');
-          setIsSuccessOpen(true);
-          return { name: prev?.name || '', uploaded: true, progress: 100 };
-        }
-        return { ...prev, progress: prev.progress! + 10 };
-      });
-    }, 200);
-  };
+  // Handler for Upload Modal Save
+  const handleSaveDocument = () => {
+    const newDoc: DocumentEntry = {
+      id: Date.now(),
+      title: uploadTitle.trim() || 'Untitled Document',
+      type: uploadType || 'Unspecified',
+      description: uploadDescription.trim() || 'Uploaded document',
+      date: new Date().toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      }),
+      status: 'For Revision',
+    }
+
+    setDocumentsByMilestone(prev => ({
+      ...prev,
+      [selectedMilestone]: [newDoc, ...(prev[selectedMilestone] ?? [])],
+    }))
+
+    setIsUploadModalOpen(false)
+    setUploadTitle('')
+    setUploadType('')
+    setUploadDescription('')
+    setSuccessMessage(`Document saved for ${selectedMilestoneLabel}`)
+    setIsSuccessOpen(true)
+  }
+
+  const handleSubmitDocuments = () => {
+    setIsSubmitDocsOpen(false)
+    setSuccessMessage(`Documents submitted for ${selectedMilestoneLabel}`)
+    setIsSuccessOpen(true)
+  }
 
   // Handler for Final Submission
   const handleSubmitFinal = () => {
@@ -333,8 +393,84 @@ export default function ThesisManagement() {
     >
       <Head title="Thesis Management" />
 
+      <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
+        <DialogContent className="max-w-3xl">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h3 className="text-2xl font-semibold text-[#730000]">Upload Document</h3>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Document Title</label>
+                <Input
+                  type="text"
+                  placeholder="Document Title"
+                  className="h-10 px-3 py-2 max-w-xs bg-[#F3EFD0] font-[DM_Sans] placeholder:text-gray-600"
+                  value={uploadTitle}
+                  onChange={e => setUploadTitle(e.target.value)}
+                />
+                </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                <Select value={uploadType} onValueChange={setUploadType}>
+                  <SelectTrigger className="w-full bg-[#F3EFD0] h-10 px-3 py-2 placeholder:text-gray-500">
+                    <SelectValue placeholder="Specify Document Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="thesis-proposal">Thesis Proposal</SelectItem>
+                    <SelectItem value="chapter">Chapter</SelectItem>
+                    <SelectItem value="supporting-document">Supporting Document</SelectItem>
+                    <SelectItem value="final-thesis">Final Thesis</SelectItem>
+                    <SelectItem value="others">Others</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Document Description</label>
+              <textarea
+                rows={3}
+                className="w-full rounded-md border bg-[#F3EFD0] px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#730000] placeholder:text-gray-500"
+                placeholder="Description"
+                value={uploadDescription}
+                onChange={e => setUploadDescription(e.target.value)}
+              />
+            </div>
+
+            <FileUpload />
+
+            <div className="flex justify-end">
+              <Button variant="primary" className="px-8" onClick={handleSaveDocument}>
+                Save
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Milestone Filter */}
+      <div className="mt-1">
+        <Select value={selectedMilestone} onValueChange={setSelectedMilestone}>
+          <SelectTrigger className="w-full max-w-xs bg-[#FFF9E6] border border-[#E5E5E5]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="w-[var(--radix-select-trigger-width)]">
+            {availableMilestones.map(milestone => (
+              <SelectItem key={milestone.key} value={milestone.key}>
+                {milestone.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* TABS */}
-      <div className="flex mt-6">
+      <div className="flex mt-2">
         {TABS.map(tab => (
           <TabButton
             key={tab.key}
@@ -357,236 +493,49 @@ export default function ThesisManagement() {
         {/* DOCUMENTS TAB */}
         {activeTab === 'documents' && (
           <>
-            <h2 className="mb-4 text-3xl font-medium text-[#730000]">
-              Documents
-            </h2>
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-3xl font-medium text-[#730000]">Documents</h2>
+              </div>
+              <Button variant="primary" className="px-5" onClick={() => setIsUploadModalOpen(true)}>
+                <Upload className="h-4 w-4 mr-2" />
+                Upload
+              </Button>
+            </div>
 
             <div className="overflow-hidden rounded-lg border">
               <table className="w-full text-sm align-middle">
                 <ThesisDocumentsHeader />
                 <tbody>
-                  {DOCUMENTS.map(doc => (
+                  {documentsForMilestone.map(doc => (
                     <ThesisDocumentRow
                       key={doc.id}
                       document={doc.title}
                       description={doc.description}
                       type={doc.type}
-                      version={doc.version}
                       date={doc.date}
                       status={doc.status}
                     />
                   ))}
+                  {documentsForMilestone.length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="px-4 py-6 text-center text-sm text-gray-600">
+                        No submissions yet for this milestone.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
-          </>
-        )}
 
-        {/* UPLOAD TAB */}
-        {activeTab === 'upload' && (
-          <>
-            <h2 className="mb-4 text-xl font-medium text-[#730000]">
-              Upload Document
-            </h2>
-
-            <div className="space-y-6">
-              {/* Document Title and Type in one row */}
-              <div className="grid grid-cols-2 gap-10">
-                {/* Document Title */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Document Title
-                  </label>
-                  <input
-                    className="w-full rounded-md border bg-[#F3EFD0] px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#730000]"
-                    placeholder="e.g., AI Applications"
-                  />
-                </div>
-
-                {/* Document Type Dropdown */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Type
-                  </label>
-                  <Select value={documentType} onValueChange={setDocumentType}>
-                    <SelectTrigger className="w-full bg-[#F3EFD0]">
-                      <SelectValue placeholder="Specify Document Type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="thesis-proposal">Thesis Proposal</SelectItem>
-                      <SelectItem value="chapter">Chapter</SelectItem>
-                      <SelectItem value="supporting-document">Supporting Document</SelectItem>
-                      <SelectItem value="final-thesis">Final Thesis</SelectItem>
-                      <SelectItem value="others">Others</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* Document Description */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Document Description
-                </label>
-                <textarea
-                  rows={3}
-                  className="w-[630px] rounded-md border bg-[#F3EFD0] px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#730000]"
-                  placeholder="Description"
-                />
-              </div>
-
-              {/* File Upload Area */}
-              <div>
-                <FileUpload />
-              </div>
-
-              {/* Upload Progress Card */}
-              {uploadedFile && (
-                <div
-                  className="bg-white rounded-lg border-[0.8px] border-[#730000] shadow-sm mx-auto"
-                  style={{ width: '925px', height: '55px' }}
-                >
-                  <div className="flex h-full items-center justify-between px-4">
-                    <div className="flex items-center gap-3">
-                      <FileText className="w-5 h-5 text-gray-600" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900 leading-tight">{uploadedFile.name}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">
-                          {uploadedFile.uploaded ? 'Upload complete' : 'Uploading...'}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {uploadedFile.uploaded ? (
-                        <span className="text-sm font-semibold text-green-600">Uploaded</span>
-                      ) : (
-                        <div className="w-32 h-2 bg-gray-200 rounded-[10px] overflow-hidden">
-                          <div
-                            className="h-full bg-[#730000] transition-all duration-300"
-                            style={{ width: `${uploadedFile.progress || 0}%` }}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Submit Button */}
-                <div className="flex justify-center">
-                  <Button 
-                    variant="primary"
-                    className="px-8"
-                    onClick={() => setIsSubmitUploadOpen(true)}
-                  >
-                    Save & Submit
-                  </Button>
-                </div>
-                {/* Confirmation Dialog */}
-                <ConfirmDialog
-                  open={isSubmitUploadOpen}
-                  onOpenChange={setIsSubmitUploadOpen}
-                  title="Are you sure you want to submit?"
-                  description="This action cannot be undone."
-                  confirmLabel="Confirm"
-                  cancelLabel="Cancel"
-                  onConfirm={handleSubmitUpload}
-                />
+            <div className="flex justify-end mt-4">
+              <Button variant="primary" onClick={() => setIsSubmitDocsOpen(true)} disabled={documentsForMilestone.length === 0}>
+                Submit
+              </Button>
             </div>
           </>
         )}
 
-        {/* HISTORY TAB */}
-        {activeTab === 'history' && (
-          <div className="flex gap-6">
-            {/* Left Panel - Latest Documents */}
-            <div className="w-96 bg-[#F3EFD0] rounded-lg p-4">
-              <h3 className="text-lg font-medium text-[#730000] mb-4">Latest Documents</h3>
-              <div className="space-y-3">
-                {HISTORY_DOCUMENTS.slice(0, 3).map(doc => (
-                  <Dialog key={doc.id}>
-                    <div className="bg-white rounded-lg p-4 border border-[#73000042]">
-                      <div className="flex flex-col gap-2">
-                        <h4 className="font-medium text-sm text-gray-900">{doc.title}</h4>
-                        <p className="text-xs text-gray-600">{doc.type}</p>
-                        <p className="text-xs text-gray-600">{doc.version}</p>
-                        <p className="text-xs text-gray-500">{doc.date}</p>
-                        <div className="flex gap-2 mt-2">
-                          <DialogTrigger asChild>
-                            <button className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-medium text-[#730000] bg-white border border-[#730000] rounded hover:bg-gray-50">
-                              <FileText className="w-3 h-3" />
-                              Preview
-                            </button>
-                          </DialogTrigger>
-                          <button className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-[#730000] rounded hover:bg-[#5a0000]">
-                            <Download className="w-3 h-3" />
-                            Download
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    <DialogContent className="max-w-4xl max-h-[90vh]">
-                      <DocumentPreview
-                        documentTitle={doc.title}
-                        onClose={() => {}}
-                      />
-                    </DialogContent>
-                  </Dialog>
-                ))}
-              </div>
-            </div>
-
-            {/* Right Panel - History Table */}
-            <div className="flex-1">
-              <h2 className="mb-4 text-3xl font-medium text-[#730000]">History</h2>
-              <div className="overflow-hidden rounded-lg border">
-                <table className="w-full text-sm">
-                  <thead className="bg-[#730000] text-white">
-                    <tr>
-                      <th className="px-6 py-3 text-left font-medium">Document</th>
-                      <th className="px-6 py-3 text-left font-medium">Type</th>
-                      <th className="px-6 py-3 text-left font-medium">Version</th>
-                      <th className="px-6 py-3 text-left font-medium">Date</th>
-                      <th className="px-6 py-3 text-left font-medium">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y">
-                    {HISTORY_DOCUMENTS.map(doc => (
-                      <Dialog key={doc.id}>
-                        <tr className="hover:bg-gray-50">
-                          <td className="px-6 py-4 text-gray-900">{doc.title}</td>
-                          <td className="px-6 py-4 text-gray-700">{doc.type}</td>
-                          <td className="px-6 py-4 text-gray-700">{doc.version}</td>
-                          <td className="px-6 py-4 text-gray-700">{doc.date}</td>
-                          <td className="px-6 py-4">
-                            <div className="flex gap-2">
-                              <DialogTrigger asChild>
-                                <button className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-[#730000] bg-white border border-[#730000] rounded hover:bg-gray-50">
-                                  <FileText className="w-3 h-3" />
-                                  Preview
-                                </button>
-                              </DialogTrigger>
-                              <button className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-[#730000] rounded hover:bg-[#5a0000]">
-                                <Download className="w-3 h-3" />
-                                Download
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                        <DialogContent className="max-w-4xl max-h-[90vh]">
-                          <DocumentPreview
-                            documentTitle={doc.title}
-                            onClose={() => {}}
-                          />
-                        </DialogContent>
-                      </Dialog>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* COMPARE TAB */}
         {activeTab === 'compare' && (
@@ -603,8 +552,9 @@ export default function ThesisManagement() {
                 </label>
                 <Input
                   type="text"
-                  placeholder="e.g., AI Applications"
+                  placeholder="Document Title"
                   inputSize="full"
+                  className="placeholder:text-gray-500"
                 />
               </div>
 
@@ -810,6 +760,16 @@ export default function ThesisManagement() {
           open={isDeleteSuccessOpen}
           onOpenChange={setIsDeleteSuccessOpen}
           message="Document deleted successfully!"
+        />
+
+        <ConfirmDialog
+          open={isSubmitDocsOpen}
+          onOpenChange={setIsSubmitDocsOpen}
+          title="Submit documents for this milestone?"
+          description={`This will submit all documents listed under ${selectedMilestoneLabel}.`}
+          confirmLabel="Submit"
+          cancelLabel="Cancel"
+          onConfirm={handleSubmitDocuments}
         />
 
         {/* CHANGE REQUEST TAB */}
@@ -1139,7 +1099,7 @@ export default function ThesisManagement() {
         )}
 
         {/* PLACEHOLDER TABS */}
-        {activeTab !== 'documents' && activeTab !== 'upload' && activeTab !== 'history' && activeTab !== 'compare' && activeTab !== 'final_submission' && activeTab !== 'change_request' && activeTab !== 'workflow' && (
+        {activeTab !== 'documents' && activeTab !== 'compare' && activeTab !== 'final_submission' && activeTab !== 'change_request' && activeTab !== 'workflow' && activeTab !== 'transfer_request' && (
           <div className="py-20 text-center text-gray-500">
             <p className="text-sm">
               This section is under development.
