@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\DefenseMatrix;
-use App\Models\Endorsement;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Endorsement;
+use App\Models\DefenseMatrix;
+use Carbon\Carbon;
 
 class DefenseMatrixSeeder extends Seeder
 {
@@ -27,13 +27,21 @@ class DefenseMatrixSeeder extends Seeder
         // 2. Schedule a Defense for these specific theses
         foreach ($approvedEndorsements as $endorsement) {
             
-            // Prevent duplicates: Check if this endorsement already has a schedule
+            // Prevent duplicates
             if (DefenseMatrix::where('endorsement_id', $endorsement->id)->exists()) {
                 continue;
             }
 
+            $year = rand(2020, 2030);
+            $month = rand(1, 12);
+            $day = rand(1, 28);
+            $hour = rand(8, 17); 
+
+            $randomDate = Carbon::create($year, $month, $day, $hour, 0, 0);
+
             DefenseMatrix::factory()->create([
                 'endorsement_id' => $endorsement->id,
+                'defense_schedule' => $randomDate,
             ]);
         }
     }

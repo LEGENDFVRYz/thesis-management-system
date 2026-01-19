@@ -283,8 +283,12 @@ Route::prefix('faculty')->group(function () {
                     Route::redirect('/', 'thesis/thesis_registry')->name('index');     // temporary
 
                     Route::get('registry', [ThesisRegistry::class, 'index'])->name('registry');
+
                     Route::get('progress', [ProgressReports::class, 'index'])->name('progress');
-                    
+                
+                    // PDF generation
+                    Route::get('reports/generate', [ProgressReports::class, 'generate'])
+                        ->name('reports.generate');
                 });
 
                 # GRADING MANAGEMENT

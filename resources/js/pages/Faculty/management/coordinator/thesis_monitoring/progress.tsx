@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
     LineChart,
     Line,
@@ -40,10 +40,20 @@ interface PageHeaderProps {
     icon: React.ReactNode;
 }
 
+interface SubmissionData {
+    year: number;
+    submission_count: number;
+}
+
+interface CompletedData {
+    year: number;
+    completed_count: number;
+}
+
 interface DashboardProps {
     course: string;
-    submission: { year: number; submission_count: number }[];
-    completed: { year: number; completed_count: number }[];
+    submission: SubmissionData[];
+    completed: CompletedData[];
 }
 
 // --- Setup ---
@@ -62,77 +72,117 @@ const pageHeader: PageHeaderProps = {
 export default function ProgressReports({ submission = [], completed = [], course = 'MOR' }: DashboardProps) {
     const [selectedYear, setSelectedYear] = useState("2024 - 2025");
     const [isExportSuccessOpen, setIsExportSuccessOpen] = useState(false);
+    
+    // State for Report Builder Checkboxes
+    const [reportConfig, setReportConfig] = useState({
+        includeSubmissions: true,
+        includeCompletions: true,
+        courses: {
+            MOR: true,
+            DP1: true,
+            DP2: true
+        }
+    });
 
-    // --- Logic: Handle Stage/Course Switch ---
+    // Convert backend data to chart format (year as string for X-axis)
+    const chartSubmissions = useMemo(() => {
+        return submission.map(item => ({
+            year: item.year.toString(),
+            submission_count: item.submission_count
+        }));
+    }, [submission]);
+
+    const chartCompleted = useMemo(() => {
+        return completed.map(item => ({
+            year: item.year.toString(),
+            completed_count: item.completed_count
+        }));
+    }, [completed]);
+
+    // Handlers
     const handleStageChange = (newStage: string) => {
-        router.get(progress().url, 
-            { course: newStage }, 
-            { 
-                preserveState: true, 
-                preserveScroll: true,
-                only: ['submission', 'completed', 'course'] 
-            }
-        );
+        router.get(progress().url, { course: newStage }, { preserveState: true, preserveScroll: true, only: ['submission', 'completed', 'course'] });
     };
+
+    const handleGenerateReport = (type: 'summary' | 'monthly' | 'filtered', format: 'pdf', useFilters: boolean = false) => {
+        let selectedCourses: string[];
+        let year: string;
+        let includeSubmissions: boolean;
+        let includeCompletions: boolean;
+
+        if (useFilters) {
+            // Use custom report builder filters
+            selectedCourses = Object.entries(reportConfig.courses)
+                .filter(([_, v]) => v)
+                .map(([c]) => c);
+            year = selectedYear;
+            includeSubmissions = reportConfig.includeSubmissions;
+            includeCompletions = reportConfig.includeCompletions;
+        } else {
+            // Use all data for templates
+            selectedCourses = ['MOR', 'DP1', 'DP2'];
+            year = type === 'summary' ? selectedYear : 'all';
+            includeSubmissions = true;
+            includeCompletions = true;
+        }
+
+        // Use Inertia router.visit for proper Laravel route handling
+        const queryParams = {
+            type,
+            format,
+            year,
+            courses: selectedCourses.join(','),
+            include_submissions: includeSubmissions.toString(),
+            include_completions: includeCompletions.toString(),
+        };
+
+        // Build URL with query parameters
+        const queryString = new URLSearchParams(queryParams).toString();
+        const url = `/faculty/coordinator/thesis/reports/generate?${queryString}`;
+
+        // Open in new window/tab
+        window.open(url, '_blank');
+        
+        // Show success dialog after a slight delay
+        setTimeout(() => {
+            setIsExportSuccessOpen(true);
+        }, 500);
+    };
+
+    const toggleConfig = (key: 'includeSubmissions' | 'includeCompletions') => 
+        setReportConfig(prev => ({ ...prev, [key]: !prev[key] }));
+    
+    const toggleCourse = (key: 'MOR' | 'DP1' | 'DP2') => 
+        setReportConfig(prev => ({ ...prev, courses: { ...prev.courses, [key]: !prev.courses[key] } }));
 
     const ACADEMIC_YEARS = useMemo(() => {
         const years = [];
-        for (let i = 2026; i >= 1900; i--) {
-            years.push(`${i} - ${i + 1}`);
-        }
+        for (let i = 2026; i >= 1900; i--) years.push(`${i} - ${i + 1}`);
         return years;
     }, []);
 
-    const handleExport = () => {
-        setIsExportSuccessOpen(true);
-    };
-
     const totalSubmissions = useMemo(() => 
-        submission.reduce((acc, curr) => acc + curr.submission_count, 0), 
-    [submission]);
-
+        submission.reduce((acc, curr) => acc + (curr.submission_count || 0), 0), 
+        [submission]
+    );
+    
     const totalCompleted = useMemo(() => 
-        completed.reduce((acc, curr) => acc + curr.completed_count, 0), 
-    [completed]);
+        completed.reduce((acc, curr) => acc + (curr.completed_count || 0), 0), 
+        [completed]
+    );
 
     return (
-        <ThesisMonitoringLayout 
-            breadcrumbs={breadcrumbs}
-            pageHeader={pageHeader}
-        >
+        <ThesisMonitoringLayout breadcrumbs={breadcrumbs} pageHeader={pageHeader}>
             <Head title={`Progress Reports`} />
-            
             <style dangerouslySetInnerHTML={{ __html: `
                 .custom-year-scrollbar::-webkit-scrollbar { width: 12px; }
                 .custom-year-scrollbar::-webkit-scrollbar-track { background: #D9D9D9; }
-                .custom-year-scrollbar::-webkit-scrollbar-thumb { 
-                    background: #8E8E8E; border-radius: 10px; border: 2px solid #D9D9D9; 
-                }
-
-                .year-item-hover:hover, .year-item-hover[data-highlighted] {
-                    background-color: #E2D9B7 !important;
-                    color: #730000 !important;
-                }
-
-                .year-item-selected[data-state="checked"] {
-                    background-color: #730000 !important;
-                    color: #FFB800 !important; 
-                }
-
-                .calendar-icon-fixed {
-                    transform: none !important;
-                    transition: none !important;
-                    rotate: 0deg !important;
-                }
-
-                [data-state="open"] .calendar-icon-fixed {
-                    transform: rotate(0deg) !important;
-                    transition: none !important;
-                }
-
-                .custom-trigger svg:not(.calendar-icon-fixed) {
-                    display: none !important;
-                }
+                .custom-year-scrollbar::-webkit-scrollbar-thumb { background: #8E8E8E; border-radius: 10px; border: 2px solid #D9D9D9; }
+                .year-item-hover:hover, .year-item-hover[data-highlighted] { background-color: #E2D9B7 !important; color: #730000 !important; }
+                .year-item-selected[data-state="checked"] { background-color: #730000 !important; color: #FFB800 !important; }
+                .calendar-icon-fixed { transform: none !important; transition: none !important; rotate: 0deg !important; }
+                [data-state="open"] .calendar-icon-fixed { transform: rotate(0deg) !important; transition: none !important; }
+                .custom-trigger svg:not(.calendar-icon-fixed) { display: none !important; }
             `}} />
 
             <div className="flex flex-col min-h-screen -mt-4 -mx-4 -mb-4 md:-mt-4 bg-primary-foreground">
@@ -141,14 +191,13 @@ export default function ProgressReports({ submission = [], completed = [], cours
                     <div className="flex justify-end w-full">
                         <StageSwitchToggle 
                             // value={course} 
-                            onChange={handleStageChange} 
-                        />
+                            onChange={handleStageChange} />
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
                         <TrendCard 
                             title={`Submission Trend`} 
-                            data={submission} 
+                            data={chartSubmissions} 
                             valueKey="submission_count"
                             dataLabel="Submissions"
                             rate={totalSubmissions} 
@@ -156,7 +205,7 @@ export default function ProgressReports({ submission = [], completed = [], cours
                         />
                         <TrendCard 
                             title={`Completion Trend`} 
-                            data={completed} 
+                            data={chartCompleted} 
                             valueKey="completed_count"
                             dataLabel="Completions"
                             rate={totalCompleted} 
@@ -194,21 +243,36 @@ export default function ProgressReports({ submission = [], completed = [], cours
                                     </Select>
                                 </div>
                                 
-                                <div className="space-y-2">
-                                    <label className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
-                                        <input type="checkbox" className="accent-primary w-4 h-4" /> Submissions
-                                    </label>
-                                    <label className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
-                                        <input type="checkbox" className="accent-primary w-4 h-4" /> Completions
-                                    </label>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="flex items-center gap-2 text-sm text-muted-foreground font-medium cursor-pointer">
+                                            <input type="checkbox" className="accent-primary w-4 h-4" checked={reportConfig.includeSubmissions} onChange={() => toggleConfig('includeSubmissions')} /> 
+                                            Submissions
+                                        </label>
+                                        <label className="flex items-center gap-2 text-sm text-muted-foreground font-medium cursor-pointer">
+                                            <input type="checkbox" className="accent-primary w-4 h-4" checked={reportConfig.includeCompletions} onChange={() => toggleConfig('includeCompletions')} /> 
+                                            Completions
+                                        </label>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="flex items-center gap-2 text-sm text-muted-foreground font-medium cursor-pointer">
+                                            <input type="checkbox" className="accent-primary w-4 h-4" checked={reportConfig.courses.MOR} onChange={() => toggleCourse('MOR')} /> 
+                                            MOR
+                                        </label>
+                                        <label className="flex items-center gap-2 text-sm text-muted-foreground font-medium cursor-pointer">
+                                            <input type="checkbox" className="accent-primary w-4 h-4" checked={reportConfig.courses.DP1} onChange={() => toggleCourse('DP1')} /> 
+                                            DP1
+                                        </label>
+                                        <label className="flex items-center gap-2 text-sm text-muted-foreground font-medium cursor-pointer">
+                                            <input type="checkbox" className="accent-primary w-4 h-4" checked={reportConfig.courses.DP2} onChange={() => toggleCourse('DP2')} /> 
+                                            DP2
+                                        </label>
+                                    </div>
                                 </div>
 
                                 <div className="flex gap-2 pt-4">
-                                    <Button onClick={handleExport} variant="tertiary" className="flex-1 text-[13px] font-dm">
+                                    <Button onClick={() => handleGenerateReport('filtered', 'pdf', true)} variant="tertiary" className="flex-1 text-[13px] font-dm">
                                         Export PDF <Download className="ml-2 w-3 h-3" />
-                                    </Button>
-                                    <Button onClick={handleExport} variant="tertiary" className="flex-1 text-[13px] font-dm">
-                                        Export Excel <Download className="ml-2 w-3 h-3" />
                                     </Button>
                                 </div>
                             </div>
@@ -220,8 +284,16 @@ export default function ProgressReports({ submission = [], completed = [], cours
                                 <h3 className="text-primary text-[22px] font-dm">Report Templates</h3>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <TemplateCard title={`AY ${selectedYear} Summary`} desc="Complete overview of submissions and completions" onUse={handleExport} />
-                                <TemplateCard title="Monthly Progress Report" desc="Month-by-month breakdown of thesis activities" onUse={handleExport} />
+                                <TemplateCard 
+                                    title={`AY ${selectedYear} Summary`} 
+                                    desc="Complete overview of submissions and completions for all courses in the selected academic year" 
+                                    onUse={() => handleGenerateReport('summary', 'pdf', false)} 
+                                />
+                                <TemplateCard 
+                                    title="Monthly Progress Report" 
+                                    desc="Month-by-month breakdown of all thesis activities across all courses and years" 
+                                    onUse={() => handleGenerateReport('monthly', 'pdf', false)} 
+                                />
                             </div>
                         </div>
                     </div>
@@ -258,12 +330,14 @@ function TrendCard({ title, data, valueKey, dataLabel, rate, rateLabel }: any) {
                                 tick={{ fill: "#00000099", fontSize: 11 }} 
                                 axisLine={{ stroke: "#0000001F" }} 
                                 tickLine={false} 
+                                type="category" 
                             />
                             <YAxis 
                                 tick={{ fill: "#00000099", fontSize: 11 }} 
                                 axisLine={{ stroke: "#0000001F" }} 
                                 tickLine={false} 
-                                domain={['auto', 'auto']} 
+                                domain={[0, 'auto']} 
+                                allowDecimals={false}
                             />
                             <Tooltip cursor={{ stroke: '#730000', strokeWidth: 0 }} />
                             <Line 
@@ -271,7 +345,8 @@ function TrendCard({ title, data, valueKey, dataLabel, rate, rateLabel }: any) {
                                 dataKey={valueKey} 
                                 stroke="#730000" 
                                 strokeWidth={2} 
-                                dot={false} 
+                                dot={{ r: 4, fill: "#730000" }} 
+                                activeDot={{ r: 6 }} 
                             />
                         </LineChart>
                     </ResponsiveContainer>
@@ -287,7 +362,7 @@ function TrendCard({ title, data, valueKey, dataLabel, rate, rateLabel }: any) {
 
 function TemplateCard({ title, desc, onUse }: any) {
     return (
-        <div className="bg-primary-foreground border border-breadcrumb rounded-xl p-5 shadow-sm">
+        <div className="bg-primary-foreground border border-breadcrumb rounded-xl p-8 shadow-sm">
             <div className="flex items-center gap-2 mb-2">
                 <FolderOpen className="w-5 h-5 text-primary-foreground-2"/>
                 <h4 className="text-primary-foreground-2 text-[22px] font-dm">{title}</h4>
@@ -295,11 +370,7 @@ function TemplateCard({ title, desc, onUse }: any) {
             <p className="text-[15px] text-foreground mb-6 leading-relaxed font-dm">{desc}</p>
             <div className="flex items-center justify-between">
                 <span className="text-[15px] text-foreground tracking-tight font-dm">Includes: All Metrics</span>
-                <Button 
-                    variant="primary" onClick={onUse} className="text-[13px] font-dm"
-                >
-                    Use Template
-                </Button>
+                <Button variant="primary" onClick={onUse} className="text-[13px] font-dm">Use Template</Button>
             </div>
         </div>
     );

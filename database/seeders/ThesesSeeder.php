@@ -6,6 +6,7 @@ use App\Models\Proposal;
 use App\Models\Theses;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Carbon\Carbon;
 
 class ThesesSeeder extends Seeder
 {
@@ -30,11 +31,19 @@ class ThesesSeeder extends Seeder
                 continue;
             }
 
+            $year = rand(2020, 2030);
+            $month = rand(1, 12);
+            $day = rand(1, 28);
+            $hour = rand(8, 17);
+
+            $randomDate = Carbon::create($year, $month, $day, $hour, 0, 0);
+
             Theses::factory()->create([
                 'proposal_id' => $proposal->id,
                 
                 // By default, use the exact title from the proposal (overrided by factory)
                 'title' => $proposal->proposal_title, 
+                'created_at' => $randomDate,
             ]);
         }
     }
