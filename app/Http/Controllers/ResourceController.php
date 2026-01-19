@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Resource;
 use Carbon\Traits\Timestamp;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -15,20 +16,23 @@ class ResourceController extends Controller
      */
     public function index()
     {
-        $data = Resource::all()->toArray();
-        // dd(Resource::all()->toArray());
+        // Check if the user is admin or not
+        $user = Auth::user();
+        $data = Resource::all();
+
+        // If admin
+        if ($user && $user->faculty && $user->faculty->isAdmin()) {
+            $resources = Resource::all();
+        } 
+        else {
+            $resources = Resource::where('is_active', 1)->get();
+        }
+
+        $data = $resources->toArray();
         
         return Inertia::render('Shared/resources', [
             'resources' => $data
         ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -88,32 +92,9 @@ class ResourceController extends Controller
     }
 
 
-
     /**
-     * Display the specified resource.
+     * Toggle Inactive and activeness
      */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-
     public function toggle(Resource $resource)
     {
         // toggle active status

@@ -32,8 +32,8 @@ import AppLayout from '@/layouts/app-layout';
 import { resources } from '@/routes/index';
 import { toggle, remove, store } from '@/routes/admin/resources/index';
 import { download } from '@/routes/resources/index';
-import { PageHeaderProps, type BreadcrumbItem } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
+import { PageHeaderProps, SharedData, type BreadcrumbItem } from '@/types';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 import { BookMarked, Upload, FileText, Download, Check, AlertCircle, Trash2} from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -74,11 +74,11 @@ interface Props {
 
 
 export default function Resources({ resources }: Props) {
+    const { user_info } = usePage<SharedData>().props;
     const [isSheetOpen, setIsSheetOpen] = useState(false);
-    const [isDownloadSuccessOpen, setIsDownloadSuccessOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [isArchiveConfirmOpen, setIsArchiveConfirmOpen] = useState(false);
     const [selectedFile, setSelectedFile] = useState<typeof resources[0] | null>(null);
+    
 
     // Restrictions Modal State
     const [isRestrictionsModalOpen, setIsRestrictionsModalOpen] = useState(false);
@@ -172,15 +172,19 @@ export default function Resources({ resources }: Props) {
 
                 <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 lg:p-8 w-full">
                     <FilterSearchSection variant="DefenseManagement" />
-                    <div className="flex justify-end">
-                        <Button 
-                            variant="primary" className="gap-2" 
-                            onClick={() => setIsUploadModalOpen(true)}
-                            disabled={processing}
-                        >
-                            <Upload className="w-4 h-4" /> Upload Document
-                        </Button>
-                    </div>
+
+                    {/* UPLOAD BUTTON */}
+                    {user_info?.is_admin && (
+                        <div className="flex justify-end">
+                            <Button 
+                                variant="primary" className="gap-2" 
+                                onClick={() => setIsUploadModalOpen(true)}
+                                disabled={processing}
+                            >
+                                <Upload className="w-4 h-4" /> Upload Document
+                            </Button>
+                        </div>
+                    )}
 
                     <div className="rounded-lg border overflow-hidden bg-card shadow-sm">
                         <Table>
@@ -190,7 +194,9 @@ export default function Resources({ resources }: Props) {
                                     <TableHead className="text-primary-foreground text-center">File Type</TableHead>
                                     <TableHead className="text-primary-foreground text-center">Uploaded By</TableHead>
                                     <TableHead className="text-primary-foreground text-center">Date Uploaded</TableHead>
-                                    <TableHead className="text-primary-foreground text-center">Status</TableHead>
+                                    {user_info?.is_admin && (
+                                        <TableHead className="text-primary-foreground text-center">Status</TableHead>
+                                    )}
                                     <TableHead className="text-primary-foreground text-center">Action</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -212,23 +218,29 @@ export default function Resources({ resources }: Props) {
                                                 <span className="text-xs text-muted-foreground">{format(new Date(file.uploaded_at), 'h:mm a')}</span>
                                             </div>
                                         </TableCell>
+                                        {user_info?.is_admin && (
+                                            <TableCell>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => toggleStatus(file)}
+                                                    className={`px-3 py-1 rounded-full text-[11px] font-bold border transition cursor-pointer
+                                                        ${
+                                                            file.is_active
+                                                                ? 'bg-[var(--completed-bg)] text-[var(--completed-font-color)] border-[var(--completed-border)]'
+                                                                : 'bg-[var(--pending-bg)] text-[var(--pending-font-color)] border-[var(--pending-border)]'
+                                                        }`}
+                                                    aria-pressed={file.is_active}
+                                                >
+                                                    {file.is_active ? 'Active' : 'Inactive'}
+                                                </button>
+                                            </TableCell>
+                                        )}
                                         <TableCell>
-                                            <button
-                                                type="button"
-                                                onClick={() => toggleStatus(file)}
-                                                className={`px-3 py-1 rounded-full text-[11px] font-bold border transition cursor-pointer
-                                                    ${
-                                                        file.is_active
-                                                            ? 'bg-[var(--completed-bg)] text-[var(--completed-font-color)] border-[var(--completed-border)]'
-                                                            : 'bg-[var(--pending-bg)] text-[var(--pending-font-color)] border-[var(--pending-border)]'
-                                                    }`}
-                                                aria-pressed={file.is_active}
-                                            >
-                                                {file.is_active ? 'Active' : 'Inactive'}
-                                            </button>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Button variant="tertiary" size="sm" onClick={() => handleViewDetails(file)} className='mr-3'>View Details</Button>
+                                            {user_info?.is_admin ? (
+                                                <Button variant="tertiary" size="sm" onClick={() => handleViewDetails(file)} className='mr-3'>View Details</Button>
+                                            ) : (
+                                                <Button variant="tertiary" size="sm" onClick={() => handleDownload(file.file_path)}> Download </Button>
+                                            )}
                                         </TableCell>
                                     </TableRow>
                                     ))
