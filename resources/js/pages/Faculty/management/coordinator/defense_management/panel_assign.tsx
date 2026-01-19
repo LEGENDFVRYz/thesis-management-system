@@ -1,5 +1,4 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import AppLayout from '@/layouts/app-layout';
 import { index as matrix } from '@/routes/faculty/coordinator/defense_management/matrix';
 import { index as panel_assign } from '@/routes/faculty/coordinator/defense_management/panel_assign';
 import { BreadcrumbItem, PageHeaderProps } from '@/types';
@@ -15,12 +14,12 @@ import {
     X,
     UserCheck,
     Save,
-    Check
+    Check,
+    AlertCircle,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from '@/lib/utils';
-import { HeaderCard } from "@/components/ui/card";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -33,7 +32,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { NavFooter } from '@/components/nav-footer';
 import DocumentPreview from '@/components/document-preview';
 import DefenseManagementLayout from '.';
 
@@ -96,17 +94,21 @@ const TabButton = React.forwardRef<HTMLButtonElement, TabButtonProps>(
         <button
             ref={ref}
             className={cn(
-                'h-12 px-[20px] flex flex-col justify-center items-center gap-2.5',
-                'rounded-t-[10px] transition-colors',
-                isActive
-                    ? 'bg-[#9b000a] text-white'
-                    : 'bg-[#800000] text-white/70 hover:bg-[#9b000a] hover:text-white',
-                className
-            )}
+                            'h-9 px-[15px] flex flex-col justify-center items-center gap-2.5',
+                            'rounded-t-[10px] transition-colors',
+                            'shadow-[inset_0_4px_4px_rgba(0,0,0,0.25)]',
+            
+                            // Base background
+                            isActive
+                                ? 'bg-[#9b000a]'
+                                : 'bg-primary hover:bg-[#9b000a]',
+            
+                            className
+                        )}
             {...props}
         >
             <div className="flex justify-center items-center gap-2.5">
-                <span className="font-medium text-[16px] leading-normal whitespace-nowrap font-dm">
+                <span className="text-primary-foreground-2 font-medium text-[19px] leading-normal whitespace-nowrap font-dm">
                     {children}
                 </span>
             </div>
@@ -130,7 +132,6 @@ const pageHeader: PageHeaderProps = {
     title: "Panel Assignment",
     subtitle: "Assign and manage panel members",
     icon: (
-        // pa correct nalang
         <div className="flex h-full w-full items-center justify-center rounded-md bg-[#800000] text-white">
             <Users className="h-5 w-5" />
         </div>
@@ -143,6 +144,7 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
     const [activeTab, setActiveTab] = useState<'assignments' | 'conflicts'>('assignments');
     
     // --- STATE MANAGEMENT ---
+    // Using local state to allow immediate UI updates (Optimistic UI)
     const [localTheses, setLocalTheses] = useState<Thesis[]>(endorsed_thesis); 
     const [openThesisId, setOpenThesisId] = useState<number | null>(null);
     const [thesisAssignments, setThesisAssignments] = useState<Record<number, Panelist[]>>({});
@@ -154,7 +156,7 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
     
     const [selectedDocument, setSelectedDocument] = useState<{title: string, type: string} | null>(null);
 
-    // Sync props with local state
+    // Sync props with local state if the server data changes
     useEffect(() => {
         setLocalTheses(endorsed_thesis);
     }, [endorsed_thesis]);
@@ -188,6 +190,7 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
         });
     };
 
+    // --- SAVE LOGIC WITH POPUP AND BADGE UPDATE ---
     const handleSaveChanges = (thesis: Thesis) => {
         const currentAssignments = thesisAssignments[thesis.thesis_id] || [];
         
@@ -206,8 +209,6 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
         };
     
         const onSuccess = () => {
-            // Update local state: Set is_complete to true AND update the panels array
-            // This ensures the badge updates immediately
             setLocalTheses(prevTheses => 
                 prevTheses.map(t => 
                     t.thesis_id === thesis.thesis_id 
@@ -230,15 +231,17 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
     
         const hasExistingPanels = thesis.panels && thesis.panels.length > 0;
     
+        // UPDATED URLS BELOW:
+        // Removed "/management" and changed "defense_management" to "defense-management"
         if (hasExistingPanels) {
             router.put(
-                `/faculty/management/coordinator/defense_management/panel-assign/${thesis.defense_matrix_id}`,
+                `/faculty/coordinator/defense-management/panel-assign/${thesis.defense_matrix_id}`,
                 payload,
                 { onSuccess, onError }
             );
         } else {
             router.post(
-                '/faculty/management/coordinator/defense_management/panel-assign',
+                '/faculty/coordinator/defense-management/panel-assign',
                 payload,
                 { onSuccess, onError }
             );
@@ -272,18 +275,6 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
 
             <div className="flex flex-col min-h-screen bg-primary-foreground -mt-4 -mx-4 -mb-4 ">
                 
-                {/* Header Card */}
-                {/* <HeaderCard
-                    title="Panel Assignment"
-                    description="Assign and manage panel members"
-                    className="w-full max-w-none rounded-none border-t-0 border-x-0"
-                    icon={
-                        <div className="flex h-full w-full items-center justify-center rounded-md bg-[#800000] text-white">
-                            <Users className="h-5 w-5" />
-                        </div>
-                    }
-                /> */}
-
                 <div className="flex flex-1 flex-col gap-6 p-4 pt-0 w-full">
 
                     {/* 1. Page Tabs */}
@@ -302,24 +293,30 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                     {/* 2. Controls & Filters */}
                     <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center pt-2">
 
-                        {/* Sub-Tabs */}
+                        {/* Sub-Tabs: Assignments vs Conflicts */}
                         <ToggleGroup
                             type="single"
                             value={activeTab}
                             onValueChange={(value) => { if (value) setActiveTab(value as 'assignments' | 'conflicts') }}
-                            className="bg-[#F3E5CA] rounded-lg p-1 gap-1 inline-flex"
+                            className="bg-[#F3E5CA] p-1 rounded-full border border-[#800000]/10 inline-flex"
                         >
                             <ToggleGroupItem
                                 value="assignments"
-                                className="whitespace-nowrap w-auto data-[state=on]:bg-[#800000] data-[state=on]:text-white text-[#800000] hover:bg-[#800000]/10 hover:text-[#800000] h-8 px-4 text-xs font-bold"
+                                className={cn(
+                                    "gap-2 h-8 px-6 rounded-full text-xs font-bold uppercase transition-all",
+                                    activeTab === 'assignments' ? "bg-[#800000] text-white shadow-md" : "text-[#800000] hover:bg-white/50"
+                                )}
                             >
-                                Panel Assignments
+                                <Users className="w-4 h-4" /> Panel Assignments
                             </ToggleGroupItem>
                             <ToggleGroupItem
                                 value="conflicts"
-                                className="whitespace-nowrap w-auto data-[state=on]:bg-[#800000] data-[state=on]:text-white text-[#800000] hover:bg-[#800000]/10 hover:text-[#800000] h-8 px-4 text-xs font-bold"
+                                className={cn(
+                                    "gap-2 h-8 px-6 rounded-full text-xs font-bold uppercase transition-all whitespace-nowrap",
+                                    activeTab === 'conflicts' ? "bg-[#800000] text-white shadow-md" : "text-[#800000] hover:bg-white/50"
+                                )}
                             >
-                                Conflict Approvals
+                                <AlertCircle className="w-4 h-4" /> Conflict Approvals
                             </ToggleGroupItem>
                         </ToggleGroup>
 
@@ -329,7 +326,7 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="primary">
-                                            <span className={selectedSection ? "text-foreground" : ""}>
+                                            <span>
                                                 {selectedSection || "Select Section"}
                                             </span>
                                             <ChevronDown className="h-4 w-4 opacity-50" />
@@ -366,10 +363,10 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col gap-2 overflow-y-auto pr-1" style={{ maxHeight: '600px' }}>
+                                    <div className="flex flex-col gap-2 overflow-y-auto pr-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]" style={{ maxHeight: '600px' }}>
                                         {available_panel.map((panelist) => (
                                             <div key={panelist.id} className="flex items-center gap-3 rounded-lg border bg-background p-3 shadow-sm">
-                                                <div className="h-2 w-2 rounded-full bg-green-500" />
+                                                <div className="h-2 w-2 rounded-full bg-[#800000]" />
                                                 <span className="text-sm font-medium text-foreground/80">{panelist.name}</span>
                                             </div>
                                         ))}
@@ -417,7 +414,7 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                                                                     </div>
                                                                 </div>
                                                                 <div className="flex items-center gap-4">
-                                                                    {/* Status Pill - Updated to check if exactly 3 panels are saved */}
+                                                                    {/* BADGE CHANGING LOGIC: Checks length dynamically */}
                                                                     {thesis.panels.length === 3 ? (
                                                                         <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
                                                                             Assigned
@@ -447,7 +444,7 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                                                                                     <Plus size={16} /> Add Panelist
                                                                                 </Button>
                                                                             </DropdownMenuTrigger>
-                                                                            <DropdownMenuContent align="end" className="w-56 max-h-[300px] overflow-y-auto">
+                                                                            <DropdownMenuContent align="end" className="w-56 max-h-[300px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                                                                                 <DropdownMenuLabel>Available Faculty</DropdownMenuLabel>
                                                                                 <DropdownMenuSeparator />
                                                                                 {available_panel.map((panelist) => {
@@ -573,8 +570,6 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                         )}
                     </div>
                 </div>
-
-                {/* <NavFooter /> */}
             </div>
 
             {/* ================= SUCCESS NOTIFICATION MODAL ================= */}

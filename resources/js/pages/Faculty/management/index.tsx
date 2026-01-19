@@ -6,7 +6,7 @@ import { type ReactNode } from 'react';
 interface ManagementLayoutProps {
     children: ReactNode;
     breadcrumbs?: BreadcrumbItem[];
-    pageHeader: PageHeaderProps;
+    pageHeader?: PageHeaderProps;
 }
 
 const breadcrumb: BreadcrumbItem[] = [
