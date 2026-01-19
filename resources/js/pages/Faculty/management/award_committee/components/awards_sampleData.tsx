@@ -1,4 +1,4 @@
-import { EvaluationRow, ResultRow } from './awards_types';
+import { EvaluationRow, ResultRow } from './awards_utils';
 
 export const evaluationData: EvaluationRow[] = [
     { 
@@ -126,7 +126,7 @@ export const resultsData: ResultRow[] = [
     { rank: 10, groupCode: '4602', title: 'Smart Waste Management System', criteria1: null, criteria2: null, criteria3: null, totalScore: null, isComplete: false },
 ];
 
-// Sample evaluation results for the View Results Modal
+// Sample evaluation results data for the View Results Modal
 export const detailedEvaluationResults = {
     '4101': {
         groupCode: '4101',
@@ -285,7 +285,11 @@ export const detailedEvaluationResults = {
         criteria1Results: [], // No grades yet for Criteria 1
         criteria2Results: [], // No grades yet for Criteria 2
         criteria3Results: [
-            { criterion: 'The project demonstrates innovative use of technology and advanced technical implementation.', score: 21, maxScore: 25 },
+            { criterion: 'Originality/novelty/usefulness, innovation/adaptation/patentability.', score: 4, maxScore: 5 },
+            { criterion: 'Potential for local value-added.', score: 4, maxScore: 5 },
+            { criterion: 'Commercialization Scale / Profitability and Productivity.', score: 5, maxScore: 5 },
+            { criterion: 'Use of environment-friendly materials/technology.', score: 3, maxScore: 5 },
+            { criterion: 'Benefits to the public.', score: 5, maxScore: 5 },
         ],
         criteria1Total: null,
         criteria2Total: null,
