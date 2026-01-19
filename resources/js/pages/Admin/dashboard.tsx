@@ -289,16 +289,8 @@ export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
                                     <MetricContent
                                         total={286}
                                         items={[
-                                            {
-                                                label: 'Total Students',
-                                                value: 256,
-                                                color: '#1C398E',
-                                            },
-                                            {
-                                                label: 'Total Faculty',
-                                                value: 30,
-                                                color: '#0D542B',
-                                            },
+                                            { label: 'Total Students', value: 256, color: 'var(--alert-info)', },
+                                            { label: 'Total Faculty', value: 30, color: 'var(--alert-success)', },
                                         ]}
                                     />
                                 </MetricCard>
@@ -311,16 +303,8 @@ export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
                                     <MetricContent
                                         total={40}
                                         items={[
-                                            {
-                                                label: 'Scheduled',
-                                                value: 20,
-                                                color: '#0D542B',
-                                            },
-                                            {
-                                                label: 'Pending',
-                                                value: 0,
-                                                color: '#730000',
-                                            },
+                                            { label: 'Scheduled', value: 20, color: 'var(--alert-success)', },
+                                            { label: 'Pending', value: 0, color: 'var(--alert-warning)', },
                                         ]}
                                     />
                                 </MetricCard>
@@ -333,16 +317,8 @@ export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
                                     <MetricContent
                                         total={20}
                                         items={[
-                                            {
-                                                label: 'Approved Requests',
-                                                value: 15,
-                                                color: '#0D542B',
-                                            },
-                                            {
-                                                label: 'Pending Requests',
-                                                value: 5,
-                                                color: '#730000',
-                                            },
+                                            { label: 'Approved Requests', value: 15, color: 'var(--alert-success)', },
+                                            { label: 'Pending Requests', value: 5, color: 'var(--alert-warning)', },
                                         ]}
                                     />
                                 </MetricCard>
@@ -355,16 +331,8 @@ export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
                                     <MetricContent
                                         total={20}
                                         items={[
-                                            {
-                                                label: 'Approved Requests',
-                                                value: 15,
-                                                color: '#0D542B',
-                                            },
-                                            {
-                                                label: 'Pending Requests',
-                                                value: 5,
-                                                color: '#730000',
-                                            },
+                                            { label: 'Approved Requests', value: 15, color: 'var(--alert-success)', },
+                                            { label: 'Pending Requests', value: 5, color: 'var(--alert-warning)', },
                                         ]}
                                     />
                                 </MetricCard>

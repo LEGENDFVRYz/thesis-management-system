@@ -12,8 +12,7 @@ import { usePage } from '@inertiajs/react';
 
 {/* UI Components Imports */}
 import { MetricCard } from '@/components/ui/card';
-import { PendingEndorsementForms } from '@/components/pending-endorsement';
-import { PendingProposalForms } from '@/components/pending-proposal';
+import { PendingForms } from '@/components/pending-forms';
 import { DeadlineTimelineView } from '@/pages/Faculty/components/deadline-timeline-view-faculty';
 
 {/* Icons Imports */}
@@ -221,16 +220,8 @@ export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
                                 <MetricContent
                                     total={286}
                                     items={[
-                                        {
-                                            label: 'Total Students',
-                                            value: 256,
-                                            color: '#1C398E',
-                                        },
-                                        {
-                                            label: 'Total Faculty',
-                                            value: 30,
-                                            color: '#0D542B',
-                                        },
+                                        { label: 'Total Students',value: 256, color: 'var(--alert-info)',},
+                                        { label: 'Total Faculty', value: 30, color: 'var(--alert-success)',},
                                     ]}
                                 />
                             </MetricCard>
@@ -243,16 +234,8 @@ export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
                                 <MetricContent
                                     total={40}
                                     items={[
-                                        {
-                                            label: 'Active Groups',
-                                            value: 30,
-                                            color: '#0D542B',
-                                        },
-                                        {
-                                            label: 'Completed Groups',
-                                            value: 10,
-                                            color: '#1C398E',
-                                        },
+                                        { label: 'Active Groups', value: 30, color: 'var(--alert-success)', },
+                                        { label: 'Completed Groups',value: 10,color: 'var(--alert-info)',},
                                     ]}
                                 />
                             </MetricCard>
@@ -265,16 +248,8 @@ export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
                                 <MetricContent
                                     total={40}
                                     items={[
-                                        {
-                                            label: 'Scheduled',
-                                            value: 20,
-                                            color: '#0D542B',
-                                        },
-                                        {
-                                            label: 'Pending',
-                                            value: 0,
-                                            color: '#730000',
-                                        },
+                                        { label: 'Scheduled', value: 20, color: 'var(--alert-success)', },
+                                        { label: 'Pending', value: 0, color: 'var(--alert-warning)', },
                                     ]}
                                 />
                             </MetricCard>
@@ -287,16 +262,8 @@ export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
                                 <MetricContent
                                     total={45}
                                     items={[
-                                        {
-                                            label: 'Active Thesis',
-                                            value: 30,
-                                            color: '#1C398E',
-                                        },
-                                        {
-                                            label: 'Completed Thesis',
-                                            value: 15,
-                                            color: '#0D542B',
-                                        },
+                                        { label: 'Active Thesis', value: 30, color: 'var(--alert-info)', },
+                                        { label: 'Completed Thesis', value: 15, color: 'var(--alert-success)', },
                                     ]}
                                 />
                             </MetricCard>
@@ -318,8 +285,12 @@ export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
                         
                         {/* Pending Endorsement Forms */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <PendingEndorsementForms />
-                            <PendingProposalForms />
+                            <PendingForms 
+                                title="Pending Endorsement Forms"
+                            />
+                            <PendingForms 
+                                title="Pending Proposal Forms"
+                            />
                         </div>
 
                         {/* Deadline Timeline View */}
