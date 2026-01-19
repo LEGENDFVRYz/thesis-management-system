@@ -202,7 +202,7 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty, availableSectio
       title: currentTitle, 
       facultyType: typeVal,
       roles: mappedRoles,
-      adviseeBlock: fac.adviseeBlock || "", 
+      adviseeBlock: fac.adviseeBlock ? String(fac.adviseeBlock) : "",
       photoPreview: fac.hasPhoto ? "" : null,
       status: "Active",
     };
