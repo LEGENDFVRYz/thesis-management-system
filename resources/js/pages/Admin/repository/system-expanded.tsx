@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Head } from '@inertiajs/react';
-import RepositoryLayout from './index';
+import RepositoryLayout from '@/pages/Shared/repository/index';
 import { system, systemExpanded } from '@/routes/admin/repository';
-import { type BreadcrumbItem } from '@/types';
+import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { SystemRepositoryStorage } from '@/components/system-repository-storage';
 import { Icon } from '@/components/icon-index';
 import { Badge } from '@/components/ui/badge';
@@ -15,13 +15,28 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from '@/components/ui/label';
 import { AlertCircle, FileText, Trash2, Calendar, X, CheckCircle } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
-import { index, theses } from '@/routes/repository';
+import { index } from '@/routes/admin/repository/index';
 import { AppContent } from '@/components/app-content';
 
+
+// Setup
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Repository', href: index().url },
     { title: 'System Archive', href: system().url },
 ];
+
+const pageHeader: PageHeaderProps = {
+    title: "System Archive",
+    subtitle: "Browse and explore student thesis projects",
+    icon: (
+        // pa correct nalang
+        <Icon
+            name="calendarDefault"
+            className="w-8 h-8 text-primary"
+        />
+    ),
+};
+
 
 // Types
 interface SystemData {
@@ -509,7 +524,10 @@ export default function SystemRepositoryExpanded() {
     <>
       <Head title="System Archive" />
 
-      <RepositoryLayout breadcrumbs={breadcrumbs}>
+      <RepositoryLayout 
+          breadcrumbs={breadcrumbs}
+          pageHeader={pageHeader}
+      >
 
       {/* <AppContent
         title="System Archive"

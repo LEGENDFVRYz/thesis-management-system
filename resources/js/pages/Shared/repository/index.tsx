@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import { index } from '@/routes/repository';
+import { index } from '@/routes/guest/repository';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { type ReactNode } from 'react';
 

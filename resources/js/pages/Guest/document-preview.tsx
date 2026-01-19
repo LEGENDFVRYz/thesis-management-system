@@ -2,6 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, FileText } from 'lucide-react';
 import { AppHeader } from '@/components/app-header';
 import { NavFooter } from '@/components/nav-footer';
+import RepositoryLayout from '@/pages/Shared/repository/index';
 import PdfViewer from '@/components/pdf-viewer';
 import { BreadcrumbItem, PageHeaderProps } from '@/types';
 import { index } from '@/routes/guest/repository/index';
@@ -49,7 +50,7 @@ export default function DocumentPreview({ journal }: DocumentPreviewProps) {
     
     return (
         <>
-        <AppLayout
+        <RepositoryLayout
             breadcrumbs={breadcrumb}
             pageHeader={pageHeader}
         >
@@ -126,7 +127,7 @@ export default function DocumentPreview({ journal }: DocumentPreviewProps) {
             </div>
 
             {/* <NavFooter /> */}
-        </AppLayout>
+        </RepositoryLayout>
         </>
     );
 }

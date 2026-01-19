@@ -5,6 +5,7 @@ import { AppContent } from '@/components/app-content';
 import { NavFooter } from '@/components/nav-footer';
 import { ArchiveCard } from '@/components/ui/card';
 import { RepositoryFilterBar } from '@/components/repository-filter-bar';
+import RepositoryLayout from '@/pages/Shared/repository/index';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, PageHeaderProps } from '@/types';
 import { Icon } from '@/components/icon-index';
@@ -114,7 +115,7 @@ export default function GuestRepository({ search = '', archives = [] }: Reposito
 
     return (
         <>
-        <AppLayout
+        <RepositoryLayout 
             breadcrumbs={breadcrumb}
             pageHeader={pageHeader}
         >
@@ -159,7 +160,7 @@ export default function GuestRepository({ search = '', archives = [] }: Reposito
                 </div>
 
             {/* <NavFooter /> */}
-        </AppLayout>
+        </RepositoryLayout>
         </>
     );
 }

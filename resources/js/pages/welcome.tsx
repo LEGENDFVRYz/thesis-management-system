@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { RepoFilter } from '@/components/filter-search';
 import RecentDP from './Guest/components/recent-dp';
 import { MetricCard } from '@/components/ui/card';
-import UndergraduateThesis from './Guest/undergraduate-thesis';
+import UndergraduateThesis from './Guest/components/undergraduate-thesis';
 import QuickLinks from './Guest/components/quick-links';
 
 export default function Welcome() {
