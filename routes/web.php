@@ -191,7 +191,9 @@ Route::prefix('faculty')->group(function () {
                 
                 # "Advisee Management" - THESIS REVIEW
                 Route::get('thesis-review', [ThesisReview::class, 'index'])->name('thesis_review.index');
-                
+                Route::get('thesis-review/{groupCode}', [ThesisReview::class, 'submissions'])->name('thesis_review.submissions');
+                Route::get('thesis-review/{groupCode}/{submissionId}', [ThesisReview::class, 'review'])->name('thesis_review.review');;
+                                
                 # "Advisee Management" - PROGRESS
                 Route::get('progress', [ProgressReport::class, 'index'])->name('progress.index');
 
