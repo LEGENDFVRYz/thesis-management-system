@@ -14,71 +14,93 @@ class MyAdvisees extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
-        $userId = Auth::id(); // logged-in faculty user
-
-        $search   = $request->input('search');
-        $section  = $request->input('block');
-        $leader   = $request->input('is_leader');
-
+    { $UserID = $request->user()->id;
+        $search = $request->query('search');
         $students = DB::table('tbl_students as s')
-
-            // Student user account (ID + email)
             ->leftJoin('users as student_user', 's.user_id', '=', 'student_user.id')
-
-            // Resolve adviser via section
             ->join('tbl_section_advisers as sa', 's.section', '=', 'sa.section')
             ->join('tbl_faculty_assignments as fa', 'sa.faculty_assign_id', '=', 'fa.id')
             ->join('tbl_faculties as f', 'fa.faculty_id', '=', 'f.id')
+            ->leftJoin('tbl_thesis_groups as tg', 's.group_id', '=', 'tg.id')
+            ->leftJoin('tbl_school_years as sy', 'fa.sy_id', '=', 'sy.id')
+            ->leftJoin('tbl_proposals as p', 'p.group_id', '=', 'tg.id')
+            ->leftJoin('tbl_theses as th', 'th.proposal_id', '=', 'p.id')
+            ->leftJoin('tbl_students as co', function ($join) {
+                $join->on('co.group_id', '=', 's.group_id')
+                     ->whereColumn('co.id', '!=', 's.id');
+            })
 
-            ->select([
-                // Student identity
-                'student_user.identity_no as student_id',
-                'student_user.email as pup_webmail',
+            ->where('f.user_id', $UserID)
+            ->where('fa.role_id', 2)
+            // ADD SEARCH FILTER
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('student_user.identity_no', 'LIKE', "%$search%")
+                      ->orWhere(DB::raw("CONCAT(s.first_name, ' ', s.last_name)"), 'LIKE', "%$search%")
+                      ->orWhere('p.proposal_title', 'LIKE', "%$search%");
+                });
+            })
 
-                // Student details
-                's.last_name',
+            ->groupBy(
+                's.id',
+                'student_user.identity_no',
+                'student_user.email',
                 's.first_name',
-                's.group_id as group_code',
-                's.section as block',
-                's.is_leader',
-            ])
+                's.last_name',
+                'sy.year',
+                'sa.section',
+                'tg.group_number',
+                's.is_leader'
+            )
 
-            // Adviser restriction
-            ->where('f.user_id', $userId)
-            ->where('fa.role_id', 2); // ADVISER ONLY
+            ->selectRaw("
+                MAX(student_user.identity_no) AS student_id,
+                MAX(student_user.email) AS pup_webmail,
+                MAX(CONCAT(s.first_name, ' ', s.last_name)) AS student_name,
 
-        // 🔍 SEARCH
-        if ($search) {
-            $students->where(function ($q) use ($search) {
-                $q->where('s.last_name', 'like', "%{$search}%")
-                  ->orWhere('s.first_name', 'like', "%{$search}%")
-                  ->orWhere('student_user.identity_no', 'like', "%{$search}%");
-            });
-        }
+                CONCAT('BSCPE ', 3 - (sy.year - 2025), '-', sa.section) AS block,
 
-        // 🎯 FILTERS
-        if ($section) {
-            $students->where('s.section', $section);
-        }
+                CONCAT(3 - (sy.year - 2025), sa.section, LPAD(tg.group_number, 2, '0')) AS group_code,
 
-        if (!is_null($leader)) {
-            $students->where('s.is_leader', $leader);
-        }
+                s.is_leader,
 
-        $students = $students
+                MAX(p.proposal_title) AS thesis_title,
+
+                GROUP_CONCAT(DISTINCT CONCAT(co.first_name, ' ', co.last_name) SEPARATOR ', ') AS co_researchers,
+
+                CASE
+                    WHEN MAX(p.id) IS NULL THEN 'No Proposal'
+                    WHEN MAX(p.is_pursued) = 0 THEN 'Proposal Pending'
+                    WHEN MAX(p.is_pursued) = 1 AND MAX(th.id) IS NULL THEN 'Proposal Approved'
+                    WHEN MAX(th.id) IS NOT NULL AND MAX(th.manuscript_filepath) IS NULL THEN 'Thesis Draft'
+                    WHEN MAX(th.manuscript_filepath) IS NOT NULL THEN 'Thesis Manuscript'
+                    ELSE 'Unknown'
+                END AS thesis_stage,
+
+                CASE
+                    WHEN MAX(p.id) IS NULL THEN 0
+                    WHEN MAX(p.is_pursued) = 0 THEN 10
+                    WHEN MAX(p.is_pursued) = 1 AND MAX(th.id) IS NULL THEN 40
+                    WHEN MAX(th.id) IS NOT NULL AND MAX(th.manuscript_filepath) IS NULL THEN 60
+                    WHEN MAX(th.manuscript_filepath) IS NOT NULL THEN 80
+                    ELSE 0
+                END AS progress
+            ")
+
             ->orderBy('s.last_name')
-            ->paginate(25)
-            ->withQueryString();
+            ->simplePaginate(25);
 
+        //dd($students);
         return Inertia::render(
             'Faculty/management/adviser/advisee_management/my_advisees',
             [
-                'students' => $students,
-                'filters'  => $request->only(['search', 'block', 'is_leader']),
+                'advisees' => $students,
+                'search' => $search,
             ]
         );
     }
+
+
 
     /**
      * Show the form for creating a new resource.
