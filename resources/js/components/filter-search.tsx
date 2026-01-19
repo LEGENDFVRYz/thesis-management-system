@@ -749,7 +749,7 @@ export function DefenseManagementFilter({
                     <PopoverContent 
                         side="left" 
                         align="end" 
-                        sideOffset={30} 
+                        sideOffset={30}
                         className="w-fit p-0 border-none shadow-2xl"
                     >
                         <GeneralSort 

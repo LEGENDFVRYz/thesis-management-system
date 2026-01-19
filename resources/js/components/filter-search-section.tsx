@@ -51,9 +51,6 @@ export default function FilterSearchSection({
     const [isSort3ModalOpen, setIsSort3ModalOpen] = useState(false);
     const [isSortModalOpen, setIsSortModalOpen] = useState(false);
 
-    const [isDMFilterOpen, setIsDMFilterOpen] = useState(false);
-    const [isSortOpen, setIsSortOpen] = useState(false);
-
     /**
      * Container Style Mapping
      * Maps the Figma layout specifications to the different page variants.
@@ -204,48 +201,75 @@ export default function FilterSearchSection({
                     </>
                 )}
 
-                {/* --- SHARED ACTION BUTTONS --- */}
+                {/* 3. SHARED ACTION BUTTONS */}
                 <div className={cn(
                     "flex flex-row items-center gap-[10px] font-dm",
                     (variant === 'ThesisArchive' || variant === 'Notifications' || variant === 'Committee') ? "mt-auto h-9" : ""
                 )}>
-                    {/* --- SORT DROPDOWN --- */}
+                    {/* --- SORT MODAL --- */}
                     {(variant === 'StudentManagement' || variant === 'Notifications' || variant === 'Committee') && (
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button variant="secondary" size="icon" className="rounded-lg border-none">
-                                    <Icon name="sortDefault" size={16} />
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent align="end" sideOffset={8} className="w-fit p-0 border-none shadow-2xl">
-                                <GeneralSort 
-                                    onClose={() => {}} 
-                                    onApply={handleApplyGeneralSort} 
-                                />
-                            </PopoverContent>
-                        </Popover>
+                        <div className="relative">
+                            <Button 
+                                variant="secondary" 
+                                size="icon" 
+                                className="rounded-lg border-none"
+                                onClick={() => setIsSortModalOpen(true)}
+                            >
+                                <Icon name="sortDefault" size={16} />
+                            </Button>
+
+                            {isSortModalOpen && (
+                                <>
+                                    <div 
+                                        className="fixed inset-0 z-40" 
+                                        onClick={() => setIsSortModalOpen(false)} 
+                                    />
+                                    
+                                    <div className="absolute right-0 mt-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                        <GeneralSort 
+                                            onClose={() => setIsSortModalOpen(false)} 
+                                            onApply={(val) => {
+                                                onSortApply?.(val);
+                                                setIsSortModalOpen(false);
+                                            }}
+                                        />
+                                    </div>
+                                </>
+                            )}
+                        </div>
                     )}
 
-                    {/* --- FILTER DROPDOWN */}
+                    {/* --- FILTER MODAL TRIGGER --- */}
                     {variant !== 'Notifications' && variant !== 'Committee' && (
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button variant="secondary" size="icon" className="rounded-lg border-none">
-                                    <Filter className="w-4 h-4" />
-                                </Button>
-                            </PopoverTrigger>
-                            {/* align="end" makes it stick to the right side of the button */}
-                            {/* sideOffset={8} adds a small gap between the button and the box */}
-                            <PopoverContent align="end" sideOffset={8} className="w-[350px] p-0 border-none shadow-2xl bg-transparent">
-                                <DefenseManagementFilter
-                                    onClose={() => {}} 
-                                    onApply={(filters) => {
-                                        setActiveFilters(filters);
-                                        onFilterApply?.(filters);
-                                    }}
-                                />
-                            </PopoverContent>
-                        </Popover>
+                        <div className="relative">
+                            <Button 
+                                variant="secondary" 
+                                size="icon" 
+                                className="rounded-lg border-none"
+                                onClick={() => setIsDMFilterModalOpen(true)}
+                            >
+                                <Filter className="w-4 h-4" />
+                            </Button>
+
+                            {isDMFilterModalOpen && (
+                                <>
+                                    <div 
+                                        className="fixed inset-0 z-40 cursor-default" 
+                                        onClick={() => setIsDMFilterModalOpen(false)} 
+                                    />
+                                    
+                                    <div className="absolute right-0 mt-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                        <DefenseManagementFilter 
+                                            onClose={() => setIsDMFilterModalOpen(false)} 
+                                            onApply={(filters) => {
+                                                onFilterApply?.(filters);
+                                                setIsDMFilterModalOpen(false);
+                                            }}
+                                        />
+                                    </div>
+                                </>
+                            )}
+                        </div>
                     )}
 
                     {variant === 'Notifications' && (
@@ -263,25 +287,29 @@ export default function FilterSearchSection({
             </div>
 
             {/* --- INTEGRATED REPO FILTER MODAL --- */}
-            <Dialog open={isRepoFilterModalOpen} onOpenChange={setIsRepoFilterModalOpen}>
-                {/* Technical Note: DialogContent has border/bg removed to let the 
-                    RepoFilter's internal shadow and bg-white container show through cleanly.
-                */}
-                <DialogContent className="max-w-md p-0 border-none bg-transparent shadow-none outline-none">
-                    <RepoFilter 
-                        onClose={() => setIsRepoFilterModalOpen(false)} 
-                        onApply={handleApplyFilters}
-                    />
-                </DialogContent>
-            </Dialog>
+            {isRepoFilterModalOpen && (
+                <>
+                    <div className="fixed inset-0 flex items-center justify-center z-50 p-4" onClick={() => setIsRepoFilterModalOpen(false)} />
+                    
+                    <div className="absolute right-60 mt-20 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                        <RepoFilter 
+                            onClose={() => setIsRepoFilterModalOpen(false)} 
+                            onApply={handleApplyFilters}
+                        />
+                    </div>
+                </>
+            )}
 
             {/* --- INTEGRATED SORT MODAL --- */}
-            <Dialog open={isSort3ModalOpen} onOpenChange={setIsSort3ModalOpen}>
-                <DialogContent className="max-w-md p-0 border-none bg-transparent shadow-none outline-none">
-                    {/* The call to Sort3 */}
-                    <Sort3/>
-                </DialogContent>
-            </Dialog>
+            {isSort3ModalOpen && (
+                <>
+                    <div className="fixed inset-0 flex items-center justify-center z-50 p-4" onClick={() => setIsSort3ModalOpen(false)} />
+                    
+                    <div className="absolute right-90 mt-20 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                        <Sort3/>
+                    </div>
+                </>
+            )}
 
         </div>
     );
