@@ -15,94 +15,93 @@ class ThesisRegistry extends Controller
     public function index(Request $request)
     {
         // ===================================
-        // For Revision: 
+        // For Revision:
         // - Wrong method getting the group code (check the admin/student for reference)
         // - Note: There is new structure in the database to get the events, check it
         // ===================================
 
 
-        // $limit  = 15;
-        // $offset = $request->input('offset', 0);
+        $groups = DB::table('tbl_thesis_groups as tg')
+            ->leftJoin('tbl_section_advisers as sa', 'tg.section_adviser_id', '=', 'sa.id')
+            ->leftJoin('tbl_faculty_assignments as fa', 'sa.faculty_assign_id', '=', 'fa.id')
 
-        // $groups = DB::table('tbl_thesis_groups as tg')
-        //     ->leftJoin('tbl_section_advisers as sa', 'tg.section_adviser_id', '=', 'sa.id')
-        //     ->leftJoin('tbl_faculty_assignments as fa', 'sa.faculty_assign_id', '=', 'fa.id')
+            // Adviser
+            ->leftJoin('tbl_faculties as f', 'fa.faculty_id', '=', 'f.id')
+            ->leftJoin('users as u_adv', 'f.user_id', '=', 'u_adv.id')
 
-        //     // Adviser
-        //     ->leftJoin('tbl_faculties as f', 'fa.faculty_id', '=', 'f.id')
-        //     ->leftJoin('users as u_adv', 'f.user_id', '=', 'u_adv.id')
+            // School Year (for Group Code)
+            ->leftJoin('tbl_school_years as sy', 'fa.sy_id', '=', 'sy.id')
 
-        //     // Events
-        //     ->leftJoin('tbl_events as e', 'fa.sy_id', '=', 'e.semester_id')
-        //     ->leftJoin('tbl_deadline_templates as dt', 'e.dl_template_id', '=', 'dt.id')
+            // Events Structure (new)
+            ->leftJoin('tbl_semesters as sem', 'sem.school_year_id', '=', 'sy.id')
+            ->leftJoin('tbl_events as e', 'e.semester_id', '=', 'sem.id')
+            ->leftJoin('tbl_milestones as m', 'm.id', '=', 'e.milestone_id')
 
-        //     // Thesis & Proposal
-        //     ->leftJoin('tbl_proposals as p', 'tg.id', '=', 'p.group_id')
-        //     ->leftJoin('tbl_theses as t', 'p.id', '=', 't.proposal_id')
+            // Thesis & Proposal
+            ->leftJoin('tbl_proposals as p', 'tg.id', '=', 'p.group_id')
+            ->leftJoin('tbl_theses as t', 'p.id', '=', 't.proposal_id')
 
-        //     ->select([
-        //         'tg.id as group_id',
-        //         'tg.group_number',
-        //         'sa.section as block',
+            ->select([
+                'tg.id as group_id',
+                'tg.group_number',
 
-        //         DB::raw("COALESCE(p.updated_at, 'N/A') as last_updated"),
-        //         DB::raw("CONCAT('DEF-', LPAD(tg.id, 3, '0')) as defense_id"),
-        //         DB::raw("COALESCE(t.title, p.proposal_title, 'No Title Yet') as thesis_title"),
-        //         DB::raw("IFNULL(u_adv.name, 'TBA') as adviser_name"),
+                // BLOCK
+                'sa.section as block',
 
-        //         // Proponents
-        //         DB::raw("
-        //             (
-        //                 SELECT GROUP_CONCAT(CONCAT(first_name, ' ', last_name) SEPARATOR ', ')
-        //                 FROM tbl_students
-        //                 WHERE group_id = tg.id
-        //             ) as proponents
-        //         "),
+                // GROUP CODE
+                DB::raw("CONCAT(sy.year, '-', sa.section, '-', LPAD(tg.group_number, 2, '0')) as group_code"),
 
-        //         'e.due_date as dp1_completed_date',
-        //         DB::raw("NULL as mor_completed_date"),
+                DB::raw("COALESCE(p.updated_at, 'N/A') as last_updated"),
+                DB::raw("CONCAT('DEF-', LPAD(tg.id, 3, '0')) as defense_id"),
+                DB::raw("COALESCE(t.title, p.proposal_title, 'No Title Yet') as thesis_title"),
+                DB::raw("IFNULL(u_adv.name, 'TBA') as adviser_name"),
 
-        //         DB::raw("IFNULL(dt.name, 'No Active Milestone') as current_event_name"),
-        //         'e.due_date as deadline',
-        //         DB::raw("DATEDIFF(e.due_date, NOW()) as days_remaining"),
+                // Proponents
+                DB::raw("
+                    (
+                        SELECT GROUP_CONCAT(CONCAT(first_name, ' ', last_name) SEPARATOR ', ')
+                        FROM tbl_students
+                        WHERE group_id = tg.id
+                    ) as proponents
+                "),
 
-        //         // STATUS LOGIC
-        //         DB::raw("
-        //             CASE
-        //                 WHEN e.due_date < CURDATE() AND (
-        //                     (dt.name LIKE '%Proposal%' AND p.id IS NULL) OR
-        //                     ((dt.name LIKE '%Manuscript%' OR dt.name LIKE '%Defense%') AND t.id IS NULL)
-        //                 ) THEN 'Critical'
+                // Event Details
+                DB::raw("IFNULL(m.name, 'No Active Milestone') as current_event_name"),
+                'e.start_date as deadline',
+                DB::raw("DATEDIFF(e.start_date, NOW()) as days_remaining"),
 
-        //                 WHEN dt.name LIKE '%Proposal%' AND p.id IS NULL THEN 'At Risk'
-        //                 WHEN (dt.name LIKE '%Manuscript%' OR dt.name LIKE '%Defense%') AND t.id IS NULL THEN 'At Risk'
-        //                 WHEN e.id IS NULL THEN 'No Events'
-        //                 ELSE 'On Track'
-        //             END as status
-        //         "),
-        //     ])
+                // STATUS LOGIC
+                DB::raw("
+                    CASE
+                        WHEN e.start_date < CURDATE() AND (
+                            (m.stage = 1 AND p.id IS NULL) OR
+                            ((m.stage = 2 OR m.stage = 3) AND t.id IS NULL)
+                        ) THEN 'Critical'
 
-        //     // ORDERING (same as SQL)
-        //     ->orderByRaw("
-        //         (e.due_date < CURDATE() AND (p.id IS NULL OR t.id IS NULL)) DESC
-        //     ")
-        //     ->orderByRaw("
-        //         ABS(DATEDIFF(e.due_date, NOW())) ASC
-        //     ")
+                        WHEN (m.stage = 1 AND p.id IS NULL) THEN 'At Risk'
+                        WHEN ((m.stage = 2 OR m.stage = 3) AND t.id IS NULL) THEN 'At Risk'
+                        WHEN e.id IS NULL THEN 'No Events'
+                        ELSE 'On Track'
+                    END as status
+                "),
+            ])
 
-        //     ->limit($limit)
-        //     ->offset($offset)
-        //     ->get();
-
-        // dd($groups);
-
+            ->orderByRaw("
+                (e.start_date < CURDATE() AND (p.id IS NULL OR t.id IS NULL)) DESC
+            ")
+            ->orderByRaw("
+                ABS(DATEDIFF(e.start_date, NOW())) ASC
+            ")
+            ->get();
+        //dd($groups);
         return Inertia::render(
             'Faculty/management/coordinator/thesis_monitoring/thesis_registry',
             [
-                'groups' => []
+                'groups' => $groups
             ]
         );
     }
+
 
     /**
      * Show the form for creating a new resource.

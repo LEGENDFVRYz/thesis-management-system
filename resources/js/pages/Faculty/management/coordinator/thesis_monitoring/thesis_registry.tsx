@@ -15,7 +15,7 @@ import {
 import {
     Dialog,
     DialogContent,
-} from "@/components/ui/dialog"; 
+} from "@/components/ui/dialog";
 import AppLayout from '@/layouts/app-layout';
 import { registry } from '@/routes/faculty/coordinator/thesis/index';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
@@ -44,7 +44,6 @@ const pageHeader: PageHeaderProps = {
     title: "Thesis Registry",
     subtitle: "View all ongoing and completed theses across all stages and batches",
     icon: (
-        // pa correct nalang
         <FolderOpen className="w-8 h-8 text-primary" />
     ),
 };
@@ -70,36 +69,13 @@ const InteractiveSvgIcon = ({ defaultSrc, hoverSrc, clickedSrc, alt, onClick }: 
     );
 };
 
-// Sample Data (move it here)
-const theses = [
-    { 
-        id: '3301', 
-        title: "Development of an AI-Powered Enrollment Forecasting System", 
-        adviser: "Dr. Juan Dela Cruz", 
-        block: "BSCPE 4-1", 
-        date: "Jan 02, 2026", 
-        time: "10:30 AM", 
-        status: "On-Track" 
-    },
-    { 
-        id: '3302', 
-        title: "Blockchain-Based Academic Record Verification", 
-        adviser: "Engr. Maria Santos", 
-        block: "BSCPE 4-2", 
-        date: "Jan 01, 2026", 
-        time: "02:15 PM", 
-        status: "At-Risk" 
-    },
-];
-
-
-export default function Dashboard() {
+export default function Dashboard({ groups }: any) {
     const [selectedThesis, setSelectedThesis] = useState<any>(null);
     const [isViewOpen, setIsViewOpen] = useState(false);
     const [isNotifySuccessOpen, setIsNotifySuccessOpen] = useState(false);
-    
-    const totalTheses = theses.length;          // remove when the backend exist
-    const displayedTheses = theses.length;      // remove when the backend exist
+
+    const totalTheses = groups.length;
+    const displayedTheses = groups.length;
 
     const handleNotify = () => {
         setIsNotifySuccessOpen(true);
@@ -111,20 +87,13 @@ export default function Dashboard() {
     };
 
     return (
-        <ThesisMonitoringLayout 
+        <ThesisMonitoringLayout
             breadcrumbs={breadcrumbs}
             pageHeader={pageHeader}
         >
             <Head title="Thesis Registry" />
-            
-            <div className="flex flex-col min-h-screen -mt-4 -mx-4 -mb-4 bg-primary-foreground">
-                {/* <HeaderCard 
-                    title="Thesis Registry" 
-                    description="View all ongoing and completed theses across all stages and batches"
-                    icon={<FolderOpen className="w-8 h-8 text-primary" />}
-                    className="w-full rounded-none border-t-0 border-x-0" 
-                /> */}
 
+            <div className="flex flex-col min-h-screen -mt-4 -mx-4 -mb-4 bg-primary-foreground">
                 <div className="flex flex-1 flex-col gap-6 p-4 pt-0 w-full">
                     <div className="flex justify-end w-full">
                         <StageSwitchToggle />
@@ -136,11 +105,10 @@ export default function Dashboard() {
 
                     <div className="rounded-lg border border-sidebar-border/70 overflow-hidden bg-card shadow-sm w-full">
                         <Table>
-                            {/* TABLE CAPTION ADDED HERE */}
                             <TableCaption className="border-t py-4 text-[16px] font-medium text-muted-foreground bg-white/50">
                                 {displayedTheses} of {totalTheses} Theses
                             </TableCaption>
-                            
+
                             <TableHeader className="bg-primary">
                                 <TableRow className="hover:bg-transparent border-none">
                                     <TableHead className="text-primary-foreground font-medium h-12 text-center">Defense ID</TableHead>
@@ -153,31 +121,30 @@ export default function Dashboard() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {theses.map((item) => (
-                                    <TableRow key={item.id} className="text-center">
-                                        <TableCell className="text-[13px] font-dm text-foreground">{item.id}</TableCell>
+                                {groups.map((item: any) => (
+                                    <TableRow key={item.group_id} className="text-center">
+                                        <TableCell className="text-[13px] font-dm text-foreground">{item.defense_id}</TableCell>
                                         <TableCell className="text-left py-4">
-                                            <span className="text-[13px] line-clamp-2 min-w-[200px] font-dm">{item.title}</span>
+                                            <span className="text-[13px] line-clamp-2 min-w-[200px] font-dm">{item.thesis_title}</span>
                                         </TableCell>
-                                        <TableCell className="text-[13px] font-dm text-foreground">{item.adviser}</TableCell>
+                                        <TableCell className="text-[13px] font-dm text-foreground">{item.adviser_name}</TableCell>
                                         <TableCell className="text-[13px] font-dm text-foreground">{item.block}</TableCell>
                                         <TableCell>
                                             <div className="flex flex-col font-dm text-foreground leading-tight">
-                                                <span>{item.date}</span>
-                                                <span>{item.time}</span>
+                                                <span>{item.last_updated}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <span 
+                                            <span
                                                 className="inline-flex items-center justify-center px-3 py-1 rounded-full text-[13px] font-dm border min-w-[90px]"
-                                                style={item.status === 'On-Track' ? {
-                                                    backgroundColor: 'var(--completed-bg)', 
-                                                    borderColor: 'var(--completed-border)', 
-                                                    color: 'var(--completed-font-color)' 
+                                                style={item.status === 'On Track' ? {
+                                                    backgroundColor: 'var(--completed-bg)',
+                                                    borderColor: 'var(--completed-border)',
+                                                    color: 'var(--completed-font-color)'
                                                 } : {
-                                                    backgroundColor: 'var(--canceled-bg)', 
-                                                    borderColor: 'var(--canceled-border)', 
-                                                    color: 'var(--canceled-font-color)' 
+                                                    backgroundColor: 'var(--canceled-bg)',
+                                                    borderColor: 'var(--canceled-border)',
+                                                    color: 'var(--canceled-font-color)'
                                                 }}
                                             >
                                                 {item.status}
@@ -185,16 +152,16 @@ export default function Dashboard() {
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex items-center justify-center gap-4">
-                                                <InteractiveSvgIcon 
-                                                    defaultSrc={eyeDefault} 
-                                                    hoverSrc={eyeHover} 
+                                                <InteractiveSvgIcon
+                                                    defaultSrc={eyeDefault}
+                                                    hoverSrc={eyeHover}
                                                     clickedSrc={eyeClicked}
                                                     alt="View"
                                                     onClick={() => handleViewDetails(item)}
                                                 />
-                                                <InteractiveSvgIcon 
-                                                    defaultSrc={notifyDefault} 
-                                                    hoverSrc={notifyHover} 
+                                                <InteractiveSvgIcon
+                                                    defaultSrc={notifyDefault}
+                                                    hoverSrc={notifyHover}
                                                     clickedSrc={notifyClicked}
                                                     alt="Notify"
                                                     onClick={handleNotify}
@@ -207,10 +174,6 @@ export default function Dashboard() {
                         </Table>
                     </div>
                 </div>
-
-                {/* <div className="w-full mt-[120px]">
-                    <NavFooter />
-                </div> */}
             </div>
 
             {/* Modal: View Thesis Details */}
@@ -220,12 +183,12 @@ export default function Dashboard() {
                         <div className="space-y-6">
                             <section>
                                 <h4 className="text-[16px] font-bold text-primary mb-1 uppercase tracking-tight font-dm">Defense ID</h4>
-                                <p className="text-[16px] text-foreground">{selectedThesis.id}</p>
+                                <p className="text-[16px] text-foreground">{selectedThesis.defense_id}</p>
                             </section>
 
                             <section>
                                 <h4 className="text-[16px] font-bold text-primary mb-1 uppercase tracking-tight font-dm">Thesis Title</h4>
-                                <p className="text-[16px] leading-snug text-foreground">{selectedThesis.title}</p>
+                                <p className="text-[16px] leading-snug text-foreground">{selectedThesis.thesis_title}</p>
                             </section>
 
                             <div className="grid grid-cols-2 gap-4">
@@ -235,7 +198,7 @@ export default function Dashboard() {
                                 </section>
                                 <section>
                                     <h4 className="text-[16px] font-bold text-primary mb-1 uppercase tracking-tight font-dm">Thesis Adviser</h4>
-                                    <p className="text-[16px] text-foreground">{selectedThesis.adviser}</p>
+                                    <p className="text-[16px] text-foreground">{selectedThesis.adviser_name}</p>
                                 </section>
                             </div>
 
@@ -258,13 +221,7 @@ export default function Dashboard() {
                                         <div>
                                             <span className="text-[16px] font-bold text-primary block uppercase font-dm">Date</span>
                                             <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                                                <Calendar className="w-4 h-4" /> {selectedThesis.date}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <span className="text-[16px] font-bold text-primary block uppercase font-dm">Time</span>
-                                            <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                                                <Clock className="w-4 h-4" /> {selectedThesis.time}
+                                                <Calendar className="w-4 h-4" /> {selectedThesis.deadline}
                                             </div>
                                         </div>
                                     </div>
