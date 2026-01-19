@@ -352,10 +352,10 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col gap-2 overflow-y-auto pr-1" style={{ maxHeight: '600px' }}>
+                                    <div className="flex flex-col gap-2 overflow-y-auto pr-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]" style={{ maxHeight: '600px' }}>
                                         {available_panel.map((panelist) => (
                                             <div key={panelist.id} className="flex items-center gap-3 rounded-lg border bg-background p-3 shadow-sm">
-                                                <div className="h-2 w-2 rounded-full bg-green-500" />
+                                                <div className="h-2 w-2 rounded-full bg-[#800000]" />
                                                 <span className="text-sm font-medium text-foreground/80">{panelist.name}</span>
                                             </div>
                                         ))}
@@ -433,7 +433,7 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                                                                                     <Plus size={16} /> Add Panelist
                                                                                 </Button>
                                                                             </DropdownMenuTrigger>
-                                                                            <DropdownMenuContent align="end" className="w-56 max-h-[300px] overflow-y-auto">
+                                                                            <DropdownMenuContent align="end" className="w-56 max-h-[300px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                                                                                 <DropdownMenuLabel>Available Faculty</DropdownMenuLabel>
                                                                                 <DropdownMenuSeparator />
                                                                                 {available_panel.map((panelist) => {
