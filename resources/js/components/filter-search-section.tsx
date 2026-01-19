@@ -26,19 +26,28 @@ interface DefenseFilterState {
 }
 interface FilterSearchSectionProps {
     variant?: SectionVariant;
-    onSearchChange?: (val: string) => void;
-    onFilterApply?: (filters: DefenseFilterState) => void; 
-    onSortApply?: (sort: string) => void;
-    onClear?: () => void;
+    searchValue?: string;
+    onSearchChange?: (value: string) => void;
+    onFilterClick?: () => void;
+    onSortClick?: () => void;
+    onSortApply?: (value: string) => void;
+    onFilterApply?: (tags: string[]) => void;
+    onClearFilters?: () => void;
+    showFilterButton?: boolean;
 }
 
 export default function FilterSearchSection({ 
     variant = 'DefenseManagement',
+    searchValue,
     onSearchChange,
-    onFilterApply,
+    onFilterClick,
+    onSortClick,
+    onClearFilters,
     onSortApply,
-    onClear
+    onFilterApply,
+    showFilterButton = true
 }: FilterSearchSectionProps) {
+    const [localQuery, setLocalQuery] = useState('');
     const [query, setQuery] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [activeFilters, setActiveFilters] = useState<DefenseFilterState | null>(null);
@@ -50,6 +59,28 @@ export default function FilterSearchSection({
     // State to manage the Sort Modal visibility
     const [isSort3ModalOpen, setIsSort3ModalOpen] = useState(false);
     const [isSortModalOpen, setIsSortModalOpen] = useState(false);
+
+    // Determine values to use (Controlled vs Uncontrolled)
+    const activeQuery = searchValue !== undefined ? searchValue : localQuery;
+    const handleSearchChange = onSearchChange || setLocalQuery;
+
+    /**
+     * HANDLERS
+     * These wrap the internal state + parent callbacks
+     */
+    const handleInternalSortApply = (sortBy: string) => {
+        console.log("Sort Applied:", sortBy);
+        if (onSortApply) onSortApply(sortBy); // Send data to parent
+        setIsSortModalOpen(false);
+        setIsSort3ModalOpen(false);
+    };
+
+    const handleInternalFilterApply = (tags: string[]) => {
+        console.log("Filter Applied:", tags);
+        if (onFilterApply) onFilterApply(tags); // Send data to parent
+        setIsRepoFilterModalOpen(false);
+        setIsDMFilterModalOpen(false);
+    };
 
     /**
      * Container Style Mapping
@@ -125,8 +156,8 @@ export default function FilterSearchSection({
                     )}
                     <SearchBar 
                         variant="filter-section" 
-                        placeholder="Keywords, Terms..."
-                        value={searchQuery} 
+                        placeholder="Keywords, Terms..." 
+                        value={activeQuery} 
                         onChange={handleSearchChange}
                     />
                 </div>
@@ -213,7 +244,7 @@ export default function FilterSearchSection({
                                 variant="secondary" 
                                 size="icon" 
                                 className="rounded-lg border-none"
-                                onClick={() => setIsSortModalOpen(true)}
+                                onClick={onSortClick || (() => setIsSortModalOpen(true))}
                             >
                                 <Icon name="sortDefault" size={16} />
                             </Button>
@@ -246,7 +277,7 @@ export default function FilterSearchSection({
                                 variant="secondary" 
                                 size="icon" 
                                 className="rounded-lg border-none"
-                                onClick={() => setIsDMFilterModalOpen(true)}
+                                onClick={onFilterClick || (() => setIsDMFilterModalOpen(true))} // Calls the modal
                             >
                                 <Filter className="w-4 h-4" />
                             </Button>
@@ -294,7 +325,7 @@ export default function FilterSearchSection({
                     <div className="absolute right-60 mt-20 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                         <RepoFilter 
                             onClose={() => setIsRepoFilterModalOpen(false)} 
-                            onApply={handleApplyFilters}
+                            onApply={handleInternalFilterApply}
                         />
                     </div>
                 </>

@@ -1,7 +1,7 @@
 // Defense
 
 import * as React from 'react';
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Head } from '@inertiajs/react';
 import { defenses as defensesRoute } from '@/routes/admin/management/index';
 import FilterSearchSection from '@/components/filter-search-section';
@@ -11,12 +11,14 @@ import { cn } from "@/lib/utils";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { Calendar, TableIcon, X } from 'lucide-react';
+import { Calendar, TableIcon, X, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import DefenseManagementIcon from '@/components/Icons/defense_management.svg';
 import { CardContent } from '@/components/ui/card';
 import { DefenseCalendar } from '@/components/defense-calendar-monthly';
 import ManagementLayout from '.';
 import { BreadcrumbItem, PageHeaderProps } from '@/types';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 
 // PAGE CONFIGURATION
 const breadcrumbs: BreadcrumbItem[] = [
@@ -165,14 +167,70 @@ export default function DefenseTable({ defenses }: { defenses: Defense[] }) {
     // State for UI filters and view modes
     const [statusFilter, setStatusFilter] = useState<string>("upcoming");
     const [view, setView] = useState<string>("table");
+    const [searchQuery, setSearchQuery] = useState("");
+
+    // --- PAGINATION STATE ---
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+
+    // --- FILTER & SEARCH LOGIC ---
+    const filteredData = useMemo(() => {
+        let data = defenses || [];
+
+        // 1. Filter by Status
+        data = data.filter((def) => {
+            const status = def.status?.toLowerCase();
+            return statusFilter === "upcoming" 
+                ? (status === "upcoming" || !status) // Default to upcoming if null
+                : status === "completed";
+        });
+
+        // 2. Filter by Search Query
+        if (searchQuery) {
+            const lowerQuery = searchQuery.toLowerCase();
+            data = data.filter(def => 
+                (def.thesis_title && def.thesis_title.toLowerCase().includes(lowerQuery)) ||
+                (def.group_code && def.group_code.toLowerCase().includes(lowerQuery)) ||
+                (def.adviser_name && def.adviser_name.toLowerCase().includes(lowerQuery)) ||
+                (def.block && String(def.block).toLowerCase().includes(lowerQuery)) ||
+                (def.proponent_names && def.proponent_names.toLowerCase().includes(lowerQuery))
+            );
+        }
+
+        return data;
+    }, [defenses, statusFilter, searchQuery]);
+
+    /**
+     * Logic: UseMemo filters data based on the statusFilter state.
+     * Uses MOCK_DEFENSES if the passed 'defenses' prop is empty.
+     */
+    // const displayData = useMemo(() => {
+    //     const sourceData = (defenses?.length > 0 && defenses[0].title) ? defenses : MOCK_DEFENSES;
+    //     return sourceData.filter(def => {
+    //         const status = def.status?.toLowerCase() || "upcoming";
+    //         return statusFilter === "upcoming" ? (status === "upcoming") : status === "completed";
+    //     });
+    // }, [defenses, statusFilter]);
 
     const handleViewDetails = (def: Defense) => {
         setSelectedDef(def);
         setIsModalOpen(true);
     };
 
-     const [searchQuery, setSearchQuery] = useState('');
     const [activeFilters, setActiveFilters] = useState<any>({});
+
+    useEffect(() => {
+        setCurrentPage(1); // Reset to page 1 when filters change
+    }, [searchQuery, statusFilter, itemsPerPage]);
+
+    const totalItems = filteredData.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+    
+    const paginatedData = useMemo(() => {
+        return filteredData.slice(startIndex, startIndex + itemsPerPage);
+    }, [filteredData, startIndex, itemsPerPage]);
 
     // Handle Search
     const handleSearchChange = (val: string) => {
@@ -189,18 +247,6 @@ export default function DefenseTable({ defenses }: { defenses: Defense[] }) {
         setSearchQuery('');
         setActiveFilters({});
     };
-
-    // 4. Update your useMemo to include the Search Query
-    const filteredData = useMemo(() => {
-        return defenses?.filter((def) => {
-            const matchesStatus = statusFilter === (def.status?.toLowerCase() || "upcoming");
-            const matchesSearch = def.thesis_title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                 def.group_code?.toLowerCase().includes(searchQuery.toLowerCase());
-            
-            // Add logic for activeFilters (Adviser, Block, etc.) if filtering locally
-            return matchesStatus && matchesSearch;
-        }) || [];
-    }, [defenses, statusFilter, searchQuery, activeFilters]);
 
     const columns = useMemo(() => [
         { label: "ID", render: (d: Defense) => d.group_code || d.id },
@@ -239,11 +285,10 @@ export default function DefenseTable({ defenses }: { defenses: Defense[] }) {
                         
                         {/* Search and Advanced Filter Section */}
                         <FilterSearchSection 
-                            variant="DefenseManagement" 
-                            onSearchChange={handleSearchChange}
-                            onFilterApply={handleFilterApply}
-                            onSortApply={(sort) => console.log(sort)}
-                            onClear={handleClear}
+                            variant="DefenseManagement"
+                            searchValue={searchQuery}
+                            onSearchChange={setSearchQuery}
+                            showFilterButton={false}
                         />
                         
                         {/* Control Bar: View Switcher and Status Toggles */}
@@ -265,42 +310,153 @@ export default function DefenseTable({ defenses }: { defenses: Defense[] }) {
                         {/* Data Display Container */}
                         <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
                             {view === 'table' ? (
-                                <Table>
-                                    <TableCaption className="pb-4 font-dm text-alert-desc">End of defense records.</TableCaption>
-                                    <TableHeader className="bg-primary">
-                                        <TableRow className="hover:bg-transparent border-none">
-                                            {["ID", "Title", "Proponents", "Adviser", "Block", "Date & Time", "Type", "Action"].map((head) => (
-                                                <TableHead key={head} className="text-primary-foreground text-center text-[13px] font-bold">
-                                                    {head}
-                                                </TableHead>
-                                            ))}
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody className="divide-y divide-border">
-                                        {filteredData.length > 0 ? (
-                                            filteredData.map((def) => (
-                                                <TableRow key={def.id} className="hover:bg-accent/5 transition-colors group">
-                                                    {columns.map((col) => (
-                                                        <TableCell 
-                                                            key={col.label} 
-                                                            className={cn("text-center font-medium py-4", col.className)}
-                                                        >
-                                                            {col.render(def)}
-                                                        </TableCell>
+                                <>
+                                    {/* TABLE */}
+                                    <div className="overflow-x-auto min-h-[400px]">
+                                        <Table>
+                                            {/* Removed Caption to use footer stats instead */}
+                                            <TableHeader className="bg-primary">
+                                                <TableRow className="hover:bg-transparent border-none">
+                                                    {["ID", "Title", "Proponents", "Adviser", "Block", "Date & Time", "Type", "Action"].map((head) => (
+                                                        <TableHead key={head} className="text-primary-foreground text-center text-[13px] font-bold">
+                                                            {head}
+                                                        </TableHead>
                                                     ))}
                                                 </TableRow>
-                                            ))
-                                        ) : (
-                                            <TableRow>
-                                                <TableCell colSpan={columns.length} className="py-20 text-center text-alert-desc font-medium">
-                                                    No {statusFilter} defenses found in records.
-                                                </TableCell>
-                                            </TableRow>
-                                        )}
-                                    </TableBody>
-                                </Table>
+                                            </TableHeader>
+                                            <TableBody className="divide-y divide-border">
+                                                {paginatedData.length > 0 ? (
+                                                    paginatedData.map((def, index) => (
+                                                        <TableRow key={index} className="hover:bg-accent/5 transition-colors group">
+                                                            <TableCell className="text-center text-alert-desc font-medium">
+                                                                {def.group_code}
+                                                            </TableCell>
+                                                            <TableCell className="px-6 text-foreground max-w-[280px] truncate font-medium text-left">
+                                                                {def.thesis_title || 'Cannot Retrieve Title'}
+                                                            </TableCell>
+                                                            <TableCell className="text-center">
+                                                                <div className="flex items-center justify-center gap-2 font-bold text-primary">
+                                                                    <Icon name="proponentsDefault" size={18} />
+                                                                    <span>{def.proponents_count || '0'}</span>
+                                                                </div>
+                                                            </TableCell>
+                                                            <TableCell className="px-6 text-alert-desc text-left">
+                                                                {def.adviser_name || 'Dr. Cherry D. Casuat'}
+                                                            </TableCell>
+                                                            <TableCell className="text-center text-alert-desc">
+                                                                BSCPE {def.year_level}-{def.block}
+                                                            </TableCell>
+                                                            <TableCell className="text-center leading-tight">
+                                                                <div className="flex flex-col text-alert-desc">
+                                                                    <span className="font-semibold text-alert-default">{def.defense_date}</span>
+                                                                    <span className="text-[10px] font-bold uppercase text-alert-desc/70">{def.defense_time}</span>
+                                                                </div>
+                                                            </TableCell>
+                                                            <TableCell className="text-center text-alert-desc">
+                                                                {def.defense_type || 'Title Defense'}
+                                                            </TableCell>
+                                                            <TableCell className="text-center">
+                                                                <Button 
+                                                                    variant="tertiary" 
+                                                                    className="tertiary-btn h-8 px-5 text-[11px] font-bold uppercase" 
+                                                                    onClick={() => handleViewDetails(def)}
+                                                                >
+                                                                    View Details
+                                                                </Button>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))
+                                                ) : (
+                                                    <TableRow>
+                                                        <TableCell colSpan={8} className="py-20 text-center text-alert-desc font-medium">
+                                                            {searchQuery ? "No records found matching your search." : `No ${statusFilter} defenses found in records.`}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+
+                                    {/* PAGINATION FOOTER (Only show if data exists) */}
+                                    {totalItems > 0 && (
+                                        <div className="border-t border-border bg-gray-50/50 dark:bg-zinc-900/50 p-4">
+                                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                                
+                                                {/* Left: Info & Limit */}
+                                                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                                    <span className="whitespace-nowrap">
+                                                        Showing <strong>{startIndex + 1}</strong> - <strong>{endIndex}</strong> of <strong>{totalItems}</strong>
+                                                    </span>
+                                                    <div className="hidden sm:flex items-center gap-2">
+                                                        <span className="text-xs">Rows per page</span>
+                                                        <Select
+                                                            value={itemsPerPage.toString()} 
+                                                            onValueChange={(val) => setItemsPerPage(Number(val))}
+                                                        >
+                                                            <SelectTrigger className="h-8 w-[70px]">
+                                                                <SelectValue placeholder={itemsPerPage} />
+                                                            </SelectTrigger>
+                                                            <SelectContent side="top">
+                                                                {[5, 10, 20, 50].map((size) => (
+                                                                    <SelectItem key={size} value={size.toString()}>
+                                                                        {size}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                </div>
+
+                                                {/* Right: Buttons */}
+                                                <div className="flex items-center gap-1">
+                                                    <Button
+                                                        size="icon"
+                                                        className="h-8 w-8 hidden sm:flex"
+                                                        onClick={() => setCurrentPage(1)}
+                                                        disabled={currentPage === 1}
+                                                        title="First Page"
+                                                    >
+                                                        <ChevronsLeft className="h-4 w-4"/>
+                                                    </Button>
+                                                    <Button
+                                                        size="icon"
+                                                        className="h-8 w-8"
+                                                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                                        disabled={currentPage === 1}
+                                                        title="Previous Page"
+                                                    >
+                                                        <ChevronLeft className="h-4 w-4"/>
+                                                    </Button>
+                                                    
+                                                    <div className="flex items-center justify-center min-w-[3rem] px-2 text-sm font-semibold text-foreground">
+                                                        Page {currentPage} of {totalPages}
+                                                    </div>
+
+                                                    <Button
+                                                        size="icon"
+                                                        className="h-8 w-8"
+                                                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                                        disabled={currentPage === totalPages}
+                                                        title="Next Page"
+                                                    >
+                                                        <ChevronRight className="h-4 w-4"/>
+                                                    </Button>
+                                                    <Button
+                                                        size="icon"
+                                                        className="h-8 w-8 hidden sm:flex"
+                                                        onClick={() => setCurrentPage(totalPages)}
+                                                        disabled={currentPage === totalPages}
+                                                        title="Last Page"
+                                                    >
+                                                        <ChevronsRight className="h-4 w-4"/>
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
                             ) : (
-                                /* CALENDAR VIEW: Shows defense events in a monthly calendar layout */
+                                /* CALENDAR VIEW */
                                 <CardContent className='w-full px-0'><DefenseCalendar value={new Date()} /></CardContent>
                             )}
                         </div>

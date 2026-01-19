@@ -193,14 +193,28 @@ interface ActiveTerm {
     display_sy: string; // e.g., "2025-2026"
 }
 
+interface StatisticData {
+    school_year: string;
+    year_start: number;
+    faculty_count: number;
+    student_count: number;
+}
+
 interface DashboardProps {
     activeTerm: ActiveTerm;
     currentDate: string;
+    statistics: StatisticData[];
+    totalActiveStudents: number;
+    totalActiveFaculty: number;
+    userFullName: string;
 }
 
 
-export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
+export default function Dashboard({ activeTerm, currentDate, totalActiveFaculty, totalActiveStudents, userFullName }: DashboardProps) {
     // console.log('Notifications:', notifications);
+
+    // Total Users Calculation
+    const totalUsers = totalActiveFaculty + totalActiveStudents;
 
     return (
         <>
@@ -215,7 +229,7 @@ export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
                                 {/* Left side - Welcome message */}
                                 <div>
                                     <h1 className={`text-[42px] font-bold leading-tight text-primary`}>
-                                        Welcome back, Engr. Dela Cruz
+                                        Welcome back, {userFullName}
                                     </h1>
                                     <p className="mt-1 text-lg text-gray-700">
                                         Department of Computer Engineering | Department Head
@@ -287,10 +301,18 @@ export default function Dashboard({ activeTerm, currentDate }: DashboardProps) {
                                     title="TOTAL ACTIVE USERS"
                                 >
                                     <MetricContent
-                                        total={286}
+                                        total= {totalUsers}
                                         items={[
-                                            { label: 'Total Students', value: 256, color: 'var(--alert-info)', },
-                                            { label: 'Total Faculty', value: 30, color: 'var(--alert-success)', },
+                                            {
+                                                label: 'Total Students',
+                                                value: totalActiveStudents,
+                                                color: 'var(--alert-info)',
+                                            },
+                                            {
+                                                label: 'Total Faculty',
+                                                value: totalActiveFaculty,
+                                                color: 'var(--alert-success)',
+                                            },
                                         ]}
                                     />
                                 </MetricCard>

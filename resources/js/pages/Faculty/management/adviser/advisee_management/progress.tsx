@@ -16,12 +16,13 @@ import {
 import { index } from '@/routes/faculty/adviser/group_comp/index';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import { Filter, Users } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Filter, Users, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { useEffect, useState, useMemo, useEffect } from 'react';
 import AdviseeManagementLayout from '.';
 import { GroupDetailCard, GroupOverviewCard } from './components/card-progress';
 import { BlockAndTagsFilter } from './components/progress-filter-search';
 import ProgressTrackingIcon from '@/components/Icons/progress_tracking.svg';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // Setup
 const breadcrumb: BreadcrumbItem[] = [
@@ -139,6 +140,10 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
     const [statusTags, setStatusTags] = useState<number[]>([0, 1, 2]);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
 
+    // --- PAGINATION STATE ---
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+
     // Filter logic
     const filteredGroups = normalizedGroups.filter((group) => {
         const matchesSearch =
@@ -162,6 +167,20 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
 
         return matchesSearch && matchesBlock && matchesTag && matchesStatus;
     });
+
+    // --- PAGINATION LOGIC ---
+    useEffect(() => {
+        setCurrentPage(1); // Reset to page 1 whenever filters change
+    }, [searchTerm, selectedBlock, selectedTags, statusTags, itemsPerPage]);
+
+    const totalItems = filteredGroups.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+
+    const paginatedGroups = useMemo(() => {
+        return filteredGroups.slice(startIndex, startIndex + itemsPerPage);
+    }, [filteredGroups, startIndex, itemsPerPage]);
 
     // Helper to get badge
 
@@ -382,8 +401,8 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {filteredGroups.length > 0 ? (
-                            filteredGroups.map((group, index) => (
+                        {paginatedGroups.length > 0 ? (
+                            paginatedGroups.map((group, index) => (
                                 <TableRow key={index}>
                                     <TableCell className="text-center font-medium">
                                         {group.group_code}
@@ -440,9 +459,84 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
                     </TableBody>
                 </Table>
 
-                <div className="border-t px-6 py-4 text-center text-sm text-alert-desc">
-                    {filteredGroups.length} of {displayGroups.length} Groups
-                </div>
+                {/* PAGINATION FOOTER */}
+                {totalItems > 0 && (
+                    <div className="border-t border-gray-200 bg-gray-50/50 dark:border-zinc-800 dark:bg-zinc-900/50 p-4">
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                            
+                            {/* Left Side: Info & Limit Selector */}
+                            <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                                <span className="whitespace-nowrap">
+                                    Showing <strong>{startIndex + 1}</strong> - <strong>{endIndex}</strong> of <strong>{totalItems}</strong>
+                                </span>
+                                
+                                <div className="hidden sm:flex items-center gap-2">
+                                    <span className="text-xs">Rows per page</span>
+                                    <Select
+                                        value={itemsPerPage.toString()} 
+                                        onValueChange={(val) => setItemsPerPage(Number(val))}
+                                    >
+                                        <SelectTrigger className="h-8 w-[70px]">
+                                            <SelectValue placeholder={itemsPerPage} />
+                                        </SelectTrigger>
+                                        <SelectContent side="top">
+                                            {[5, 10, 20, 50].map((size) => (
+                                                <SelectItem key={size} value={size.toString()}>
+                                                    {size}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+
+                            {/* Right Side: Navigation Buttons */}
+                            <div className="flex items-center gap-1">
+                                <Button
+                                    size="icon"
+                                    className="h-8 w-8 hidden sm:flex"
+                                    onClick={() => setCurrentPage(1)}
+                                    disabled={currentPage === 1}
+                                    title="First Page"
+                                >
+                                    <ChevronsLeft className="h-4 w-4"/>
+                                </Button>
+                                <Button
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                    disabled={currentPage === 1}
+                                    title="Previous Page"
+                                >
+                                    <ChevronLeft className="h-4 w-4"/>
+                                </Button>
+                                
+                                <div className="flex items-center justify-center min-w-[3rem] px-2 text-sm font-semibold text-gray-900 dark:text-white">
+                                    Page {currentPage} of {totalPages}
+                                </div>
+
+                                <Button
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                    disabled={currentPage === totalPages}
+                                    title="Next Page"
+                                >
+                                    <ChevronRight className="h-4 w-4"/>
+                                </Button>
+                                <Button
+                                    size="icon"
+                                    className="h-8 w-8 hidden sm:flex"
+                                    onClick={() => setCurrentPage(totalPages)}
+                                    disabled={currentPage === totalPages}
+                                    title="Last Page"
+                                >
+                                    <ChevronsRight className="h-4 w-4"/>
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Filters Modal */}

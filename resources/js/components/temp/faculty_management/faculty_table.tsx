@@ -54,7 +54,7 @@ export function FacultyTable({ data, onViewEdit }: FacultyTableProps) {
                 </TableCell>
 
                 {/* Faculty Name */}
-                <TableCell className="text-center">
+                <TableCell className="flex justify-left">
                   <div className="flex items-center justify-center gap-2">
                     {faculty.hasPhoto ? (
                       <img

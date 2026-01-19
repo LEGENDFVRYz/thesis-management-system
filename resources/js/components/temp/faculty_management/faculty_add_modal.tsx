@@ -6,17 +6,22 @@ import { CheckboxWithLabel } from "@/components/ui/checkbox-with-label";
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { X, Upload, Check } from 'lucide-react';
+import { X, Upload, Check, AlertCircle} from 'lucide-react';
 import { useFacultyValidation } from './faculty_validation';
 import { router } from '@inertiajs/react';
 
+interface SectionOption {
+  value: string;
+  label: string;
+}
 interface AddFacultyModalProps {
   isOpen: boolean;
   onClose: () => void;
+  availableSections: SectionOption[];
 }
 
 // Success Popup Component
-function SuccessPopup({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+function SuccessPopup({ isOpen, onClose}: { isOpen: boolean; onClose: () => void }) {
   if (!isOpen) return null;
 
   return (
@@ -47,7 +52,7 @@ function SuccessPopup({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
   );
 }
 
-export function AddFacultyModal({ isOpen, onClose }: AddFacultyModalProps) {
+export function AddFacultyModal({ isOpen, onClose, availableSections = [] }: AddFacultyModalProps) {
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -74,6 +79,9 @@ export function AddFacultyModal({ isOpen, onClose }: AddFacultyModalProps) {
   } = useFacultyValidation();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Check if there are sections available
+  const hasAvailableSections = availableSections.length > 0;
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -108,8 +116,8 @@ export function AddFacultyModal({ isOpen, onClose }: AddFacultyModalProps) {
               return "Coordinator";
           if (role === "Thesis Adviser")
               return "Adviser";
-          if (role === "Panel Member")
-              return "Panelist";
+          // if (role === "Panel Member")
+          //     return "Panelist";
           return role;
       });
 
@@ -185,7 +193,7 @@ export function AddFacultyModal({ isOpen, onClose }: AddFacultyModalProps) {
         <div className="bg-white rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto">
           {/* Header */}
           <div className="bg-primary text-white p-6 rounded-t-lg relative">
-            <h2 className="text-[35px] font-bold text-center">Add Faculty</h2>
+            <h2 className="text-[25px] font-bold text-center">Add Faculty</h2>
             <Button variant="link"
               onClick={handleCancel}
               className="absolute right-4 top-4 text-white hover:text-gray-200"
@@ -198,7 +206,7 @@ export function AddFacultyModal({ isOpen, onClose }: AddFacultyModalProps) {
             {/* Photo Upload */}
             <div className="flex flex-col items-center mb-6">
               <div 
-                className="w-45 h-45 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
+                className="w-30 h-30 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
                 onClick={() => fileInputRef.current?.click()}
               >
                 {formData.photoPreview ? (
@@ -351,7 +359,7 @@ export function AddFacultyModal({ isOpen, onClose }: AddFacultyModalProps) {
                   >
                     <RadioGroupItemWithLabel id="fullTime" value="Full-time" label="Full-time" />
                     <RadioGroupItemWithLabel id="partTime" value="Part-time" label="Part-time" />
-                    <RadioGroupItemWithLabel id="external" value="External (Non-Faculty)" label="External (Non-Faculty)" />
+                    {/* <RadioGroupItemWithLabel id="external" value="External (Non-Faculty)" label="External (Non-Faculty)" /> */}
                   </RadioGroup>
                   {errors.facultyType && touched.facultyType && isSubmitAttempted && (
                     <p className="text-red-500 text-xs mt-1">{errors.facultyType}</p>
@@ -377,14 +385,23 @@ export function AddFacultyModal({ isOpen, onClose }: AddFacultyModalProps) {
                   label="Thesis Adviser"
                   checked={formData.roles.includes("Thesis Adviser")}
                   onCheckedChange={() => onRoleToggle("Thesis Adviser")}
+                  disabled={!hasAvailableSections}
                 />
-                <CheckboxWithLabel
+                {/* <CheckboxWithLabel
                   id="panelMember"
                   label="Panel Member"
                   checked={formData.roles.includes("Panel Member")}
                   onCheckedChange={() => onRoleToggle("Panel Member")}
-                />
+                /> */}
               </div>
+
+              {/* SHOW WARNING IF NO SECTIONS */}
+              {!hasAvailableSections && (
+                  <div className="flex items-center gap-2 p-2 mb-2 bg-yellow-50 text-yellow-700 text-xs rounded border border-yellow-200">
+                      <AlertCircle className="w-4 h-4" />
+                      <span>All sections currently have an assigned adviser.</span>
+                  </div>
+              )}
 
               {formData.roles.includes("Thesis Adviser") && (
                 <div>
@@ -405,13 +422,11 @@ export function AddFacultyModal({ isOpen, onClose }: AddFacultyModalProps) {
                       <SelectValue placeholder="Select Block..." />
                     </SelectTrigger>
                     <SelectContent className='!w-100'>
-                      <SelectItem value="1">BSCPE Section 1</SelectItem>
-                      <SelectItem value="2">BSCPE Section 2</SelectItem>
-                      <SelectItem value="3">BSCPE Section 3</SelectItem>
-                      <SelectItem value="4">BSCPE Section 4</SelectItem>
-                      <SelectItem value="5">BSCPE Section 5</SelectItem>
-                      <SelectItem value="6">BSCPE Section 6</SelectItem>
-                      <SelectItem value="7">BSCPE Section 7</SelectItem>
+                      {availableSections.map((section) => (
+                        <SelectItem key={section.value} value={section.value}>
+                            {section.label} 
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   {errors.adviseeBlock && touched.adviseeBlock && isSubmitAttempted && (
