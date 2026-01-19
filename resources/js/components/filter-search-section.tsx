@@ -62,7 +62,7 @@ export default function FilterSearchSection({
 
     // Determine values to use (Controlled vs Uncontrolled)
     const activeQuery = searchValue !== undefined ? searchValue : localQuery;
-    const handleSearchChange = onSearchChange || setLocalQuery;
+    // const handleSearchChange = onSearchChange || setLocalQuery;
 
     /**
      * HANDLERS
@@ -271,7 +271,7 @@ export default function FilterSearchSection({
                     )}
 
                     {/* --- FILTER MODAL TRIGGER --- */}
-                    {variant !== 'Notifications' && variant !== 'Committee' && (
+                    {variant !== 'Notifications' && variant !== 'Committee' && showFilterButton && (
                         <div className="relative">
                             <Button 
                                 variant="secondary" 
@@ -318,29 +318,48 @@ export default function FilterSearchSection({
             </div>
 
             {/* --- INTEGRATED REPO FILTER MODAL --- */}
-            {isRepoFilterModalOpen && (
-                <>
-                    <div className="fixed inset-0 flex items-center justify-center z-50 p-4" onClick={() => setIsRepoFilterModalOpen(false)} />
-                    
-                    <div className="absolute right-60 mt-20 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                        <RepoFilter 
-                            onClose={() => setIsRepoFilterModalOpen(false)} 
-                            onApply={handleInternalFilterApply}
-                        />
-                    </div>
-                </>
-            )}
+            <Dialog open={isRepoFilterModalOpen} onOpenChange={setIsRepoFilterModalOpen}>
+                {/* Technical Note: DialogContent has border/bg removed to let the 
+                    RepoFilter's internal shadow and bg-white container show through cleanly.
+                */}
+                <DialogContent className="max-w-md p-0 border-none bg-transparent shadow-none outline-none">
+                    <RepoFilter 
+                        onClose={() => setIsRepoFilterModalOpen(false)} 
+                        onApply={handleApplyFilters}
+                    />
+                </DialogContent>
+            </Dialog>
+
+            {/* --- INTEGRATED DEFENSE MANAGEMENT FILTER MODAL --- */}
+            <Dialog open={isDMFilterModalOpen} onOpenChange={setIsDMFilterModalOpen}>
+                {/* Technical Note: DialogContent has border/bg removed to let the 
+                    RepoFilter's internal shadow and bg-white container show through cleanly.
+                */}
+                <DialogContent className="max-w-md p-0 border-none bg-transparent shadow-none outline-none [&>button]:hidden justify-center">
+                    <DefenseManagementFilter 
+                        onClose={() => setIsDMFilterModalOpen(false)} 
+                    />
+                </DialogContent>
+            </Dialog>
 
             {/* --- INTEGRATED SORT MODAL --- */}
-            {isSort3ModalOpen && (
-                <>
-                    <div className="fixed inset-0 flex items-center justify-center z-50 p-4" onClick={() => setIsSort3ModalOpen(false)} />
-                    
-                    <div className="absolute right-90 mt-20 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                        <Sort3/>
-                    </div>
-                </>
-            )}
+            <Dialog open={isSort3ModalOpen} onOpenChange={setIsSort3ModalOpen}>
+                <DialogContent className="max-w-md p-0 border-none bg-transparent shadow-none outline-none">
+                    {/* The call to Sort3 */}
+                    <Sort3/>
+                </DialogContent>
+            </Dialog>
+
+            {/* --- INTEGRATED GENERAL SORT MODAL --- */}
+            <Dialog open={isSortModalOpen} onOpenChange={setIsSortModalOpen}>
+                <DialogContent className="max-w-md p-0 border-none bg-transparent shadow-none outline-none [&>button]:hidden justify-center">
+                    {/* The call to General Sort */}
+                    <GeneralSort 
+                        onClose={() => setIsSortOpen(false)} 
+                        onApply={handleApplySort} 
+                    />
+                </DialogContent>
+            </Dialog>
 
         </div>
     );

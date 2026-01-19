@@ -17,7 +17,7 @@ import { index } from '@/routes/faculty/adviser/group_comp/index';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Filter, Users, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
-import { useEffect, useState, useMemo, useEffect } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import AdviseeManagementLayout from '.';
 import { GroupDetailCard, GroupOverviewCard } from './components/card-progress';
 import { BlockAndTagsFilter } from './components/progress-filter-search';
