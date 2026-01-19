@@ -131,13 +131,17 @@ class GroupComp extends Controller
             ->join('tbl_faculty_assignments as fa', 'adviser.id', '=', 'fa.faculty_id')
             ->join('tbl_section_advisers as sa', 'fa.id', '=', 'sa.faculty_assign_id')
             ->leftJoin('tbl_school_years as sy', 'fa.sy_id', '=', 'sy.id')
-            ->join('tbl_semesters as sem', 'sy.id', '=', 'sem.school_year_id')
             ->join('tbl_students as s', 'sa.section', '=', 's.section')
             ->join('users as u', 's.user_id', '=', 'u.id')
             ->where('adviser.user_id', $userId)
             ->where('fa.is_active', 1)
-            ->where('sem.is_active', 1)
             ->whereNull('s.group_id')
+            ->where('fa.sy_id', function ($query) {
+                $query->select('school_year_id')
+                    ->from('tbl_semesters')
+                    ->where('is_active', 1)
+                    ->limit(1);
+            })
             ->groupBy([
                 's.id',
                 's.last_name',
@@ -193,11 +197,22 @@ class GroupComp extends Controller
             return back()->withErrors(['members' => 'Exactly one member must be designated as leader.']);
         }
 
-        // Generate the next group number for this section adviser
-        $maxGroupNumber = DB::table('tbl_thesis_groups')
+        // Generate the next group number for this section adviser, filling in any gaps
+        $existingGroupNumbers = DB::table('tbl_thesis_groups')
             ->where('section_adviser_id', $validated['section_adviser_id'])
-            ->max('group_number') ?? 0;
-        $newGroupNumber = $maxGroupNumber + 1;
+            ->pluck('group_number')
+            ->sort()
+            ->values()
+            ->all();
+
+        $newGroupNumber = 1;
+        foreach ($existingGroupNumbers as $number) {
+            if ($number == $newGroupNumber) {
+                $newGroupNumber++;
+            } else {
+                break; // Found a gap
+            }
+        }
 
         // Create the thesis group
         $groupId = DB::table('tbl_thesis_groups')->insertGetId([
