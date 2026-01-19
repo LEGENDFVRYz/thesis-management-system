@@ -374,18 +374,67 @@ const submittedDocuments = [
     { id: 3, name: 'Source_Code_Documentation.pdf', size: '1.2 MB', version: 'v2' },
 ];
 
+const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, subtitle }: { isOpen: boolean; onClose: () => void; onConfirm: () => void; title?: string; subtitle?: string }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-150">
+            <div className="bg-white rounded-xl shadow-lg py-6 px-8 w-full max-w-[340px] flex flex-col items-center text-center animate-in zoom-in-95 duration-150 font-dm">
+                
+                {/* Red Exclamation Icon */}
+                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mb-4">
+                    <span className="text-white text-xl font-semibold">!</span>
+                </div>
+
+                {/* Text Content */}
+                <p className="text-sm font-medium text-foreground mb-0.5">
+                    {title || 'Are you sure you want to submit?'}
+                </p>
+                <p className="text-xs text-muted-foreground mb-5">
+                    {subtitle || 'This action cannot be undone.'}
+                </p>
+
+                {/* Buttons */}
+                <div className="flex gap-3 w-full">
+                    <button 
+                        onClick={onClose} 
+                        className="flex-1 py-2 px-4 rounded-full border border-border text-foreground text-xs font-medium hover:bg-muted transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        onClick={onConfirm} 
+                        className="flex-1 py-2 px-4 rounded-full bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
+                    >
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const DocumentReviewView = ({ advisory, onBack }: { advisory: Advisory, onBack: () => void }) => {
     const [activeTab, setActiveTab] = useState<'review' | 'evaluation'>('review');
     const [ratings, setRatings] = useState<Record<string, number>>({});
     const [decision, setDecision] = useState<string>('');
     const [selectedDocumentId, setSelectedDocumentId] = useState<number>(1);
     const [isExiting, setIsExiting] = useState(false);
+    
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [showDraftModal, setShowDraftModal] = useState(false);
 
     const handleReturn = () => {
         setIsExiting(true);
         setTimeout(() => {
             onBack();
         }, 200);
+    };
+
+    const handleConfirmSubmit = () => {
+        // Handle actual submission logic here
+        console.log("Submitted!");
+        setShowConfirmModal(false);
     };
 
     let panelists: PanelReview[] = [];
@@ -432,6 +481,24 @@ const DocumentReviewView = ({ advisory, onBack }: { advisory: Advisory, onBack: 
     
     return (
         <FacultyManagementLayout breadcrumbs={[{ title: 'Evaluation', href: '#' }]} pageHeader={undefined}>
+            
+            <ConfirmationModal 
+                isOpen={showConfirmModal}
+                onClose={() => setShowConfirmModal(false)}
+                onConfirm={handleConfirmSubmit}
+            />
+
+            <ConfirmationModal 
+                isOpen={showDraftModal}
+                onClose={() => setShowDraftModal(false)}
+                onConfirm={() => {
+                    setShowDraftModal(false);
+                    // Handle save draft logic here
+                }}
+                title="Are you sure you want to save changes?"
+                subtitle="This action cannot be undone."
+            />
+
              <div className={`font-dm transition-all duration-200 ease-out ${isExiting ? 'opacity-0 translate-x-4' : 'opacity-100 translate-x-0'}`}>
                 <div className="mb-6">
                     <button onClick={handleReturn} className="flex items-center text-primary font-bold hover:underline gap-1 transition-transform hover:-translate-x-1">
@@ -550,6 +617,51 @@ const DocumentReviewView = ({ advisory, onBack }: { advisory: Advisory, onBack: 
                                 </div>
                             </div>
 
+                            {/* Panel Evaluation Cards */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                                {panelists.length > 0 ? panelists.map((panel, idx) => {
+                                    // Determine badge and remarks for demo: first is Accepted, second is Rejected
+                                    let badgeText = 'Accepted';
+                                    let badgeClass = 'bg-[#D1FAE5] text-[#065F46]';
+                                    if (idx === 1) {
+                                        badgeText = 'Rejected';
+                                        badgeClass = 'bg-[#FEE2E2] text-[#991B1B]';
+                                    }
+                                    return (
+                                        <div key={idx} className="bg-[#FFFCF5] border border-gray-100 rounded-xl p-6 shadow-md font-dm">
+                                            <div className="flex items-center gap-3 mb-5">
+                                                <div className="w-10 h-10 rounded-full bg-[#9B2C2C] text-white flex items-center justify-center text-body-2 font-bold shadow-sm">
+                                                    P{idx + 1}
+                                                </div>
+                                                <span className="font-semibold text-black text-body-1">{panel.name}</span>
+                                            </div>
+                                            <div className="flex justify-between items-start mb-5">
+                                                <div>
+                                                    <p className="text-[#8B0000] font-semibold text-body-2 mb-1">Total Score</p>
+                                                    <p className="text-black font-bold text-lg">{panel.grade || 'N/A'}</p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-[#8B0000] font-semibold text-body-2 mb-1">Evaluation Decision</p>
+                                                    <span className={`inline-block px-4 py-1.5 rounded-full text-body-3 font-semibold ${badgeClass}`}>
+                                                        {badgeText}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <p className="text-[#8B0000] font-semibold text-body-2 mb-2">Comments/Recommendations</p>
+                                                <p className="text-gray-700 text-body-2 leading-relaxed">
+                                                    {panel.comment || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    );
+                                }) : (
+                                    <div className="col-span-3 text-center py-8 text-muted-foreground text-body-1 italic">
+                                        No panel evaluations available
+                                    </div>
+                                )}
+                            </div>
+
 
                             {activeTab === 'review' ? (
                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -623,7 +735,10 @@ const DocumentReviewView = ({ advisory, onBack }: { advisory: Advisory, onBack: 
                                             placeholder="Enter your comments and recommendations here..."
                                         ></textarea>
                                         <div className="flex justify-end mt-4">
-                                            <button className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2.5 px-6 rounded-lg transition-colors">
+                                            <button 
+                                                onClick={() => setShowConfirmModal(true)}
+                                                className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2.5 px-6 rounded-lg transition-colors"
+                                            >
                                                 <Send className="w-4 h-4" />
                                                 Submit Comment
                                             </button>
@@ -674,7 +789,7 @@ const DocumentReviewView = ({ advisory, onBack }: { advisory: Advisory, onBack: 
                                                                 
                                                                 {[1, 2, 3, 4].map((val, idx) => (
                                                                     <th key={val} className={`px-2 py-1 text-center font-bold text-black w-[40px] border-b border-gray-400 ${idx === 3 ? 'border-r border-gray-400' : 'border-r border-gray-300'}`}>
-                                                                            {val}
+                                                                                {val}
                                                                     </th>
                                                                 ))}
                                                             </tr>
@@ -689,7 +804,7 @@ const DocumentReviewView = ({ advisory, onBack }: { advisory: Advisory, onBack: 
                                                                         <td key={ratingIdx} className="px-4 py-4 text-muted-foreground border-r border-border bg-card align-top text-sm">
                                                                             <span className="leading-snug">{desc}</span>
                                                                         </td>
-                                                                    ))}                                                                    
+                                                                    ))}                                                        
                                                                     {[1, 2, 3, 4].map((val) => (
                                                                         <td key={val} className="px-2 py-4 bg-[#FCFCFC] text-center border-r border-border align-middle w-[40px]">
                                                                             <div className="flex items-center justify-center h-full">
@@ -762,7 +877,16 @@ const DocumentReviewView = ({ advisory, onBack }: { advisory: Advisory, onBack: 
                                         </div>
 
                                         <div className="flex justify-end gap-3 pt-4 border-t border-border mt-6">
-                                            <button className="primary-btn px-6 py-2.5 rounded-lg text-body-3 font-bold">
+                                            <button 
+                                                onClick={() => setShowDraftModal(true)}
+                                                className="primary-btn px-6 py-2.5 rounded-lg text-body-3 font-bold"
+                                            >
+                                                <Save className="w-4 h-4 inline mr-2" /> Save as Draft
+                                            </button>
+                                            <button 
+                                                onClick={() => setShowConfirmModal(true)}
+                                                className="primary-btn px-6 py-2.5 rounded-lg text-body-3 font-bold"
+                                            >
                                                 <Send className="w-4 h-4 inline mr-2" /> Submit Grades
                                             </button>
                                         </div>
@@ -843,8 +967,6 @@ export default function EvalAndGrading({ myAdvisories }: EvalGradingProps) {
             )}
 
             <div className="flex flex-col w-full space-y-6 font-dm">
-                
-
                 
                 <div className="flex justify-end w-full pr-4">
                     <StageSwitchToggle 
