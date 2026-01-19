@@ -32,6 +32,7 @@ use App\Http\Controllers\Shared\ThesisArchive;
 use App\Http\Controllers\Student\EvaluationController;
 use App\Http\Controllers\Student\MatrixController;
 use App\Http\Controllers\Student\ProgressController;
+use App\Http\Controllers\Student\ThesisManagementController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -96,6 +97,26 @@ Route::middleware(['auth', 'role:student'])->group(function () {
         Route::get('thesis', function () {
             return Inertia::render('Student/management/thesis-management/thesis');
         })->name('student.management.thesis');
+
+        # Thesis Management
+        Route::prefix('thesis')->name('student.thesis.')->group(function () {
+            
+            // 1. Documents (Default Page)
+            Route::get('/documents', [ThesisManagementController::class, 'documents'])->name('documents');
+
+            // 2. Compare
+            Route::get('/compare', [ThesisManagementController::class, 'compare'])->name('compare');
+
+            // 3. Workflow
+            Route::get('/workflow', [ThesisManagementController::class, 'workflow'])->name('workflow');
+
+            // 4. Final Submission
+            Route::get('/final-submission', [ThesisManagementController::class, 'finalSubmission'])->name('final.submission');
+
+            // 5. Change Request
+            Route::get('/change-request', [ThesisManagementController::class, 'changeRequest'])->name('request');
+        });
+
 
         # Defense Management
         Route::get('defense_matrix', [MatrixController::class, 'index'])->name('student.management.defense_matrix');
