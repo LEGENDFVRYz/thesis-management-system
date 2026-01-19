@@ -326,7 +326,7 @@ export default function Dashboard({ sections, available_panel, endorsed_thesis }
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="primary">
-                                            <span className={selectedSection ? "text-foreground" : ""}>
+                                            <span>
                                                 {selectedSection || "Select Section"}
                                             </span>
                                             <ChevronDown className="h-4 w-4 opacity-50" />
