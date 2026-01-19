@@ -63,42 +63,77 @@ interface Proposal {
     manuscriptUrl?: string;
 }
 
-const mockProposals: Proposal[] = Array(6).fill({
-    id: '1',
-    title: 'Cloud-Based Hospital Management System',
-    groupCode: '[GROUP CODE e.g 2101]',
-    proponents: ['William Brown', 'Amelia Wilson', 'Benjamin Lee'],
-    block: 'BSCpE 3-3',
-    adviser: 'Prof. James Lee',
-    approvalDate: '12/5/2025',
-    status: 'Endorsed',
-    manuscriptUrl: 'https://www.w3.org/WAI/WCAG21/Techniques/pdf/pdf1.pdf',
-    panelMembers: [
-        { id: 'p1', role: 'P1', name: 'Dr. Robert Chen' },
-        { id: 'p2', role: 'P2', name: 'Dr. Sofia Smith' },
-        { id: 'p3', role: 'P3', name: 'Engr. John Johnson' },
-    ],
-}).map((item, index) => ({ ...item, id: index.toString() }));
+
+
+const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, subtitle }: { isOpen: boolean; onClose: () => void; onConfirm: () => void; title?: string; subtitle?: string }) => {
+    if (!isOpen) return null;
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-150">
+            <div className="bg-white rounded-xl shadow-lg py-6 px-8 w-full max-w-[340px] flex flex-col items-center text-center animate-in zoom-in-95 duration-150 font-dm">
+                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mb-4">
+                    <span className="text-white text-xl font-semibold">!</span>
+                </div>
+                <p className="text-sm font-medium text-foreground mb-0.5">
+                    {title || 'Are you sure you want to submit this endorsement?'}
+                </p>
+                <p className="text-xs text-muted-foreground mb-5">
+                    {subtitle || 'This action cannot be undone.'}
+                </p>
+                <div className="flex gap-3 w-full">
+                    <button 
+                        onClick={onClose} 
+                        className="flex-1 py-2 px-4 rounded-full border border-border text-foreground text-xs font-medium hover:bg-muted transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        onClick={onConfirm} 
+                        className="flex-1 py-2 px-4 rounded-full bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
+                    >
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const EndorsementCard = ({ data }: { data: Proposal }) => {
     const [showPreview, setShowPreview] = useState(false);
     const [showEndorseModal, setShowEndorseModal] = useState(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [remarks, setRemarks] = useState('');
 
     const { put, processing } = useForm({});
 
     const handleEndorseSubmit = () => {
+        setShowConfirmModal(true);
+    };
+
+    const [successMsg, setSuccessMsg] = useState('');
+    const handleConfirmEndorse = () => {
         put(`/faculty/management/adviser/endorsement/${data.id}`, {
             onSuccess: () => {
                 setShowEndorseModal(false);
+                setShowConfirmModal(false);
                 setRemarks('');
+                setSuccessMsg('Endorsement submitted successfully!');
+                setTimeout(() => setSuccessMsg(''), 3000);
             },
-            onError: (err:any) => console.error(err)
+            onError: (err:any) => {
+                setShowConfirmModal(false);
+                console.error(err);
+            }
         });
     };
 
     return (
         <>
+            {successMsg && (
+                <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-[200] bg-green-600 text-white px-6 py-3 rounded shadow-lg animate-in fade-in duration-200">
+                    {successMsg}
+                </div>
+            )}
             <div className="bg-card dark:bg-card rounded-[var(--radius-lg)] shadow-sm border border-border p-5 flex flex-col h-full hover:shadow-md transition-shadow">
             
                 <div className="flex justify-between items-start mb-2">
@@ -150,7 +185,7 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                         <Eye size={14} /> 
                         View Manuscript
                     </button>
-                    {/* Reverted Endorse Button to Outline/White style */}
+              
                     {data.status !== 'Endorsed' ? (
                         <button 
                             onClick={() => setShowEndorseModal(true)}
@@ -197,7 +232,6 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
             {showEndorseModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm font-dm">
                     <div className="bg-background rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-border/50">
-                        
                         {/* Primary Color Header */}
                         <div className="bg-primary text-primary-foreground px-6 py-5 flex items-center justify-between">
                             <div className="flex items-center gap-3">
@@ -216,7 +250,6 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                                 <X size={18} />
                             </button>
                         </div>
-
                         <div className="p-6">
                             {/* Thesis Title Card */}
                             <div className="bg-muted/50 rounded-lg p-4 mb-5 border border-border/50">
@@ -225,7 +258,6 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                                     {data.title}
                                 </h3>
                             </div>
-
                             {/* Info Grid */}
                             <div className="grid grid-cols-2 gap-4 mb-5">
                                 <div className="space-y-3">
@@ -253,7 +285,6 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                                     </div>
                                 </div>
                             </div>
-
                             {/* Confirmation Box */}
                             <div className="bg-[var(--revision-bg)] border border-[var(--revision-border)] rounded-lg p-4 flex gap-3">
                                 <div className="p-1.5 bg-[var(--revision-border)]/30 rounded-full h-fit">
@@ -272,7 +303,6 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                                 </div>
                             </div>
                         </div>
-
                         <div className="px-6 py-4 bg-muted/30 border-t border-border flex justify-end gap-3">
                             <button
                                 onClick={() => setShowEndorseModal(false)}
@@ -291,6 +321,13 @@ const EndorsementCard = ({ data }: { data: Proposal }) => {
                     </div>
                 </div>
             )}
+            <ConfirmationModal
+                isOpen={showConfirmModal}
+                onClose={() => setShowConfirmModal(false)}
+                onConfirm={handleConfirmEndorse}
+                title="Are you sure you want to submit this endorsement?"
+                subtitle="This action cannot be undone."
+            />
         </>
     );
 };
