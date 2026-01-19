@@ -314,26 +314,31 @@ export default function ThesisDocuments({
                 onOpenChange={setIsUploadModalOpen}
             >
                 <DialogContent className="max-w-3xl">
-                    <div className="mb-4">
-                        <h3 className="text-2xl font-semibold text-[#730000]">
-                            Upload Document
-                        </h3>
+                    <div className="mb-4 flex items-center justify-between">
+                        <div>
+                            <h3 className="text-2xl font-semibold text-[#730000]">
+                                Upload Document
+                            </h3>
+                        </div>
                     </div>
+
                     <div className="space-y-6">
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
                             <div className="space-y-2">
                                 <label className="mb-2 block text-sm font-medium text-gray-700">
                                     Document Title
                                 </label>
                                 <Input
+                                    type="text"
+                                    placeholder="Document Title"
+                                    className="h-10 max-w-xs bg-[#F3EFD0] px-3 py-2 font-[DM_Sans] placeholder:text-gray-600"
                                     value={uploadTitle}
                                     onChange={(e) =>
                                         setUploadTitle(e.target.value)
                                     }
-                                    placeholder="Document Title"
-                                    className="bg-[#F3EFD0]"
                                 />
                             </div>
+
                             <div className="space-y-2">
                                 <label className="mb-2 block text-sm font-medium text-gray-700">
                                     Type
@@ -342,7 +347,7 @@ export default function ThesisDocuments({
                                     value={uploadType}
                                     onValueChange={setUploadType}
                                 >
-                                    <SelectTrigger className="bg-[#F3EFD0]">
+                                    <SelectTrigger className="h-10 w-full bg-[#F3EFD0] px-3 py-2 placeholder:text-gray-500">
                                         <SelectValue placeholder="Specify Document Type" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -355,25 +360,34 @@ export default function ThesisDocuments({
                                         <SelectItem value="supporting-document">
                                             Supporting Document
                                         </SelectItem>
+                                        <SelectItem value="final-thesis">
+                                            Final Thesis
+                                        </SelectItem>
+                                        <SelectItem value="others">
+                                            Others
+                                        </SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
                         </div>
+
                         <div>
                             <label className="mb-2 block text-sm font-medium text-gray-700">
-                                Description
+                                Document Description
                             </label>
                             <textarea
                                 rows={3}
-                                className="w-full rounded-md border bg-[#F3EFD0] px-4 py-2"
+                                className="w-full rounded-md border bg-[#F3EFD0] px-4 py-2 placeholder:text-gray-500 focus:ring-2 focus:ring-[#730000] focus:outline-none"
+                                placeholder="Description"
                                 value={uploadDescription}
                                 onChange={(e) =>
                                     setUploadDescription(e.target.value)
                                 }
-                                placeholder="Description"
                             />
                         </div>
+
                         <FileUpload />
+
                         <div className="flex justify-end">
                             <Button
                                 variant="primary"
