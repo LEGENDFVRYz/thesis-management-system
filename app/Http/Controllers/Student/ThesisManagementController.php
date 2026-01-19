@@ -8,7 +8,7 @@ use Inertia\Inertia;
 
 class ThesisManagementController extends Controller
 {
-/**
+    /**
      *  DOCUMENTS PAGE (Default)
      */
     public function documents()
