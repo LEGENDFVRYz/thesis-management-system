@@ -604,56 +604,68 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     else alert(err);
   };
 
-  if (uploadedFiles.length > 0 && !isUploading && uploadProgress === 100) {
+  if (uploadedFiles.length > 0 && !isUploading) {
+    const isUploadComplete = uploadProgress === 100;
+
     return (
-      <>
-        <div className={`bg-white rounded-lg border-2 border-gray-300 p-12 flex flex-col items-center justify-center ${className}`}>
-          <div className="w-12 h-12 rounded-lg border-2 border-yellow-500 flex items-center justify-center mb-4">
-            <Check className="w-6 h-6 text-yellow-500" />
+      <div className={`w-full ${className}`}>
+        {/* Container for the file list - Removed the huge p-12 and flex-center */}
+        <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-4">
+          
+          {/* Header Status Text (Optional - can be removed if redundant) */}
+          <div className="flex items-center gap-2 justify-center">
+             <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                <Check className="w-3 h-3 text-primary-foreground-2 font-bold" />
+             </div>
+             <p className="text-sm font-medium text-gray-700">
+               {isUploadComplete ? 'Upload complete' : 'Ready to upload'}
+             </p>
           </div>
-          
-          <p className="text-red-900 font-medium mb-4">
-            {uploadedFiles.length === 1 ? 'File uploaded successfully!' : `${uploadedFiles.length} files uploaded successfully!`}
-          </p>
-          
-          <div className="w-full max-w-md space-y-3 mb-6">
+
+          {/* File List Items */}
+          <div className="space-y-2">
             {uploadedFiles.map((file, index) => (
               <div 
-                // FIX: Added file name/size to key to force re-render if file changes but index stays same
-                key={`${file.name}-${file.size}-${index}`} 
-                className="flex items-center gap-3 p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors border border-transparent hover:border-gray-200"
-                onClick={() => handleFileClick(file)}
-                title="Click to preview/edit"
+                key={`${file.name}-${index}`} 
+                className="flex items-center justify-between p-3 bg-gray-50 border border-gray-100 rounded-md group hover:border-gray-300 transition-colors"
               >
-                <div className="w-8 h-8 bg-red-600 rounded flex items-center justify-center flex-shrink-0">
-                  <FileText className="w-5 h-5 text-white" />
+                <div className="flex items-center gap-3 overflow-hidden">
+                  <div className="w-8 h-8 bg-red-100 rounded flex items-center justify-center flex-shrink-0">
+                    <FileText className="w-4 h-4 text-red-600" />
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-sm font-medium text-gray-700 truncate block max-w-[200px] sm:max-w-xs">
+                      {file.name}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {/* FIX: Handle small files (0 MB) better */}
+                      {file.size < 1024 * 1024 
+                        ? `${(file.size / 1024).toFixed(0)} KB` 
+                        : formatFileSize(file.size)
+                      }
+                    </span>
+                  </div>
                 </div>
-                <span className="text-gray-700 font-medium truncate flex-1 text-left">{file.name}</span>
-                <span className="text-gray-500 flex-shrink-0">{formatFileSize(file.size)}</span>
+
+                {/* Remove / Delete Action */}
+                {!isUploadComplete && (
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      setUploadedFiles([]); 
+                      if (fileInputRef.current) fileInputRef.current.value = '';
+                      onFileSelect?.([]);
+                    }}
+                    className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
               </div>
             ))}
           </div>
-
-          <button
-            type="button"
-            onClick={handleDone}
-            className="px-8 py-2 border-2 border-gray-900 rounded-full text-gray-900 font-medium hover:bg-gray-50 transition-colors"
-          >
-            Done
-          </button>
         </div>
-
-        <DocumentPreview 
-          isOpen={isModalOpen}
-          currentDocument={previewFile}
-          onClose={() => setIsModalOpen(false)}
-          onFileUpload={handleModalFileUpload}
-          onDelete={handleModalDelete}
-          // FIX: Pass error handler here so edit validation failures aren't silent
-          onError={handleModalError} 
-          multiple={false}
-        />
-      </>
+      </div>
     );
   }
 

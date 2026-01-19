@@ -16,6 +16,7 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
+    DialogFooter,
 } from "@/components/ui/dialog";
 import { 
     Sheet, 
@@ -28,13 +29,13 @@ import { FileUpload } from '@/components/file-upload';
 import { NavFooter } from '@/components/nav-footer';
 import { TextLink } from '@/components/text-link';
 import AppLayout from '@/layouts/app-layout';
-import { resources } from '@/routes/admin/index';
+import { resources } from '@/routes/index';
 import { toggle, remove, store } from '@/routes/admin/resources/index';
 import { download } from '@/routes/resources/index';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { useRef, useState } from 'react';
-import { BookMarked, Upload, FileText, Download, Check, AlertCircle} from 'lucide-react';
+import { BookMarked, Upload, FileText, Download, Check, AlertCircle, Trash2} from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { format } from 'date-fns';
 
@@ -75,6 +76,7 @@ interface Props {
 export default function Resources({ resources }: Props) {
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [isDownloadSuccessOpen, setIsDownloadSuccessOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isArchiveConfirmOpen, setIsArchiveConfirmOpen] = useState(false);
     const [selectedFile, setSelectedFile] = useState<typeof resources[0] | null>(null);
 
@@ -89,6 +91,11 @@ export default function Resources({ resources }: Props) {
         { role: "Student", view: false, update: false, delete: false },
     ]);
 
+    const handleViewDetails = (resource: Resource) => {
+        setSelectedFile(resource);
+        setIsSheetOpen(true);
+    };
+
     const totalCount = resources?.length ?? 0;
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
@@ -98,19 +105,38 @@ export default function Resources({ resources }: Props) {
 
     const { patch, delete: destroy, processing, reset, setData, post } = uploadForm;
 
-    // Toggle the view mode status
-    const toggleStatus = (resource: Resource) => {
-        patch(toggle(resource.id).url, {
+    const handleConfirmDelete = () => {
+        if (!selectedFile) return;
+
+        destroy(remove(selectedFile.id).url, {
             preserveScroll: true,
+            onSuccess: () => {
+                // Close both the delete confirmation and the detail sheet
+                setIsDeleteModalOpen(false);
+                setIsSheetOpen(false);
+                setSelectedFile(null);
+            },
+            onError: () => {
+                // Optional: Handle error (keep modal open)
+                setIsDeleteModalOpen(false);
+            }
         });
     };
 
-    // Remove the resorce in the record
-    const handleDelete = (id: number) => {
-        if (!confirm('Are you sure you want to delete this resource?')) return;
+    // Toggle the view mode status
+    const toggleStatus = (resource: Resource) => {
+        if (processing) return; // Prevent double clicks
 
-        destroy(remove(id).url, {
+        patch(toggle(resource.id).url, {
             preserveScroll: true,
+            onSuccess: () => {
+                // Update the local selectedFile state so the Sheet UI reflects the change immediately
+                setSelectedFile(current => 
+                    current && current.id === resource.id 
+                        ? { ...current, is_active: !current.is_active } 
+                        : current
+                );
+            },
         });
     };
 
@@ -187,14 +213,22 @@ export default function Resources({ resources }: Props) {
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <span className={`px-3 py-1 rounded-full text-[11px] font-bold border ${
-                                                file.is_active ? 'bg-[var(--completed-bg)] text-[var(--completed-font-color)] border-[var(--completed-border)]' : 'bg-[var(--pending-bg)] text-[var(--pending-font-color)] border-[var(--pending-border)]'
-                                            }`}>
+                                            <button
+                                                type="button"
+                                                onClick={() => toggleStatus(file)}
+                                                className={`px-3 py-1 rounded-full text-[11px] font-bold border transition cursor-pointer
+                                                    ${
+                                                        file.is_active
+                                                            ? 'bg-[var(--completed-bg)] text-[var(--completed-font-color)] border-[var(--completed-border)]'
+                                                            : 'bg-[var(--pending-bg)] text-[var(--pending-font-color)] border-[var(--pending-border)]'
+                                                    }`}
+                                                aria-pressed={file.is_active}
+                                            >
                                                 {file.is_active ? 'Active' : 'Inactive'}
-                                            </span>
+                                            </button>
                                         </TableCell>
                                         <TableCell>
-                                            <Button variant="tertiary" size="sm" onClick={() => handleViewDetails(file)}>View Details</Button>
+                                            <Button variant="tertiary" size="sm" onClick={() => handleViewDetails(file)} className='mr-3'>View Details</Button>
                                         </TableCell>
                                     </TableRow>
                                     ))
@@ -216,43 +250,81 @@ export default function Resources({ resources }: Props) {
                 {/* Side Sheet Panel */}
                 <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                     <SheetContent className="sm:max-w-[450px] flex flex-col p-0">
-                        <SheetHeader className="p-6 text-left border-b">
-                            <SheetTitle className="font-dm flex items-center gap-2 text-xl">File Details</SheetTitle>
-                            <SheetDescription>Additional information about the template</SheetDescription>
-                        </SheetHeader>
+                    {/* Only render content if selectedFile is present to prevent null errors */}
+                    {selectedFile ? (
+                        <>
+                            <SheetHeader className="p-6 text-left border-b bg-gray-50/50">
+                                <SheetTitle className="font-dm flex items-center gap-2 text-xl break-all">
+                                    <FileText className="w-5 h-5 text-primary flex-shrink-0" />
+                                    {selectedFile.file_name}
+                                </SheetTitle>
+                                <SheetDescription>
+                                    Uploaded by {selectedFile.uploaded_by} on {format(new Date(selectedFile.uploaded_at), 'MMM d, yyyy')}
+                                </SheetDescription>
+                            </SheetHeader>
 
-                        <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                            <div>
-                                <h4 className="text-sm font-semibold text-primary mb-3">File Preview</h4>
-                                <div className="h-96 w-full rounded-lg border-2 border-dashed border-muted flex flex-col items-center justify-center bg-muted/5">
-                                    <FileText className="w-16 h-16 text-muted-foreground/20" />
+                            <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                                <div>
+                                    <h4 className="text-sm font-semibold text-primary mb-3">File Preview</h4>
+                                    <div className="h-64 w-full rounded-lg border-2 border-dashed border-muted flex flex-col items-center justify-center bg-muted/5 gap-2">
+                                        <FileText className="w-12 h-12 text-muted-foreground/30" />
+                                        <p className="text-sm text-muted-foreground">Preview not available</p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h4 className="text-sm font-semibold text-primary">File Information</h4>
+                                        <div onClick={() => setIsRestrictionsModalOpen(true)} className="cursor-pointer">
+                                            <TextLink href="#" variant="restriction" onClick={(e) => e.preventDefault()}>
+                                                Manage restrictions
+                                            </TextLink>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-y-6 gap-x-4">
+                                        <div>
+                                            <p className="text-xs font-bold text-muted-foreground uppercase mb-1">File Type</p>
+                                            <p className="text-sm font-medium">{selectedFile.file_type}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-bold text-muted-foreground uppercase mb-1">Size</p>
+                                            <p className="text-sm font-medium">{selectedFile.file_size} MB</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-bold text-muted-foreground uppercase mb-1">Status</p>
+                                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                                                selectedFile.is_active ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                            }`}>
+                                                {selectedFile.is_active ? 'Active' : 'Inactive'}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-bold text-muted-foreground uppercase mb-1">File ID</p>
+                                            <p className="text-sm font-mono text-gray-500">#{selectedFile.id}</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div onClick={() => setIsRestrictionsModalOpen(true)} className="cursor-pointer inline-block">
-                                <TextLink href="#" variant="restriction" onClick={(e) => e.preventDefault()}>
-                                    Manage file restrictions
-                                </TextLink>
+                            <div className="p-6 border-t bg-gray-50/50 flex flex-col gap-3">
+                                <Button className="w-full" variant="secondary" onClick={() => handleDownload(selectedFile.file_path)}>
+                                    <Download className="w-4 h-4 mr-2" /> Download File
+                                </Button>
+                                <Button 
+                                    className="w-full text-red-600 hover:text-red-700 hover:bg-red-50" 
+                                    variant="ghost" 
+                                    onClick={() => setIsDeleteModalOpen(true)}
+                                >
+                                    <Trash2 className="w-4 h-4 mr-2" /> {processing ? 'Deleting...' : 'Delete Resource'}
+                                </Button>
                             </div>
-
-                            <div className="space-y-4">
-                                {['Size', 'Storage used', 'Owner'].map((label) => (
-                                    <div key={label}>
-                                        <p className="text-xs font-bold text-primary uppercase">{label}</p>
-                                        <p className="text-sm">{label === 'Owner' ? selectedFile?.owner : selectedFile?.size}</p>
-                                    </div>
-                                ))}
-                            </div>
+                        </>
+                    ) : (
+                        <div className="flex h-full items-center justify-center p-6 text-muted-foreground">
+                            <p>No file selected</p>
                         </div>
-
-                        <div className="p-6 border-t bg-muted/5 flex justify-end gap-3">
-                            <Button variant="secondary" onClick={handleDownload}>
-                                <Download className="w-4 h-4" /> Download
-                            </Button>
-                            {selectedFile?.status === 'Active' && (
-                                <Button variant="negative" onClick={() => setIsArchiveConfirmOpen(true)}> Archive </Button>
-                            )}
-                        </div>
+                    )}
                     </SheetContent>
                 </Sheet>
 
@@ -323,109 +395,99 @@ export default function Resources({ resources }: Props) {
                         </div>
                     </DialogContent>
                 </Dialog>
+                
 
-                {/* Other Modals */}
-                <Dialog open={isDownloadSuccessOpen} onOpenChange={setIsDownloadSuccessOpen}>
-                    <DialogContent className="max-w-[320px] rounded-[24px] p-10 flex flex-col items-center justify-center border-none shadow-2xl bg-primary-foreground">
-                        <div className="w-16 h-16 bg-alert-success rounded-full flex items-center justify-center mb-6 shadow-lg">
-                            <Check className="w-10 h-10 text-primary-foreground" />
-                        </div>
-                        <p className="text-[16px] text-center text-foreground font-dm font-bold">Item downloaded successfully.</p>
-                    </DialogContent>
-                </Dialog>
-
-                <Dialog open={isArchiveConfirmOpen} onOpenChange={setIsArchiveConfirmOpen}>
-                    <DialogContent className="max-w-[400px] rounded-[24px] p-10 flex flex-col items-center justify-center border-none shadow-2xl bg-primary-foreground">
-                        <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-6 shadow-lg">
-                            <AlertCircle className="w-10 h-10 text-primary-foreground" />
-                        </div>
-                        <div className="text-center space-y-2 mb-8">
-                            <h3 className="text-lg font-bold font-dm">Are you sure you want to archive the file?</h3>
-                        </div>
-                        <div className="flex gap-4 w-full">
-                            <Button variant="outline" className="flex-1 rounded-full border-foreground font-bold" onClick={() => setIsArchiveConfirmOpen(false)}>Cancel</Button>
-                            <Button variant="negative" className="flex-1 rounded-full font-bold" onClick={() => setIsArchiveConfirmOpen(false)}>Confirm</Button>
-                        </div>
-                    </DialogContent>
-                </Dialog>
-
+                {/* Upload Modals */}
                 <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
                     <DialogContent className="sm:max-w-[500px]">
-                        <DialogHeader><DialogTitle className="font-dm text-primary">Upload Document</DialogTitle></DialogHeader>
-                        <div className="py-4">
-                            <FileUpload {...({ onChange: (files: File[]) => console.log(files) } as any)} />
-                        </div>
-                    </DialogContent>
-                </Dialog>
+                        <DialogHeader>
+                            <DialogTitle className="font-dm text-primary">
+                                Upload Document
+                            </DialogTitle>
+                        </DialogHeader>
 
-                {/* <div className="w-full mt-[120px]">
-                    <NavFooter />
-                </div> */}
-            </div>
+                        <form onSubmit={submitUpload} className="space-y-6">
+                            <FileUpload
+                                maxSizeMB={10}
+                                multiple={false}
+                                isUploading={uploadForm.processing}
+                                uploadProgress={uploadForm.progress?.percentage ?? 0}
+                                onFileSelect={(files: File[]) => {
+                                    uploadForm.setData('file', files[0] ?? null)
+                                }}
+                                onError={(err) => {
+                                    uploadForm.setError('file', err)
+                                }}
+                            />
 
-            {/* Upload Testing Modal */}
-            {isUploadModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-                    <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl ring-1 ring-gray-200">
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-lg font-bold text-gray-800">Upload Resource</h2>
-                            <button onClick={() => setIsUploadModalOpen(false)} className="text-gray-400 hover:text-gray-600">✕</button>
-                        </div>
+                            {/* Error */}
+                            {uploadForm.errors.file && (
+                                <p className="text-sm text-red-500">
+                                {uploadForm.errors.file}
+                                </p>
+                            )}
 
-                        <form onSubmit={submitUpload}>
-                            <div className="mb-6">
-                                <label className="mb-2 block text-sm font-medium text-gray-700">
-                                    Select File
-                                </label>
-                                <input
-                                    type="file"
-                                    accept=".pdf,.doc,.docx,.xls,.xlsx"
-                                    onChange={(e) =>
-                                        uploadForm.setData('file', e.target.files ? e.target.files[0] : null)
-                                    }
-                                    className="block w-full text-sm text-slate-500
-                                        file:mr-4 file:py-2 file:px-4
-                                        file:rounded-full file:border-0
-                                        file:text-sm file:font-semibold
-                                        file:bg-violet-50 file:text-violet-700
-                                        hover:file:bg-violet-100
-                                    "
-                                />
-                                {uploadForm.errors.file && (
-                                    <p className="mt-2 text-sm text-red-500 font-medium">
-                                        {uploadForm.errors.file}
-                                    </p>
-                                )}
-                                {uploadForm.progress && (
-                                    <div className="w-full bg-gray-200 rounded-full h-2 mt-4">
-                                        <div
-                                            className="bg-violet-600 h-2 rounded-full transition-all duration-300"
-                                            style={{ width: `${uploadForm.progress.percentage}%` }}
-                                        ></div>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="flex gap-3 justify-end">
+                            {/* Confirmation */}
+                            <div className="flex justify-end gap-3">
                                 <button
                                     type="button"
                                     onClick={() => setIsUploadModalOpen(false)}
-                                    className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                                    className="px-4 py-2 text-sm text-gray-700"
                                 >
                                     Cancel
                                 </button>
+
                                 <button
                                     type="submit"
                                     disabled={uploadForm.processing}
-                                    className="rounded-lg px-4 py-2 text-sm font-medium bg-gray-900 text-white hover:bg-gray-800 disabled:opacity-50"
+                                    className="px-4 py-2 text-sm bg-primary text-white rounded disabled:opacity-50"
                                 >
-                                    {uploadForm.processing ? 'Uploading...' : 'Upload'}
+                                    {uploadForm.processing ? 'Uploading…' : 'Upload'}
                                 </button>
                             </div>
                         </form>
-                    </div>
-                </div>
-            )}
+                    </DialogContent>
+                </Dialog>
+
+                {/* Delete modal */}
+                <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 rounded-full bg-primary">
+                                    <AlertCircle className="w-6 h-6 text-primary-foreground-2" />
+                                </div>
+                                <DialogTitle className="text-xl text-red-900">Delete Resource?</DialogTitle>
+                            </div>
+                        </DialogHeader>
+
+                        <div className="pt-2">
+                            Are you sure you want to delete <span className="font-semibold text-gray-900">"{selectedFile?.file_name}"</span>? 
+                            <br />
+                            This action cannot be undone.
+                        </div>
+
+                        <DialogFooter className="gap-2 mt-4 sm:justify-end">
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                onClick={() => setIsDeleteModalOpen(false)}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                type="button"
+                                onClick={handleConfirmDelete}
+                                disabled={processing}
+                                className="bg-primary hover:bg-red-700 text-white"
+                            >
+                                {processing ? 'Deleting...' : 'Delete Resource'}
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            </div>
+
         </AppLayout>
     );
 }

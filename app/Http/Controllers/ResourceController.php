@@ -121,7 +121,7 @@ class ResourceController extends Controller
             'is_active' => !$resource->is_active,
         ]);
 
-        return back()->with('success', `{$resource->file_name} successfully set to {$resource->is_active}.`);
+        return back()->with('success', "{$resource->file_name} successfully set to {$resource->is_active}");
     }
 
     /**

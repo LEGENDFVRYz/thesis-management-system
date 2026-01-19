@@ -285,7 +285,7 @@ Route::prefix('faculty')->group(function () {
                 })->name('evaluation');
             });
 
-        Route::get('resources', [ResourceController::class, 'index'])->name('faculty.resources');
+        // Route::get('resources', [ResourceController::class, 'index'])->name('faculty.resources');
     });
 });
 
@@ -358,7 +358,7 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
 
 
     // Resources Routes
-    Route::get('resources', [ResourceController::class, 'index'])->name('admin.resources');
+    // Route::get('resources', [ResourceController::class, 'index'])->name('admin.resources');
     Route::post('resources', [ResourceController::class, 'store'])->name('admin.resources.store');
     Route::delete('resources/{resource}', [ResourceController::class, 'destroy'])->name('admin.resources.remove');
     Route::patch('resources/{resource}/toggle', [ResourceController::class, 'toggle'])->name('admin.resources.toggle');
@@ -373,7 +373,7 @@ SHARED AUTH ROUTES
 */
 Route::middleware(['auth'])->group(function() {
 
-    // ---- Repository -----
+    // ---- Repository Page -----
     // Route::get('/test-thesis', function () {
     //     return Inertia::render('Shared/repository/thesis');
     // });
@@ -382,6 +382,10 @@ Route::middleware(['auth'])->group(function() {
     //     // this one is temporary only, the routing wil be change soon
     //     return Inertia::render('Shared/repository/document-preview');
     // });
+
+
+    // ---- Resources Page ----
+    Route::get('resources', [ResourceController::class, 'index'])->name('resources');
 
 
     // ---- Notification Routes ----
