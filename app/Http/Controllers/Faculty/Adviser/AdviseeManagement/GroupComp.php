@@ -20,19 +20,21 @@ class GroupComp extends Controller
         // Get the logged-in adviser's user ID
         $userId = Auth::id();
 
-        // Main Query - check the figma and task description
-        $students = DB::table('tbl_students as s')
-            // Join: Students -> Thesis Groups
-            ->join('tbl_thesis_groups as tg', 's.group_id', '=', 'tg.id')
-            // Join: Students -> users
-            ->join('users as u', 's.user_id', '=', 'u.id')
-            // Join: Thesis Groups -> Section Advisers
-            ->join('tbl_section_advisers as sa', 'tg.section_adviser_id', '=', 'sa.id')
-            // Join: Section Advisers -> Faculty Assignments
-            ->join('tbl_faculty_assignments as fa', 'sa.faculty_assign_id', '=', 'fa.id')
-            // Join: Faculty Assignments -> Faculties
-            ->join('tbl_faculties as f', 'fa.faculty_id', '=', 'f.id')
-            // LEFT JOIN: Proposals (Filter for only the pursued proposal)
+        $activeYear = DB::table('tbl_school_years')
+    ->join('tbl_semesters', 'tbl_school_years.id', '=', 'tbl_semesters.school_year_id')
+    ->where('tbl_semesters.is_active', 1)
+    ->select(DB::raw('COALESCE(tbl_school_years.year, YEAR(CURDATE())) as active_year'))
+    ->value('active_year');
+
+        // Main Query - adapted from MySQL query with $userId filter
+        $students = DB::table('tbl_faculties as adviser')
+            // Join: Faculties -> Faculty Assignments
+            ->join('tbl_faculty_assignments as fa', 'adviser.id', '=', 'fa.faculty_id')
+            // Join: Faculty Assignments -> Section Advisers
+            ->join('tbl_section_advisers as sa', 'fa.id', '=', 'sa.faculty_assign_id')
+            // Join: Section Advisers -> Thesis Groups
+            ->join('tbl_thesis_groups as tg', 'sa.id', '=', 'tg.section_adviser_id')
+            // LEFT JOIN: Thesis Groups -> Proposals (pursued only)
             ->leftJoin('tbl_proposals as p', function ($join) {
                 $join->on('tg.id', '=', 'p.group_id')
                     ->whereNull('p.deleted_at')
@@ -42,84 +44,114 @@ class GroupComp extends Controller
             ->leftJoin('tbl_theses as t', 'p.id', '=', 't.proposal_id')
             // LEFT JOIN: Theses -> Endorsements
             ->leftJoin('tbl_endorsements as e', 't.id', '=', 'e.thesis_id')
-            // LEFT JOIN: Endorsements -> Defense Matrices
-            ->leftJoin('tbl_defense_matrices as dm', 'e.id', '=', 'dm.endorsement_id')
-            ->where('f.user_id', $userId)
-
+            // Join: Thesis Groups -> Students
+            ->join('tbl_students as s', 'tg.id', '=', 's.group_id')
+            // Join: Students -> Users
+            ->join('users as u', 's.user_id', '=', 'u.id')
+            // LEFT JOIN: Faculty Assignments -> School Years
+            ->leftJoin('tbl_school_years as sy', 'fa.sy_id', '=', 'sy.id')
+            // Filter by logged-in adviser's user ID
+            ->where('adviser.user_id', $userId)
+            // Group by essential fields
             ->groupBy([
-                's.id',
-                's.last_name',
-                's.first_name',
-                's.middle_name',
-                's.is_leader',
-                's.section',
-                'u.identity_no',
-                'u.email',
                 'tg.id',
                 'tg.group_number',
                 'tg.section_adviser_id',
                 'sa.section',
-                'f.id',
                 't.title',
+                'sy.year',
+                'adviser.name_prefix',
+                'adviser.first_name',
+                'adviser.last_name',
+                's.id',
+                's.first_name',
+                's.last_name',
+                's.is_leader',
+                'u.identity_no',
+                'u.email',
             ])
-            ->orderBy('formatted_group_number')
+            ->orderBy('defense_id')
             ->orderBy('s.last_name', 'asc')
             ->select([
-                // 1. Student Name
-                DB::raw("CONCAT(s.last_name, ', ', s.first_name, ' ', COALESCE(s.middle_name, '')) AS student_name"),
-                // Identity number as Student Number
-                'u.identity_no as student_number',
-                // Email of the student
-                'u.email',
-                // 2. Leader Status
-                's.is_leader',
-                // 3. Student Section
-                's.section',
-                // 4. Group ID (actual database ID for updates)
-                'tg.id as group_id',
-                // 5. Section Adviser ID (for edit modal)
-                'tg.section_adviser_id',
-                // 6. Group Number - use the most advanced course (DP2 > DP1 > MOR)
+                // Defense ID / Group Code
                 DB::raw("CONCAT(
-                    CASE
-                        WHEN MAX(CASE WHEN dm.course IN ('DP1', 'DP2') THEN 1 ELSE 0 END) = 1 THEN '4'
-                        WHEN MAX(CASE WHEN dm.course = 'MOR' THEN 1 ELSE 0 END) = 1 THEN '3'
-                        ELSE '-'
-                    END,
-                    s.section,
+                    (3 + ($activeYear - sy.year)),
+                    sa.section,
                     LPAD(tg.group_number, 2, '0')
-                ) AS formatted_group_number"),
-                // 7. Course - get the most advanced course (DP2 > DP1 > MOR)
-                DB::raw("CASE
-                    WHEN MAX(CASE WHEN dm.course = 'DP2' THEN 1 ELSE 0 END) = 1 THEN 'DP2'
-                    WHEN MAX(CASE WHEN dm.course = 'DP1' THEN 1 ELSE 0 END) = 1 THEN 'DP1'
-                    WHEN MAX(CASE WHEN dm.course = 'MOR' THEN 1 ELSE 0 END) = 1 THEN 'MOR'
-                    ELSE NULL
-                END as course"),
-                // 8. Block
-                'sa.section as block',
-                // 9. Faculty ID
-                'f.id as faculty_id',
-                // 10. Thesis Title
-                't.title as thesis_title',
+                ) AS defense_id"),
+                // Thesis Title
+                't.title',
+                // Student ID (Identity Number)
+                'u.identity_no as student_id',
+                // Student Name
+                DB::raw("CONCAT(s.first_name, ' ', s.last_name) as student_name"),
+                // Student Program and Section
+                DB::raw("CONCAT('BSCPE ', (3 + ($activeYear - sy.year)), '-', sa.section) as student_program_section"),
+                // Student Email
+                'u.email as student_email',
+                // Group Number
+                'tg.group_number',
+                // Section
+                'sa.section',
+                // Year Level (computed)
+                DB::raw("(3 + ($activeYear - sy.year)) as year_level"),
+                // Group Code (same as defense_id)
+                DB::raw("CONCAT(
+                    (3 + ($activeYear - sy.year)),
+                    sa.section,
+                    LPAD(tg.group_number, 2, '0')
+                ) AS group_code"),
+                // Adviser Name (with prefix)
+                DB::raw("CONCAT(adviser.name_prefix, ' ', adviser.first_name, ' ', adviser.last_name) as adviser_name"),
+                // Critical fields for modals/CRUD operations
+                'tg.id as group_id',
+                'tg.section_adviser_id',
+                's.is_leader',
             ])
             ->get();
         // Get section advisers for the logged-in adviser (for block dropdown)
         $sectionAdvisers = DB::table('tbl_section_advisers as sa')
             ->join('tbl_faculty_assignments as fa', 'sa.faculty_assign_id', '=', 'fa.id')
             ->join('tbl_faculties as f', 'fa.faculty_id', '=', 'f.id')
+            ->leftJoin('tbl_school_years as sy', 'fa.sy_id', '=', 'sy.id')
+            ->join('tbl_semesters as sem', 'sy.id', '=', 'sem.school_year_id')
             ->where('f.user_id', $userId)
+            ->where('fa.is_active', 1)
+            // ->where('sem.is_active', 1) 
             ->select([
-                'f.user_id',
                 'sa.id as section_adviser_id',
                 'sa.section',
+                DB::raw("(3 + ($activeYear - sy.year)) as year_level"),
             ])
+            ->distinct()
             ->get();
 
         // Get students without a thesis group (for create group dropdown)
-        $studentsWithoutGroup = DB::table('tbl_students as s')
+        $studentsWithoutGroup = DB::table('tbl_faculties as adviser')
+            ->join('tbl_faculty_assignments as fa', 'adviser.id', '=', 'fa.faculty_id')
+            ->join('tbl_section_advisers as sa', 'fa.id', '=', 'sa.faculty_assign_id')
+            ->leftJoin('tbl_school_years as sy', 'fa.sy_id', '=', 'sy.id')
+            ->join('tbl_students as s', 'sa.section', '=', 's.section')
             ->join('users as u', 's.user_id', '=', 'u.id')
+            ->where('adviser.user_id', $userId)
+            ->where('fa.is_active', 1)
             ->whereNull('s.group_id')
+            ->where('fa.sy_id', function ($query) {
+                $query->select('school_year_id')
+                    ->from('tbl_semesters')
+                    ->where('is_active', 1)
+                    ->limit(1);
+            })
+            ->groupBy([
+                's.id',
+                's.last_name',
+                's.first_name',
+                's.middle_name',
+                'u.identity_no',
+                'u.email',
+                's.section',
+                'sy.year',
+            ])
             ->orderBy('s.last_name')
             ->orderBy('s.first_name')
             ->select([
@@ -128,11 +160,9 @@ class GroupComp extends Controller
                 'u.identity_no as student_number',
                 'u.email',
                 's.section',
+                DB::raw("(3 + ($activeYear - sy.year)) as year_level"),
             ])
             ->get();
-    
-        // dd($students, $sectionAdvisers, $studentsWithoutGroup);
-
         return Inertia::render('Faculty/management/adviser/advisee_management/group_comp', [
             'students' => $students,
             'sectionAdvisers' => $sectionAdvisers,
@@ -167,11 +197,22 @@ class GroupComp extends Controller
             return back()->withErrors(['members' => 'Exactly one member must be designated as leader.']);
         }
 
-        // Generate the next group number for this section adviser
-        $maxGroupNumber = DB::table('tbl_thesis_groups')
+        // Generate the next group number for this section adviser, filling in any gaps
+        $existingGroupNumbers = DB::table('tbl_thesis_groups')
             ->where('section_adviser_id', $validated['section_adviser_id'])
-            ->max('group_number') ?? 0;
-        $newGroupNumber = $maxGroupNumber + 1;
+            ->pluck('group_number')
+            ->sort()
+            ->values()
+            ->all();
+
+        $newGroupNumber = 1;
+        foreach ($existingGroupNumbers as $number) {
+            if ($number == $newGroupNumber) {
+                $newGroupNumber++;
+            } else {
+                break; // Found a gap
+            }
+        }
 
         // Create the thesis group
         $groupId = DB::table('tbl_thesis_groups')->insertGetId([
@@ -230,7 +271,7 @@ class GroupComp extends Controller
                 ->delete();
         }
 
-        return redirect()->route('faculty.management.adviser.advisee_management.group_comp')
+        return redirect()->route('faculty.adviser.group_comp.index')
             ->with('success', 'Group created successfully.');
     }
 
@@ -333,7 +374,7 @@ class GroupComp extends Controller
             }
         }
 
-        return redirect()->route('faculty.management.adviser.advisee_management.group_comp')
+        return redirect()->route('faculty.adviser.group_comp.index')
             ->with('success', 'Group updated successfully.');
     }
 
@@ -369,7 +410,7 @@ class GroupComp extends Controller
             DB::table('tbl_thesis_groups')->where('id', $id)->delete();
         }
 
-        return redirect()->route('faculty.management.adviser.advisee_management.group_comp')
+        return redirect()->route('faculty.adviser.group_comp.index')
             ->with('success', 'Group removed successfully.');
     }
 }

@@ -4,7 +4,7 @@ import { index } from '@/routes/faculty/joint/defense_management';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import FacultyManagementLayout from '@/pages/Faculty/management/index';
-import { Icon } from '@/components/icon-index';
+import DefenseManagementIcon from '@/components/Icons/defense_management.svg';
 
 // Setup
 const breadcrumbs: BreadcrumbItem[] = [
@@ -18,11 +18,7 @@ const pageHeader: PageHeaderProps = {
     title: "Defense Management",
     subtitle: "Monitor all defense schedules and panel assignments",
     icon: (
-        // pa correct nalang
-        <Icon
-            name="calendarDefault"
-            className="w-8 h-8 text-primary"
-        />
+        <img src={DefenseManagementIcon} alt="Defense Management" className="w-8 h-8" />
     ),
 };
 

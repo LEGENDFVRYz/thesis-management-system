@@ -4,7 +4,7 @@ import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import ProgressTrackingLayout from './index';
 import { MessageSquare } from 'lucide-react';
-import { Icon } from '@/components/icon-index';
+import ProgressTrackingIcon from '@/components/Icons/progress_tracking.svg';
 
 // Setup
 const breadcrumb: BreadcrumbItem[] = [
@@ -17,8 +17,7 @@ const pageHeader: PageHeaderProps = {
     title: "Progress Tracking" ,
     subtitle: "Access a comprehensive archive of student theses",
     icon: (
-        // pa correct nalang
-        <Icon name="calendarDefault" className="w-8 h-8 text-primary" />
+        <img src={ProgressTrackingIcon} alt="Progress Tracking" className="w-8 h-8" />
     ),
 };
 

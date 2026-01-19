@@ -6,7 +6,7 @@ import { AppContent } from '@/components/app-content';
 import { NavFooter } from '@/components/nav-footer';
 import FilterSearchSection from '@/components/filter-search-section';
 import { Button } from '@/components/ui/button';
-import { Icon } from '@/components/icon-index';
+import DefenseManagementIcon from '@/components/Icons/defense_management.svg';
 import { cn } from "@/lib/utils";
 import {
     Table,
@@ -86,8 +86,7 @@ const pageHeader: PageHeaderProps = {
     title: "Defense Schedule",
     subtitle: "View your upcoming thesis defense schedules",
     icon: (
-        // pa correct nalang
-        <Icon name="calendarDefault" className="w-8 h-8 text-primary" />
+        <img src={DefenseManagementIcon} alt="Defense Management" className="w-8 h-8" />
     ),
 };
 

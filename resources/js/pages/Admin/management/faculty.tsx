@@ -2,12 +2,11 @@ import { useState, useMemo, useRef } from 'react';
 import { Head } from '@inertiajs/react';
 import ManagementLayout from '@/pages/Admin/management/index';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
-import { Plus } from 'lucide-react';
+import { Plus, Users } from 'lucide-react';
 
-// SHARED COMPONENTS 
+// SHARED COMPONENTS
 import { NavFooter } from '@/components/nav-footer';
 import { Button } from '@/components/ui/button';
-import { Icon } from '@/components/icon-index';
 import FilterSearchSection from '@/components/filter-search-section';
 
 
@@ -30,11 +29,7 @@ const pageHeader: PageHeaderProps = {
     title: "Faculty Management",
     subtitle: "Manage Faculty Accounts and Assign Roles",
     icon: (
-        // paki coprrect nalang ng icon
-        <Icon
-            name="proponentsDefault"
-            className="w-8 h-8 text-primary"
-        />
+        <Users className="w-8 h-8 text-primary" />
     ),
 };
 

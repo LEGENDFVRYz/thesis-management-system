@@ -23,7 +23,8 @@ interface Member {
 
 interface SectionAdviser {
   section_adviser_id: number;
-  section: number;
+  section: string;
+  year_level: number;
 }
 
 interface StudentWithoutGroup {
@@ -271,7 +272,7 @@ export default function CreateGroupModal({ isOpen, onClose, sectionAdvisers, stu
               <option value="">Select Block...</option>
               {sectionAdvisers.map((sa) => (
                 <option key={sa.section_adviser_id} value={sa.section_adviser_id}>
-                  Block {sa.section}
+                  BSCPE {sa.year_level}-{sa.section}
                 </option>
               ))}
             </select>

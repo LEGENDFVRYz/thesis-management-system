@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Icon } from '@/components/icon-index';
 import type { BreadcrumbItem, PageHeaderProps } from '@/types'
 import { Head } from '@inertiajs/react'
 import AdviseeManagementLayout from '@/pages/Faculty/management/adviser/advisee_management/index'
@@ -11,19 +10,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { FileText, CheckCircle, Clock, XCircle, AlertCircle } from 'lucide-react'
+import { FileText, CheckCircle, Clock, XCircle, AlertCircle, Users } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 
 // Setup
 const pageHeader: PageHeaderProps = {
-    title: "Advisee Management",
+    title: "Change Request",
     subtitle: "Manage your advisees and their requests",
     icon: (
-            <Icon
-                name="calendarDefault"
-                className="w-8 h-8 text-primary"
-            />
-        ),
+        <Users className="w-8 h-8 text-primary" />
+    ),
 }
 
 const breadcrumbs: BreadcrumbItem[] = [

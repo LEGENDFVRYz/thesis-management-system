@@ -9,11 +9,32 @@ use Inertia\Inertia;
 class ThesisReview extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display the groups list page.
      */
     public function index()
     {
-        return Inertia::render('Faculty/management/adviser/advisee_management/thesis_review');
+        return Inertia::render('Faculty/management/adviser/advisee_management/thesis_review/index');
+    }
+
+    /**
+     * Display the submissions list page for a specific group.
+     */
+    public function submissions($groupCode)
+    {
+        return Inertia::render('Faculty/management/adviser/advisee_management/thesis_review/submissions', [
+            'groupCode' => $groupCode,
+        ]);
+    }
+
+    /**
+     * Display the document review page.
+     */
+    public function review($groupCode, $submissionId)
+    {
+        return Inertia::render('Faculty/management/adviser/advisee_management/thesis_review/review', [
+            'groupCode' => $groupCode,
+            'submissionId' => $submissionId,
+        ]);
     }
 
     /**

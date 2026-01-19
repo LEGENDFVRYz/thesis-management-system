@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/table';
 import { index } from '@/routes/faculty/adviser/my_advisees/index';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { Filter, Users } from 'lucide-react';
 import { useState } from 'react';
 import AdviseeManagementLayout from '.';
@@ -27,18 +27,13 @@ const breadcrumb: BreadcrumbItem[] = [
 ];
 
 const pageHeader: PageHeaderProps = {
-    title: "My Advisees",
-    subtitle: "View and manage all students under supervision with their current thesis stages",
+    title: 'My Advisees',
+    subtitle:
+        'View and manage all students under supervision with their current thesis stages',
     icon: (
-        // pa correct nalang
-        <Icon
-            name="calendarDefault"
-            className="w-8 h-8 text-primary"
-        />
+        <Users className="w-8 h-8 text-primary" />
     ),
 };
-
-
 
 interface Advisee {
     student_id: string;
@@ -46,7 +41,14 @@ interface Advisee {
     pup_webmail: string;
     group_code: string;
     block: string;
+
+    // NEW FIELDS
+    thesis_title: string;
+    co_researchers: string;
     thesis_stage: string;
+    thesis_title: string;
+    co_researchers: string[];
+    progress_percentage: number;
 }
 
 interface MyAdviseesProps {
@@ -67,10 +69,17 @@ const sampleAdvisees: Advisee[] = Array(20)
             'Manuscript Submission',
             'DP1 Manuscript Revision',
         ][index % 3],
+        thesis_title: [
+            'Machine Learning Applications in Healthcare',
+            'IoT-Based Smart Home System',
+            'Blockchain for Supply Chain Management',
+        ][index % 3],
+        co_researchers: ['Jane Smith', 'John Doe', 'Alice Johnson'],
+        progress_percentage: [40, 60, 80][index % 3],
     }));
 
 export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
-    const displayAdvisees = advisees.length > 0 ? advisees : sampleAdvisees;
+    const displayAdvisees = advisees.data;//.length > 0 ? advisees : sampleAdvisees; // Using sample data
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [selectedAdvisee, setSelectedAdvisee] = useState<Advisee | null>(
         null,
@@ -172,21 +181,25 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                 </div>
             </div>
 
+            <Badge variant="default" className="mt-4 mb-4">
+                Total Advisees ({filteredAdvisees.length})
+            </Badge>
+
             {/* Table Section */}
             <div className="overflow-x-auto rounded-lg border-1 border-[var(--primary)] bg-primary-foreground shadow">
-                <Table className="w-[1360px]">
+                <Table className="w-full table-fixed">
                     <TableHeader>
                         <TableRow className="bg-primary hover:bg-primary">
                             <TableHead className="text-center text-primary-foreground">
                                 Student ID
                             </TableHead>
-                            <TableHead className="text-center text-primary-foreground">
+                            <TableHead className="w-[180px] text-center text-primary-foreground">
                                 Student Name
                             </TableHead>
-                            <TableHead className="text-center text-primary-foreground">
+                            <TableHead className="w-[280px] text-center text-primary-foreground">
                                 PUP Webmail
                             </TableHead>
-                            <TableHead className="text-center text-primary-foreground">
+                            <TableHead className="w-[120px] text-center text-primary-foreground">
                                 Group Code
                             </TableHead>
                             <TableHead className="text-center text-primary-foreground">
@@ -207,13 +220,13 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                                     <TableCell className="text-center font-medium">
                                         {advisee.student_id}
                                     </TableCell>
-                                    <TableCell className="text-center">
+                                    <TableCell className="w-[180px] text-center break-words whitespace-normal">
                                         {advisee.student_name}
                                     </TableCell>
-                                    <TableCell className="text-center">
+                                    <TableCell className="w-[280px] text-center whitespace-nowrap">
                                         {advisee.pup_webmail}
                                     </TableCell>
-                                    <TableCell className="text-center">
+                                    <TableCell className="w-[120px] text-center whitespace-nowrap">
                                         {advisee.group_code}
                                     </TableCell>
                                     <TableCell className="text-center">
@@ -334,13 +347,22 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                                     </div>
                                 </div>
                             </div>
+
                             {/* Right Column - Thesis Information */}
                             <div>
                                 <div className="flex items-start justify-between">
                                     <p className="text-body-1 mb-2 pb-2 font-bold text-primary">
                                         THESIS INFORMATION
                                     </p>
-                                    <Button variant="primary" size="sm">
+                                    <Button
+                                        variant="primary"
+                                        size="sm"
+                                        onClick={() => {
+                                            router.visit(
+                                                `/faculty/adviser/progress`, // /faculty/adviser/progress=${selectedAdvisee?.group_code}
+                                            );
+                                        }}
+                                    >
                                         View
                                     </Button>
                                 </div>
@@ -351,34 +373,25 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                                             Thesis Title
                                         </p>
                                         <p className="font-medium">
-                                            Machine Learning Applications in
-                                            Healthcare
+                                            {selectedAdvisee?.thesis_title}
                                         </p>
                                     </div>
-
                                     <div>
                                         <p className="text-body-3 text-alert-desc">
                                             Co-researchers
                                         </p>
                                         <div className="mt-2 flex gap-2">
-                                            <Badge
-                                                variant="outline"
-                                                className="rounded-full"
-                                            >
-                                                Jane Smith
-                                            </Badge>
-                                            <Badge
-                                                variant="outline"
-                                                className="rounded-full"
-                                            >
-                                                Jane Smith
-                                            </Badge>
-                                            <Badge
-                                                variant="outline"
-                                                className="rounded-full"
-                                            >
-                                                Jane Smith
-                                            </Badge>
+                                            {selectedAdvisee?.co_researchers.map(
+                                                (researcher, idx) => (
+                                                    <Badge
+                                                        key={idx}
+                                                        variant="outline"
+                                                        className="rounded-full"
+                                                    >
+                                                        {researcher}
+                                                    </Badge>
+                                                ),
+                                            )}
                                         </div>
                                     </div>
 
@@ -398,11 +411,16 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                                         <div className="h-3 w-full overflow-hidden rounded-full bg-primary">
                                             <div
                                                 className="h-full bg-primary-foreground-2"
-                                                style={{ width: '60%' }}
+                                                style={{
+                                                    width: `${selectedAdvisee?.progress_percentage}%`,
+                                                }}
                                             />
                                         </div>
                                         <p className="mt-1 text-sm font-medium">
-                                            60% Complete
+                                            {
+                                                selectedAdvisee?.progress_percentage
+                                            }
+                                            % Complete
                                         </p>
                                     </div>
                                 </div>
@@ -417,7 +435,14 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                             >
                                 Cancel
                             </Button>
-                            <Button variant="primary">
+                            <Button
+                                variant="primary"
+                                // onClick={() => {
+                                //     router.visit(
+                                //         `/faculty/adviser/thesis-review`, (new page from thesis-review for sending message/feedback)
+                                //     );
+                                // }}
+                            >
                                 Send Message/Feedback
                             </Button>
                         </div>
