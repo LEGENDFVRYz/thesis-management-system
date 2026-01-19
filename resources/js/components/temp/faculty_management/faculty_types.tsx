@@ -8,8 +8,3 @@ export interface Faculty {
   initials?: string;
   hasPhoto?: boolean;
 }
-
-export interface FilterState {
-  roles: string[];
-  facultyType: string;
-}

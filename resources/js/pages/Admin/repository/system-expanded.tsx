@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import RepositoryLayout from '@/pages/Shared/repository/index';
 import { system, systemExpanded } from '@/routes/admin/repository';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
@@ -13,7 +13,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from '@/components/ui/label';
-import { AlertCircle, FileText, Trash2, Calendar, X, CheckCircle } from 'lucide-react';
+import { AlertCircle, FileText, Trash2, Calendar, X, CheckCircle, ArrowLeft } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import { index } from '@/routes/admin/repository/index';
 import { AppContent } from '@/components/app-content';
@@ -483,9 +483,10 @@ export default function SystemRepositoryExpanded() {
   const [deletedCount, setDeletedCount] = useState(0);
 
   const handleConfirmDelete = () => {
-    setDeletedCount(deleteCount);
+    setDeletedCount(deleteCount > 0 ? deleteCount : 1);
     setShowDeleteConfirm(false);
     setShowDeleteSuccess(true);
+    setShowDetailsModal(false);
     handleClearSelection();
   };
 
@@ -534,6 +535,15 @@ export default function SystemRepositoryExpanded() {
         subtitle="Browse and explore student thesis projects"
       > */}
 
+        {/* Return Button */}
+        <Link
+          href="/admin/repository/resources"
+          className="inline-flex items-center gap-2 text-primary hover:underline mb-6 font-dm"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          <span className="font-medium">Return</span>
+        </Link>
+
         {/* Storage Card */}
         <div className="mb-8">
           <SystemRepositoryStorage />
@@ -555,7 +565,7 @@ export default function SystemRepositoryExpanded() {
                 value="synced"
                 className="px-6 py-2 min-w-[220px] flex justify-center"
               >
-                <span className="font-dm text-[13.33px] font-medium whitespace-nowrap">
+                <span className="font-dm text-[13.33px] font-medium whitespace-nowrap cursor-pointer">
                   Synced Successfully ({syncedCount})
                 </span>
               </ToggleGroupItem>
@@ -564,7 +574,7 @@ export default function SystemRepositoryExpanded() {
                 value="failed"
                 className="px-6 py-2 min-w-[220px] flex justify-center"
               >
-                <span className="font-dm text-[13.33px] font-medium whitespace-nowrap">
+                <span className="font-dm text-[13.33px] font-medium whitespace-nowrap cursor-pointer">
                   Sync Failed ({failedCount})
                 </span>
               </ToggleGroupItem>
@@ -578,7 +588,7 @@ export default function SystemRepositoryExpanded() {
               !failedIsSyncing ? (
                 <button
                   onClick={handleFailedSyncNow}
-                  className="underline text-primary font-medium hover:opacity-80 h-10 flex items-center px-2"
+                  className="underline text-primary font-medium hover:opacity-80 h-10 flex items-center px-2 cursor-pointer"
                   type="button"
                 >
                   Sync Now
@@ -611,7 +621,7 @@ export default function SystemRepositoryExpanded() {
                   }
                 }
               }}
-              className={`h-10 px-4 flex items-center rounded-lg border-[0.8px] font-dm text-[13.33px] font-medium transition-colors ${
+              className={`h-10 px-4 flex items-center rounded-lg border-[0.8px] font-dm text-[13.33px] font-medium transition-colors cursor-pointer ${
                 activeSelectMode
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-background text-foreground border-primary/15 hover:bg-breadcrumb"
@@ -620,7 +630,7 @@ export default function SystemRepositoryExpanded() {
               {activeSelectMode ? (
                 <>
                   <X size={16} />
-                  <span className="mx-3 h-4 w-px bg-primary-foreground/40" />
+                  <span className="mx-3 h-4 w-px bg-primary-foreground/40 cursor-pointer"/>
                   <span>{activeSelectedIds.length} Selected</span>
                 </>
               ) : (
@@ -632,7 +642,7 @@ export default function SystemRepositoryExpanded() {
             {activeSelectMode && activeSelectedIds.length > 0 && (
               <button
                 onClick={handleDeleteClick}
-                className="h-10 w-10 flex items-center justify-center rounded-lg border-[0.8px] border-primary/15 bg-background text-foreground hover:bg-breadcrumb transition-colors"
+                className="h-10 w-10 flex items-center justify-center rounded-lg border-[0.8px] border-primary/15 bg-background text-foreground hover:bg-breadcrumb transition-colors cursor-pointer"
                 aria-label="Delete selected items"
               >
                 <Trash2 size={16} />
@@ -641,7 +651,7 @@ export default function SystemRepositoryExpanded() {
 
             {/* Delete Confirmation Modal */}
             {showDeleteConfirm && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+              <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50">
                 <div
                   className="w-[400px] rounded-lg bg-background p-6"
                   style={{
@@ -669,7 +679,7 @@ export default function SystemRepositoryExpanded() {
                   <div className="flex justify-center gap-4">
                     <Button
                       variant="secondary"
-                      className="rounded-full px-8"
+                      className="rounded-full px-8 cursor-pointer"
                       onClick={() => setShowDeleteConfirm(false)}
                       size="default"
                     >
@@ -677,7 +687,7 @@ export default function SystemRepositoryExpanded() {
                     </Button>
                     <Button
                       variant="negative"
-                      className="rounded-full px-8"
+                      className="rounded-full px-8 cursor-pointer"
                       onClick={handleConfirmDelete}
                       size="default"
                     >
@@ -690,7 +700,7 @@ export default function SystemRepositoryExpanded() {
 
             {/* Delete Success Modal */}
             {showDeleteSuccess && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+              <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50">
                 <div
                   className="w-[400px] rounded-lg bg-background p-6"
                   style={{
@@ -712,7 +722,7 @@ export default function SystemRepositoryExpanded() {
                   <div className="flex justify-center">
                     <Button
                       variant="secondary"
-                      className="rounded-full px-10 bg-alert-success text-primary-foreground hover:bg-alert-success"
+                      className="rounded-full px-10 bg-alert-success text-primary-foreground hover:bg-alert-success cursor-pointer"
                       onClick={() => setShowDeleteSuccess(false)}
                       size="default"
                     >
@@ -727,7 +737,7 @@ export default function SystemRepositoryExpanded() {
             <div className="flex items-center gap-3 relative">
               <button
                 onClick={() => setShowSortDropdown(!showSortDropdown)}
-                className="h-10 px-4 flex items-center justify-center gap-2 rounded-lg border-[0.8px] border-primary/15 bg-background text-foreground hover:bg-breadcrumb transition-colors font-dm text-[13.33px] font-medium"
+                className="h-10 px-4 flex items-center justify-center gap-2 rounded-lg border-[0.8px] border-primary/15 bg-background text-foreground hover:bg-breadcrumb transition-colors font-dm text-[13.33px] font-medium cursor-pointer"
               >
                 <Icon name="sortDefault" size={16} />
                 <span>Sort</span>
@@ -744,7 +754,7 @@ export default function SystemRepositoryExpanded() {
 
         {/* Failed Sync Success Modal */}
         {failedShowSuccess && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50">
             <div
               className="w-[400px] rounded-lg bg-background p-6"
               style={{
@@ -766,7 +776,7 @@ export default function SystemRepositoryExpanded() {
               <div className="flex justify-center">
                 <Button
                   variant="secondary"
-                  className="rounded-full px-10 bg-alert-success text-primary-foreground hover:bg-alert-success"
+                  className="rounded-full px-10 bg-alert-success text-primary-foreground hover:bg-alert-success cursor-pointer"
                   onClick={() => setFailedShowSuccess(false)}
                   size="default"
                 >
@@ -875,7 +885,7 @@ export default function SystemRepositoryExpanded() {
                     onClick={() => handleViewDetails(item)}
                     className="h-8 px-4 min-w-[110px] flex items-center justify-center gap-[6px] rounded-lg border-[0.8px] border-primary/75 hover:bg-breadcrumb transition-colors whitespace-nowrap"
                   >
-                    <span className="text-primary/75 font-dm text-[13.33px] font-medium">
+                    <span className="text-primary/75 font-dm text-[13.33px] font-medium cursor-pointer">
                       View Details
                     </span>
                   </button>
@@ -934,7 +944,8 @@ export default function SystemRepositoryExpanded() {
                   <Button
                     variant="default"
                     size="sm"
-                    className="h-8 px-3 gap-[6px] rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
+                    onClick={handleDeleteClick}
+                    className="h-8 px-3 gap-[6px] rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
                   >
                     <Trash2 size={16} />
                     <span className="text-[12px] font-medium">Delete</span>
@@ -961,7 +972,7 @@ export default function SystemRepositoryExpanded() {
                           {currentModalSyncStatus === 'Failed' && (
                             <button
                               onClick={handleSyncNow}
-                              className="text-foreground font-dm text-[12px] font-medium underline hover:text-primary"
+                              className="text-foreground font-dm text-[12px] font-medium underline hover:text-primary cursor-pointer"
                             >
                               Sync now
                             </button>

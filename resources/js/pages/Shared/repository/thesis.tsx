@@ -8,7 +8,7 @@ import { RepositoryFilterBar } from '@/components/repository-filter-bar';
 import RepositoryLayout from './index';
 import { index, theses } from '@/routes/repository';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
-import { Users } from 'lucide-react';
+import { Archive } from 'lucide-react';
 
 
 // Setup
@@ -20,8 +20,7 @@ const pageHeader: PageHeaderProps = {
     title: "Thesis Archive",
     subtitle: "Browse and explore student thesis projects",
     icon: (
-        // pa correct nalang
-        <Users className="w-8 h-8 text-primary" />
+        <Archive className="w-8 h-8 text-primary" />
     ),
 };
 

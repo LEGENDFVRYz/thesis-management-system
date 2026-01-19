@@ -45,7 +45,7 @@ export function ThesisDocumentsHeader() {
       <tr>
         <th className="px-4 py-3 text-center text-sm text-white">Document</th>
         <th className="px-4 py-3 text-center text-sm text-white">Type</th>
-        <th className="px-4 py-3 text-center text-sm text-white">Version</th>
+        <th className="px-4 py-3 text-center text-sm text-white">Description</th>
         <th className="px-4 py-3 text-center text-sm text-white">Date</th>
         <th className="px-4 py-3 text-center text-sm text-white">Status</th>
         <th className="px-4 py-3 text-center text-sm text-white">Action</th>
@@ -59,7 +59,6 @@ interface ThesisDocumentRowProps {
   document: string;
   description?: string;
   type: string;
-  version: string;
   date: string;
   status: string;
 }
@@ -68,7 +67,6 @@ export function ThesisDocumentRow({
   document, 
   description, 
   type, 
-  version, 
   date, 
   status 
 }: ThesisDocumentRowProps) {
@@ -82,7 +80,7 @@ export function ThesisDocumentRow({
           {description && <div className="text-xs text-[#0A0A0A80] text-center">{description}</div>}
         </td>
         <td className="px-4 py-3 text-center text-[#0A0A0A]">{type}</td>
-        <td className="px-4 py-3 text-center text-[#0A0A0A]">{version}</td>
+        <td className="px-4 py-3 text-center text-[#0A0A0A]">{description || '—'}</td>
         <td className="px-4 py-3 text-center text-[#0A0A0A]">{date}</td>
         <td className="px-4 py-3 align-middle">
             <div className="flex justify-center">

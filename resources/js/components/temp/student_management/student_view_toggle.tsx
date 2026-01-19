@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Table, LayoutGrid } from 'lucide-react';
+import { Table, LayoutGrid, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ViewToggleProps {
@@ -10,7 +10,7 @@ interface ViewToggleProps {
 
 export function ViewToggle({ view, onViewChange, onImport }: ViewToggleProps) {
   return (
-    <div className="flex justify-between items-center mb-6">
+    <div className="flex justify-between items-center mt-6 mb-6">
       {/* View Toggle Buttons */}
       <div className="flex gap-2">
         <Button
@@ -43,7 +43,8 @@ export function ViewToggle({ view, onViewChange, onImport }: ViewToggleProps) {
 
       {/* Import Button */}
       {onImport && view === 'table' && (
-        <Button onClick={onImport}>
+        <Button onClick={onImport} className="gap-2">
+          <Upload className="w-4 h-4" />
           Import
         </Button>
       )}

@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, FileText, Users } from 'lucide-react';
+import { ArrowLeft, FileText, Archive } from 'lucide-react';
 import { AppHeader } from '@/components/app-header';
 import { NavFooter } from '@/components/nav-footer';
 import { Separator } from '@/components/ui/separator';
@@ -19,8 +19,7 @@ const pageHeader: PageHeaderProps = {
     title: "Thesis Archive",
     subtitle: "Browse and explore student thesis projects",
     icon: (
-        // pa correct nalang
-        <Users className="w-8 h-8 text-primary" />
+        <Archive className="w-8 h-8 text-primary" />
     ),
 };
 
@@ -307,7 +306,8 @@ export default function DocumentPreview({ thesis }: DocumentPreviewProps) {
                                 <h3 className="text-base font-medium text-foreground font-dm">
                                     {displayThesis.title}
                                 </h3>
-                                <Button variant="secondary">
+                                <Button variant="secondary"
+                                    className="cursor-pointer">
                                     Download Document
                                 </Button>
                             </div>
