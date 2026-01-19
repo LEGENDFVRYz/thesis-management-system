@@ -1,4 +1,3 @@
-import { SearchBar, Sort2 } from '@/components/filter-search';
 import { Icon } from '@/components/icon-index';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,10 +13,10 @@ import {
 import { index } from '@/routes/faculty/adviser/my_advisees/index';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { Filter, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 import { useState } from 'react';
 import AdviseeManagementLayout from '.';
-import { BlockAndTagsFilter } from './components/advisee-filter-search';
+import { AdviseeFilterSearch } from './components/advisee-filter-search';
 
 const breadcrumb: BreadcrumbItem[] = [
     {
@@ -30,10 +29,7 @@ const pageHeader: PageHeaderProps = {
     title: 'My Advisees',
     subtitle:
         'View and manage all students under supervision with their current thesis stages',
-    icon: (
-        // pa correct nalang
-        <Icon name="peopleLinear" className="h-8 w-8 text-primary" />
-    ),
+    icon: <Icon name="peopleLinear" className="h-8 w-8 text-primary" />,
 };
 
 interface Advisee {
@@ -81,11 +77,8 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
     const [selectedAdvisee, setSelectedAdvisee] = useState<Advisee | null>(
         null,
     );
-    const [isSortOpen, setIsSortOpen] = useState(false);
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedBlock, setSelectedBlock] = useState('');
-
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     const filteredAdvisees = displayAdvisees.filter((advisee) => {
@@ -116,67 +109,19 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
         >
             <Head title="My Advisees" />
 
-            {/* Filter & Search Section with Container Styling */}
-            <div className="box-border flex h-[134px] w-full max-w-[1360px] flex-col items-start gap-4 self-stretch rounded-[10px] border-[0.8px] border-primary/20 bg-card p-[24.8px_24.8px_0.8px_24.8px] font-dm shadow-sm transition-all duration-200">
-                {/* Header Section */}
-                <div className="flex h-6 w-full flex-row items-center gap-2 self-stretch rounded-none font-dm">
-                    <Filter className="h-5 w-5 text-primary" />
-                    <h2 className="font-dm text-base leading-6 font-normal text-primary">
-                        Search, Sort, & Filter
-                    </h2>
-                </div>
-
-                {/* Controls Row */}
-                <div className="flex w-full flex-row items-center justify-center gap-[10px] self-stretch font-dm">
-                    {/* Search Box */}
-                    <div className="flex-1 font-dm">
-                        <SearchBar
-                            variant="filter-section"
-                            placeholder="Search student name, student ID, or thesis title..."
-                            value={searchQuery}
-                            onChange={setSearchQuery}
-                        />
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex flex-row items-center gap-[10px] font-dm">
-                        {/* Sort Button */}
-                        <Button
-                            variant="secondary"
-                            size="icon"
-                            className="rounded-lg border-none font-dm"
-                            onClick={() => setIsSortOpen(true)}
-                        >
-                            <Icon name="sortDefault" size={16} />
-                        </Button>
-
-                        {/* Filter Button */}
-                        <Button
-                            variant="secondary"
-                            size="icon"
-                            className="rounded-lg border-none font-dm"
-                            onClick={() => setIsFilterOpen(true)}
-                        >
-                            <Filter className="h-4 w-4" />
-                        </Button>
-
-                        {/* Clear Filter Button */}
-                        <Button
-                            variant="negative"
-                            className="h-9 min-w-[101px] gap-2 rounded-lg px-4 py-2 font-dm"
-                            onClick={() => {
-                                setSearchQuery('');
-                                setSelectedBlock('');
-                                setSelectedTags([]);
-                            }}
-                        >
-                            <span className="font-dm text-[13.33px] font-medium">
-                                Clear Filter
-                            </span>
-                        </Button>
-                    </div>
-                </div>
-            </div>
+            <AdviseeFilterSearch
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                selectedBlock={selectedBlock}
+                onBlockChange={setSelectedBlock}
+                selectedTags={selectedTags}
+                onTagsChange={setSelectedTags}
+                onClearFilters={() => {
+                    setSearchQuery('');
+                    setSelectedBlock('');
+                    setSelectedTags([]);
+                }}
+            />
 
             <Badge variant="default" className="mt-4 mb-4">
                 Total Advisees ({filteredAdvisees.length})
@@ -355,7 +300,7 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                                         size="sm"
                                         onClick={() => {
                                             router.visit(
-                                                `/faculty/adviser/progress`, // /faculty/adviser/progress=${selectedAdvisee?.group_code}
+                                                `/faculty/adviser/progress`,
                                             );
                                         }}
                                     >
@@ -431,43 +376,11 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                             >
                                 Cancel
                             </Button>
-                            <Button
-                                variant="primary"
-                                // onClick={() => {
-                                //     router.visit(
-                                //         `/faculty/adviser/thesis-review`, (new page from thesis-review for sending message/feedback)
-                                //     );
-                                // }}
-                            >
+                            <Button variant="primary">
                                 Send Message/Feedback
                             </Button>
                         </div>
                     </div>
-                </DialogContent>
-            </Dialog>
-
-            <Dialog open={isSortOpen} onOpenChange={setIsSortOpen}>
-                <DialogContent className="p-0">
-                    <Sort2 />
-                </DialogContent>
-            </Dialog>
-
-            <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-                <DialogContent
-                    className="p-0 [&_[data-slot=dialog-overlay]]:bg-foreground/20 [&_[data-slot=dialog-overlay]]:backdrop-blur-sm"
-                    style={{ maxWidth: '350px' }}
-                >
-                    <BlockAndTagsFilter
-                        block={selectedBlock}
-                        onBlockChange={setSelectedBlock}
-                        tags={selectedTags}
-                        onTagsChange={setSelectedTags}
-                        onApply={() => setIsFilterOpen(false)}
-                        onReset={() => {
-                            setSelectedBlock('');
-                            setSelectedTags([]);
-                        }}
-                    />
                 </DialogContent>
             </Dialog>
         </AdviseeManagementLayout>

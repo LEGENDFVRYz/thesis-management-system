@@ -1,10 +1,8 @@
 import { badgesRegistry, type BadgeName } from '@/components/badges-registry';
-import { SearchBar } from '@/components/filter-search';
 import { Icon } from '@/components/icon-index';
 import { iconRegistry } from '@/components/icons-registry';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
 import {
     Table,
     TableBody,
@@ -16,11 +14,11 @@ import {
 import { index } from '@/routes/faculty/adviser/group_comp/index';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import { Filter, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import AdviseeManagementLayout from '.';
 import { GroupDetailCard, GroupOverviewCard } from './components/card-progress';
-import { BlockAndTagsFilter } from './components/progress-filter-search';
+import { ProgressFilterSearch } from './components/progress-filter-search'; // Import the new component
 
 // Setup
 const breadcrumb: BreadcrumbItem[] = [
@@ -109,9 +107,6 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
         status: 0, // temp until backend sends this
     }));
 
-    // console.log('groups from backend:', groups);
-    // console.log('displayGroups:', displayGroups);
-
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const groupCode = urlParams.get('group');
@@ -129,13 +124,8 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
     // Filters
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedBlock, setSelectedBlock] = useState('');
-    const [selectedTags, setSelectedTags] = useState<string[]>([
-        'Title Proposal',
-        'Manuscript Submission',
-        'DP1 Manuscript Revision',
-    ]);
-    const [statusTags, setStatusTags] = useState<number[]>([0, 1, 2]);
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const [statusTags, setStatusTags] = useState<number[]>([]);
 
     // Filter logic
     const filteredGroups = normalizedGroups.filter((group) => {
@@ -162,7 +152,6 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
     });
 
     // Helper to get badge
-
     const getStatusBadgeComponent = (status: number) => {
         const statusMap: Record<number, BadgeName> = {
             0: 'statusBadgePendingReview',
@@ -276,16 +265,7 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
                     <Button variant="secondary" onClick={handleBackToList}>
                         Cancel
                     </Button>
-                    <Button
-                        variant="default"
-                        // onClick={() => {
-                        //     router.visit(
-                        //         `/faculty/adviser/thesis-review`, (new page from thesis-review for sending message/feedback)
-                        //     );
-                        // }}
-                    >
-                        Send Message / Feedback
-                    </Button>
+                    <Button variant="default">Send Message / Feedback</Button>
                 </div>
             </AdviseeManagementLayout>
         );
@@ -299,55 +279,25 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
         >
             <Head title="Progress Monitoring" />
 
-            {/* Search & Filter Controls */}
-            <div className="mb-6 flex h-[125.6px] w-full max-w-[1360px] flex-col gap-4 rounded-[10px] border-[0.8px] border-primary/20 bg-card p-[24.8px_24.8px_0.8px_24.8px] font-dm shadow-sm">
-                <div className="flex h-6 w-full items-center gap-2">
-                    <Filter className="h-5 w-5 text-primary" />
-                    <h2 className="text-base font-normal text-primary">
-                        Filters & Search
-                    </h2>
-                </div>
+            {/* NEW: Use ProgressFilterSearch component */}
+            <ProgressFilterSearch
+                searchQuery={searchTerm}
+                onSearchChange={setSearchTerm}
+                selectedBlock={selectedBlock}
+                onBlockChange={setSelectedBlock}
+                selectedTags={selectedTags}
+                onTagsChange={setSelectedTags}
+                selectedStatusTags={statusTags}
+                onStatusTagsChange={setStatusTags}
+                onClearFilters={() => {
+                    setSearchTerm('');
+                    setSelectedBlock('');
+                    setSelectedTags([]);
+                    setStatusTags([]);
+                }}
+            />
 
-                <div className="flex w-full items-center gap-[10px]">
-                    <div className="flex-1">
-                        <SearchBar
-                            variant="filter-section"
-                            placeholder="Search student, group code, or thesis title..."
-                            value={searchTerm}
-                            onChange={setSearchTerm}
-                        />
-                    </div>
-
-                    <div className="flex items-center gap-[10px]">
-                        <Button
-                            variant="secondary"
-                            size="icon"
-                            onClick={() => setIsFilterOpen(true)}
-                        >
-                            <Filter className="h-4 w-4" />
-                        </Button>
-
-                        <Button
-                            variant="negative"
-                            className="h-9 min-w-[101px] gap-2 px-4 py-2"
-                            onClick={() => {
-                                setSearchTerm('');
-                                setSelectedBlock('');
-                                setSelectedTags([
-                                    'Title Proposal',
-                                    'Manuscript Submission',
-                                    'DP1 Manuscript Revision',
-                                ]);
-                                setStatusTags([0, 1, 2]);
-                            }}
-                        >
-                            Clear Filter
-                        </Button>
-                    </div>
-                </div>
-            </div>
-
-            <Badge variant="default" className="mb-4">
+            <Badge variant="default" className="mt-4 mb-4">
                 Total Groups ({filteredGroups.length})
             </Badge>
 
@@ -427,8 +377,11 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
                                             No records found
                                         </p>
                                         <p className="text-sm">
-                                            {searchTerm
-                                                ? 'Try adjusting your search'
+                                            {searchTerm ||
+                                            selectedBlock ||
+                                            selectedTags.length > 0 ||
+                                            statusTags.length > 0
+                                                ? 'Try adjusting your filters'
                                                 : 'Groups will appear once available'}
                                         </p>
                                     </div>
@@ -442,39 +395,6 @@ export default function Dashboard({ groups = [] }: ProgressProps) {
                     {filteredGroups.length} of {displayGroups.length} Groups
                 </div>
             </div>
-
-            {/* Filters Modal */}
-            <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-                <DialogContent
-                    className="p-0 [&_[data-slot=dialog-overlay]]:bg-foreground/20 [&_[data-slot=dialog-overlay]]:backdrop-blur-sm"
-                    style={{
-                        maxWidth: '400px',
-                        overflow: 'visible',
-                    }}
-                >
-                    <BlockAndTagsFilter
-                        block={selectedBlock}
-                        onBlockChange={setSelectedBlock}
-                        tags={selectedTags}
-                        onTagsChange={setSelectedTags}
-                        statusTags={statusTags}
-                        onStatusTagsChange={setStatusTags}
-                        searchTerm={searchTerm}
-                        onSearchTermChange={setSearchTerm}
-                        onApply={() => setIsFilterOpen(false)}
-                        onReset={() => {
-                            setSelectedBlock('');
-                            setSelectedTags([
-                                'Title Proposal',
-                                'Manuscript Submission',
-                                'DP1 Manuscript Revision',
-                            ]);
-                            setStatusTags([0, 1, 2]);
-                            setSearchTerm('');
-                        }}
-                    />
-                </DialogContent>
-            </Dialog>
         </AdviseeManagementLayout>
     );
 }
