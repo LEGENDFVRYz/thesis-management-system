@@ -7,7 +7,7 @@ import FacultyManagementLayout from '@/pages/Faculty/management/index';
 import { Eye, CheckCircle, Layers, X, AlertCircle, Send } from 'lucide-react';
 import { useState } from 'react';
 import DocumentPreview from '@/components/document-preview';
-import { Icon } from '@/components/icon-index';
+import PanelEndorsementIcon from '@/components/Icons/panel_endorsement.svg';
 
 // Setup
 const breadcrumbs: BreadcrumbItem[] = [
@@ -21,11 +21,7 @@ const pageHeader: PageHeaderProps = {
     title: "Panel Endorsement" ,
     subtitle: "Endorse approved proposals/theses of your advisory class for formal review",
     icon: (
-        // pa correct nalang
-        <Icon
-            name="calendarDefault"
-            className="w-8 h-8 text-primary"
-        />
+        <img src={PanelEndorsementIcon} alt="Panel Endorsement" className="w-8 h-8" />
     ),
 };
 
