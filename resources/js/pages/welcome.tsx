@@ -1,6 +1,7 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { NavFooter } from '@/components/nav-footer';
 import { AppHeader } from '@/components/app-header';
+import { login } from '@/routes/guest/index';
 import { useState, useEffect } from 'react';
 import { ResearchAreaChart } from '@/components/research-area-distribution-pie';
 import FilterIcon from '@/components/icons/filter-icon';
@@ -45,6 +46,19 @@ export default function Welcome() {
             window.removeEventListener('scroll', handleScroll, true);
         };
     }, [isFilterOpen]);
+
+
+    // Guest Initial temporary login button
+    const form = useForm({});
+
+    const handleGuestLogin = () => {
+        form.post(login().url, {
+            onError: (errors) => {
+                console.error('Guest login error:', errors);
+            },
+        });
+    };
+
 
     // Placeholder thesis data
     const recentProjects = [
@@ -175,6 +189,19 @@ export default function Welcome() {
                         <div className="space-y-6">
                             {/* Login and Repository Buttons */}
                             <QuickLinks />
+                            
+                            {/* Login as a Guest */}
+                            <div className="flex justify-center my-6 mb-9">
+                                <Button
+                                    variant="outline"
+                                    size="lg"
+                                    className="px-6 py-3 font-semibold w-full"
+                                    onClick={handleGuestLogin}
+                                    disabled={form.processing}
+                                >
+                                    {form.processing ? 'Logging in...' : 'Login as Guest'}
+                                </Button>
+                            </div>
 
                             {/* About Section */}
                             <MetricCard

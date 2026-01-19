@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureGuest;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
@@ -32,7 +33,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // faculty sub-roles checker
             'faculty.role' => \App\Http\Middleware\CheckFacultyRole::class,
 
-            'gues' => \App\Http\Middleware\Guesser::class,
+            'guestAuth' => \App\Http\Middleware\Guest::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
