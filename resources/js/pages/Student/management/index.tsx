@@ -29,7 +29,7 @@ export default function StudentManagementLayout({ children, breadcrumbs, pageHea
             <div className="flex h-full flex-1">
 
                 {/* Main Content Area */}
-                <div className="flex-1 h-full p-6 overflow-x-auto">
+                <div className="flex-1 h-full overflow-x-auto">
                     {children}
                 </div>
             </div>

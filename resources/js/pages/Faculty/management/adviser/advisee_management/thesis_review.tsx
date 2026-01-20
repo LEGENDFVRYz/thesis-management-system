@@ -34,6 +34,27 @@ const pageHeader: PageHeaderProps = {
     ),
 };
 
+// Interface
+interface AdviserGroup {
+    group_id: number;
+    group_number: number;
+    section: number;
+    thesis_title: string;
+    proponents: string;
+    proponent_count: number;
+    year_level: number;
+    group_code: string;
+    // Needed later
+    // status?: string; 
+    // submission_count?: number; 
+    // last_submission_date?: string;
+}
+
+interface PageProps {
+    groups: AdviserGroup[]; // Data passed from Laravel
+}
+
+
 
 const mockThesisGroups = [
   {
@@ -322,22 +343,28 @@ function CommentItem({ author, date, text, avatar }: CommentItemProps) {
     );
 }
 
-export default function ThesisReview() {
-    const [selectedGroup, setSelectedGroup] = useState<typeof mockThesisGroups[0] | null>(null);
+export default function ThesisReview({ groups }: PageProps) {
+    const [selectedGroup, setSelectedGroup] = useState<AdviserGroup | null>(null);
     const [selectedSubmission, setSelectedSubmission] = useState<any | null>(null);
     const [commentText, setCommentText] = useState('');
     const [pageNumber, setPageNumber] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
 
     // Filter groups based on search query
-    const filteredGroups = mockThesisGroups.filter(
-        (group) =>
-            group.groupCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            group.thesisTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            group.section.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredGroups = groups.filter((group) => {
+        const query = searchQuery.toLowerCase();
+        
+        // Construct the section string (e.g., "BSCPE 4-1") for searching
+        const sectionString = `BSCPE ${group.year_level}-${group.section}`;
 
-    const handleGroupClick = (group: typeof mockThesisGroups[0]) => {
+        return (
+            group.group_code.toLowerCase().includes(query) ||
+            group.thesis_title.toLowerCase().includes(query) ||
+            sectionString.toLowerCase().includes(query)
+        );
+    });
+
+    const handleGroupClick = (group: AdviserGroup) => {
         setSelectedGroup(group);
         setSelectedSubmission(null);
     };
@@ -388,9 +415,9 @@ export default function ThesisReview() {
 
                     <div className="bg-primary text-white rounded-lg p-6">
                         <h1 className="text-2xl font-bold mb-2">{selectedSubmission.title}</h1>
-                        <p className="text-sm text-white/90 mb-1">{selectedGroup.thesisTitle}</p>
+                        <p className="text-sm text-white/90 mb-1">{selectedGroup.thesis_title}</p>
                         <div className="flex items-center gap-4 text-sm">
-                            <span>{selectedGroup.groupCode}</span>
+                            <span>{selectedGroup.group_code}</span>
                             <span>•</span>
                             <span>Submitted by {selectedSubmission.submittedBy}</span>
                         </div>
@@ -438,7 +465,7 @@ export default function ThesisReview() {
                                         Defense ID:
                                     </p>
                                     <p className="text-[13px] leading-[17px] font-medium text-[rgba(10,10,10,0.8)]">
-                                        4305
+                                        {selectedGroup.group_code}
                                     </p>
                                 </div>
 
@@ -456,14 +483,13 @@ export default function ThesisReview() {
                                         Submitted Date:
                                     </p>
                                     <p className="text-[11px] leading-[14px] font-medium text-[rgba(10,10,10,0.8)]">
-                                        November 18, 2025
+                                        January 18, 2026
                                     </p>
                                 </div>
                             </div>
                             
                             <div className="flex justify-center gap-4 pt-4 border-t mt-4">
                                 <Button variant="outline" className="w-70 px-6 py-2 border-[#730000] text-[#730000] hover:bg-red-50" >
-                
                                     Request Revisions
                                 </Button>
                                 <Button variant="negative"className="w-70">
@@ -526,7 +552,7 @@ export default function ThesisReview() {
 
     // Submissions List View
     if (selectedGroup) {
-        const submissions = getSubmissionsForGroup(selectedGroup.groupCode);
+        const submissions = getSubmissionsForGroup(selectedGroup.group_code);
 
         return (
             <AdviseeManagementLayout 
@@ -546,11 +572,12 @@ export default function ThesisReview() {
                     <div className="relative bg-white border border-[#7A7A8A] rounded-[10px] p-[18px_17px] shadow-[0px_4px_4px_rgba(0,0,0,0.25)]">
                         <div className="flex items-center justify-between mb-[3px]">
                             <h2 className="text-base leading-[21px] font-semibold text-primary">
-                                {selectedGroup.groupCode}
+                                {selectedGroup.group_code}
                             </h2>
-                            {selectedGroup.badge && (
+                            {/* {selectedGroup.badge && (
                                 <StatusBadge status={selectedGroup.badge} />
-                            )}
+                            )} */}
+                            <StatusBadge status={"Pending Review"} />
                         </div>
                         
                         <div className="flex items-center gap-[6px] mb-[3px]">
@@ -558,28 +585,28 @@ export default function ThesisReview() {
                                 <path d="M16 12V4H17V2H7V4H8V12L6 14V16H11V22H13V16H18V14L16 12Z" fill="#730000"/>
                             </svg>
                             <span className="text-[13.33px] leading-[17px] font-medium text-primary">
-                                {selectedGroup.thesisTitle}
+                                {selectedGroup.thesis_title}
                             </span>
                         </div>
 
                         <Badge variant="outline" className="text-[8px] h-auto px-2 py-0.5 mb-[3px]">
-                            {selectedGroup.section}
+                            BSCPE {selectedGroup.year_level}-{selectedGroup.section}
                         </Badge>
 
                         <div className="flex items-center gap-[6px] mt-[3px] pt-[3px] border-t border-gray-200">
                             <User className="w-[10px] h-[10px] text-[#8B8B98]" />
                             <span className="text-[8px] leading-[10px] font-medium text-[#7A7A8A]">
-                                {selectedGroup.numberofMembers}
+                                {selectedGroup.proponent_count}
                             </span>
                             <span className="text-[#7A7A8A] mx-0.5">•</span>
                             <FileText className="w-[10px] h-[10px] text-[#8B8B98]" />
                             <span className="text-[8px] leading-[10px] font-medium text-[#7A7A8A]">
-                                {selectedGroup.numberofSubmissions}
+                                "3 Submissions"
                             </span>
                             <span className="text-[#7A7A8A] mx-0.5">•</span>
                             <Calendar className="w-[10px] h-[10px] text-[#8B8B98]" />
                             <span className="text-[8px] leading-[10px] font-medium text-[#7A7A8A]">
-                                Last submission: {selectedGroup.lastSubmissionDate}
+                                Last submission: January 18, 2026
                             </span>
                         </div>
                     </div>
@@ -662,23 +689,29 @@ export default function ThesisReview() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredGroups.map((group, index) => (
-                        <div 
-                            key={index}
-                            onClick={() => handleGroupClick(group)}
-                            className="cursor-pointer"
-                        >
-                            <AdviseeGroupCard
-                                groupCode={group.groupCode}
-                                badge={group.badge}
-                                thesisTitle={group.thesisTitle}
-                                section={group.section}
-                                numberofMembers={group.numberofMembers}
-                                numberofSubmissions={group.numberofSubmissions}
-                                lastSubmissionDate={group.lastSubmissionDate}
-                            />
+                    {filteredGroups.length > 0 ? (
+                        filteredGroups.map((group, index) => (
+                            <div 
+                                key={index}
+                                onClick={() => handleGroupClick(group)}
+                                className="cursor-pointer"
+                            >
+                                <AdviseeGroupCard
+                                    groupCode={group.group_code}
+                                    badge={"Pending Review"}
+                                    thesisTitle={group.thesis_title}
+                                    section={`BSCPE ${group.year_level}-${group.section}`}
+                                    numberofMembers={`${group.proponent_count} Members`}
+                                    numberofSubmissions={"3 Submissions"}
+                                    lastSubmissionDate={"January 18, 2026"}
+                                />
+                            </div>
+                        ))
+                    ) : (
+                        <div className="col-span-full text-center py-10 text-gray-500">
+                            No groups found.
                         </div>
-                    ))}
+                    )}
                 </div>
             </div>
         </AdviseeManagementLayout>

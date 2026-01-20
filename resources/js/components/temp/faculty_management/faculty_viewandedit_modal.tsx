@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { RadioGroup } from "@/components/ui/radio-group";
 import { RadioGroupItemWithLabel } from "@/components/ui/radio-group-with-label";
@@ -8,22 +8,36 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { X, Upload, Check, AlertCircle, AlertCircleIcon } from 'lucide-react';
 import { useFacultyValidation } from './faculty_validation';
+import { router } from '@inertiajs/react';
+
+
+interface SectionOption {
+  value: string;
+  label: string;
+}
 
 interface Faculty {
   id: string;
   name: string;
+  firstName: string; 
+  lastName: string;
+  suffix: string;
+  prefix: string;
   email: string;
   roles: string[];
   type: string;
   dateAdded: string;
   initials?: string;
   hasPhoto?: boolean;
+  adviseeBlock?: string;
+  adviseeYear?: string;
 }
 
 interface ViewEditFacultyModalProps {
   isOpen: boolean;
   onClose: () => void;
   faculty: Faculty | null;
+  availableSections: SectionOption[];
 }
 
 // Confirmation Popup Component
@@ -39,7 +53,7 @@ function ConfirmationPopup({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
       <div className="bg-white rounded-lg p-8 max-w-sm w-full mx-4 shadow-xl">
         <div className="flex flex-col items-center text-center">
           {/* Warning Icon */}
@@ -113,7 +127,7 @@ function SuccessPopup({
   );
 }
 
-export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacultyModalProps) {
+export function ViewEditFacultyModal({ isOpen, onClose, faculty, availableSections = [] }: ViewEditFacultyModalProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
   const [showArchiveSuccess, setShowArchiveSuccess] = useState(false);
@@ -142,26 +156,63 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
     handleRoleToggle: hookHandleRoleToggle,
     handleSubmit,
     resetValidation,
+    setErrors,
   } = useFacultyValidation();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const dynamicSectionOptions = useMemo(() => {
+    // If we have a current block and it's not in availableSections, add it temporarily
+    if (formData.adviseeBlock && !availableSections.some(s => s.value === formData.adviseeBlock)) {
+        return [
+            { value: formData.adviseeBlock, label: `BSCPE 3-${formData.adviseeBlock}` },
+            ...availableSections
+        ].sort((a, b) => a.value.localeCompare(b.value));
+    }
+    return availableSections;
+  }, [availableSections, formData.adviseeBlock]);
+
+  const canSelectAdviser = dynamicSectionOptions.length > 0;
+
+  // --- HELPER TO PARSE FACULTY DATA ---
+  const parseFacultyData = (fac: Faculty) => {
+    // 2. FIXED MAPPING: Use correct property names from Interface
+    const currentTitle = fac.prefix || ""; 
+    const firstName = fac.firstName || "";
+    const lastName = fac.lastName || "";
+    const suffix = fac.suffix || "";
+
+    // Normalize Roles
+    const mappedRoles = fac.roles.map(r => {
+        if (r === "Coordinator") return "Thesis Coordinator";
+        if (r === "Adviser") return "Thesis Adviser";
+        return r; 
+    });
+
+    // Normalize Faculty Type
+    let typeVal = fac.type;
+    if (typeVal === "Full-time") typeVal = "Full-Time";
+    if (typeVal === "Part-time") typeVal = "Part-Time";
+
+    return {
+      firstName,
+      lastName,
+      suffix,
+      facultyId: fac.id,
+      pupWebmail: fac.email,
+      title: currentTitle, 
+      facultyType: typeVal,
+      roles: mappedRoles,
+      adviseeBlock: fac.adviseeBlock ? String(fac.adviseeBlock) : "",
+      photoPreview: fac.hasPhoto ? "" : null,
+      status: "Active",
+    };
+  };
+    
+
   useEffect(() => {
     if (faculty) {
-      const [firstName, ...lastNameParts] = faculty.name.split(' ');
-      setFormData({
-        firstName: firstName || "",
-        lastName: lastNameParts.join(' ') || "",
-        suffix: "",
-        facultyId: faculty.id,
-        pupWebmail: faculty.email,
-        title: "",
-        facultyType: faculty.type,
-        roles: faculty.roles,
-        adviseeBlock: "",
-        photoPreview: faculty.hasPhoto ? "" : null,
-        status: "Active",
-      });
+      setFormData(parseFacultyData(faculty));
     }
   }, [faculty]);
 
@@ -177,20 +228,67 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
   };
 
   const onRoleToggle = (role: string) => {
+    if (role === "Thesis Adviser" && !canSelectAdviser && !formData.roles.includes("Thesis Adviser")) {
+      return;
+    }
+
     hookHandleRoleToggle(role, formData.roles, formData);
     setFormData(prev => ({
       ...prev,
       roles: prev.roles.includes(role) 
         ? prev.roles.filter(r => r !== role) 
         : [...prev.roles, role],
+      // If unchecking, clear block. If checking, keep existing or empty.
       adviseeBlock: role === "Thesis Adviser" && prev.roles.includes(role) ? "" : prev.adviseeBlock
     }));
   };
 
   const onSave = () => {
     handleSubmit(formData, () => {
-      console.log("Saved faculty data:", formData);
-      setShowSaveSuccess(true);
+      // 2. Prepare Payload (Match backend expectations)
+      // Map roles back to simple strings (e.g., "Thesis Coordinator" -> "Coordinator")
+      const dbRoles = formData.roles.map(role => {
+          if (role === "Thesis Coordinator") return "Coordinator";
+          if (role === "Thesis Adviser") return "Adviser";
+          return role;
+      });
+
+      const payload = {
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          suffix: formData.suffix,
+          faculty_id: formData.facultyId,
+          email: formData.pupWebmail,
+          name_prefix: formData.title,
+          type: formData.facultyType,
+          roles: dbRoles,
+          advisee_block: formData.adviseeBlock
+      };
+
+      // 3. Send PUT Request
+        if (faculty?.id) {
+          router.put(`/admin/management/faculty/${faculty.id}`, payload, {
+              onSuccess: () => {
+                  setShowSaveSuccess(true);
+                  setIsEditing(false);
+              },
+              onError: (serverErrors) => {
+                  // --- FIX START: Map Backend Errors ---
+                  const mappedErrors: any = {};
+
+                  if (serverErrors.email) mappedErrors.pupWebmail = serverErrors.email;
+                  if (serverErrors.faculty_id) mappedErrors.facultyId = serverErrors.faculty_id;
+                  // Handle unique validation on update often returning 'identity_no' error
+                  if (serverErrors.identity_no) mappedErrors.facultyId = serverErrors.identity_no; 
+
+                  if (serverErrors.first_name) mappedErrors.firstName = serverErrors.first_name;
+                  if (serverErrors.last_name) mappedErrors.lastName = serverErrors.last_name;
+                  
+                  setErrors(mappedErrors);
+                  // --- FIX END ---
+              }
+          });
+      }
     });
   };
 
@@ -220,20 +318,7 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
     resetValidation();
     
     if (faculty) {
-      const [firstName, ...lastNameParts] = faculty.name.split(' ');
-      setFormData({
-        firstName: firstName || "",
-        lastName: lastNameParts.join(' ') || "",
-        suffix: "",
-        facultyId: faculty.id,
-        pupWebmail: faculty.email,
-        title: "",
-        facultyType: faculty.type,
-        roles: faculty.roles,
-        adviseeBlock: "",
-        photoPreview: faculty.hasPhoto ? "" : null,
-        status: "Active",
-      });
+      setFormData(parseFacultyData(faculty));
     }
   };
 
@@ -245,7 +330,7 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
         <div className="bg-white rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto">
           {/* Header */}
           <div className="bg-primary text-white p-6 rounded-t-lg relative">
-            <h2 className="text-[35px] font-bold text-center">
+            <h2 className="text-[25px] font-bold text-center">
               {isEditing ? "Edit Faculty" : "View Faculty"}
             </h2>
             <Button variant="link"
@@ -260,7 +345,7 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
             {/* Photo */}
             <div className="flex flex-col items-center mb-6">
               <div 
-                className={`w-45 h-45 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden ${
+                className={`w-30 h-30 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden ${
                   isEditing ? 'cursor-pointer hover:opacity-80' : ''
                 } transition-opacity`}
                 onClick={() => isEditing && fileInputRef.current?.click()}
@@ -297,8 +382,7 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
             {/* Faculty Name & Role */}
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold text-primary mb-2">
-                {formData.title && `${formData.title} `}
-                {faculty.name.toUpperCase()}
+                {`${formData.title ? formData.title + ' ' : ''}${formData.firstName} ${formData.lastName} ${formData.suffix ? ' ' + formData.suffix : ''}`.toUpperCase()}
               </h3>
               {!isEditing && formData.roles.length > 0 && (
                 <div className="flex justify-center gap-2 flex-wrap">
@@ -444,7 +528,7 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
                       >
                         <RadioGroupItemWithLabel id="fullTime-edit" value="Full-Time" label="Full-Time" />
                         <RadioGroupItemWithLabel id="partTime-edit" value="Part-Time" label="Part-Time" />
-                        <RadioGroupItemWithLabel id="external-edit" value="External (Non-Faculty)" label="External (Non-Faculty)" />
+                        {/* <RadioGroupItemWithLabel id="external-edit" value="External (Non-Faculty)" label="External (Non-Faculty)" /> */}
                       </RadioGroup>
                       {errors.facultyType && touched.facultyType && isSubmitAttempted && (
                         <p className="text-red-500 text-xs mt-1">{errors.facultyType}</p>
@@ -527,13 +611,22 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
                       label="Thesis Adviser"
                       checked={formData.roles.includes("Thesis Adviser")}
                       onCheckedChange={() => onRoleToggle("Thesis Adviser")}
+                      disabled={!canSelectAdviser}
                     />
-                    <CheckboxWithLabel
+                    {/* <CheckboxWithLabel
                       id="panelMember-edit"
                       label="Panel Member"
                       checked={formData.roles.includes("Panel Member")}
                       onCheckedChange={() => onRoleToggle("Panel Member")}
-                    />
+                    /> */}
+
+                    {/* ALERT IF NO SECTIONS */}
+                    {!canSelectAdviser && (
+                        <div className="flex items-center gap-2 p-2 mb-2 bg-yellow-50 text-yellow-700 text-xs rounded border border-yellow-200">
+                            <AlertCircle className="w-4 h-4" />
+                            <span>All sections currently have an assigned adviser.</span>
+                        </div>
+                    )}
                   </div>
 
                   {formData.roles.includes("Thesis Adviser") && (
@@ -555,13 +648,11 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
                           <SelectValue placeholder="Select Block..." />
                         </SelectTrigger>
                         <SelectContent className='!w-100'>
-                          <SelectItem value="BSCPE Section 1">BSCPE Section 1</SelectItem>
-                          <SelectItem value="BSCPE Section 2">BSCPE Section 2</SelectItem>
-                          <SelectItem value="BSCPE Section 3">BSCPE Section 3</SelectItem>
-                          <SelectItem value="BSCPE Section 4">BSCPE Section 4</SelectItem>
-                          <SelectItem value="BSCPE Section 5">BSCPE Section 5</SelectItem>
-                          <SelectItem value="BSCPE Section 6">BSCPE Section 6</SelectItem>
-                          <SelectItem value="BSCPE Section 7">BSCPE Section 7</SelectItem>
+                          {dynamicSectionOptions.map((section) => (
+                              <SelectItem key={section.value} value={section.value}>
+                                  {section.label}
+                              </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       {errors.adviseeBlock && touched.adviseeBlock && isSubmitAttempted && (
@@ -588,7 +679,15 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty }: ViewEditFacul
                         </div>
                         <div>
                           <p className="text-sm text-gray-500 mb-1">Assigned Block</p>
-                          <p className="text-base font-medium">{formData.adviseeBlock}</p>
+                          {/* Display Label if possible, fallback to value */}        
+                            <p className="text-base font-medium">
+                                {isEditing 
+                                    ? (dynamicSectionOptions.find(s => s.value === formData.adviseeBlock)?.label || "N/A")
+                                    : (faculty.adviseeBlock 
+                                        ? `BSCPE ${faculty.adviseeYear || '3'}-${faculty.adviseeBlock}` 
+                                        : "Not Assigned")
+                                }
+                            </p>
                         </div>
                       </div>
                     )}

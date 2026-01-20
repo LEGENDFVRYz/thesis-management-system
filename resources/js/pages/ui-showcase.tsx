@@ -1177,7 +1177,6 @@ export default function UIShowcase() {
                                 <TableCaption>A list of recent thesis submissions</TableCaption>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Student Name</TableHead>
                                         <TableHead>Thesis Title</TableHead>
                                         <TableHead>Status</TableHead>
                                         <TableHead className="text-right">Grade</TableHead>

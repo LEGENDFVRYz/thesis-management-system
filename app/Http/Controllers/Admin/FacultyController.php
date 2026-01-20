@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -30,7 +31,30 @@ class FacultyController extends Controller
                 'tbl_faculties.is_regular',
                 
                 DB::raw("DATE_FORMAT(users.created_at, '%M %e, %Y') as date_added"),
-                DB::raw("GROUP_CONCAT(DISTINCT tbl_faculty_roles.role_name SEPARATOR ', ') as roles")
+                DB::raw("GROUP_CONCAT(DISTINCT tbl_faculty_roles.role_name SEPARATOR ', ') as roles"), 
+
+                DB::raw("(
+                    SELECT sa.section 
+                    FROM tbl_section_advisers sa
+                    JOIN tbl_faculty_assignments fa ON sa.faculty_assign_id = fa.id
+                    JOIN tbl_faculty_roles fr ON fa.role_id = fr.id
+                    WHERE fa.faculty_id = tbl_faculties.id AND fr.role_name = 'Adviser'
+                    LIMIT 1
+                ) as advisee_block"),
+
+                DB::raw("(
+                    SELECT 
+                        CASE 
+                            WHEN sa.id BETWEEN 1 AND 7 THEN '3' 
+                            WHEN sa.id BETWEEN 8 AND 14 THEN '4'
+                            ELSE '?' 
+                        END
+                    FROM tbl_section_advisers sa
+                    JOIN tbl_faculty_assignments fa ON sa.faculty_assign_id = fa.id
+                    JOIN tbl_faculty_roles fr ON fa.role_id = fr.id
+                    WHERE fa.faculty_id = tbl_faculties.id AND fr.role_name = 'Adviser'
+                    LIMIT 1
+                ) as advisee_year")
             )
             ->groupBy(
                 'tbl_faculties.id',
@@ -45,10 +69,34 @@ class FacultyController extends Controller
             )
             ->get();
 
-        // dd($faculties);
+        $availableRows = DB::table('tbl_section_advisers')
+        ->whereBetween('id', [1, 14])
+        ->whereNull('faculty_assign_id') 
+        ->select('id', 'section')
+        ->orderBy('id', 'asc')
+        ->get();
+
+        // 2. Format for Frontend Dropdown
+        $formattedSections = $availableRows->map(function ($row) {
+            // Determine Year Level based on ID range
+            // IDs 1-7 are 3rd Year, IDs 8-14 are 4th Year
+            $year = ($row->id <= 7) ? 3 : 4;
+
+            return [
+                // VALUE: We combine Year and Section (e.g., "3-1" or "4-1") 
+                // This ensures "Section 1" of 3rd year is different from "Section 1" of 4th year.
+                'value' => "{$year}-{$row->section}", 
+                
+                // LABEL: What the user sees
+                'label' => "BSCPE {$year}-{$row->section}"
+            ];
+        })->values()->toArray();
+
+        // dd($takenSections, $availableSections, $formattedSections);
 
         return Inertia::render('Admin/management/faculty', [
-            'faculties'=> $faculties
+            'faculties'=> $faculties,
+            'availableSections' => $formattedSections
         ]);
     }
 
@@ -208,7 +256,100 @@ class FacultyController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        
+        $user = User::where('identity_no', $id)->firstOrFail();
+        // 1. Validation
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'faculty_id' => 'required|string|max:50|unique:users,identity_no,' . $user->id, // Identity No
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'type' => 'required|string',
+            'roles' => 'array',
+            'advisee_block' => 'nullable|string'
+        ]);
+
+        $activeSyId = DB::table('tbl_semesters')->where('is_active', true)->value('school_year_id');
+
+        if (!$activeSyId) {
+            return back()->withErrors(['error' => 'Active school year not found.']);
+        }
+
+        // 2. Start Transaction
+        DB::beginTransaction();
+
+        try {
+            // A. Find the User
+            // Note: $id from route might be identity_no. Let's find user by it.
+            $user = User::where('identity_no', $id)->firstOrFail();
+
+            // B. Update User Table
+            $user->update([
+                'email' => $validated['email'],
+                'identity_no' => $validated['faculty_id']   
+            ]);
+
+            // C. Update Faculty Profile Table
+            $faculty = DB::table('tbl_faculties')->where('user_id', $user->id)->first();
+            
+            if ($faculty) {
+                DB::table('tbl_faculties')->where('id', $faculty->id)->update([
+                    'first_name' => $validated['first_name'],
+                    'last_name' => $validated['last_name'],
+                    'suffix' => $request->suffix,
+                    'name_prefix' => $request->name_prefix,
+                    'is_regular' => ($validated['type'] === 'Full-Time' || $validated['type'] === 'Full-time') ? 1 : 0,
+                    'updated_at' => now(),
+                ]);
+            }
+
+            // D. Sync Roles (Delete old, Add new)
+            // First, remove existing assignments for this faculty
+            DB::table('tbl_faculty_assignments')->where('faculty_id', $faculty->id)->delete();
+
+            // Add new roles
+            foreach ($validated['roles'] as $roleName) {
+                $roleId = DB::table('tbl_faculty_roles')->where('role_name', $roleName)->value('id');
+                
+                if ($roleId) {
+                    $assignmentId = DB::table('tbl_faculty_assignments')->insertGetId([
+                        'faculty_id' => $faculty->id,
+                        'role_id' => $roleId,
+                        'sy_id' => $activeSyId,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+
+                    // E. Handle "Adviser" Section Assignment
+                    if ($roleName === 'Adviser' && !empty($validated['advisee_block'])) {
+                        // $validated['advisee_block'] is "1", "2", etc.
+                        
+                        // Clear previous section assignment for this faculty (optional safeguard)
+                        DB::table('tbl_section_advisers')
+                            ->where('faculty_assign_id', $assignmentId) 
+                            ->update(['faculty_assign_id' => null]);
+
+                        // Assign to new section
+                        // We need to find the section row. Assuming sections 1-7 (IDs 1-7) are 3rd year.
+                        // You might need a more robust way to find the correct section ID based on the string "1".
+                        
+                        DB::table('tbl_section_advisers')
+                        ->where('section', $validated['advisee_block'])
+                        ->whereBetween('id', [1, 7]) 
+                        ->update([
+                            'faculty_assign_id' => $assignmentId
+                        ]);
+                    }
+                }
+            }
+
+            DB::commit();
+            return back()->with('success', 'Faculty updated successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => 'Failed to update faculty: ' . $e->getMessage()]);
+        }
     }
 
     /**

@@ -1,24 +1,23 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import ManagementLayout from '@/pages/Admin/management/index';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Plus } from 'lucide-react';
 
 // SHARED COMPONENTS 
 import { NavFooter } from '@/components/nav-footer';
 import { Button } from '@/components/ui/button';
-import { Filter as FilterIcon } from 'lucide-react';
 import { Icon } from '@/components/icon-index';
-import { SearchBar } from '@/components/filter-search';
+import FilterSearchSection from '@/components/filter-search-section';
+
 
 // FACULTY COMPONENTS
-import { Dropdown } from '../../../components/temp/faculty_management/faculty_dropdown';
-import { FacultyFilterDropdown } from '../../../components/temp/faculty_management/faculty_filter_dropdown';
-import { FacultySortDropdown } from '../../../components/temp/faculty_management/faculty_sort_dropdown';
+import { FacultyTable } from '../../../components/temp/faculty_management/faculty_table';
+import { Faculty } from '../../../components/temp/faculty_management/faculty_types';
 import { AddFacultyModal } from '../../../components/temp/faculty_management/faculty_add_modal';
 import { ViewEditFacultyModal } from '../../../components/temp/faculty_management/faculty_viewandedit_modal';
-import { FacultyTable } from '../../../components/temp/faculty_management/faculty_table';
-import { Faculty, FilterState } from '../../../components/temp/faculty_management/faculty_types';
-
+import { FacultyFilterSearch } from '@/components/temp/faculty_management/faculty_filter_search';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // Page Setup
 const breadcrumbs: BreadcrumbItem[] = [
@@ -34,13 +33,18 @@ const pageHeader: PageHeaderProps = {
     icon: (
         // paki coprrect nalang ng icon
         <Icon
-            name="calendarDefault"
+            name="proponentsDefault"
             className="w-8 h-8 text-primary"
         />
     ),
 };
 
 // INTERFACE
+
+interface SectionOption {
+    value: string;
+    label: string;
+}
 interface RawFaculty {
     faculty_id: string;
     email: string;
@@ -51,10 +55,21 @@ interface RawFaculty {
     is_regular: number;
     date_added: string;
     roles: string | null;
+    advisee_block: string | null;
+    advisee_year: string | null;
+}
+
+interface PageProps {
+    faculties: RawFaculty[];
+    availableSections: SectionOption[];
 }
 
 
-export default function FacultyManagement({ faculties }: { faculties: RawFaculty[] }) {
+export default function FacultyManagement({ faculties, availableSections }: PageProps) {
+
+    // --- PAGINATION STATE ---
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
 
     // TRANSFORM DATA: Map Laravel props to Frontend Interface
     const processedData: Faculty[] = useMemo(() => {
@@ -73,14 +88,14 @@ export default function FacultyManagement({ faculties }: { faculties: RawFaculty
                 roles: fac.roles ? fac.roles.split(', ') : [], 
                 type: fac.is_regular ? "Full-time" : "Part-time",
                 dateAdded: fac.date_added,
-                initials: (fac.first_name[0] + fac.last_name[0]).toUpperCase()
+                initials: (fac.first_name[0] + fac.last_name[0]).toUpperCase(),
+                adviseeBlock: fac.advisee_block || "",
+                adviseeYear: fac.advisee_year || ""
             };
         });
     }, [faculties]);
     
     const [searchQuery, setSearchQuery] = useState("");
-    const [filters, setFilters] = useState<FilterState>({ roles: [], facultyType: "" });
-    const [sortOption, setSortOption] = useState("");
     const [filterOpen, setFilterOpen] = useState(false);
     const [sortOpen, setSortOpen] = useState(false);
     const [addFacultyOpen, setAddFacultyOpen] = useState(false);
@@ -90,7 +105,7 @@ export default function FacultyManagement({ faculties }: { faculties: RawFaculty
     const sortButtonRef = useRef<HTMLButtonElement>(null);
     const filterButtonRef = useRef<HTMLButtonElement>(null);
 
-    // Apply filtering and sorting
+    // Apply search 
     const filteredAndSortedData = useMemo(() => {
         let result = [...processedData];
 
@@ -99,49 +114,57 @@ export default function FacultyManagement({ faculties }: { faculties: RawFaculty
             result = result.filter(faculty =>
                 faculty.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 faculty.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                faculty.id.toLowerCase().includes(searchQuery.toLowerCase())
+                faculty.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                faculty.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                faculty.roles.join(' ').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                faculty.dateAdded.toLowerCase().includes(searchQuery.toLowerCase())
             );
-        }
-
-        // Apply role filter
-        if (filters.roles.length > 0) {
-            result = result.filter(faculty =>
-                faculty.roles.some(role => filters.roles.includes(role))
-            );
-        }
-
-        // Apply faculty type filter
-        if (filters.facultyType) {
-            result = result.filter(faculty => faculty.type === filters.facultyType);
-        }
-
-        // Apply sorting
-        if (sortOption === "faculty-id-asc") {
-            result.sort((a, b) => a.id.localeCompare(b.id));
-        } else if (sortOption === "faculty-id-desc") {
-            result.sort((a, b) => b.id.localeCompare(a.id));
-        } else if (sortOption === "faculty-name-a-z") {
-            result.sort((a, b) => a.name.localeCompare(b.name));
-        } else if (sortOption === "faculty-name-z-a") {
-            result.sort((a, b) => b.name.localeCompare(a.name));
-        } else if (sortOption === "date-oldest") {
-            result.sort((a, b) => new Date(a.dateAdded).getTime() - new Date(b.dateAdded).getTime());
-        } else if (sortOption === "date-newest") {
-            result.sort((a, b) => new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime());
         }
 
         return result;
-    }, [processedData, searchQuery, filters, sortOption]);
+    }, [processedData, searchQuery]);
+
+    // --- PAGINATION LOGIC ---
+    useEffect(() => {
+        setCurrentPage(1); // Reset to page 1 whenever filters change
+    }, [searchQuery, itemsPerPage]);
+
+    const totalItems = filteredAndSortedData.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+    
+    const paginatedData = useMemo(() => {
+        return filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
+    }, [filteredAndSortedData, startIndex, itemsPerPage]);
 
     const handleClearFilters = () => {
         setSearchQuery("");
-        setFilters({ roles: [], facultyType: "" });
-        setSortOption("");
     };
 
     const handleViewEdit = (faculty: Faculty) => {
         setSelectedFaculty(faculty);
         setViewEditFacultyOpen(true);
+    };
+
+    const handleSortApply = (value: string) => {
+        console.log("Parent received sort:", value);
+        // Add logic to sort `filteredAndSortedData` based on `value`
+    };
+
+    const handleFilterApply = (tags: string[]) => {
+        console.log("Parent received filters:", tags);
+        // Add logic to filter `filteredAndSortedData` based on `tags`
+    };
+
+    const handleSortToggle = () => {
+        setSortOpen(!sortOpen);
+        setFilterOpen(false);
+    };
+
+    const handleFilterToggle = () => {
+        setFilterOpen(!filterOpen);
+        setSortOpen(false);
     };
 
     return (
@@ -150,111 +173,134 @@ export default function FacultyManagement({ faculties }: { faculties: RawFaculty
                 breadcrumbs={breadcrumbs}
                 pageHeader={pageHeader}
             >
-                {/* Filter & Search Section */}
-            <div className="mb-4">
-                <div className="flex flex-col items-start self-stretch w-full max-w-[1360px] bg-card rounded-[10px] border-[0.8px] border-primary/20 shadow-sm h-[134px] p-[24.8px] gap-4 font-dm">
-                    {/* Header */}
-                    <div className="flex flex-row items-center gap-2 self-stretch w-full h-6">
-                        <FilterIcon className="w-5 h-5 text-primary" />
-                        <h2 className="font-dm font-normal text-base leading-6 text-primary">
-                            Search, Sort, & Filter
-                        </h2>
-                    </div>
+                {/* Filter & Search Section 
+                    --- UPDATE: Used the existing Filter-Search component (StudentManagement variant)
+                               Sort and filter is different for faculty management*/}
+                
+                <FilterSearchSection 
+                    variant="DefenseManagement" 
+                    searchValue={searchQuery}
+                    onSearchChange={setSearchQuery}
+                    onSortApply={handleSortApply}
+                    onFilterApply={handleFilterApply}
+                    onClearFilters={handleClearFilters}
+                    showFilterButton={false}
+                />
 
-                    {/* Controls Row */}
-                    <div className="flex flex-row items-center gap-[10px] self-stretch w-full">
-                        {/* Search Bar */}
-                        <div className="flex-1">
-                            <SearchBar 
-                                variant="filter-section" 
-                                placeholder="Search by name, email, or ID..." 
-                                value={searchQuery} 
-                                onChange={setSearchQuery} 
-                            />
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="flex flex-row items-center gap-[10px]">
-                            {/* Sort Button with Dropdown */}
-                            <div className="relative">
-                                <Button 
-                                    ref={sortButtonRef}
-                                    variant="secondary" 
-                                    size="icon" 
-                                    className="rounded-lg border-none"
-                                    onClick={() => {
-                                        setSortOpen(!sortOpen);
-                                        setFilterOpen(false);
-                                    }}
-                                >
-                                    <Icon name="sortDefault" size={16} />
-                                </Button>
-                                <Dropdown 
-                                    isOpen={sortOpen} 
-                                    onClose={() => setSortOpen(false)}
-                                    triggerRef={sortButtonRef}
-                                >
-                                    <FacultySortDropdown 
-                                        onApply={setSortOption}
-                                        onClose={() => setSortOpen(false)}
-                                    />
-                                </Dropdown>
-                            </div>
-
-                            {/* Filter Button with Dropdown */}
-                            <div className="relative">
-                                <Button 
-                                    ref={filterButtonRef}
-                                    variant="secondary" 
-                                    size="icon" 
-                                    className="rounded-lg border-none"
-                                    onClick={() => {
-                                        setFilterOpen(!filterOpen);
-                                        setSortOpen(false);
-                                    }}
-                                >
-                                    <FilterIcon className="w-4 h-4" />
-                                </Button>
-                                <Dropdown 
-                                    isOpen={filterOpen} 
-                                    onClose={() => setFilterOpen(false)}
-                                    triggerRef={filterButtonRef}
-                                >
-                                    <FacultyFilterDropdown 
-                                        onApply={setFilters}
-                                        onClose={() => setFilterOpen(false)}
-                                    />
-                                </Dropdown>
-                            </div>
-
-                            {/* Clear Filter Button */}
-                            <Button 
-                                variant="negative" 
-                                className="px-4 py-2 gap-2 h-9 rounded-lg min-w-[101px]"
-                                onClick={handleClearFilters}
-                            >
-                                <span className="text-[13.33px] font-medium">Clear Filter</span>
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+                {/* Self-made Filter & Search Component for Faculty Management */}
+                {/* <FacultyFilterSearch 
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
+                    onClearSearch={handleClearSearch}
+                    sortOpen={sortOpen}
+                    filterOpen={filterOpen}
+                    onSortToggle={handleSortToggle}
+                    onFilterToggle={handleFilterToggle}
+                    onSortClose={() => setSortOpen(false)}
+                    onFilterClose={() => setFilterOpen(false)}
+                />
+            
             {/* Add Faculty Button */}
-            <div className="flex justify-end mb-6">
-                <Button onClick={() => setAddFacultyOpen(true)}> + Add Faculty </Button>
+            <div className="flex justify-end mt-6 mb-6">
+                <Button onClick={() => setAddFacultyOpen(true)}> 
+                    <Plus className="w-4 h-4" />
+                    Add Faculty 
+                </Button>
             </div>
             
-            {/* Data Table */}
+            {/* Faculty Data Table */}
             <FacultyTable 
-                data={filteredAndSortedData}
+                data={paginatedData}
                 onViewEdit={handleViewEdit}
             />
+
+            {/* 3. PAGINATION FOOTER */}
+            {totalItems > 0 ? (
+                <div className="border-t border-gray-200 bg-gray-50/50 dark:border-zinc-800 dark:bg-zinc-900/50 p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    
+                    {/* Left Side: Info & Limit Selector */}
+                    <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                        <span className="whitespace-nowrap">
+                            Showing <strong>{startIndex + 1}</strong> - <strong>{endIndex}</strong> of <strong>{totalItems}</strong>
+                        </span>
+                        
+                        {/* Optional: Rows per page selector */}
+                        <div className="hidden sm:flex items-center gap-2">
+                            <span className="text-xs">Rows per page</span>
+                            <Select
+                                value={itemsPerPage.toString()} 
+                                onValueChange={(val) => setItemsPerPage(Number(val))}
+                            >
+                                <SelectTrigger className="h-8 w-[70px]">
+                                    <SelectValue placeholder={itemsPerPage} />
+                                </SelectTrigger>
+                                <SelectContent side="top">
+                                    {[5, 10, 20, 50].map((size) => (
+                                        <SelectItem key={size} value={size.toString()}>
+                                            {size}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
+                    {/* Right Side: Navigation Buttons */}
+                    <div className="flex items-center gap-2">
+                        <Button
+                            size="icon"
+                            className="h-8 w-8 hidden sm:flex"
+                            onClick={() => setCurrentPage(1)}
+                            disabled={currentPage === 1}
+                            title="First Page"
+                        >
+                            <ChevronsLeft className="h-4 w-4"/>
+                        </Button>
+                        <Button
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                            disabled={currentPage === 1}
+                            title="Previous Page"
+                        >
+                            <ChevronLeft className="h-4 w-4"/>
+                        </Button>
+                        
+                        <div className="flex items-center justify-center min-w-[3rem] text-sm font-medium">
+                            Page {currentPage} of {totalPages}
+                        </div>
+
+                        <Button
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                            disabled={currentPage === totalPages}
+                            title="Next Page"
+                        >
+                            <ChevronRight className="h-4 w-4"/>
+                        </Button>
+                        <Button
+                            size="icon"
+                            className="h-8 w-8 hidden sm:flex"
+                            onClick={() => setCurrentPage(totalPages)}
+                            disabled={currentPage === totalPages}
+                            title="Last Page"
+                        >
+                            <ChevronsRight className="h-4 w-4"/>
+                        </Button>
+                    </div>
+                </div>
+            ) : (
+                <div className="p-8 text-center text-gray-500">
+                    No records found matching your search.
+                </div>
+            )}
             
             {/* Modals */}
             <AddFacultyModal 
                 isOpen={addFacultyOpen} 
-                onClose={() => setAddFacultyOpen(false)} 
+                onClose={() => setAddFacultyOpen(false)}
+                availableSections={availableSections}
             />
             
             <ViewEditFacultyModal 
@@ -264,6 +310,7 @@ export default function FacultyManagement({ faculties }: { faculties: RawFaculty
                     setSelectedFaculty(null);
                 }}
                 faculty={selectedFaculty}
+                availableSections={availableSections}
             />
         </ManagementLayout>
         

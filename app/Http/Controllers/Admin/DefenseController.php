@@ -171,6 +171,8 @@ class DefenseController extends Controller
             });
         }
 
+        // dd($defenses);
+
         return Inertia::render('Admin/management/defense', [
             'defenses' => $defenses,
             'activeYear' => $activeYear,

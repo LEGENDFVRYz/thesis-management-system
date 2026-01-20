@@ -69,6 +69,7 @@ class UserSeeder extends Seeder
             'name_prefix' => 'Dr.',
             'first_name' => 'Admin',
             'last_name' => 'User',
+            'is_regular' => 1,
         ]);
 
         $assignRoles($adminProfile->id, 'Admin');
@@ -87,7 +88,8 @@ class UserSeeder extends Seeder
         $facProfile = Faculty::firstOrCreate(['user_id' => $facUser->id], [
             'name_prefix' => $faker->randomElement(['Dr.', 'Prof.', 'Engr.']),
             'first_name' => 'Faculty',
-            'last_name' => 'User'
+            'last_name' => 'User',
+            'is_regular' => 1,
         ]);
 
         $assignRoles($facProfile->id, 'Panelist'); // Default role
@@ -114,7 +116,8 @@ class UserSeeder extends Seeder
             $p = Faculty::firstOrCreate(['user_id' => $u->id], [
                 'name_prefix' => $faker->randomElement(['Dr.', 'Prof.', 'Engr.']),
                 'first_name' => $roleName,
-                'last_name' => 'User'
+                'last_name' => 'User',
+                'is_regular' => 1,
             ]);
             
             // Apply the logic (Adviser -> Committee, All -> Panelist)

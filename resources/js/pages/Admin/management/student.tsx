@@ -1,27 +1,30 @@
 // IMPORTS
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import ManagementLayout from '@/pages/Admin/management/index';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 
 // SHARED COMPONENTS 
 import { NavFooter } from '@/components/nav-footer';
+import FilterSearchSection from '@/components/filter-search-section';
 
 // STUDENT MNGMT COMPONENTS
-import { FilterSection } from '../../../components/temp/student_management/student_filter_section';
 import { StudentTableView } from '../../../components/temp/student_management/student_table_view';
 import { GroupCardView } from '../../../components/temp/student_management/student_groupcard_view';
 import { ViewToggle } from '../../../components/temp/student_management/student_view_toggle';
 import { StudentProfileModal } from '../../../components/temp/student_management/student_viewStudprofile_modal';
 import { GroupProfileModal } from '../../../components/temp/student_management/student_viewgroup_modal';
 import { StudentImportModal } from '../../../components/temp/student_management/student_import_modal';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // TYPES AND SAMPLE DATA
 import { Student, GroupData, FilterState } from '../../../components/temp/student_management/student_interface';
 import { studentData, thesisTitles } from '../../../components/temp/student_management/student_sampleData';
 
 import { filterAndSortStudents, filterAndSortGroups, groupStudentsByCode } from '../../../components/temp/student_management/student_data_utilities';
+import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/icon-index';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 
 
 // Page Setup
@@ -38,7 +41,7 @@ const pageHeader: PageHeaderProps = {
     icon: (
         // paki coprrect nalang ng icon
         <Icon
-            name="calendarDefault"
+            name="proponentsDefault"
             className="w-8 h-8 text-primary"
         />
     ),
@@ -57,9 +60,12 @@ interface RawStudent {
   thesis_title: string | null;
 }
 
-
-
 export default function StudentManagement({ students }: { students: RawStudent[] }) {
+
+  // --- PAGINATION STATE ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<FilterState>({ blocks: [], specializations: [] });
   const [sortOption, setSortOption] = useState("");
@@ -116,6 +122,20 @@ export default function StudentManagement({ students }: { students: RawStudent[]
     return filterAndSortStudents(processedStudents, searchQuery, filters, sortOption);
   }, [searchQuery, filters, sortOption]);
 
+  // --- PAGINATION LOGIC (Applied to filteredAndSortedData) ---
+  useEffect(() => {
+      setCurrentPage(1); // Reset to page 1 whenever filters/search change
+  }, [searchQuery, filters, sortOption, itemsPerPage]);
+
+  const totalItems = filteredAndSortedData.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+
+  const paginatedData = useMemo(() => {
+      return filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredAndSortedData, startIndex, itemsPerPage]);
+
   const handleViewStudent = (student: Student) => {
     setSelectedStudent(student);
     setIsModalOpen(true);
@@ -160,19 +180,12 @@ export default function StudentManagement({ students }: { students: RawStudent[]
         pageHeader={pageHeader}
       >
         {/* Filter & Search Section */}
-        <FilterSection
-          searchQuery={searchQuery}
+        {/* UPDATE: Used the existing filter and search section component for student management*/}
+        <FilterSearchSection 
+          variant="DefenseManagement"
+          searchValue={searchQuery}
           onSearchChange={setSearchQuery}
-          filterOpen={filterOpen}
-          sortOpen={sortOpen}
-          onFilterToggle={handleFilterToggle}
-          onSortToggle={handleSortToggle}
-          onFilterClose={() => setFilterOpen(false)}
-          onSortClose={() => setSortOpen(false)}
-          onApplyFilter={setFilters}
-          onApplySort={setSortOption}
-          onClearFilters={handleClearFilters}
-          view={view}
+          showFilterButton={false}
         />
 
         {/* View Toggle and Import Button */}
@@ -193,16 +206,110 @@ export default function StudentManagement({ students }: { students: RawStudent[]
 
         {/* Data Views */}
         {view === 'table' ? (
-          <StudentTableView
-            students={filteredAndSortedData}
-            onViewStudent={handleViewStudent}
-          />
-        ) : (
+          <div className="rounded-md border border-gray-200 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden flex flex-col">
+              {/* Table Area */}
+              <div className="overflow-x-auto min-h-[400px]">
+                  <StudentTableView
+                      students={paginatedData} // Pass PAGINATED data
+                      onViewStudent={handleViewStudent}
+                  />
+                  
+                  {totalItems === 0 && (
+                      <div className="flex flex-col items-center justify-center py-12 text-center">
+                          <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-zinc-800 flex items-center justify-center mb-3">
+                              <Icon name="proponentsDefault" className="w-6 h-6 text-gray-400" />
+                          </div>
+                          <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">No students found</h3>
+                          <p className="text-xs text-gray-500 mt-1">Try adjusting your search or filters.</p>
+                      </div>
+                  )}
+              </div>
+
+              {/* Pagination Footer */}
+              {totalItems > 0 && (
+                  <div className="border-t border-gray-200 bg-gray-50/50 dark:border-zinc-800 dark:bg-zinc-900/50 p-4">
+                      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                          
+                          {/* Left: Results Counter */}
+                          <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                              <span className="whitespace-nowrap">
+                                  Showing <strong>{startIndex + 1}</strong> - <strong>{endIndex}</strong> of <strong>{totalItems}</strong>
+                              </span>
+                              
+                              <div className="hidden sm:flex items-center gap-2">
+                                  <span className="text-xs">Rows per page</span>
+                                  <Select
+                                      value={itemsPerPage.toString()} 
+                                      onValueChange={(val) => setItemsPerPage(Number(val))}
+                                  >
+                                      <SelectTrigger className="h-8 w-[70px]">
+                                          <SelectValue placeholder={itemsPerPage} />
+                                      </SelectTrigger>
+                                      <SelectContent side="top">
+                                          {[5, 10, 20, 50].map((size) => (
+                                              <SelectItem key={size} value={size.toString()}>
+                                                  {size}
+                                              </SelectItem>
+                                          ))}
+                                      </SelectContent>
+                                  </Select>
+                              </div>
+                          </div>
+
+                          {/* Right: Controls */}
+                          <div className="flex items-center gap-1">
+                              <Button
+                                  size="icon"
+                                  className="h-8 w-8 hidden sm:flex"
+                                  onClick={() => setCurrentPage(1)}
+                                  disabled={currentPage === 1}
+                                  title="First Page"
+                              >
+                                  <ChevronsLeft className="h-4 w-4"/>
+                              </Button>
+                              <Button
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                  disabled={currentPage === 1}
+                                  title="Previous Page"
+                              >
+                                  <ChevronLeft className="h-4 w-4"/>
+                              </Button>
+                              
+                              <div className="flex items-center justify-center min-w-[3rem] px-2 text-sm font-semibold text-gray-900 dark:text-white">
+                                  Page {currentPage} of {totalPages}
+                              </div>
+
+                              <Button
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                  disabled={currentPage === totalPages}
+                                  title="Next Page"
+                              >
+                                  <ChevronRight className="h-4 w-4"/>
+                              </Button>
+                              <Button
+                                  size="icon"
+                                  className="h-8 w-8 hidden sm:flex"
+                                  onClick={() => setCurrentPage(totalPages)}
+                                  disabled={currentPage === totalPages}
+                                  title="Last Page"
+                              >
+                                  <ChevronsRight className="h-4 w-4"/>
+                              </Button>
+                          </div>
+                      </div>
+                  </div>
+              )}
+          </div>
+      ) : (
           <GroupCardView
-            groups={filteredAndSortedGroups}
-            onViewGroup={handleViewGroup}
+              groups={filteredAndSortedGroups}
+              onViewGroup={handleViewGroup}
           />
-        )}
+      )}
 
         {/* Modals */}
         <StudentProfileModal 

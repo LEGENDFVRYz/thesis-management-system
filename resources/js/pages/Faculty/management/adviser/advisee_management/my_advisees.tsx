@@ -14,10 +14,11 @@ import {
 import { index } from '@/routes/faculty/adviser/my_advisees/index';
 import { PageHeaderProps, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import { Filter, Users } from 'lucide-react';
-import { useState } from 'react';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Filter, Users } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import AdviseeManagementLayout from '.';
 import { BlockAndTagsFilter } from './components/advisee-filter-search';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const breadcrumb: BreadcrumbItem[] = [
     {
@@ -82,26 +83,41 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
 
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-    const filteredAdvisees = displayAdvisees.filter((advisee) => {
-        const matchesSearch =
-            advisee.student_name
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase()) ||
-            advisee.student_id
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase()) ||
-            advisee.pup_webmail
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase());
+    // --- PAGINATION STATE ---
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
 
-        const matchesBlock = !selectedBlock || advisee.block === selectedBlock;
+    // --- FILTER LOGIC ---
+    const filteredAdvisees = useMemo(() => {
+        return displayAdvisees.filter((advisee) => {
+            const matchesSearch =
+                advisee.student_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                advisee.student_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                advisee.pup_webmail.toLowerCase().includes(searchQuery.toLowerCase());
 
-        const matchesTags =
-            selectedTags.length === 0 ||
-            selectedTags.includes(advisee.thesis_stage);
+            const matchesBlock = !selectedBlock || advisee.block === selectedBlock;
 
-        return matchesSearch && matchesBlock && matchesTags;
-    });
+            const matchesTags =
+                selectedTags.length === 0 ||
+                selectedTags.includes(advisee.thesis_stage);
+
+            return matchesSearch && matchesBlock && matchesTags;
+        });
+    }, [displayAdvisees, searchQuery, selectedBlock, selectedTags]);
+
+    // --- PAGINATION LOGIC ---
+    useEffect(() => {
+        setCurrentPage(1); // Reset to page 1 whenever filters change
+    }, [searchQuery, selectedBlock, selectedTags, itemsPerPage]);
+
+    const totalItems = filteredAdvisees.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+
+    const paginatedAdvisees = useMemo(() => {
+        return filteredAdvisees.slice(startIndex, startIndex + itemsPerPage);
+    }, [filteredAdvisees, startIndex, itemsPerPage]);
 
     return (
         <AdviseeManagementLayout
@@ -133,26 +149,26 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex flex-row items-center gap-[10px] font-dm">
+                    <div className="flex flex-row items-center gap-[2px] font-dm">
                         {/* Sort Button */}
-                        <Button
+                        {/* <Button
                             variant="secondary"
                             size="icon"
                             className="rounded-lg border-none font-dm"
                             onClick={() => setIsSortOpen(true)}
                         >
                             <Icon name="sortDefault" size={16} />
-                        </Button>
+                        </Button> */}
 
                         {/* Filter Button */}
-                        <Button
+                        {/* <Button
                             variant="secondary"
                             size="icon"
                             className="rounded-lg border-none font-dm"
                             onClick={() => setIsFilterOpen(true)}
                         >
                             <Filter className="h-4 w-4" />
-                        </Button>
+                        </Button> */}
 
                         {/* Clear Filter Button */}
                         <Button
@@ -173,100 +189,144 @@ export default function MyAdvisees({ advisees = [] }: MyAdviseesProps) {
             </div>
 
             {/* Table Section */}
-            <div className="overflow-x-auto rounded-lg border-1 border-[var(--primary)] bg-primary-foreground shadow">
-                <Table className="w-[1360px]">
-                    <TableHeader>
-                        <TableRow className="bg-primary hover:bg-primary">
-                            <TableHead className="text-center text-primary-foreground">
-                                Student ID
-                            </TableHead>
-                            <TableHead className="text-center text-primary-foreground">
-                                Student Name
-                            </TableHead>
-                            <TableHead className="text-center text-primary-foreground">
-                                PUP Webmail
-                            </TableHead>
-                            <TableHead className="text-center text-primary-foreground">
-                                Group Code
-                            </TableHead>
-                            <TableHead className="text-center text-primary-foreground">
-                                Block
-                            </TableHead>
-                            <TableHead className="text-center text-primary-foreground">
-                                Thesis Stage
-                            </TableHead>
-                            <TableHead className="text-center text-primary-foreground">
-                                Action
-                            </TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody className="[&_tr]:border-b-0">
-                        {filteredAdvisees.length > 0 ? (
-                            filteredAdvisees.map((advisee, index) => (
-                                <TableRow key={index}>
-                                    <TableCell className="text-center font-medium">
-                                        {advisee.student_id}
-                                    </TableCell>
-                                    <TableCell className="text-center">
-                                        {advisee.student_name}
-                                    </TableCell>
-                                    <TableCell className="text-center">
-                                        {advisee.pup_webmail}
-                                    </TableCell>
-                                    <TableCell className="text-center">
-                                        {advisee.group_code}
-                                    </TableCell>
-                                    <TableCell className="text-center">
-                                        {advisee.block}
-                                    </TableCell>
-                                    <TableCell className="text-center">
-                                        {advisee.thesis_stage}
-                                    </TableCell>
-                                    <TableCell className="text-center">
-                                        <Button
-                                            variant="tertiary"
-                                            size="sm"
-                                            onClick={() => {
-                                                setSelectedAdvisee(advisee);
-                                                setIsProfileOpen(true);
-                                            }}
-                                        >
-                                            View
-                                        </Button>
+            {/* Table Section */}
+            <div className="overflow-x-auto rounded-lg border-1 border-[var(--primary)] bg-primary-foreground shadow flex flex-col">
+                <div className="min-h-[400px]">
+                    <Table className="w-[1360px]">
+                        <TableHeader>
+                            <TableRow className="bg-primary hover:bg-primary">
+                                <TableHead className="text-center text-primary-foreground">Student ID</TableHead>
+                                <TableHead className="text-center text-primary-foreground">Student Name</TableHead>
+                                <TableHead className="text-center text-primary-foreground">PUP Webmail</TableHead>
+                                <TableHead className="text-center text-primary-foreground">Group Code</TableHead>
+                                <TableHead className="text-center text-primary-foreground">Block</TableHead>
+                                <TableHead className="text-center text-primary-foreground">Thesis Stage</TableHead>
+                                <TableHead className="text-center text-primary-foreground">Action</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody className="[&_tr]:border-b-0">
+                            {paginatedAdvisees.length > 0 ? (
+                                paginatedAdvisees.map((advisee, index) => (
+                                    <TableRow key={index} className="hover:bg-accent/5 transition-colors">
+                                        <TableCell className="text-center font-medium">{advisee.student_id}</TableCell>
+                                        <TableCell className="text-center">{advisee.student_name}</TableCell>
+                                        <TableCell className="text-center">{advisee.pup_webmail}</TableCell>
+                                        <TableCell className="text-center">{advisee.group_code}</TableCell>
+                                        <TableCell className="text-center">{advisee.block}</TableCell>
+                                        <TableCell className="text-center">{advisee.thesis_stage}</TableCell>
+                                        <TableCell className="text-center">
+                                            <Button
+                                                variant="tertiary"
+                                                size="sm"
+                                                onClick={() => {
+                                                    setSelectedAdvisee(advisee);
+                                                    setIsProfileOpen(true);
+                                                }}
+                                            >
+                                                View
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={7} className="h-64 text-center">
+                                        <div className="flex flex-col items-center justify-center text-alert-desc">
+                                            <Users className="mb-4 h-12 w-12 text-alert-desc" />
+                                            <p className="text-lg font-medium">No advisees found</p>
+                                            <p className="text-sm">
+                                                {searchQuery || selectedBlock || selectedTags.length > 0
+                                                    ? 'Try adjusting your search or filters'
+                                                    : 'Students will appear here once assigned'}
+                                            </p>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={7}
-                                    className="h-64 text-center"
-                                >
-                                    <div className="flex flex-col items-center justify-center text-alert-desc">
-                                        <Users className="mb-4 h-12 w-12 text-alert-desc" />
-                                        <p className="text-lg font-medium">
-                                            No advisees found
-                                        </p>
-                                        <p className="text-sm">
-                                            {searchQuery ||
-                                            selectedBlock ||
-                                            selectedTags.length > 0
-                                                ? 'Try adjusting your search or filters'
-                                                : 'Students will appear here once assigned'}
-                                        </p>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-                <div className="border-t border-gray-200 bg-primary-foreground px-6 py-4 text-center">
-                    <p className="text-sm text-alert-desc">
-                        {filteredAdvisees.length} of {displayAdvisees.length}{' '}
-                        Student Accounts
-                    </p>
+                            )}
+                        </TableBody>
+                    </Table>
                 </div>
+
+                {/* PAGINATION FOOTER */}
+                {totalItems > 0 && (
+                    <div className="border-t border-gray-200 bg-gray-50/50 dark:border-zinc-800 dark:bg-zinc-900/50 p-4">
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                            
+                            {/* Left Side: Info & Limit Selector */}
+                            <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                                <span className="whitespace-nowrap">
+                                    Showing <strong>{startIndex + 1}</strong> - <strong>{endIndex}</strong> of <strong>{totalItems}</strong>
+                                </span>
+                                
+                                <div className="hidden sm:flex items-center gap-2">
+                                    <span className="text-xs">Rows per page</span>
+                                    <Select
+                                        value={itemsPerPage.toString()} 
+                                        onValueChange={(val) => setItemsPerPage(Number(val))}
+                                    >
+                                        <SelectTrigger className="h-8 w-[70px]">
+                                            <SelectValue placeholder={itemsPerPage} />
+                                        </SelectTrigger>
+                                        <SelectContent side="top">
+                                            {[5, 10, 20, 50].map((size) => (
+                                                <SelectItem key={size} value={size.toString()}>
+                                                    {size}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+
+                            {/* Right Side: Navigation Buttons */}
+                            <div className="flex items-center gap-1">
+                                <Button
+                                    size="icon"
+                                    className="h-8 w-8 hidden sm:flex"
+                                    onClick={() => setCurrentPage(1)}
+                                    disabled={currentPage === 1}
+                                    title="First Page"
+                                >
+                                    <ChevronsLeft className="h-4 w-4"/>
+                                </Button>
+                                <Button
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                    disabled={currentPage === 1}
+                                    title="Previous Page"
+                                >
+                                    <ChevronLeft className="h-4 w-4"/>
+                                </Button>
+                                
+                                <div className="flex items-center justify-center min-w-[3rem] px-2 text-sm font-semibold text-gray-900 dark:text-white">
+                                    Page {currentPage} of {totalPages}
+                                </div>
+
+                                <Button
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                    disabled={currentPage === totalPages}
+                                    title="Next Page"
+                                >
+                                    <ChevronRight className="h-4 w-4"/>
+                                </Button>
+                                <Button
+                                    size="icon"
+                                    className="h-8 w-8 hidden sm:flex"
+                                    onClick={() => setCurrentPage(totalPages)}
+                                    disabled={currentPage === totalPages}
+                                    title="Last Page"
+                                >
+                                    <ChevronsRight className="h-4 w-4"/>
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
+            
 
             <Dialog open={isProfileOpen} onOpenChange={setIsProfileOpen}>
                 <DialogContent

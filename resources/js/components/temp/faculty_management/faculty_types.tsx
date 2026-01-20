@@ -1,15 +1,23 @@
 export interface Faculty {
-  id: string;
-  name: string;
-  email: string;
-  roles: string[];
-  type: string;
-  dateAdded: string;
-  initials?: string;
-  hasPhoto?: boolean;
-}
+    // Basic Info
+    id: string;
+    name: string;
+    email: string;
+    
+    // Name Parts (New fields required for Edit Modal)
+    firstName: string;
+    lastName: string;
+    prefix: string; // Corresponds to name_prefix/title
+    suffix: string;
 
-export interface FilterState {
-  roles: string[];
-  facultyType: string;
-}
+    // Roles & Details
+    roles: string[];
+    type: string; // 'Full-time' | 'Part-time'
+    dateAdded: string;
+    
+    // Optional / UI fields
+    initials?: string;
+    hasPhoto?: boolean;
+    adviseeBlock?: string;
+    adviseeYear?: string;
+} 

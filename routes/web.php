@@ -13,6 +13,7 @@ use App\Http\Controllers\Faculty\Adviser\AdviseeManagement\GroupComp;
 use App\Http\Controllers\Faculty\Adviser\AdviseeManagement\MyAdvisees;
 use App\Http\Controllers\Faculty\Adviser\AdviseeManagement\ProgressReport;
 use App\Http\Controllers\Faculty\Adviser\AdviseeManagement\ThesisReview;
+use App\Http\Controllers\Faculty\Adviser\AdviseeManagement\ChangeRequest;
 use App\Http\Controllers\Faculty\Adviser\EvaluationGrading;
 use App\Http\Controllers\Faculty\Committee\ProposalReview;
 use App\Http\Controllers\Faculty\Coordinator\Communication;
@@ -194,7 +195,9 @@ Route::prefix('faculty')->group(function () {
                 
                 # "Advisee Management" - PROGRESS
                 Route::get('progress', [ProgressReport::class, 'index'])->name('progress.index');
-                
+
+                # "Advisee Management" - CHANGE REQUEST
+                Route::get('change-request', [ChangeRequest::class, 'index'])->name('change_request.index');
                 
                 // ----------------------------------------------------------------------
                 // NOTE: DEFENSE MANAGEMENT OF ADVISER HAS BEEN JOINED WITH PANEL
@@ -350,6 +353,7 @@ Route::middleware(['auth', 'role:faculty', 'faculty.admin'])->prefix('admin')->g
 
         Route::get('faculty', [FacultyController::class, 'index'])->name('admin.management.faculty');
         Route::post('faculty', [FacultyController::class, 'store'])->name('admin.management.faculty.store');
+        Route::put('faculty/{id}', [FacultyController::class, 'update'])->name('admin.management.faculty.update');
 
         Route::get('academic-settings', [AcademicSettingController::class, 'index'])->name('admin.management.academic');
         Route::put('academic-settings', [AcademicSettingController::class, 'update'])->name('admin.management.academic.update');

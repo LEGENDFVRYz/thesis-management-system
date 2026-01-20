@@ -802,6 +802,17 @@
     }
 }
 
+/** Metric cards **/
+@layer utilities {
+    .text-alert-info { color: var(--alert-info); }
+    .text-alert-success { color: var(--alert-success); }
+    .text-alert-warning { color: var(--alert-warning); }
+
+    .bg-alert-info { background-color: var(--alert-info); }
+    .bg-alert-success { background-color: var(--alert-success); }
+    .bg-alert-warning { background-color: var(--alert-warning); }
+}
+
 @layer utilities {
   .text-body-1 { font-size: var(--body-1); }
   .text-body-2 { font-size: var(--body-2); }
