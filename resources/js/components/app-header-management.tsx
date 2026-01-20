@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react'; // Added useRef
 import { Link } from '@inertiajs/react'; 
 import { ChevronRight, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -28,26 +28,41 @@ export function GlobalNavDropdown({
 }: Props) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<string | null>(null);
+    
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const isAdmin = variant === 'admin';
     const isCoordinator = variant === 'coordinator';
     const isStudent = variant === 'student';
 
+    const handleMouseEnter = () => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        setIsMenuOpen(true);
+    };
+
+    const handleMouseLeave = () => {
+        timeoutRef.current = setTimeout(() => {
+            setIsMenuOpen(false);
+            setActiveTab(null);
+        }, 500); // 200ms grace period
+    };
+
+    const handleSubMouseEnter = (id: string) => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        setActiveTab(id);
+    };
+
     return (
         <div 
             className="relative inline-block"
-            onMouseEnter={() => setIsMenuOpen(true)}
-            onMouseLeave={() => {
-                setIsMenuOpen(false);
-                setActiveTab(null);
-            }}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
         >
             {/* --- TRIGGER BUTTON --- */}
             <Button
                 variant="primary"
                 className={cn(
                     "mx-1 border-none shadow-none",
-                    /* Added underline and ensured text remains yellow on hover */
                     "hover:text-primary-foreground-2 hover:underline"
                 )}
             >
@@ -60,14 +75,16 @@ export function GlobalNavDropdown({
 
             {/* --- MAIN DROPDOWN CONTAINER --- */}
             {isMenuOpen && (
-                <div className={cn(
-                    "absolute left-0 top-full mt-1 flex flex-col animate-in fade-in zoom-in-95 duration-200 z-[100]",
-                    "w-full"
-                )}>
+                <div 
+                    className={cn(
+                        "absolute left-0 top-full mt-1 flex flex-col animate-in fade-in zoom-in-95 duration-200 z-[100]",
+                        "w-full"
+                    )}
+                    onMouseEnter={handleMouseEnter} // Clear timer if user enters dropdown
+                >
                     
                     {isAdmin || isCoordinator || isStudent ? (
-                        /* --- ADMIN/COORDINATOR/STUDENT VARIANT --- */
-                        <div className="w-full rounded-b-xl bg-primary borderbackdrop-blur-sm">
+                        <div className="w-full rounded-b-xl bg-primary border border-background/10 backdrop-blur-sm shadow-xl">
                             {items[0]?.children?.map((sub, idx) => {
                                 const isCategory = sub.isHeader ||
                                     ["User Management", "System Configuration", "Defense Management", "Panel Endorsement", "Grading Management", "Thesis Management", "Progress Tracking"].includes(sub.title);
@@ -97,7 +114,7 @@ export function GlobalNavDropdown({
                             {items.map((item) => (
                                 <div 
                                     key={item.id} 
-                                    onMouseEnter={() => setActiveTab(item.id)} 
+                                    onMouseEnter={() => handleSubMouseEnter(item.id)} 
                                     className="relative"
                                 >
                                     <div 
@@ -114,13 +131,12 @@ export function GlobalNavDropdown({
 
                                     {/* --- Sub-Menu Fly-out --- */}
                                     {activeTab === item.id && item.children && (
-                                        <div className="absolute left-full top-0 ml-1 h-full w-full z-[110]">
+                                        <div 
+                                            className="absolute left-full top-0 ml-1 h-full w-full z-[110]"
+                                            onMouseEnter={handleMouseEnter} // Important for bridging the fly-out gap
+                                        >
                                             <div className="rounded-r-xl bg-primary border border-background/10 shadow-2xl animate-in fade-in slide-in-from-left-2 duration-200">
                                                 {item.children.map((sub, idx) => {
-                                                    /* INDENTATION LOGIC:
-                                                       These titles are aligned to the left (pl-4). 
-                                                       Everything else is indented (pl-10).
-                                                    */
                                                     const isSubCategory = sub.isHeader || 
                                                         [
                                                             "Advisee Management", 
@@ -161,3 +177,5 @@ export function GlobalNavDropdown({
         </div>
     );
 }
+
+
