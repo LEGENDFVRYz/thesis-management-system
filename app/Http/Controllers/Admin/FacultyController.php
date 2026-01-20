@@ -256,12 +256,14 @@ class FacultyController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        
+        $user = User::where('identity_no', $id)->firstOrFail();
         // 1. Validation
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'faculty_id' => 'required|string|max:50', // Identity No
-            'email' => 'required|email|max:255',
+            'faculty_id' => 'required|string|max:50|unique:users,identity_no,' . $user->id, // Identity No
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'type' => 'required|string',
             'roles' => 'array',
             'advisee_block' => 'nullable|string'

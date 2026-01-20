@@ -156,6 +156,7 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty, availableSectio
     handleRoleToggle: hookHandleRoleToggle,
     handleSubmit,
     resetValidation,
+    setErrors,
   } = useFacultyValidation();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -265,14 +266,26 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty, availableSectio
       };
 
       // 3. Send PUT Request
-      if (faculty?.id) {
+        if (faculty?.id) {
           router.put(`/admin/management/faculty/${faculty.id}`, payload, {
               onSuccess: () => {
                   setShowSaveSuccess(true);
-                  setIsEditing(false); // Switch back to view mode
+                  setIsEditing(false);
               },
-              onError: (errors) => {
-                  console.error("Update errors:", errors);
+              onError: (serverErrors) => {
+                  // --- FIX START: Map Backend Errors ---
+                  const mappedErrors: any = {};
+
+                  if (serverErrors.email) mappedErrors.pupWebmail = serverErrors.email;
+                  if (serverErrors.faculty_id) mappedErrors.facultyId = serverErrors.faculty_id;
+                  // Handle unique validation on update often returning 'identity_no' error
+                  if (serverErrors.identity_no) mappedErrors.facultyId = serverErrors.identity_no; 
+
+                  if (serverErrors.first_name) mappedErrors.firstName = serverErrors.first_name;
+                  if (serverErrors.last_name) mappedErrors.lastName = serverErrors.last_name;
+                  
+                  setErrors(mappedErrors);
+                  // --- FIX END ---
               }
           });
       }

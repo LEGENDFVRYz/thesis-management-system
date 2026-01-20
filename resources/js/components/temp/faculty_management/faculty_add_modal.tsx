@@ -76,6 +76,7 @@ export function AddFacultyModal({ isOpen, onClose, availableSections = [] }: Add
     handleRoleToggle,
     handleSubmit,
     resetValidation,
+    setErrors
   } = useFacultyValidation();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -139,9 +140,31 @@ export function AddFacultyModal({ isOpen, onClose, availableSections = [] }: Add
           onSuccess: () => {
               setShowSuccessPopup(true);
           },
-          onError: (errors) => {
-              console.error("Backend errors:", errors);
-          }
+          onError: (serverErrors) => {
+            // --- FIX START: Map Backend Errors to Frontend Fields ---
+            const mappedErrors: any = {};
+
+            // Map 'email' (DB) to 'pupWebmail' (Frontend)
+            if (serverErrors.email) {
+                mappedErrors.pupWebmail = serverErrors.email;
+            }
+            
+            // Map 'faculty_id' or 'identity_no' (DB) to 'facultyId' (Frontend)
+            if (serverErrors.faculty_id) {
+                mappedErrors.facultyId = serverErrors.faculty_id;
+            }
+            if (serverErrors.identity_no) { // Just in case backend validation uses identity_no
+                 mappedErrors.facultyId = serverErrors.identity_no;
+            }
+
+            // Map other fields if necessary
+            if (serverErrors.first_name) mappedErrors.firstName = serverErrors.first_name;
+            if (serverErrors.last_name) mappedErrors.lastName = serverErrors.last_name;
+
+            // Update the error state
+            setErrors(mappedErrors);
+            // --- FIX END ---
+        }
       });
     });
   };
