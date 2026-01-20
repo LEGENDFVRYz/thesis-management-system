@@ -16,72 +16,42 @@ class EndorsedPanelSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Get all Defense Schedules
+        // Eager load necessary relationships
         $schedules = DefenseMatrix::with([
-            // Eager load the chain to get to the Adviser's Faculty Assignment
             'endorsement.thesis.proposal.group.sectionAdviser.assignment'
         ])->get();
 
-        // Get the Panelist Role ID once
         $panelistRoleId = FacultyRole::where('role_name', 'Panelist')->value('id');
 
-        if (!$panelistRoleId) {
-            $this->command->error("Panelist role not found in database.");
-            return;
-        }
-
         foreach ($schedules as $schedule) {
-            
-            // 2. Identify the School Year (sy_id) of this specific defense group
-            // Path: DefenseMatrix -> Endorsement -> Thesis -> Proposal -> Group -> SectionAdviser -> FacultyAssignment
+            // 1. Trace the School Year
             $adviserAssignment = $schedule->endorsement?->thesis?->proposal?->group?->sectionAdviser?->assignment;
 
-            if (!$adviserAssignment) {
-                $this->command->warn("Skipping Schedule ID {$schedule->id}: Could not trace Adviser Assignment.");
-                continue;
-            }
+            if (!$adviserAssignment) continue; // Skip if broken data
 
             $targetSyId = $adviserAssignment->sy_id;
 
-            // 3. Query Panelists matching ONLY this sy_id
-            $validPanelists = FacultyAssignment::query()
-                ->where('role_id', $panelistRoleId)
-                ->where('sy_id', $targetSyId) // <--- CRITICAL FIX: Match the batch
+            // 2. Find Valid Panelists for this specific SY
+            $validPanelists = FacultyAssignment::where('role_id', $panelistRoleId)
+                ->where('sy_id', $targetSyId)
                 ->where('is_active', true)
-                // Exclude the adviser themselves from being a panelist (Conflict of Interest)
-                ->where('faculty_id', '!=', $adviserAssignment->faculty_id) 
+                ->where('faculty_id', '!=', $adviserAssignment->faculty_id) // Exclude Adviser
                 ->inRandomOrder()
-                ->get();
+                ->get()
+                ->unique('faculty_id'); // Ensure unique distinct physical people
 
-            // 4. Ensure Unique Physical Faculties
-            // (If a faculty has 2 active panelist roles in same SY for some reason, pick unique faculty_id)
-            $uniquePanelists = $validPanelists->unique('faculty_id');
+            if ($validPanelists->count() < 3) continue;
 
-            if ($uniquePanelists->count() < 3) {
-                // Optional: Fallback or skip if not enough panelists exist for this specific SY
-                // $this->command->info("Not enough panelists for SY ID: {$targetSyId}. Skipping.");
-                continue;
-            }
-
-            // 5. Pick 3-5 random candidates
-            $candidates = $uniquePanelists->take(rand(3, 5));
-
-            $confirmedCount = 0;
+            // 3. Invite 3 Panelists (All confirm for simplicity in seed data)
+            $candidates = $validPanelists->take(3);
 
             foreach ($candidates as $panelist) {
-                
-                // Logic: The first 3 ALWAYS confirm. The rest reject.
-                $shouldConfirm = ($confirmedCount < 3);
-
-                EndorsedPanel::create([
+                EndorsedPanel::firstOrCreate([
                     'defense_matrix_id' => $schedule->id,
-                    'panel_id'          => $panelist->id, // This ID is now guaranteed to match the SY
-                    'is_confirmed'      => $shouldConfirm,
+                    'panel_id'          => $panelist->id,
+                ], [
+                    'is_confirmed'      => true,
                 ]);
-
-                if ($shouldConfirm) {
-                    $confirmedCount++;
-                }
             }
         }
     }

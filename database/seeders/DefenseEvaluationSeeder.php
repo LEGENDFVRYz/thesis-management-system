@@ -8,6 +8,7 @@ use App\Models\FacultyAssignment;
 use App\Models\FacultyRole;
 use App\Models\GradingRubric;
 use App\Models\RubricScore;
+use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -18,12 +19,12 @@ class DefenseEvaluationSeeder extends Seeder
      */
     public function run(): void
     {
-
         // PRE-FETCH RUBRICS
         $rubrics = GradingRubric::all();
 
         if ($rubrics->isEmpty()) {
             $this->command->warn('No Grading Rubrics found. Scores will not be generated.');
+            return;
         }
 
         // Get valid Panelists for substitution logic
@@ -31,47 +32,62 @@ class DefenseEvaluationSeeder extends Seeder
         $allPanelists = FacultyAssignment::where('role_id', $panelistRole->id)->get();
 
         // Loop through every scheduled defense
-        // Eager load 'endorsedPanels' to see who was SUPPOSED to be there
         $defenses = DefenseMatrix::with('endorsedPanels')->get();
 
         foreach ($defenses as $defense) {
+            
+            // Parse the defense schedule
+            $scheduleTime = Carbon::parse($defense->defense_schedule);
+            
+            // Calculate a realistic "Evaluation Time" (e.g., 2 hours after start)
+            $evaluationTime = $scheduleTime->copy()->addHours(2);
 
-            // Filter only the 3 CONFIRMED panelists
+            // LOGIC CHECK: Only grade if this evaluation time is in the past relative to NOW
+            if (Carbon::now()->lessThan($evaluationTime)) {
+                // Skip upcoming defenses (Future)
+                continue; 
+            }
+
+            // Get the panels we seeded
             $confirmedPanels = $defense->endorsedPanels->where('is_confirmed', true);
 
-            if ($confirmedPanels->isEmpty()) {
-                continue;
-            }
+            if ($confirmedPanels->isEmpty()) continue;
 
             foreach ($confirmedPanels as $panelInvitation) {
                 
                 // ATTENDANCE LOGIC
-                // 90% chance the confirmed panel attends. 10% chance they are absent.
                 $isPresent = (rand(1, 100) <= 90);
                 
                 if ($isPresent) {
-                    // Scenario A: The confirmed panel grades the student
                     $evaluatorId = $panelInvitation->panel_id;
                 } else {
-                    // Scenario B: SUBSTITUTION
-                    // Pick a random faculty who is NOT one of the original invited panels
                     $excludedIds = $confirmedPanels->pluck('panel_id')->toArray();
+                    // Pick a random substitute who matches the SY if possible, 
+                    // or just random from list for simplicity in fallback
                     $substitute = $allPanelists->whereNotIn('id', $excludedIds)->random();
                     $evaluatorId = $substitute->id;
                 }
 
-                // Create the Evaluation
-                $evaluation = DefenseEvaluation::factory()->create([
+                // Create the Evaluation with REALISTIC DATE
+                $evaluation = DefenseEvaluation::create([
                     'defense_id'   => $defense->id,
                     'evaluator_id' => $evaluatorId,
+                    'grade'        => rand(80, 98),
+                    'comment'      => 'Good job, minor revisions needed.',
+                    'remarks'      => 'Minor Revisions',
+                    // OVERRIDE TIMESTAMPS
+                    'created_at'   => $evaluationTime,
+                    'updated_at'   => $evaluationTime,
                 ]);
 
-                // Create Rubric Scores for this specific evaluation
+                // Create Rubric Scores with SAME TIMESTAMP
                 foreach ($rubrics as $rubric) {
-                    RubricScore::factory()->create([
+                    RubricScore::create([
                         'evaluation_id' => $evaluation->id,
                         'rubric_id'     => $rubric->id,
-                        'rating'        => rand(1, 4),
+                        'rating'        => rand(2, 4),
+                        'created_at'    => $evaluationTime,
+                        'updated_at'    => $evaluationTime,
                     ]);
                 }
             }
