@@ -149,7 +149,8 @@ public function update(Request $request)
             // $users = User::all();
             // Notification::send($users, new AcademicYearAnnounced($academicYear));
             
-            return redirect()->route('admin.management.academic');
+            return back()->with('success', 'Academic Semester updated successfully');
+
         } 
         
         // SCENARIO 2: UPDATING ACADEMIC YEAR
@@ -198,13 +199,12 @@ public function update(Request $request)
                 ->delete();
 
             // Notify the users:
-            $users = User::first(); // try
-            // Notification::send($users, new AcademicYearAnnounced($newSemester->load('schoolYear')->toArray()));
-            $users->notify(
-                new AcademicYearAnnounced($newSemester->load('schoolYear'))
-            );
+            $users = User::all();
 
-            return redirect()->route('admin.management.academic');
+            // Send notification to all
+            Notification::send($users, new AcademicYearAnnounced($newSemester->load('schoolYear')));
+
+            return back()->with('success', 'Academic Year has change successfully');
         }
     }
 
