@@ -217,7 +217,7 @@ export const useFacultyValidation = () => {
     handleBlur,
     handleInputChange,
     handleRoleToggle,
-    handleSubmit,
+    handleSubmit, 
     resetValidation,
     setErrors,
   };
