@@ -16,10 +16,33 @@ import notifyDefault from '@/components/icons/ic_notify-Default.svg';
 import notifyHover from '@/components/icons/ic_notify-Hover.svg';
 import notifyClicked from '@/components/icons/ic_notify-Clicked.svg';
 
-type Stage = 'mor' | 'dp1' | 'dp2';
 
+
+// --- TYPES ---
+type Proponent = {
+    id: number;
+    name: string;
+};
+
+type ThesisData = {
+    id: string; 
+    title: string;
+    adviser: string;
+    block: string;
+    date: string;
+    time: string;
+    status: string; 
+    stage: 'mor' | 'dp1' | 'dp2';
+    proponents: Proponent[];
+};
+
+type Props = {
+    theses: ThesisData[];
+};
+
+// --- CONFIG ---
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Thesis Registry', href: registry().url }
+    { title: 'Thesis Registry', href: '#' }
 ];
 
 const pageHeader: PageHeaderProps = {
@@ -28,16 +51,7 @@ const pageHeader: PageHeaderProps = {
     icon: <img src={FolderIcon} className="w-8 h-8" alt="Registry Icon" />,
 };
 
-const allTheses = [
-    { id: '3301', title: "AI-Powered Enrollment Forecasting", adviser: "Dr. Cherry D. Casuat", block: "BSCPE 4-1", date: "January 02, 2026", time: "10:30 AM", status: "On-Track", stage: 'mor', proponents: ["Alice Doe", "Bob Smith", "Charlie Sy", "Diana Hood"] },
-    { id: '3302', title: "Blockchain Academic Records", adviser: "Engr. Maria Santos", block: "BSCPE 4-2", date: "January 01, 2026", time: "02:15 PM", status: "At-Risk", stage: 'mor', proponents: ["Edward Ray", "Fiona Glen", "George Tan", "Hannah Lee"] },
-    { id: '4401', title: "IoT Smart Agriculture System", adviser: "Dr. Arvin dela Cruz", block: "BSCPE 4-1", date: "December 15, 2025", time: "09:00 AM", status: "On-Track", stage: 'dp1', proponents: ["Ian Wright", "Julia Roberts", "Kevin Hart", "Luna Smith"] },
-    { id: '4402', title: "Cybersecurity Threat Detection", adviser: "Engr. Julius Cansino", block: "BSCPE 4-3", date: "December 12, 2025", time: "11:00 AM", status: "At-Risk", stage: 'dp1', proponents: ["Mike Ross", "Nina Dobrev", "Oscar Isaac", "Paula Garcia"] },
-    { id: '4501', title: "Autonomous Delivery Drone", adviser: "Dr. Rufo Marasigan Jr.", block: "BSCPE 4-2", date: "November 20, 2025", time: "01:30 PM", status: "On-Track", stage: 'dp2', proponents: ["Quinn Fabray", "Riley Reid", "Steve Jobs", "Erica Sinclair"] },
-    { id: '4602', title: "Real-time Sign Language Translator", adviser: "Engr. Adelino Racusa", block: "BSCPE 4-4", date: "November 18, 2025", time: "03:45 PM", status: "At-Risk", stage: 'dp2', proponents: ["Uma Thurman", "Victor Magtanggol", "Wendy Smith", "Ford Collins"] },
-];
-
-// Helper component for Interactive SVG Icons
+// --- HELPER ---
 const InteractiveSvgIcon = ({ defaultSrc, hoverSrc, clickedSrc, alt, onClick }: any) => {
     const [currentSrc, setCurrentSrc] = useState(defaultSrc);
     return (
@@ -53,32 +67,35 @@ const InteractiveSvgIcon = ({ defaultSrc, hoverSrc, clickedSrc, alt, onClick }: 
     );
 };
 
-/** --- MAIN COMPONENT --- */
-export default function Dashboard() {
-    const [selectedThesis, setSelectedThesis] = useState<any>(null);
+// --- MAIN COMPONENT ---
+export default function Registry({ theses }: Props) {
+    const [selectedThesis, setSelectedThesis] = useState<ThesisData | null>(null);
     const [isViewOpen, setIsViewOpen] = useState(false);
     const [isNotifySuccessOpen, setIsNotifySuccessOpen] = useState(false);
-    const [activeStage, setActiveStage] = useState<Stage>('mor');
+    const [activeStage, setActiveStage] = useState<'mor' | 'dp1' | 'dp2'>('mor');
 
+    // Filter Logic
     const filteredTheses = useMemo(() => 
-        allTheses.filter(t => t.stage === activeStage), 
-    [activeStage]);
+        theses.filter(t => t.stage === activeStage), 
+    [activeStage, theses]);
 
     return (
         <ThesisMonitoringLayout breadcrumbs={breadcrumbs} pageHeader={pageHeader}>
             <Head title="Thesis Registry" />
 
             <div className="flex flex-col min-h-screen -mt-4 -mx-4 -mb-4 bg-primary-foreground p-4 pt-0 gap-6">
+                
+                {/* Controls */}
                 <div className="flex justify-end w-full">
                     <StageSwitchToggle 
                         value={activeStage} 
-                        onChange={(stage) => setActiveStage(stage)} 
+                        onChange={(stage: any) => setActiveStage(stage)} 
                     />
                 </div>
 
                 <FilterSearchSection variant="DefenseManagement" />
 
-                {/* Table Section */}
+                {/* Table */}
                 <div className="rounded-lg border border-sidebar-border/70 overflow-hidden bg-card shadow-sm">
                     <Table>
                         <TableHeader className="bg-primary">
@@ -88,54 +105,63 @@ export default function Dashboard() {
                                 <TableHead className="text-primary-foreground text-center">Adviser</TableHead>
                                 <TableHead className="text-primary-foreground text-center">Block</TableHead>
                                 <TableHead className="text-primary-foreground text-center">Last Updated</TableHead>
-                                <TableHead className="text-primary-foreground text-center">Status</TableHead>
+                                {/* <TableHead className="text-primary-foreground text-center">Status</TableHead> */}
                                 <TableHead className="text-primary-foreground text-center">Action</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {filteredTheses.map((item) => (
-                                <TableRow key={item.id} className="text-center">
-                                    <TableCell className="text-[13px] font-dm">{item.id}</TableCell>
-                                    <TableCell className="text-left py-4 min-w-[200px]">
-                                        <span className="text-[13px] line-clamp-2 font-dm">{item.title}</span>
-                                    </TableCell>
-                                    <TableCell className="text-[13px] font-dm">{item.adviser}</TableCell>
-                                    <TableCell className="text-[13px] font-dm">{item.block}</TableCell>
-                                    <TableCell className="text-[13px] font-dm leading-tight">
-                                        <div className="flex flex-col">
-                                            <span>{item.date}</span>
-                                            <span>{item.time}</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span 
-                                            className="inline-flex items-center justify-center px-3 py-1 rounded-full text-[13px] font-dm border min-w-[90px]"
-                                            style={{
-                                                backgroundColor: `var(--${item.status === 'On-Track' ? 'completed' : 'canceled'}-bg)`,
-                                                borderColor: `var(--${item.status === 'On-Track' ? 'completed' : 'canceled'}-border)`,
-                                                color: `var(--${item.status === 'On-Track' ? 'completed' : 'canceled'}-font-color)`
-                                            }}
-                                        >
-                                            {item.status}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center justify-center gap-4">
-                                            <InteractiveSvgIcon 
-                                                defaultSrc={eyeDefault} hoverSrc={eyeHover} clickedSrc={eyeClicked} 
-                                                alt="View" onClick={() => { setSelectedThesis(item); setIsViewOpen(true); }} 
-                                            />
-                                            <InteractiveSvgIcon 
-                                                defaultSrc={notifyDefault} hoverSrc={notifyHover} clickedSrc={notifyClicked} 
-                                                alt="Notify" onClick={() => setIsNotifySuccessOpen(true)} 
-                                            />
-                                        </div>
+                            {filteredTheses.length > 0 ? (
+                                filteredTheses.map((item) => (
+                                    <TableRow key={item.id} className="text-center">
+                                        <TableCell className="text-[13px] font-dm">{item.id}</TableCell>
+                                        <TableCell className="text-left py-4 min-w-[200px]">
+                                            <span className="text-[13px] line-clamp-2 font-dm">{item.title}</span>
+                                        </TableCell>
+                                        <TableCell className="text-[13px] font-dm">{item.adviser}</TableCell>
+                                        <TableCell className="text-[13px] font-dm">{item.block}</TableCell>
+                                        <TableCell className="text-[13px] font-dm leading-tight">
+                                            <div className="flex flex-col items-center">
+                                                <span>{item.date}</span>
+                                                <span className="text-muted-foreground text-xs">{item.time}</span>
+                                            </div>
+                                        </TableCell>
+                                        {/* <TableCell>
+                                            <span 
+                                                className="inline-flex items-center justify-center px-3 py-1 rounded-full text-[13px] font-dm border min-w-[90px]"
+                                                style={{
+                                                    // Note: Backend sends 'On-Track', so this will always render the 'completed' style for now
+                                                    backgroundColor: `var(--${item.status === 'On-Track' ? 'completed' : 'canceled'}-bg)`,
+                                                    borderColor: `var(--${item.status === 'On-Track' ? 'completed' : 'canceled'}-border)`,
+                                                    color: `var(--${item.status === 'On-Track' ? 'completed' : 'canceled'}-font-color)`
+                                                }}
+                                            >
+                                                {item.status}
+                                            </span>
+                                        </TableCell> */}
+                                        <TableCell>
+                                            <div className="flex items-center justify-center gap-4">
+                                                <InteractiveSvgIcon 
+                                                    defaultSrc={eyeDefault} hoverSrc={eyeHover} clickedSrc={eyeClicked} 
+                                                    alt="View" onClick={() => { setSelectedThesis(item); setIsViewOpen(true); }} 
+                                                />
+                                                <InteractiveSvgIcon 
+                                                    defaultSrc={notifyDefault} hoverSrc={notifyHover} clickedSrc={notifyClicked} 
+                                                    alt="Notify" onClick={() => setIsNotifySuccessOpen(true)} 
+                                                />
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                                        No theses found for this stage.
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            )}
                         </TableBody>
                         <TableCaption className="border-t py-4 text-[16px] font-medium text-muted-foreground bg-white/50">
-                            {filteredTheses.length} of {filteredTheses.length} Theses
+                            {filteredTheses.length} Theses
                         </TableCaption>
                     </Table>
                 </div>
@@ -170,16 +196,17 @@ export default function Dashboard() {
                             <section>
                                 <h4 className="text-[16px] font-bold text-primary mb-3 uppercase font-dm">Proponents</h4>
                                 <div className="flex flex-wrap gap-2">
-                                    {selectedThesis.proponents.map((name: string, idx: number) => (
-                                        <div key={idx} className="flex items-center gap-1.5 bg-[#FFF9E5] border border-[#F5D67B] px-3 py-1.5 rounded-lg">
+                                    {selectedThesis.proponents.map((student) => (
+                                        <div key={student.id} className="flex items-center gap-1.5 bg-[#FFF9E5] border border-[#F5D67B] px-3 py-1.5 rounded-lg">
                                             <User className="w-3 h-3 text-[#A67C00]" />
-                                            <span className="text-[11px] font-bold text-[#A67C00]">{name}</span>
+                                            <span className="text-[11px] font-bold text-[#A67C00]">{student.name}</span>
                                         </div>
                                     ))}
                                 </div>
                             </section>
 
-                            {activeStage !== 'mor' && (
+                            {/* Conditional History View */}
+                            {/* {activeStage !== 'mor' && (
                                 <div className="pt-4 border-t border-dashed border-border/60 space-y-4">
                                     <div className="space-y-2">
                                         <h4 className="text-[16px] font-bold text-primary uppercase font-dm">MOR Completed</h4>
@@ -219,7 +246,7 @@ export default function Dashboard() {
                                         </div>
                                     )}
                                 </div>
-                            )}
+                            )} */}
                         </>
                     )}
                 </DialogContent>
