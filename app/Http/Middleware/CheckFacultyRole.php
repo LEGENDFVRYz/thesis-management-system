@@ -24,7 +24,6 @@ class CheckFacultyRole
                 abort(403, 'Access denied. Faculty credentials required.');
             }
 
-            // dd($user->faculty->roles->pluck('role_name')->toArray());
             $user_faculty_roles = $user->faculty->roles->pluck('role_name')->toArray();
 
             if (empty(array_intersect($faculty_role, $user_faculty_roles))) {

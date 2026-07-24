@@ -106,8 +106,6 @@ class DepartmentPoliciesController extends Controller
             'minimum'  => 'required|numeric|min:0|max:100',
         ]);
 
-        // dd($validated);
-
         // Update with validated data
         $criteria->update($validated);
 

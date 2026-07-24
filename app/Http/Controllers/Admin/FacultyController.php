@@ -92,20 +92,10 @@ class FacultyController extends Controller
             ];
         })->values()->toArray();
 
-        // dd($takenSections, $availableSections, $formattedSections);
-
         return Inertia::render('Admin/management/faculty', [
             'faculties'=> $faculties,
             'availableSections' => $formattedSections
         ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -236,22 +226,6 @@ class FacultyController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
@@ -350,13 +324,5 @@ class FacultyController extends Controller
             DB::rollBack();
             return back()->withErrors(['error' => 'Failed to update faculty: ' . $e->getMessage()]);
         }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

@@ -60,44 +60,10 @@ class DeadlineController extends Controller
             })
             ->toArray();
 
-        // dd($workflow_steps);
-
         return Inertia::render('Admin/management/deadline', [
             'workflow' => $workflow_steps,
             'allowed_stages' => $allowed_stages,
         ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
     }
 
     /**
@@ -167,16 +133,6 @@ class DeadlineController extends Controller
         $currentEvent->start_date = $validated['start_date'];
         $currentEvent->save();
 
-        // dd($currentEvent);
-
         return back()->with('success', 'Event schedule updated successfully.');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

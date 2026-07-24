@@ -99,8 +99,6 @@ class ThesisManagementController extends Controller
             return in_array($doc['status'], ['Pending', 'Reviewing', 'Revision']);
         });
 
-        // dd($documentsByMilestone);
-
         return Inertia::render('Student/management/thesis-management/documents', [
             'documentsByMilestone' => $documentsByMilestone,
             'group_id'             => $group->id,

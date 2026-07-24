@@ -127,8 +127,6 @@ class EvaluationController extends Controller
         // If adviser hasn't graded, we can't compute full grade yet, but showing partial data is better than nothing.
         $finalGrade = ($adviserGrade * 0.40) + ($panelAverage * 0.60);
 
-        // dd($adviserGrade);   
-
         return Inertia::render('Student/management/evaluation-and-grading', [
             'hasRecord' => true,
             'details' => [
@@ -146,53 +144,5 @@ class EvaluationController extends Controller
                 'has_adviser_graded' => $hasAdviserGraded
             ]
         ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

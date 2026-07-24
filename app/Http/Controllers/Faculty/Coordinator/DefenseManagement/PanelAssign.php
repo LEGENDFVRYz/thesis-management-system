@@ -92,11 +92,6 @@ class PanelAssign extends Controller
         ]);
     }
 
-    public function create()
-    {
-        //
-    }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -142,28 +137,13 @@ class PanelAssign extends Controller
         }
     }
 
-    public function show(string $id)
-    {
-        //
-    }
-
-    public function edit(string $id)
-    {
-        //
-    }
-
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
-        // Since we are syncing the full list of 3 panels, 
+        // Since we are syncing the full list of 3 panels,
         // the logic is identical to store.
         return $this->store($request);
-    }
-
-    public function destroy(string $id)
-    {
-        //
     }
 }

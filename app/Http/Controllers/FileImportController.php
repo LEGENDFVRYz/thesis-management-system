@@ -21,8 +21,6 @@ class FileImportController extends Controller
      */
     public function store(FileUploadRequest $request): JsonResponse
     {
-        // dd("dsada");
-        
         // Validate the file
         $request->validate([
             'file' => 'required|file|mimes:xlsx,csv,txt|max:2048', // adjust types and size

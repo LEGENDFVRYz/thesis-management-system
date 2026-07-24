@@ -25,7 +25,6 @@ class FacultyIsAdmin
         }
         
         // Collect the faculty all subroles                     // next time we check if inactive or not
-        // dd($user->faculty->roles->pluck('role_name'));
 
         // Check if the faculty has active admin access
         if (!$user->faculty || !$user->faculty->isAdmin()) {

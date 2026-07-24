@@ -115,50 +115,12 @@ class DefenseManagement extends Controller
             return $d->is_adviser || ($d->is_panelist && $d->panel_status == 1);
         })->values();
 
-        // dd(vars: [
-        //     'defenses'         => $defenses,
-        //     'pendingRequests'  => $pendingRequests,
-        //     'acceptedRequests' => $acceptedRequests,
-        // ]);
-
         return Inertia::render('Faculty/management/adviser/defense_management', [
             'pendingRequests'  => $pendingRequests,
             'acceptedRequests' => $acceptedRequests,
         ]);
     }
 
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -228,14 +190,5 @@ class DefenseManagement extends Controller
             DB::rollBack();
             throw $e;
         }
-    }
-
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

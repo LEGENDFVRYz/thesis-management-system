@@ -158,13 +158,7 @@ class Matrix extends Controller
         ]);
 
     }
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -208,45 +202,6 @@ class Matrix extends Controller
         // ===== 4️⃣ Redirect back with success message =====
         return redirect()->route('faculty.defense.index')
             ->with('success', 'Defense scheduled successfully!');
-            
-    }
 
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        // TASK 3.1: Timo       --part 3/4
-        // Note: Granted permission, you can add new route in routes/web.php dependent on your logic
-
-        // Same logic to create but you should update change data only
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        // TASK 3.1: Timo       --part 4/4
-        // Note: Granted permission, you can add new route in routes/web.php dependent on your logic
-
-        // Delete the selected date schedule
     }
 }

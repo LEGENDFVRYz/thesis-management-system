@@ -98,21 +98,11 @@ class ProposalReview extends Controller
             'evaluated'    => $grouped->get('evaluated', collect())->values(),
         ];
 
-        // ================= DEBUG (REMOVE AFTER CHECK) =================
-        // dd($data);
         return Inertia::render('Faculty/management/committee/proposal-review', [
                 'proposals' => $data,
                 // 'filters'   => $request->only('status'),
             ]
         );
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -160,38 +150,6 @@ class ProposalReview extends Controller
                 'created_at'   => now(),
                 'updated_at'   => now(),
             ]);
-    }
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        }
     }
 }

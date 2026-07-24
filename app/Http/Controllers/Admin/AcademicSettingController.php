@@ -60,8 +60,6 @@ class AcademicSettingController extends Controller
             ];
         };
 
-        // dd($active_semestral);
-
         return Inertia::render('Admin/management/academic', [
             'active_sy'     => $active_acad_year,
             'active_sem'    => $active_semestral,
@@ -70,41 +68,9 @@ class AcademicSettingController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
-public function update(Request $request)
+    public function update(Request $request)
     {
         // SCENARIO 1: UPDATING A SEMESTER
         if ($request->filled('sem_index')) {
@@ -115,8 +81,6 @@ public function update(Request $request)
                 'start_date' => 'required|date',
                 'end_date'   => 'required|date|after:start_date',
             ]);
-
-            // dd($request);
 
             $schoolYear = SchoolYear::where('year', $validated['sy_year'])->first();
 
@@ -142,8 +106,6 @@ public function update(Request $request)
                     ]
                 );
             });
-
-            // dd($newSemester->load('schoolYear'));
 
             // Notify the users:
             // $users = User::all();
@@ -190,8 +152,6 @@ public function update(Request $request)
                 );
             });
 
-            // dd($newSemester->load('schoolYear')->toArray());
-
             // Clear the old notifications
             DB::table('notifications')
                 ->where('type', AcademicYearAnnounced::class) // Target this specific notification class
@@ -206,13 +166,5 @@ public function update(Request $request)
 
             return back()->with('success', 'Academic Year has change successfully');
         }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

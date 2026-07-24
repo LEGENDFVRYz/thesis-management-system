@@ -79,7 +79,6 @@ class ResourceController extends Controller
         $file_ext = strtolower($resource->file_type);
         $fullPath = storage_path('app/public/resources/' . $filename . '.' . $file_ext);
 
-        // dd($fullPath);
         abort_if(!file_exists($fullPath), 404);
 
         return response()->download(

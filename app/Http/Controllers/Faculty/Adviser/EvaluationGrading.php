@@ -128,8 +128,6 @@ class EvaluationGrading extends Controller
             ->orderBy('tbl_defense_matrices.defense_schedule', 'asc')
             ->get();
 
-        // dd($myAdvisories);
-
         return Inertia::render('Faculty/management/adviser/evaluation_grading/eval_n_grading', [
             'myAdvisories' => $myAdvisories
         ]);
@@ -234,8 +232,6 @@ class EvaluationGrading extends Controller
                 'tbl_faculties.id'
             )
             ->first();
-
-        // dd($advisory);
 
         return Inertia::render('Faculty/management/adviser/evaluation_grading/document_review', [
             'advisory' => $advisory,
@@ -374,14 +370,6 @@ class EvaluationGrading extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
@@ -454,37 +442,5 @@ class EvaluationGrading extends Controller
         // Redirect back to the main table or show success
         return redirect()->route('faculty.management.adviser.eval_n_grading')
             ->with('success', 'Evaluation submitted successfully.');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }
