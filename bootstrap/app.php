@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Middleware\EnsureGuest;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
@@ -22,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
-        
+
         $middleware->alias([
             // main role checker    (either student or faculty)
             'role' => \App\Http\Middleware\CheckRole::class,
@@ -35,6 +34,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
             'guestAuth' => \App\Http\Middleware\Guest::class,
         ]);
+
+        $middleware->redirectGuestsTo(fn () => route('login'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\StudentLoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\Auth\StudentLoginRequest;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
-
 
 class StudentLoginController extends Controller
 {
@@ -22,7 +21,6 @@ class StudentLoginController extends Controller
         ]);
     }
 
-
     // Handle an incoming authentication request.
     public function store(StudentLoginRequest $request): RedirectResponse
     {
@@ -31,7 +29,6 @@ class StudentLoginController extends Controller
 
         return redirect()->intended(route('dashboard', absolute: false));
     }
-
 
     // Destroy an authenticated session.
     public function destroy(Request $request): RedirectResponse
@@ -46,6 +43,7 @@ class StudentLoginController extends Controller
         if ($referer && str_contains($referer, '/faculty')) {
             return redirect()->route('faculty.login');
         }
-        return redirect()->route('student.login');
+
+        return redirect()->route('login');
     }
 }

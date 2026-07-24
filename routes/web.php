@@ -68,7 +68,10 @@ GUEST ROUTES
 ==================================================================================
 */
 Route::middleware('guest')->group(function () {
-    Route::get('login', [StudentLoginController::class, 'create'])->name('student.login');
+    // Named 'login' (not 'student.login') because Fortify's own vendor code internally
+    // calls route('login') in a couple of places that aren't overridable via config
+    // (e.g. the two-factor challenge screen when there's no pending login session).
+    Route::get('login', [StudentLoginController::class, 'create'])->name('login');
     Route::post('login', [StudentLoginController::class, 'store'])->name('student.store');
 
     Route::get('/faculty/login', [FacultyLoginController::class, 'create'])->name('faculty.login');
