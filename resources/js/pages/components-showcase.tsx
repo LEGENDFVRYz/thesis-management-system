@@ -26,7 +26,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { login as studentLogin } from '@/routes/student';
+import { login as studentLogin } from '@/routes/';
 import { login as facultyLogin } from '@/routes/faculty';
 import { HomeIcon, SettingsIcon, BellIcon } from 'lucide-react';
 import { useState } from 'react';

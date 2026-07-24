@@ -1,5 +1,5 @@
 import RoleToggle from '@/components/role-toggle';
-import { login as studentLogin } from '@/routes/student';
+import { login as studentLogin } from '@/routes/';
 import InputError from '@/components/input-error';
 import { TextLink } from '@/components/text-link';
 import { Button } from '@/components/ui/button';
