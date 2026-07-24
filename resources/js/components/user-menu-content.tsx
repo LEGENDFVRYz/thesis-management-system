@@ -6,9 +6,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
-import { logout } from '@/routes/faculty';                  // temporary, since we dont have mobile yet
+import { logout as facultyLogout, dashboard as fcltyDashboard } from '@/routes/faculty';
+import { logout as studentLogout } from '@/routes/student';
 import { edit } from '@/routes/profile';
-import { dashboard as fcltyDashboard } from '@/routes/faculty';
 import { dashboard as adminDashboard } from '@/routes/admin';
 import { isSameUrl, isSectionUrl } from '@/lib/utils';
 import { type SharedData, type User } from '@/types';
@@ -30,6 +30,9 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
 
     const { user_info } = usePage<SharedData>().props;
     const { url } = usePage(); // current URL
+
+    // Use the logout route matching the user's active role
+    const logout = user_info?.user_role === 'student' ? studentLogout : facultyLogout;
 
     return (
         <>
