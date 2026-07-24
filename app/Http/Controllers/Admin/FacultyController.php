@@ -238,7 +238,7 @@ class FacultyController extends Controller
             'last_name' => 'required|string|max:255',
             'faculty_id' => 'required|string|max:50|unique:users,identity_no,' . $user->id, // Identity No
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'type' => 'required|string',
+            'type' => 'required|in:Full-time,Part-time',
             'roles' => 'array',
             'advisee_block' => 'nullable|string'
         ]);
@@ -272,7 +272,7 @@ class FacultyController extends Controller
                     'last_name' => $validated['last_name'],
                     'suffix' => $request->suffix,
                     'name_prefix' => $request->name_prefix,
-                    'is_regular' => ($validated['type'] === 'Full-Time' || $validated['type'] === 'Full-time') ? 1 : 0,
+                    'is_regular' => $validated['type'] === 'Full-time' ? 1 : 0,
                     'updated_at' => now(),
                 ]);
             }

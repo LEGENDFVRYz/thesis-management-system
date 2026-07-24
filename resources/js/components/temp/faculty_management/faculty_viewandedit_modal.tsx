@@ -189,10 +189,7 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty, availableSectio
         return r; 
     });
 
-    // Normalize Faculty Type
-    let typeVal = fac.type;
-    if (typeVal === "Full-time") typeVal = "Full-Time";
-    if (typeVal === "Part-time") typeVal = "Part-Time";
+    const typeVal = fac.type;
 
     return {
       firstName,
@@ -526,8 +523,8 @@ export function ViewEditFacultyModal({ isOpen, onClose, faculty, availableSectio
                         }}
                         className="flex flex-col gap-2"
                       >
-                        <RadioGroupItemWithLabel id="fullTime-edit" value="Full-Time" label="Full-Time" />
-                        <RadioGroupItemWithLabel id="partTime-edit" value="Part-Time" label="Part-Time" />
+                        <RadioGroupItemWithLabel id="fullTime-edit" value="Full-time" label="Full-time" />
+                        <RadioGroupItemWithLabel id="partTime-edit" value="Part-time" label="Part-time" />
                         {/* <RadioGroupItemWithLabel id="external-edit" value="External (Non-Faculty)" label="External (Non-Faculty)" /> */}
                       </RadioGroup>
                       {errors.facultyType && touched.facultyType && isSubmitAttempted && (
