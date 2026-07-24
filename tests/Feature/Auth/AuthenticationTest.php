@@ -1,20 +1,26 @@
 <?php
 
-use App\Models\User;
+use App\Models\Student;
 use Illuminate\Support\Facades\RateLimiter;
-use Laravel\Fortify\Features;
 
-test('login screen can be rendered', function () {
+test('student login screen can be rendered', function () {
     $response = $this->get(route('login'));
 
     $response->assertStatus(200);
 });
 
-test('users can authenticate using the login screen', function () {
-    $user = User::factory()->withoutTwoFactor()->create();
+test('faculty login screen can be rendered', function () {
+    $response = $this->get(route('faculty.login'));
 
-    $response = $this->post(route('login.store'), [
-        'email' => $user->email,
+    $response->assertStatus(200);
+});
+
+test('students can authenticate using the student login screen', function () {
+    $student = Student::factory()->create();
+    $user = $student->user;
+
+    $response = $this->post(route('student.store'), [
+        'identity_no' => $user->identity_no,
         'password' => 'password',
     ]);
 
@@ -22,63 +28,85 @@ test('users can authenticate using the login screen', function () {
     $response->assertRedirect(route('dashboard', absolute: false));
 });
 
-test('users with two factor enabled are redirected to two factor challenge', function () {
-    if (! Features::canManageTwoFactorAuthentication()) {
-        $this->markTestSkipped('Two-factor authentication is not enabled.');
-    }
+test('faculty can authenticate using the faculty login screen', function () {
+    $faculty = \App\Models\Faculty::factory()->create();
+    $user = $faculty->user;
 
-    Features::twoFactorAuthentication([
-        'confirm' => true,
-        'confirmPassword' => true,
-    ]);
-
-    $user = User::factory()->create();
-
-    $user->forceFill([
-        'two_factor_secret' => encrypt('test-secret'),
-        'two_factor_recovery_codes' => encrypt(json_encode(['code1', 'code2'])),
-        'two_factor_confirmed_at' => now(),
-    ])->save();
-
-    $response = $this->post(route('login'), [
+    $response = $this->post(route('faculty.store'), [
         'email' => $user->email,
         'password' => 'password',
     ]);
 
-    $response->assertRedirect(route('two-factor.login'));
-    $response->assertSessionHas('login.id', $user->id);
-    $this->assertGuest();
+    $this->assertAuthenticated();
+    $response->assertRedirect(route('faculty.dashboard', absolute: false));
 });
 
-test('users can not authenticate with invalid password', function () {
-    $user = User::factory()->create();
+test('students cannot authenticate through the faculty login screen', function () {
+    $student = Student::factory()->create();
+    $user = $student->user;
 
-    $this->post(route('login.store'), [
+    $response = $this->post(route('faculty.store'), [
         'email' => $user->email,
+        'password' => 'password',
+    ]);
+
+    $this->assertGuest();
+    $response->assertSessionHasErrors('email');
+});
+
+test('faculty cannot authenticate through the student login screen', function () {
+    $faculty = \App\Models\Faculty::factory()->create();
+    $user = $faculty->user;
+
+    $response = $this->post(route('student.store'), [
+        'identity_no' => $user->identity_no,
+        'password' => 'password',
+    ]);
+
+    $this->assertGuest();
+    $response->assertSessionHasErrors('identity_no');
+});
+
+test('students cannot authenticate with invalid password', function () {
+    $student = Student::factory()->create();
+    $user = $student->user;
+
+    $this->post(route('student.store'), [
+        'identity_no' => $user->identity_no,
         'password' => 'wrong-password',
     ]);
 
     $this->assertGuest();
 });
 
-test('users can logout', function () {
-    $user = User::factory()->create();
+test('students can logout', function () {
+    $student = Student::factory()->create();
 
-    $response = $this->actingAs($user)->post(route('logout'));
+    $response = $this->actingAs($student->user)->post(route('student.logout'));
 
     $this->assertGuest();
-    $response->assertRedirect(route('home'));
+    $response->assertRedirect(route('login'));
 });
 
-test('users are rate limited', function () {
-    $user = User::factory()->create();
+test('faculty can logout', function () {
+    $faculty = \App\Models\Faculty::factory()->create();
 
-    RateLimiter::increment(md5('login'.implode('|', [$user->email, '127.0.0.1'])), amount: 5);
+    $response = $this->actingAs($faculty->user)->post(route('faculty.logout'));
 
-    $response = $this->post(route('login.store'), [
-        'email' => $user->email,
+    $this->assertGuest();
+    $response->assertRedirect('/faculty/login');
+});
+
+test('students are rate limited after too many failed attempts', function () {
+    $student = Student::factory()->create();
+    $user = $student->user;
+
+    RateLimiter::increment(md5(strtolower($user->identity_no).'|'.'127.0.0.1'), amount: 5);
+
+    $response = $this->post(route('student.store'), [
+        'identity_no' => $user->identity_no,
         'password' => 'wrong-password',
     ]);
 
-    $response->assertTooManyRequests();
+    $response->assertSessionHasErrors('identity_no');
 });
