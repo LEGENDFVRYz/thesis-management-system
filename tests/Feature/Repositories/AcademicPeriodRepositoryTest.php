@@ -47,6 +47,10 @@ test('activeYearOrDefault returns the given fallback when no semester is active'
     expect($this->repository->activeYearOrDefault(fallback: (int) date('Y')))->toBe((int) date('Y'));
 });
 
+test('activeYearOrDefault defaults to the current year when no fallback is given', function () {
+    expect($this->repository->activeYearOrDefault())->toBe((int) date('Y'));
+});
+
 test('activeSemester returns the active semester with its school year loaded', function () {
     $schoolYear = SchoolYear::factory()->create(['year' => 2025]);
     $semester = Semester::factory()->create([

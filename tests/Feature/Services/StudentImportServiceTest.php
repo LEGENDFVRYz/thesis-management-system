@@ -32,7 +32,7 @@ test('creates a new student from a CSV row', function () {
     expect($user)->not->toBeNull();
     expect($user->role)->toBe('student');
     // Pinning known bug: hardcoded password, not a generated one.
-    expect(Hash::check('suffering', $user->password))->toBeTrue();
+    expect(Hash::check('password123', $user->password))->toBeTrue();
 
     $student = Student::where('user_id', $user->id)->first();
     expect($student)->not->toBeNull();

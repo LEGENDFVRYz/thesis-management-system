@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Centralizes lookup: 
+ * Centralizes lookup:
  *     - "currently active school year / semester"
  */
 class AcademicPeriodRepository
@@ -48,12 +48,14 @@ class AcademicPeriodRepository
 
     /**
      * Mirrors "join tbl_school_years to tbl_semesters where
-     * is_active" pattern duplicated across difference controllers:
-     *  
-     *     - $fallback is required (not defaulted)
+     * is_active" pattern duplicated across difference controllers.
+     *
+     *     - $fallback is optional (current year by default)
      */
-    public function activeYearOrDefault(int $fallback): int
+    public function activeYearOrDefault(?int $fallback = null): int
     {
+        $fallback ??= (int) date('Y');
+
         $activeYear = DB::table('tbl_school_years')
             ->join('tbl_semesters', 'tbl_school_years.id', '=', 'tbl_semesters.school_year_id')
             ->where('tbl_semesters.is_active', true)
