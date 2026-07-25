@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\SchoolYear;
-use App\Models\Semester;
+use App\Repositories\Academic\AcademicPeriodRepository;
 use App\Services\AcademicSettingService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,6 +11,7 @@ use Inertia\Inertia;
 class AcademicSettingController extends Controller
 {
     public function __construct(
+        protected AcademicPeriodRepository $academicPeriods,
         protected AcademicSettingService $academicSettings,
     ) {}
 
@@ -21,9 +21,7 @@ class AcademicSettingController extends Controller
     public function index()
     {
         // Pull the active semestral record
-        $active = Semester::with('schoolYear')
-            ->where('is_active', true)
-            ->first();
+        $active = $this->academicPeriods->activeSemester();
 
         // Get the value for active s.y. and sem
         $active_acad_year = $active?->schoolYear?->year;
@@ -32,10 +30,7 @@ class AcademicSettingController extends Controller
         // --- PREPARE THE DATA FOR THE DYNAMIC INPUTED DROPDOWM ---
         // Get all the school years that in the scoped range
         $currentYear = (int) date('Y');
-        $valid_sy = SchoolYear::with('semesters')
-            ->whereBetween('year', [$currentYear - 2, $currentYear + 1])
-            ->get()
-            ->keyBy('year');
+        $valid_sy = $this->academicPeriods->schoolYearsBetween($currentYear - 2, $currentYear + 1);
 
         // Make the options for dynamic dropdown in academic configuration
         $schoolYears = [];

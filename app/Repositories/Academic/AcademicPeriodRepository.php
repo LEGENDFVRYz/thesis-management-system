@@ -4,41 +4,53 @@ namespace App\Repositories\Academic;
 
 use App\Models\SchoolYear;
 use App\Models\Semester;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Centralizes the "what is the currently active school year / semester"
- * lookup that is duplicated (in raw-DB and Eloquent forms, with different
- * fallback values) across several Admin and Student controllers.
- *
- * This repository intentionally does NOT unify the differing fallback
- * values used at each call site (some use 2025, some use date('Y')) — the
- * fallback is a required parameter so each caller keeps its own current
- * behavior exactly, byte-for-byte, until that inconsistency is explicitly
- * decided on separately.
+ * Centralizes lookup: 
+ *     - "currently active school year / semester"
  */
 class AcademicPeriodRepository
 {
     /**
-     * Mirrors AcademicSettingController::index()'s existing Eloquent lookup.
+     * The currently active Semester, with its SchoolYear eager loaded.
      */
-    public function activeSchoolYear(): ?SchoolYear
+    public function activeSemester(): ?Semester
     {
-        $active = Semester::with('schoolYear')
+        return Semester::with('schoolYear')
             ->where('is_active', true)
             ->first();
-
-        return $active?->schoolYear;
     }
 
     /**
-     * Mirrors the raw-DB "join tbl_school_years to tbl_semesters where
-     * is_active" pattern duplicated across StudentController, FacultyController,
-     * DefenseController, MatrixController, and EvaluationController.
+     * Mirrors AcademicSettingController::index() existing Eloquent lookup.
+     */
+    public function activeSchoolYear(): ?SchoolYear
+    {
+        return $this->activeSemester()?->schoolYear;
+    }
+
+    /**
+     * School years (with their semesters) between $fromYear and $toYear
+     * inclusive, keyed by year — the data set AcademicSettingController's
+     * dropdown/date-range pickers are built from.
      *
-     * $fallback is required (not defaulted) so each call site must state its
-     * own existing fallback explicitly, rather than this repository silently
-     * picking one.
+     * @return Collection<int, SchoolYear>
+     */
+    public function schoolYearsBetween(int $fromYear, int $toYear): Collection
+    {
+        return SchoolYear::with('semesters')
+            ->whereBetween('year', [$fromYear, $toYear])
+            ->get()
+            ->keyBy('year');
+    }
+
+    /**
+     * Mirrors "join tbl_school_years to tbl_semesters where
+     * is_active" pattern duplicated across difference controllers:
+     *  
+     *     - $fallback is required (not defaulted)
      */
     public function activeYearOrDefault(int $fallback): int
     {

@@ -10,9 +10,9 @@ use Illuminate\Support\Facades\DB;
 use Notification;
 
 /**
- * Business logic behind the Academic Settings admin page: 
+ * Business logic behind the Academic Settings admin page:
  * updating semester schedule, and updating/creating a school year
- * 
+ *
  * This services contains:
  *    #1 - Update Semester
  *    #2 - Update Academic Year
@@ -88,12 +88,11 @@ class AcademicSettingService
         return $newSemester;
     }
 
-
     /**
      * -------------------------------------------------------------------------
      * **Helper** - Notification Sender
      * Clears unread AcademicYearAnnounced notifications and broadcasts the
-     * newly active academic period to all users. 
+     * newly active academic period to all users.
      */
     private function announceAcademicPeriodChange(Semester $semester): void
     {

@@ -46,3 +46,34 @@ test('activeYearOrDefault returns the given fallback when no semester is active'
     expect($this->repository->activeYearOrDefault(fallback: 2025))->toBe(2025);
     expect($this->repository->activeYearOrDefault(fallback: (int) date('Y')))->toBe((int) date('Y'));
 });
+
+test('activeSemester returns the active semester with its school year loaded', function () {
+    $schoolYear = SchoolYear::factory()->create(['year' => 2025]);
+    $semester = Semester::factory()->create([
+        'school_year_id' => $schoolYear->id,
+        'semester' => 1,
+        'is_active' => true,
+    ]);
+
+    $result = $this->repository->activeSemester();
+
+    expect($result)->not->toBeNull();
+    expect($result->id)->toBe($semester->id);
+    expect($result->schoolYear->id)->toBe($schoolYear->id);
+});
+
+test('activeSemester returns null when no semester is active', function () {
+    expect($this->repository->activeSemester())->toBeNull();
+});
+
+test('schoolYearsBetween returns school years with semesters keyed by year within range', function () {
+    $inRange = SchoolYear::factory()->create(['year' => 2025]);
+    Semester::factory()->create(['school_year_id' => $inRange->id]);
+    SchoolYear::factory()->create(['year' => 2020]);
+
+    $result = $this->repository->schoolYearsBetween(2024, 2026);
+
+    expect($result->keys()->all())->toBe([2025]);
+    expect($result->get(2025)->id)->toBe($inRange->id);
+    expect($result->get(2025)->semesters)->toHaveCount(1);
+});
