@@ -79,3 +79,51 @@ Follow these steps to get the application up and running locally:
 
    **Note:** You may change the application URL in the .env file if the default address is not available.
 
+
+## 🏛️ Authorship & Credits
+
+### **Leaders:**
+
+| Role | Name |
+| :--- | :--- |
+| **Project Managers** | Marielle Lois L.  Adolfo |
+| **Project Managers** | Arnel M. Galit |
+| **Lead Frontend Developer** | Frances Leigh G. Baay |
+| **Lead Backend Developer** | Sebastien Louis J. Cruz |
+| **Lead Database Designer** | Christian April Kim R. Villanueva |
+| **Lead UI/UX Designer** | Ken Andrea G. Legaspi |
+
+### **UI/UX Team:**
+
+* Ken Andrea Legaspi (**Lead**)
+* Zemerelin Iris Membrere
+* Katrina Pabuna
+* Angeline Laguador
+* Frances Leigh Baay
+* Helaena Mae Bacolod
+* John Claufer Sotomil
+
+### **Frontend Team:**
+
+* Frances Leigh Baay (**Lead**)
+* Louise Jamae Haduca
+* Marken Ricardo
+* Helaena Mae Bacolod
+* John Claufer Sotomil
+* Zemerelin Iris Membrere
+* Ken Andrea Legaspi
+* Katrina Pabuna
+* Angeline Laguador
+* Christian Español
+* Janna Elijah Penuela
+* Niña Fajardo
+* Christine Leanne Villanueva
+
+### **Backend Team:**
+
+* Sebastien Louis J. Cruz (**Lead**)
+* Christian April Kim Villanueva
+* Marielle Adolfo
+* Timothy Castillo
+* Trisha Maedelline Pablo
+* Arnel Galit
