@@ -5,37 +5,37 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\SchoolYear;
 use App\Models\Semester;
-use App\Models\User;
-use App\Notifications\AcademicYearAnnounced;
-use Carbon\Carbon;
+use App\Services\AcademicSettingService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
-use Notification;
 
 class AcademicSettingController extends Controller
 {
+    public function __construct(
+        protected AcademicSettingService $academicSettings,
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        // Pull the active semestral recorc
+        // Pull the active semestral record
         $active = Semester::with('schoolYear')
-                                ->where('is_active', true)
-                                ->first();
+            ->where('is_active', true)
+            ->first();
 
         // Get the value for active s.y. and sem
-        $active_acad_year               = $active?->schoolYear?->year;
-        $active_semestral               = $active?->semester;
+        $active_acad_year = $active?->schoolYear?->year;
+        $active_semestral = $active?->semester;
 
         // --- PREPARE THE DATA FOR THE DYNAMIC INPUTED DROPDOWM ---
         // Get all the school years that in the scoped range
         $currentYear = (int) date('Y');
         $valid_sy = SchoolYear::with('semesters')
-                                ->whereBetween('year', [$currentYear - 2, $currentYear + 1])
-                                ->get()
-                                ->keyBy('year');
+            ->whereBetween('year', [$currentYear - 2, $currentYear + 1])
+            ->get()
+            ->keyBy('year');
 
         // Make the options for dynamic dropdown in academic configuration
         $schoolYears = [];
@@ -48,22 +48,22 @@ class AcademicSettingController extends Controller
                 foreach ($sy->semesters as $sem) {
                     $sy_semesters[$sem->semester] = [
                         'start' => $sem->start_date?->toDateString(),
-                        'end'   => $sem->end_date?->toDateString(),
+                        'end' => $sem->end_date?->toDateString(),
                     ];
                 }
             }
 
             $schoolYears[$year] = [
-                'start'     => $sy?->start_date?->toDateString(),
-                'end'       => $sy?->end_date?->toDateString(),
+                'start' => $sy?->start_date?->toDateString(),
+                'end' => $sy?->end_date?->toDateString(),
                 'semesters' => $sy_semesters,
             ];
-        };
+        }
 
         return Inertia::render('Admin/management/academic', [
-            'active_sy'     => $active_acad_year,
-            'active_sem'    => $active_semestral,
-            'school_year'   => $schoolYears
+            'active_sy' => $active_acad_year,
+            'active_sem' => $active_semestral,
+            'school_year' => $schoolYears,
         ]);
     }
 
@@ -74,97 +74,31 @@ class AcademicSettingController extends Controller
     {
         // SCENARIO 1: UPDATING A SEMESTER
         if ($request->filled('sem_index')) {
-            
             $validated = $request->validate([
-                'sy_year'    => 'required|integer',
-                'sem_index'  => 'required|integer|in:0,1',
+                'sy_year' => 'required|integer',
+                'sem_index' => 'required|integer|in:0,1',
                 'start_date' => 'required|date',
-                'end_date'   => 'required|date|after:start_date',
+                'end_date' => 'required|date|after:start_date',
             ]);
 
-            $schoolYear = SchoolYear::where('year', $validated['sy_year'])->first();
-
-            if (!$schoolYear) {
-                return back()->withErrors(['year' => 'School year not found. Create the year first.']);
+            try {
+                $this->academicSettings->updateSemester($validated);
+            } catch (\RuntimeException $e) {
+                return back()->withErrors(['year' => $e->getMessage()]);
             }
 
-            // Ensures to deactivate ALL semesters in the database
-            $newSemester = DB::transaction(function () use ($schoolYear, $validated) {
-                
-                Semester::query()->update(['is_active' => false]);
-
-                // Update or Create the Semester record linked to that School Year
-                return Semester::updateOrCreate(
-                    [
-                        'school_year_id' => $schoolYear->id,
-                        'semester'       => $validated['sem_index']
-                    ],
-                    [
-                        'start_date' => $validated['start_date'],
-                        'end_date'   => $validated['end_date'],
-                        'is_active' => true 
-                    ]
-                );
-            });
-
-            // Notify the users:
-            // $users = User::all();
-            // Notification::send($users, new AcademicYearAnnounced($academicYear));
-            
             return back()->with('success', 'Academic Semester updated successfully');
-
-        } 
-        
-        // SCENARIO 2: UPDATING ACADEMIC YEAR
-        else {
-            $validated = $request->validate([
-                'year'       => 'required|integer',
-                'start_date' => 'required|date',
-                'end_date'   => 'required|date|after:start_date',
-            ]);
-
-            // Update or create the school year
-            $schoolYear =SchoolYear::updateOrCreate(
-                ['year' => $validated['year']],     // Search by unique year
-                [
-                    'start_date' => $validated['start_date'],
-                    'end_date'   => $validated['end_date'],
-                ]
-            );
-
-            // Get the currently active semester
-            // $activeSemester = Semester::where('is_active', true)->value('semester');
-
-            // Ensures to deactivate ALL semesters in the database
-            $newSemester = DB::transaction(function () use ($schoolYear, $validated) {
-                
-                Semester::query()->update(['is_active' => false]);
-
-                // Force Activate the First Semester (temporary soln -- depends, maybe we used the activeSemester)
-                return Semester::updateOrCreate(
-                    [
-                        'school_year_id' => $schoolYear->id,
-                        'semester'       => 0,              
-                    ],
-                    [
-                        'is_active' => true,
-                    ]
-                );
-            });
-
-            // Clear the old notifications
-            DB::table('notifications')
-                ->where('type', AcademicYearAnnounced::class) // Target this specific notification class
-                ->whereNull('read_at') // Only remove them if they haven't been read yet
-                ->delete();
-
-            // Notify the users:
-            $users = User::all();
-
-            // Send notification to all
-            Notification::send($users, new AcademicYearAnnounced($newSemester->load('schoolYear')));
-
-            return back()->with('success', 'Academic Year has change successfully');
         }
+
+        // SCENARIO 2: UPDATING ACADEMIC YEAR
+        $validated = $request->validate([
+            'year' => 'required|integer',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+        ]);
+
+        $this->academicSettings->updateAcademicYear($validated);
+
+        return back()->with('success', 'Academic Year has change successfully');
     }
 }
